@@ -4,8 +4,10 @@ from data_a import A
 from data_b import B
 from data_c import C,PNC,FR,EXTRA_C
 from data_ma import M,PNM
-C=C+M; PNC=dict(PNC); PNC.update(PNM)
+from data_worc import X,PNX
+C=C+M+X; PNC=dict(PNC); PNC.update(PNM); PNC.update(PNX)
 NEW2={m['id'] for m in M}
+NEW3={x['id'] for x in X}
 E=json.load(open('src/entries.json')); L=json.load(open('src/landmarks.json')); G2=json.load(open('src/g2.json'))
 def conf_of(s):
     s=s.lower()
@@ -56,6 +58,7 @@ for s in sites:
     if s['id'] in FR: s['fr']=FR[s['id']]
     if s['id'] in NEWIDS: s['new']=True
     if s['id'] in NEW2: s['new']=2
+    if s['id'] in NEW3: s['new']=3
     if s['id'] in EXTRA_C: s['story']=(s['story']+EXTRA_C[s['id']]).strip()
 ids=[s['id'] for s in sites]; assert len(ids)==len(set(ids)),[i for i in ids if ids.count(i)>1]
 json.dump(sites,open('build/sites.json','w'),indent=1,ensure_ascii=False)

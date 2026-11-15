@@ -98,7 +98,7 @@ function match(s){
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
-  if(F.fresh&&!(F.fresh===2?s.new===2:s.new)) return false;
+  if(F.fresh&&!(F.fresh===2?s.new>=2:s.new)) return false;
   const my=U.status[s.id]||'';
   if(F.my==='mine'){ if(!s.mine) return false; } else if(F.my!=='any'&&my!==F.my) return false;
   if(F.hideDone&&(my==='filmed'||my==='skip')) return false;
@@ -107,6 +107,7 @@ function match(s){
 function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.fresh=false;F.my='any';F.hideDone=false; }
 const PRESETS=[
+  ['Worcester County',()=>{ F.reg='worc'; }],
   ['New: Massachusetts',()=>{ F.fresh=2; }],
   ['New: around Albany',()=>{ F.fresh=true; F.max=135; }],
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
