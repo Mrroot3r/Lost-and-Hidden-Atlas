@@ -1,0 +1,534 @@
+{
+"L0": [
+42.6528,
+-73.7572,
+"POI",
+100,
+"New York State Capitol"
+],
+"L1": [
+42.6518,
+-73.7545,
+"PointAddress",
+96.45,
+"24 Eagle St, Albany, New York, 12207"
+],
+"L2": [
+42.65315,
+-73.75463,
+"StreetName",
+90,
+"Academy Park, Albany, New York, 12207"
+],
+"L3": [
+42.66501,
+-73.74361,
+"StreetName",
+82.95,
+"N Pearl St, Albany, New York, 12204"
+],
+"L4": [
+42.64138,
+-73.75909,
+"POI",
+100,
+"Schuyler Mansion State Historic Site"
+],
+"L5": [
+42.6347,
+-73.76291,
+"POI",
+100,
+"Historic Cherry Hill"
+],
+"L6": [
+42.65872,
+-73.75114,
+"POI",
+100,
+"Ten Broeck Mansion"
+],
+"L7": [
+42.65114,
+-73.75005,
+"StreetName",
+97.01,
+"Kiernan Way, Albany, New York, 12207"
+],
+"L8": [
+42.6514,
+-73.7835,
+"POI",
+85,
+"Administration Building"
+],
+"L9": [
+42.70616,
+-73.72881,
+"StreetName",
+100,
+"Albany Rural Cemetery, Albany, New York, 12204"
+],
+"L10": [
+42.66111,
+-73.75446,
+"POI",
+100,
+"Stephen & Harriet Myers Residence"
+],
+"L11": [
+42.69799,
+-73.85082,
+"StreetName",
+100,
+"Rapp Rd, Albany, New York, 12203"
+],
+"L12": [
+42.62272,
+-73.76382,
+"StreetName",
+97.01,
+"Normanskill St, Albany, New York, 12202"
+],
+"L13": [
+42.63457,
+-73.7494,
+"POI",
+100,
+"Crailo State Historic Site"
+],
+"L14": [
+42.73006,
+-73.69159,
+"POI",
+100,
+"Troy Savings Bank Music Hall"
+],
+"L15": [
+42.72948,
+-73.69223,
+"POI",
+92.32,
+"Hart-Cluett House"
+],
+"L16": [
+42.71002,
+-73.69896,
+"POI",
+100,
+"Burden Iron Works Museum"
+],
+"L17": [
+42.73252,
+-73.68997,
+"StreetName",
+82.5,
+"Fulton St, Troy, New York, 12180"
+],
+"L18": [
+42.74287,
+-73.67788,
+"POI",
+100,
+"Oakwood Cemetery Troy NY"
+],
+"L19": [
+42.73056,
+-73.68889,
+"POI",
+98.38,
+"Proctor's Fourth Street Theatre"
+],
+"L20": [
+42.78196,
+-73.70628,
+"StreetName",
+98.21,
+"Harmony Mills W, Cohoes, New York, 12047"
+],
+"L21": [
+42.76773,
+-73.68652,
+"POI",
+83.2,
+"Van Schaick"
+],
+"L22": [
+42.78931,
+-73.68184,
+"POI",
+99.98,
+"Erie Canal Lock E-2"
+],
+"L23": [
+42.81888,
+-73.9445,
+"Locality",
+78.93,
+"Stockade, Schenectady, New York"
+],
+"L24": [
+42.81237,
+-73.94179,
+"POI",
+98.5,
+"Proctor's Theater"
+],
+"L25": [
+42.8139,
+-73.93421,
+"POI",
+88.91,
+"Union Graduate College"
+],
+"L26": [
+42.80592,
+-73.93236,
+"POI",
+100,
+"Vale Cemetery"
+],
+"L27": [
+42.86608,
+-74.0331,
+"POI",
+100,
+"Mabee Farm Historic Site"
+],
+"L28": [
+42.82237,
+-73.95946,
+"POI",
+100,
+"Glen Sanders Mansion"
+],
+"L29": [
+42.64252,
+-73.75863,
+"POI",
+100,
+"Shaker Heritage Society"
+],
+"L30": [
+42.9395,
+-74.28203,
+"POI",
+100,
+"Schoharie Crossing State Historic Site"
+],
+"L31": [
+42.6773,
+-74.3018,
+"POI",
+100,
+"Old Stone Fort Museum"
+],
+"L32": [
+43.0782,
+-73.78433,
+"POI",
+80.47,
+"Congress Park"
+],
+"L33": [
+43.20128,
+-73.7454,
+"POI",
+93.91,
+"Ulysses S. Grant Cottage National Historic Landmark"
+],
+"L34": [
+42.22576,
+-73.86145,
+"POI",
+100,
+"Thomas Cole National Historic Site"
+],
+"L35": [
+42.21513,
+-73.8278,
+"POI",
+100,
+"Olana State Historic Site"
+],
+"L36": [
+42.34434,
+-73.84691,
+"POI",
+100,
+"Bronck Museum"
+],
+"L37": [
+42.25178,
+-73.78788,
+"Locality",
+75,
+"Hudson, New York"
+],
+"L38": [
+42.07115,
+-74.12259,
+"POI",
+100,
+"Overlook Mountain Trailhead"
+],
+"L39": [
+42.05405,
+-74.02635,
+"POI",
+100,
+"Opus 40"
+],
+"L40": [
+43.84168,
+-73.38754,
+"POI",
+100,
+"Fort Ticonderoga"
+],
+"L41": [
+43.76361,
+-74.62878,
+"POI",
+100,
+"Great Camp Sagamore"
+],
+"33": [
+42.70665,
+-73.71036,
+"PointAddress",
+100,
+"595 Broadway, Menands, New York, 12204"
+],
+"93": [
+42.31695,
+-73.78726,
+"POI",
+100,
+"Four Mile Point Preserve"
+],
+"sf2": [
+42.70424,
+-73.74225,
+"StreetName",
+90.85,
+"Schuyler Rd, Albany, New York, 12204"
+],
+"ws": [
+42.78602,
+-73.69205,
+"POI",
+96.25,
+"Lock"
+],
+"yc": [
+42.852,
+-73.88662,
+"POI",
+100,
+"Schenectady Yacht Club"
+],
+"aq": [
+42.84795,
+-73.90291,
+"POI",
+100,
+"Aqueduct Park"
+],
+"up": [
+44.08666,
+-74.05586,
+"POI",
+100,
+"Upper Works Trailhead"
+],
+"sc": [
+42.9395,
+-74.28203,
+"POI",
+100,
+"Schoharie Crossing State Historic Site"
+],
+"kw": [
+42.62491,
+-73.76855,
+"Locality",
+100,
+"Kenwood, New York"
+],
+"nl": [
+42.19799,
+-74.09532,
+"StreetName",
+97.07,
+"N Lake Rd, Haines Falls, New York, 12436"
+],
+"kf": [
+42.19342,
+-74.06319,
+"POI",
+100,
+"Kaaterskill Falls"
+],
+"wt": [
+42.73835,
+-73.70004,
+"POI",
+100,
+"Maplewood Historic Park"
+],
+"ph": [
+42.08017,
+-74.30824,
+"POI",
+100,
+"Phoenicia Railroad Station"
+],
+"pm": [
+42.77302,
+-73.69786,
+"Locality",
+75,
+"Cohoes, New York"
+],
+"bp": [
+42.70483,
+-73.69686,
+"StreetName",
+77.61,
+"Burden Ave, Troy, New York, 12180"
+],
+"hl": [
+43.74522,
+-73.49845,
+"Locality",
+100,
+"Hague, New York"
+],
+"ir": [
+43.92243,
+-73.53574,
+"Locality",
+100,
+"Ironville, New York"
+],
+"pk": [
+42.49358,
+-73.88347,
+"Locality",
+91.65,
+"Coeymans, New York"
+],
+"pa": [
+42.62702,
+-73.7604,
+"POI",
+100,
+"Port of Albany"
+],
+"rf": [
+42.93602,
+-74.19057,
+"POI",
+100,
+"Riverfront Center"
+],
+"mh": [
+42.82485,
+-73.93289,
+"POI",
+100,
+"Mohawk Harbor"
+],
+"lp": [
+42.6452,
+-73.76417,
+"POI",
+100,
+"Lincoln Park"
+],
+"wp": [
+42.6551,
+-73.77186,
+"StreetName",
+97.01,
+"Washington Park Rd, Albany, New York, 12203"
+],
+"cp": [
+42.65189,
+-73.74623,
+"POI",
+100,
+"Corning Preserve"
+],
+"nd": [
+42.44078,
+-73.66082,
+"Locality",
+100,
+"Niverville, New York"
+],
+"ap": [
+42.63434,
+-73.55358,
+"Locality",
+100,
+"Averill Park, New York"
+],
+"st": [
+42.39014,
+-73.78129,
+"Locality",
+100,
+"Stuyvesant, New York"
+],
+"gh": [
+41.78745,
+-74.72835,
+"StreetName",
+95.26,
+"Grossinger Rd, Liberty, New York, 12754"
+],
+"sh": [
+42.08759,
+-74.81988,
+"POI",
+100,
+"Shavertown Bridge"
+],
+"dq": [
+42.177,
+-74.14871,
+"Locality",
+77.39,
+"Elka Park, New York"
+],
+"lk": [
+42.79255,
+-73.84748,
+"StreetName",
+100,
+"Lock 7 Rd, Schenectady, New York, 12309"
+],
+"ew": [
+42.33541,
+-73.75915,
+"POI",
+77.23,
+"Empire Brickyard Wildlife Management Area"
+],
+"ce": [
+42.47203,
+-73.92582,
+"Locality",
+100,
+"Alcove, New York"
+],
+"gl": [
+42.86673,
+-73.89802,
+"StreetInt",
+99.9,
+"Glenridge Rd & Bruce Dr, Schenectady, New York, 12302"
+]
+}

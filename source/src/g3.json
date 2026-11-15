@@ -1,0 +1,65 @@
+{
+"a": [
+42.70979,
+-73.70655,
+"StreetInt",
+100,
+"4th St & Broadway, Watervliet, New York, 12189"
+],
+"b": [
+42.15109,
+-74.13111,
+"POI",
+100,
+"Roaring Kill"
+],
+"c": [
+42.20222,
+-74.05515,
+"POI",
+86.16,
+"North-South Lake Campground"
+],
+"d": [
+43.42559,
+-73.72024,
+"POI",
+94.9,
+"Prospect Mountain Hiking Trail"
+],
+"e": [
+42.1938,
+-74.0636,
+"POI",
+91.76,
+"Kaaterskill Falls"
+],
+"f": [
+42.20161,
+-74.05776,
+"StreetName",
+88.33,
+"Scutt Rd, Haines Falls, New York, 12436"
+],
+"g": [
+42.14537,
+-74.12176,
+"StreetName",
+87.99,
+"Pecoy Notch Rd, Elka Park, New York, 12427"
+],
+"h": [
+42.19799,
+-74.09532,
+"StreetName",
+85.63,
+"N Lake Rd, Haines Falls, New York, 12436"
+],
+"i": [
+42.12673,
+-74.82244,
+"StreetName",
+83.64,
+"Dibble Rd, Andes, New York, 13731"
+]
+}

@@ -1,0 +1,67 @@
+<div id="app">
+  <aside id="side">
+    <header class="top pad">
+      <div class="brand">
+        <span class="mark" aria-hidden="true"></span>
+        <div>
+          <h1>Lost &amp; Hidden Atlas</h1>
+          <p id="tagline">Upstate New York · Massachusetts</p>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button role="tab" id="tab-list" data-view="list" aria-selected="true">Places</button>
+        <button role="tab" id="tab-trip" data-view="trip" aria-selected="false">Trip<span class="n" id="trip-n">0</span></button>
+        <button role="tab" id="tab-log" data-view="log" aria-selected="false">Log</button>
+        <button role="tab" id="tab-guide" data-view="guide" aria-selected="false">Guide</button>
+      </nav>
+    </header>
+
+    <section class="view" id="v-list" aria-labelledby="tab-list">
+      <div class="tools pad">
+        <div class="row">
+          <label class="field"><span>Find a place</span>
+            <input type="search" id="q" placeholder="Name, town, or a word like coaster" autocomplete="off"></label>
+        </div>
+        <div class="row">
+          <label class="field"><span>Drive times from</span>
+            <select id="home"></select></label>
+          <button class="btn" id="add-place" title="Click the map to drop a new pin">+ Add a place</button>
+        </div>
+        <div class="presets" id="presets"></div>
+        <details class="filters" id="filters">
+          <summary><span>Filters</span><span id="fcount" class="mono"></span></summary>
+          <div class="fbody" id="fbody"></div>
+        </details>
+      </div>
+      <div class="pad">
+        <div class="count" style="padding-block:8px 4px">
+          <span id="count"></span>
+          <label class="row" style="gap:5px;flex-wrap:nowrap"><span class="lbl">Sort</span>
+            <select id="sort"><option value="time">Nearest first</option><option value="name">Name</option><option value="reg">Region</option><option value="left">Most left to see</option></select></label>
+        </div>
+      </div>
+      <div class="pad" id="linechip" hidden style="padding-bottom:6px"></div>
+      <ul id="list"></ul>
+    </section>
+
+    <section class="view" id="v-detail" hidden></section>
+    <section class="view" id="v-trip" hidden aria-labelledby="tab-trip"></section>
+    <section class="view" id="v-log" hidden aria-labelledby="tab-log"></section>
+    <section class="view guide" id="v-guide" hidden aria-labelledby="tab-guide"></section>
+  </aside>
+
+  <main id="stage">
+    <div id="map" role="application" aria-label="Map of sites"></div>
+    <div id="readout" class="float mono" hidden></div>
+    <div id="lbar" role="toolbar" aria-label="Map layers and tools"><div class="lscroll" id="lscroll"></div><div class="lfix" id="lfix"></div></div>
+    <div id="swipe" hidden><span class="side l" id="swipe-l"></span><span class="side r" id="swipe-r"></span><div class="grip" role="slider" aria-label="Compare divider" tabindex="0">&lt;&gt;</div></div>
+    <div id="addbar" class="float" hidden><span>Tap the map where the place is.</span><button class="btn sm" id="add-here" hidden>Use where I am</button><button class="btn sm" id="add-cancel">Cancel</button></div>
+    <div id="recbar" class="float" hidden><span class="recdot" aria-hidden="true"></span><span id="rec-t" class="mono" aria-live="off"></span><button class="btn sm" id="rec-note" type="button">+ Note</button><button class="btn sm" id="rec-stop" type="button">Stop</button><form id="rec-form" hidden><input type="text" id="rec-text" placeholder="What is here?" autocomplete="off" aria-label="Note"><button class="btn sm pri" type="submit">Save</button></form></div>
+    <div id="banner" class="float" hidden></div>
+    <div id="scrim" hidden></div>
+    <section id="sheet" hidden role="dialog" aria-labelledby="sheet-t">
+      <header><h2 id="sheet-t">Map options</h2><button class="btn pri" id="sheet-x" type="button">Done</button></header>
+      <div id="sheet-b"></div>
+    </section>
+  </main>
+</div>

@@ -1,0 +1,828 @@
+{
+"0": [
+42.65656,
+-73.74527,
+"PointAddress",
+100,
+"143 Montgomery St, Albany, New York, 12207"
+],
+"7": [
+42.6566,
+-73.76212,
+"PointAddress",
+100,
+"161 Washington Ave, Albany, New York, 12210"
+],
+"8": [
+42.64987,
+-73.75274,
+"StreetInt",
+100,
+"State St & N Pearl St, Albany, New York, 12207"
+],
+"9": [
+42.64971,
+-73.75482,
+"StreetInt",
+100,
+"Howard St & Lodge St, Albany, New York, 12207"
+],
+"10": [
+42.65148,
+-73.74951,
+"PointAddress",
+100,
+"575 Broadway, Albany, New York, 12207"
+],
+"12": [
+42.65094,
+-73.78134,
+"PointAddress",
+100,
+"150 New Scotland Ave, Albany, New York, 12208"
+],
+"13a": [
+42.66471,
+-73.74935,
+"StreetName",
+100,
+"Dudley Hts, Albany, New York, 12210"
+],
+"13b": [
+42.65434,
+-73.78027,
+"PointAddress",
+100,
+"75 New Scotland Ave, Albany, New York, 12208"
+],
+"14": [
+42.65074,
+-73.77194,
+"PointAddress",
+100,
+"113 Holland Ave, Albany, New York, 12208"
+],
+"15": [
+42.64428,
+-73.77402,
+"StreetName",
+100,
+"Mona Ter, Albany, New York, 12209"
+],
+"16a": [
+42.64235,
+-73.7565,
+"StreetInt",
+100,
+"S Pearl St & Arch St, Albany, New York, 12202"
+],
+"17": [
+42.65282,
+-73.75123,
+"StreetName",
+90.58,
+"Sheridan Ave, Albany, New York, 12207"
+],
+"18": [
+42.66289,
+-73.74365,
+"StreetInt",
+100,
+"Manor St & Broadway, Albany, New York, 12207"
+],
+"20": [
+42.65829,
+-73.74366,
+"StreetName",
+89.63,
+"N Lawrence St, Albany, New York, 12207"
+],
+"23": [
+42.6664,
+-73.79215,
+"StreetInt",
+100,
+"Madison Ave & S Allen St, Albany, New York, 12203"
+],
+"24": [
+42.64825,
+-73.76525,
+"StreetInt",
+100,
+"Myrtle Ave & S Swan St, Albany, New York, 12202"
+],
+"25": [
+42.66979,
+-73.77478,
+"POI",
+100,
+"Bleecker Stadium"
+],
+"26": [
+42.69647,
+-73.8309,
+"POI",
+96.42,
+"Six Mile Waterworks Park"
+],
+"27": [
+42.6703,
+-73.76316,
+"POI",
+100,
+"Tivoli Lake Preserve"
+],
+"28": [
+42.62809,
+-73.77187,
+"PointAddress",
+100,
+"799 S Pearl St, Albany, New York, 12202"
+],
+"29": [
+42.63154,
+-73.76531,
+"PointAddress",
+100,
+"625 S Pearl St, Albany, New York, 12202"
+],
+"31": [
+42.74699,
+-73.81451,
+"PointAddress",
+100,
+"830 Albany Shaker Rd, Loudonville, New York, 12211"
+],
+"32": [
+42.68303,
+-73.73211,
+"PointAddress",
+100,
+"100 Broadway, Menands, New York, 12204"
+],
+"33": [
+42.72146,
+-73.83728,
+"Locality",
+75,
+"Colonie, New York"
+],
+"34": [
+42.72189,
+-73.86026,
+"Locality",
+100,
+"Karner, New York"
+],
+"35": [
+42.7984,
+-73.73369,
+"Locality",
+100,
+"Crescent Station, New York"
+],
+"36": [
+42.7028,
+-73.91331,
+"StreetName",
+100,
+"Foundry Rd, Guilderland, New York, 12084"
+],
+"37": [
+42.68292,
+-73.95364,
+"StreetName",
+97.12,
+"Northeastern Industrial Park, Altamont, New York, 12009"
+],
+"38": [
+42.64449,
+-74.08691,
+"StreetName",
+100,
+"Knox Cave Rd, Altamont, New York, 12009"
+],
+"39": [
+42.65062,
+-74.00633,
+"POI",
+100,
+"Thacher State Park Overlook"
+],
+"40": [
+42.47542,
+-73.92679,
+"POI",
+100,
+"Indian Fields Cemetery"
+],
+"41": [
+42.47397,
+-73.79235,
+"Locality",
+92.17,
+"Coeymans Landing, New York"
+],
+"42": [
+42.58322,
+-73.758,
+"StreetName",
+100,
+"Van Wies Point Rd, Glenmont, New York, 12077"
+],
+"43": [
+42.7316,
+-73.69243,
+"PointAddress",
+100,
+"1 Monument Sq, Troy, New York, 12180"
+],
+"44": [
+42.72979,
+-73.69036,
+"POI",
+100,
+"Barker Park"
+],
+"45": [
+42.73092,
+-73.68709,
+"StreetInt",
+100,
+"Union St & Broadway, Troy, New York, 12180"
+],
+"47a": [
+42.73202,
+-73.69001,
+"StreetAddress",
+100,
+"12 3rd St, Troy, New York, 12180"
+],
+"47b": [
+42.73304,
+-73.68994,
+"StreetAddress",
+100,
+"323 River St, Troy, New York, 12180"
+],
+"47c": [
+42.7295,
+-73.69073,
+"StreetAddress",
+100,
+"73 3rd St, Troy, New York, 12180"
+],
+"50": [
+42.71923,
+-73.69872,
+"StreetName",
+88.86,
+"Madison St, Troy, New York, 12180"
+],
+"50b": [
+42.72053,
+-73.69391,
+"StreetInt",
+100,
+"2nd St & Ida St, Troy, New York, 12180"
+],
+"51": [
+42.72015,
+-73.68062,
+"POI",
+100,
+"Poestenkill Gorge Park"
+],
+"52": [
+42.72453,
+-73.68208,
+"POI",
+100,
+"Prospect Park"
+],
+"54a": [
+42.7656,
+-73.67353,
+"StreetInt",
+100,
+"109th St & 8th Ave, Troy, New York, 12182"
+],
+"54b": [
+42.76111,
+-73.67444,
+"POI",
+98.67,
+"Knickerbocker Park"
+],
+"55": [
+42.64341,
+-73.60845,
+"Locality",
+80,
+"West Sand Lake, New York"
+],
+"55b": [
+42.70186,
+-73.65653,
+"StreetInt",
+100,
+"Pawling Ave & Winter St, Troy, New York, 12180"
+],
+"56": [
+42.78046,
+-73.7047,
+"PointAddress",
+100,
+"100 N Mohawk St, Cohoes, New York, 12047"
+],
+"57": [
+42.77924,
+-73.70534,
+"StreetInt",
+100,
+"Vliet St & Harmony St, Cohoes, New York, 12047"
+],
+"61": [
+42.79015,
+-73.67826,
+"StreetInt",
+100,
+"Broad St & 3rd St, Waterford, New York, 12188"
+],
+"62": [
+42.79348,
+-73.68047,
+"StreetAddress",
+90.8,
+"2 Park Pl, Waterford, New York, 12188"
+],
+"64": [
+42.73272,
+-73.69965,
+"StreetInt",
+100,
+"23rd St & Broadway, Watervliet, New York, 12189"
+],
+"66": [
+42.63728,
+-73.74839,
+"StreetName",
+91.92,
+"Broadway, Rensselaer, New York, 12144"
+],
+"68b": [
+42.80865,
+-73.94202,
+"StreetInt",
+100,
+"Veeder Ave & Hamilton St, Schenectady, New York, 12305"
+],
+"69": [
+42.81825,
+-73.94569,
+"StreetInt",
+100,
+"Green St & Front St, Schenectady, New York, 12305"
+],
+"71": [
+42.81776,
+-73.94905,
+"StreetInt",
+100,
+"Washington Ave & Front St, Schenectady, New York, 12305"
+],
+"72": [
+42.81422,
+-73.9441,
+"StreetInt",
+100,
+"Erie Blvd & State St, Schenectady, New York, 12305"
+],
+"73": [
+42.81552,
+-73.9423,
+"PointAddress",
+100,
+"332 Erie Blvd, Schenectady, New York, 12305"
+],
+"76": [
+42.81151,
+-73.93927,
+"StreetAddress",
+100,
+"617 State St, Schenectady, New York, 12305"
+],
+"77": [
+42.79898,
+-73.92416,
+"PointAddress",
+100,
+"1241 State St, Schenectady, New York, 12304"
+],
+"80": [
+42.82311,
+-73.73168,
+"POI",
+100,
+"Crescent Park"
+],
+"82": [
+42.91297,
+-73.86797,
+"Locality",
+100,
+"Ballston Lake, New York"
+],
+"82b": [
+42.91123,
+-73.87684,
+"StreetInt",
+93.9,
+"Lake Hill Rd & Main St, Ballston Lake, New York, 12019"
+],
+"85": [
+42.78674,
+-73.971,
+"Locality",
+79.5,
+"Rotterdam, New York"
+],
+"86": [
+42.84355,
+-73.99186,
+"POI",
+99.9,
+"Glenville Business and Technology Park"
+],
+"87": [
+42.93919,
+-74.28158,
+"StreetAddress",
+100,
+"129 Schoharie St, Fort Hunter, New York, 12069"
+],
+"88": [
+42.93649,
+-74.19174,
+"StreetInt",
+100,
+"E Main St & Church St, Amsterdam, New York, 12010"
+],
+"89": [
+42.3582,
+-73.78746,
+"StreetName",
+100,
+"Ice House Rd, Stuyvesant, New York, 12173"
+],
+"90": [
+42.32981,
+-73.77318,
+"POI",
+100,
+"Gays Point"
+],
+"91a": [
+41.9337,
+-73.96676,
+"PointAddress",
+100,
+"200 North St, Kingston, New York, 12401"
+],
+"91b": [
+42.09423,
+-73.93482,
+"Locality",
+100,
+"Malden-on-Hudson, New York"
+],
+"91c": [
+41.95663,
+-73.96853,
+"Locality",
+100,
+"East Kingston, New York"
+],
+"94": [
+42.25178,
+-73.78788,
+"Locality",
+74.25,
+"Hudson, New York"
+],
+"95": [
+42.25362,
+-73.79039,
+"StreetInt",
+100,
+"Columbia St & N 3rd St, Hudson, New York, 12534"
+],
+"96": [
+41.92057,
+-73.98454,
+"StreetName",
+91.47,
+"Gallo Dr, Kingston, New York, 12401"
+],
+"97": [
+42.21759,
+-73.85945,
+"StreetName",
+100,
+"Prospect Ave, Catskill, New York, 12414"
+],
+"102": [
+42.15133,
+-74.48917,
+"PointAddress",
+100,
+"111 Clubhouse Dr, Highmount, New York, 12441"
+],
+"104": [
+42.07115,
+-74.12259,
+"POI",
+100,
+"Overlook Mountain Trailhead"
+],
+"105": [
+41.78745,
+-74.72835,
+"StreetName",
+100,
+"Grossinger Rd, Liberty, New York, 12754"
+],
+"106": [
+42.177,
+-74.14871,
+"StreetName",
+100,
+"Roaring Kill Rd, Elka Park, New York, 12427"
+],
+"107a": [
+42.21372,
+-74.21929,
+"Locality",
+100,
+"Hunter, New York"
+],
+"107b": [
+42.31161,
+-74.42676,
+"POI",
+100,
+"Pratt Rock"
+],
+"107c": [
+42.1748,
+-74.02018,
+"Locality",
+100,
+"Palenville, New York"
+],
+"107d": [
+41.88762,
+-74.29395,
+"Locality",
+100,
+"Samsonville, New York"
+],
+"108": [
+42.39175,
+-74.44959,
+"POI",
+100,
+"Gilboa Dam"
+],
+"108b": [
+42.40043,
+-74.45008,
+"PointAddress",
+100,
+"122 Stryker Rd, Gilboa, New York, 12076"
+],
+"111": [
+42.70823,
+-73.9574,
+"StreetName",
+100,
+"Frenchs Mill Rd, Altamont, New York, 12009"
+],
+"114": [
+43.07875,
+-73.786,
+"StreetInt",
+100,
+"Broadway & Congress St, Saratoga Springs, New York, 12866"
+],
+"115": [
+43.08101,
+-73.78602,
+"PointAddress",
+100,
+"385 Broadway, Saratoga Springs, New York, 12866"
+],
+"116": [
+43.07967,
+-73.78589,
+"StreetInt",
+100,
+"Broadway & Spring St, Saratoga Springs, New York, 12866"
+],
+"117": [
+43.19684,
+-73.74882,
+"POI",
+84.92,
+"Grant Cottage History Site"
+],
+"118": [
+43.00262,
+-73.8488,
+"StreetInt",
+100,
+"Front St & Milton Ave, Ballston Spa, New York, 12020"
+],
+"119": [
+43.05177,
+-73.73215,
+"StreetName",
+100,
+"Kaydeross Park Rd, Saratoga Springs, New York, 12866"
+],
+"120a": [
+43.41822,
+-73.71594,
+"StreetName",
+96.77,
+"Cortland St, Lake George, New York, 12845"
+],
+"120b": [
+43.41562,
+-73.70761,
+"POI",
+100,
+"Lake George Battlefield Park"
+],
+"121": [
+43.42522,
+-73.74453,
+"POI",
+100,
+"Prospect Mountain"
+],
+"121b": [
+43.42447,
+-73.72068,
+"StreetName",
+100,
+"Smith St, Lake George, New York, 12845"
+],
+"122": [
+43.4195,
+-73.71331,
+"PointAddress",
+100,
+"48 Canada St, Lake George, New York, 12845"
+],
+"123": [
+43.75511,
+-73.5593,
+"Locality",
+100,
+"Graphite, New York"
+],
+"124": [
+43.47068,
+-74.22452,
+"Locality",
+100,
+"Griffin, New York"
+],
+"126": [
+42.98857,
+-74.43314,
+"Locality",
+88.21,
+"Sammonsville, New York"
+],
+"126b": [
+43.92294,
+-73.5362,
+"POI",
+100,
+"Penfield Homestead Museum"
+],
+"127": [
+44.04292,
+-74.05842,
+"Locality",
+100,
+"Tahawus, New York"
+],
+"ep": [
+42.4518,
+-73.64801,
+"StreetName",
+100,
+"Electric Park Rd, Valatie, New York, 12184"
+],
+"cl": [
+42.64007,
+-73.55534,
+"POI",
+100,
+"Crystal Lake"
+],
+"bl": [
+42.8521,
+-73.89086,
+"StreetName",
+100,
+"Bluff Rd, Rexford, New York, 12148"
+],
+"fp": [
+42.92264,
+-73.80765,
+"StreetName",
+97.01,
+"Forest Dr, Ballston Lake, New York, 12019"
+],
+"kp": [
+42.78921,
+-73.67685,
+"StreetName",
+82.65,
+"Knickerbocker Ln, Waterford, New York, 12188"
+],
+"hm": [
+42.69185,
+-73.7246,
+"Locality",
+75.65,
+"Menands, New York"
+],
+"mid": [
+42.69185,
+-73.7246,
+"Locality",
+84.76,
+"Menands, New York"
+],
+"100": [
+42.2009,
+-74.06559,
+"StreetName",
+100,
+"Laurel House Rd, Haines Falls, New York, 12436"
+],
+"99": [
+42.19799,
+-74.09532,
+"StreetName",
+85.63,
+"N Lake Rd, Haines Falls, New York, 12436"
+],
+"98": [
+42.20161,
+-74.05776,
+"StreetName",
+100,
+"Scutt Rd, Haines Falls, New York, 12436"
+],
+"101": [
+42.19082,
+-74.01667,
+"StreetName",
+95.38,
+"Bogart Rd, Palenville, New York, 12463"
+],
+"103": [
+42.04702,
+-74.27197,
+"Locality",
+100,
+"Mount Tremper, New York"
+],
+"109a": [
+41.92723,
+-74.21561,
+"Locality",
+100,
+"Olivebridge, New York"
+],
+"109b": [
+41.93356,
+-74.22216,
+"POI",
+96.62,
+"Ashokan Reservoir Promenade West Parking Lot"
+],
+"110": [
+43.319,
+-73.9219,
+"POI",
+100,
+"Conklingville Dam"
+]
+}

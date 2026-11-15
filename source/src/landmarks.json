@@ -1,0 +1,338 @@
+[
+ {
+  "name": "New York State Capitol",
+  "q": "New+York+State+Capitol%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1867–1899",
+  "visit": "Public building; tours",
+  "why": "Stands behind the vanished 1809 capitol site"
+ },
+ {
+  "name": "Albany City Hall (H.H. Richardson)",
+  "q": "Albany+City+Hall%2C+24+Eagle+St%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1880–1883",
+  "visit": "Public building",
+  "why": "Replaced Hooker's 1832 hall after the 1880 fire"
+ },
+ {
+  "name": "Old Albany Academy (Philip Hooker)",
+  "q": "Old+Albany+Academy%2C+Academy+Park%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1815–1817",
+  "visit": "Offices; exterior",
+  "why": "One of only two surviving Hooker buildings"
+ },
+ {
+  "name": "First Church in Albany (Hooker)",
+  "q": "First+Church+in+Albany%2C+North+Pearl+St%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1798",
+  "visit": "Active church; exterior",
+  "why": "The other Hooker survivor"
+ },
+ {
+  "name": "Schuyler Mansion",
+  "q": "Schuyler+Mansion+State+Historic+Site%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1761–1765",
+  "visit": "State historic site; check season",
+  "why": "Pair with Schuyler Flatts burials"
+ },
+ {
+  "name": "Cherry Hill",
+  "q": "Historic+Cherry+Hill%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1787",
+  "visit": "House museum; check hours",
+  "why": "South End estate survivor near Mount Hope"
+ },
+ {
+  "name": "Ten Broeck Mansion",
+  "q": "Ten+Broeck+Mansion%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1797–1798",
+  "visit": "House museum; check hours",
+  "why": "Lumber-baron Arbor Hill above the Lumber District"
+ },
+ {
+  "name": "Kiernan Plaza (Union Station)",
+  "q": "Kiernan+Plaza%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1900",
+  "visit": "Office building; exterior",
+  "why": "The station Albany saved, unlike Troy and Schenectady"
+ },
+ {
+  "name": "SUNY Plaza (D&H Building, Marcus T. Reynolds)",
+  "q": "SUNY+System+Administration+Building%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1914–1918",
+  "visit": "Offices; exterior",
+  "why": "Reynolds also moved the Van Rensselaer Manor House"
+ },
+ {
+  "name": "Albany Rural Cemetery",
+  "q": "Albany+Rural+Cemetery%2C+Menands%2C+NY",
+  "town": "Menands",
+  "built": "1844–1845",
+  "visit": "Cemetery grounds",
+  "why": "Where the city's moved graves went"
+ },
+ {
+  "name": "Stephen and Harriet Myers Residence",
+  "q": "Stephen+and+Harriet+Myers+Residence%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1840s",
+  "visit": "Museum; call ahead",
+  "why": "Underground Railroad; Arbor Hill"
+ },
+ {
+  "name": "Rapp Road Historic District",
+  "q": "Rapp+Road%2C+Albany%2C+NY",
+  "town": "Albany",
+  "built": "1930s",
+  "visit": "Private homes; from the road",
+  "why": "Great Migration community in the Pine Bush"
+ },
+ {
+  "name": "Whipple bowstring truss bridge",
+  "q": "Normanskill+Farm%2C+Albany%2C+NY",
+  "town": "Normanskill Farm",
+  "built": "1867",
+  "visit": "City farm park",
+  "why": "Relocated survivor of a lost bridge era"
+ },
+ {
+  "name": "Fort Crailo",
+  "q": "Crailo+State+Historic+Site%2C+Rensselaer%2C+NY",
+  "town": "Rensselaer",
+  "built": "early 1700s",
+  "visit": "State historic site; check season",
+  "why": "Near the lost East Albany rail yards"
+ },
+ {
+  "name": "Troy Savings Bank Music Hall",
+  "q": "Troy+Savings+Bank+Music+Hall%2C+Troy%2C+NY",
+  "town": "Troy",
+  "built": "1875",
+  "visit": "Concert hall; inside for events",
+  "why": "Downtown survivor of the theater losses"
+ },
+ {
+  "name": "Hart-Cluett Museum",
+  "q": "Hart-Cluett+Museum%2C+Troy%2C+NY",
+  "town": "Troy",
+  "built": "1827",
+  "visit": "Museum; check hours",
+  "why": "Archive for Troy then-and-now photos"
+ },
+ {
+  "name": "Burden Iron Works office (museum)",
+  "q": "Burden+Iron+Works+Museum%2C+Troy%2C+NY",
+  "town": "Troy",
+  "built": "1881",
+  "visit": "Museum; call ahead",
+  "why": "Start point for the Burden wheel story"
+ },
+ {
+  "name": "W. & L.E. Gurley Building",
+  "q": "Gurley+Building%2C+Fulton+St%2C+Troy%2C+NY",
+  "town": "Troy",
+  "built": "1862",
+  "visit": "Exterior",
+  "why": "Rebuilt right after the Great Fire"
+ },
+ {
+  "name": "Oakwood Cemetery and Earl Chapel",
+  "q": "Oakwood+Cemetery%2C+Troy%2C+NY",
+  "town": "Troy",
+  "built": "1848 / 1890s",
+  "visit": "Cemetery grounds",
+  "why": "Burden and Troy's industrialists"
+ },
+ {
+  "name": "Proctor's Troy",
+  "q": "Proctor%27s+Theater%2C+Fourth+St%2C+Troy%2C+NY",
+  "town": "Troy",
+  "built": "1914",
+  "visit": "Exterior",
+  "why": "Long-vacant shell among demolished theaters"
+ },
+ {
+  "name": "Harmony Mills",
+  "q": "Harmony+Mills%2C+Cohoes%2C+NY",
+  "town": "Cohoes",
+  "built": "1860s–1870s",
+  "visit": "Apartments; exterior",
+  "why": "Built over original Erie locks; mastodon mill"
+ },
+ {
+  "name": "Van Schaick Mansion",
+  "q": "Van+Schaick+Mansion%2C+Cohoes%2C+NY",
+  "town": "Cohoes",
+  "built": "c.1735",
+  "visit": "Mostly exterior; call ahead",
+  "why": "Next to Matton Shipyard"
+ },
+ {
+  "name": "Waterford Flight (Barge Canal)",
+  "q": "Erie+Canal+Lock+E2%2C+Waterford%2C+NY",
+  "town": "Waterford",
+  "built": "1915",
+  "visit": "Canal park; locks run in boating season",
+  "why": "The canal that replaced the ruins in this doc"
+ },
+ {
+  "name": "Stockade Historic District",
+  "q": "Stockade+Historic+District%2C+Schenectady%2C+NY",
+  "town": "Schenectady",
+  "built": "1700s–1800s",
+  "visit": "Walkable streets",
+  "why": "Around Queen's Fort and the moved churchyard"
+ },
+ {
+  "name": "Proctors",
+  "q": "Proctors+Theatre%2C+Schenectady%2C+NY",
+  "town": "Schenectady",
+  "built": "1926",
+  "visit": "Working theater",
+  "why": "Successor to the first Proctor's, which opened onto the canal towpath"
+ },
+ {
+  "name": "Nott Memorial",
+  "q": "Nott+Memorial%2C+Union+College%2C+Schenectady%2C+NY",
+  "town": "Schenectady",
+  "built": "1858–1879",
+  "visit": "College campus",
+  "why": "Union College landmark"
+ },
+ {
+  "name": "Vale Cemetery",
+  "q": "Vale+Cemetery%2C+Schenectady%2C+NY",
+  "town": "Schenectady",
+  "built": "1857",
+  "visit": "Cemetery grounds",
+  "why": "Where two cemeteries were moved"
+ },
+ {
+  "name": "Mabee Farm",
+  "q": "Mabee+Farm+Historic+Site%2C+Rotterdam+Junction%2C+NY",
+  "town": "Rotterdam Junction",
+  "built": "c.1705",
+  "visit": "Historic site; check season",
+  "why": "Near Lock 23 and the canal trail"
+ },
+ {
+  "name": "Glen Sanders Mansion",
+  "q": "Glen+Sanders+Mansion%2C+Scotia%2C+NY",
+  "town": "Scotia",
+  "built": "parts 1713",
+  "visit": "Inn and restaurant",
+  "why": "Across from the Burr bridge abutment"
+ },
+ {
+  "name": "Watervliet Shaker Historic District",
+  "q": "Shaker+Heritage+Society%2C+Albany%2C+NY",
+  "town": "Colonie",
+  "built": "1776 on",
+  "visit": "Museum and grounds; check hours",
+  "why": "Next to the airport-area paupers' hill"
+ },
+ {
+  "name": "Schoharie Crossing",
+  "q": "Schoharie+Crossing+State+Historic+Site%2C+Fort+Hunter%2C+NY",
+  "town": "Fort Hunter",
+  "built": "1841 aqueduct",
+  "visit": "State historic site; trails",
+  "why": "Lost Fort Hunter and Queen Anne's Chapel"
+ },
+ {
+  "name": "Old Stone Fort",
+  "q": "Old+Stone+Fort+Museum%2C+Schoharie%2C+NY",
+  "town": "Schoharie",
+  "built": "1772",
+  "visit": "Museum; check season",
+  "why": "Revolutionary-era fortified church"
+ },
+ {
+  "name": "Canfield Casino and Congress Park",
+  "q": "Canfield+Casino%2C+Congress+Park%2C+Saratoga+Springs%2C+NY",
+  "town": "Saratoga Springs",
+  "built": "1870 / 1913",
+  "visit": "City park; museum in the casino",
+  "why": "Park built over Congress Hall"
+ },
+ {
+  "name": "Grant Cottage",
+  "q": "Ulysses+S.+Grant+Cottage%2C+Wilton%2C+NY",
+  "town": "Mount McGregor",
+  "built": "1885",
+  "visit": "State historic site; check season",
+  "why": "Beside the Hotel Balmoral site"
+ },
+ {
+  "name": "Thomas Cole House",
+  "q": "Thomas+Cole+National+Historic+Site%2C+Catskill%2C+NY",
+  "town": "Catskill",
+  "built": "1815",
+  "visit": "Museum; check season",
+  "why": "Painted the hotels and tanneries that vanished"
+ },
+ {
+  "name": "Olana",
+  "q": "Olana+State+Historic+Site%2C+Hudson%2C+NY",
+  "town": "Hudson",
+  "built": "1870–1872",
+  "visit": "Grounds; house by tour",
+  "why": "Views over the lost river industries"
+ },
+ {
+  "name": "Bronck House",
+  "q": "Bronck+Museum%2C+Coxsackie%2C+NY",
+  "town": "Coxsackie",
+  "built": "1663",
+  "visit": "Museum; check season",
+  "why": "Near Rattlesnake Island and the lost light"
+ },
+ {
+  "name": "Hudson–Athens Lighthouse",
+  "q": "Hudson-Athens+Lighthouse%2C+Hudson%2C+NY",
+  "town": "Hudson River",
+  "built": "1874",
+  "visit": "Boat tours in season",
+  "why": "Survivor at risk now"
+ },
+ {
+  "name": "Overlook Mountain House ruins",
+  "q": "Overlook+Mountain+Trailhead%2C+Woodstock%2C+NY",
+  "town": "Woodstock",
+  "built": "1920s",
+  "visit": "Uphill hike from the trailhead",
+  "why": "The one Catskill hotel ruin still standing"
+ },
+ {
+  "name": "Opus 40",
+  "q": "Opus+40%2C+Saugerties%2C+NY",
+  "town": "Saugerties",
+  "built": "1939 on",
+  "visit": "Sculpture park; check season",
+  "why": "Built in an abandoned bluestone quarry"
+ },
+ {
+  "name": "Fort Ticonderoga",
+  "q": "Fort+Ticonderoga%2C+Ticonderoga%2C+NY",
+  "town": "Ticonderoga",
+  "built": "1755",
+  "visit": "Museum; check season",
+  "why": "Near the graphite mines"
+ },
+ {
+  "name": "Great Camp Sagamore",
+  "q": "Great+Camp+Sagamore%2C+Raquette+Lake%2C+NY",
+  "town": "Raquette Lake",
+  "built": "1897",
+  "visit": "Guided tours; check season",
+  "why": "Survivor of the Adirondack resort era"
+ }
+]
