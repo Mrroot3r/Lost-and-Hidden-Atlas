@@ -1,4 +1,7 @@
 import json,math,re
+import os,sys
+if not os.path.exists('cache/osm/leads.json'):
+    print('no raw OpenStreetMap download here; keeping the existing build/leads.json'); sys.exit(0)
 d=json.load(open('cache/osm/leads.json')); els=d['elements'] if isinstance(d,dict) else d
 import os
 if os.path.exists('cache/osm/leads_ma.json'):

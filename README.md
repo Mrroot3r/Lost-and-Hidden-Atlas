@@ -15,8 +15,13 @@ A map tool for finding abandoned sites and ruins across upstate New York and Mas
 | `data/leads.json` | Unchecked leads from OpenStreetMap, loaded when the Leads layer is switched on |
 | `topo/` | One old USGS survey map per place, loaded when that place is opened |
 | `source/` | The files the site is built from |
+| `GUIDE.md` | How the Atlas works and how to add places to it. Start here if you want to help |
 
 Notes, progress, field logs and added places are saved in the visitor's own browser. Nothing is uploaded here.
+
+## Helping out
+
+New places, corrected pins and field reports are welcome. `GUIDE.md` explains the place format and the research rules that keep the map trustworthy.
 
 ## Data credits
 

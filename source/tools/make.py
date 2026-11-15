@@ -1,5 +1,5 @@
 import json,re,base64,os,datetime,hashlib,shutil
-R='/home/claude/atlas/'
+R=os.environ.get('ATLAS','/home/claude/atlas').rstrip('/')+'/'
 S=json.load(open(R+'build/sites.json')); HUBS=json.load(open(R+'build/hubs.json')); TM=json.load(open(R+'build/topo/meta.json'))
 topo={}
 for s in S:
