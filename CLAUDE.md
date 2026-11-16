@@ -12,6 +12,7 @@ Read `GUIDE.md` before doing anything. The short version:
 - Two more lead layers, vanished places (`tools/vanished.py`, the 2021 federal names file) and old mines and quarries (`tools/mines.py`, USGS records), cover nine Northeast states. Both are public-domain lists of unchecked leads; to add a state see GUIDE.md section 8, "Vanished places and old mines for a new state".
 - Run `tools/overpass_check.py` before touching the rail and canal lines: GUIDE.md section 10 has a standing note to re-download New York from Overpass once it answers.
 - "Near me" (the Near tab, and the buzz when you walk close to a place or lead) is in GUIDE.md section 9, and its Android half in section 12. After changing it run `tools/near_test.js`; after changing `NearList.java` run `tools/near_check.sh`.
+- The episode kit (chapters, description, route map picture from a field log) is in GUIDE.md section 9. After changing it run `tools/kit_test.js`. Its route picture must stay on a public-domain base map.
 - Never commit personal information; the repository is public.
 - Run `check.py` and the smoke test before opening the pull request.
 - If `git push` is refused, attach the repository to the session with push access, then push again (GUIDE.md section 3). Do not retry or look for another login.

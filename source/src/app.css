@@ -377,3 +377,11 @@ details>.phs{margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){.nmarrow{transition:none}}
 @media (max-width:820px){.tabs button{padding-inline:2px} .tabs .n{margin-left:3px;padding:1px 5px}}
 @media (max-width:820px){#near-k .chip{padding:6px 9px}}
+
+/* episode kit (in a finished field log) */
+.kit{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.kit h4{margin:0 0 4px;font-size:15px} .kit h5{margin:12px 0 4px;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+.kitstops{margin:8px 0 0;padding-left:22px} .kitstops li{padding:4px 0;cursor:pointer} .kitstops b{display:block;font-weight:600} .kitstops small{color:var(--mute);font-size:12px}
+.kitpre{margin:0;padding:8px 10px;background:var(--chip);border-radius:8px;font-family:var(--fm);font-size:12.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.kitpic img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);margin-top:8px}
+.kit select{flex:0 1 auto}

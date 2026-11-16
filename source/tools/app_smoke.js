@@ -32,6 +32,7 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
         { kind: 'image', id: 1, name: 'P1.jpg', taken: (o.from + 62) * 1000, modified: o.from + 62, bucket: 'Camera' },
         { kind: 'image', id: 2, name: 'shot.png', taken: (o.from + 63) * 1000, modified: o.from + 63, bucket: 'Screenshots' },
         { kind: 'video', id: 3, name: 'V1.mp4', taken: (o.from + 70) * 1000, modified: o.from + 70, duration: 5000, bucket: 'Camera' }] })
+      else if (m === 'share') { s.lastShare = { name: o.name, mime: o.mime, b64: (o.base64 || '').length, text: (o.text || '').length }; res({}); }
       else if (m === 'targets') { s.targets = { r: o.r, n: (o.list || []).length, first: (o.list || [])[0] }; res({}); }   // Near me: what the recorder should buzz near
       else if (m === 'marks') res({ marks: (s.marks || []).slice(o.from || 0) })
       else if (m === 'saveBackup') res({ where: 'Download/Lost Hidden Atlas/' + o.name, bytes: o.text.length })
@@ -72,6 +73,12 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   ok('the log lists them', /1 photo · 1 video/.test(await page.locator('.logitem').first().innerText()));
   await page.getByRole('button', { name: 'Share route (GPX)' }).click(); await page.waitForTimeout(400);
   ok('GPX goes to the Android share sheet', (await phone()).calls.includes('share'));
+  await page.getByRole('button', { name: 'Episode kit' }).click(); await page.waitForTimeout(400);
+  ok('Episode kit opens on a finished log', /Episode kit/.test(await page.locator('.kit').innerText()) && await page.getByRole('button', { name: 'Share the whole kit' }).count() === 1);
+  await page.getByRole('button', { name: 'Share the whole kit' }).click(); await page.waitForTimeout(500);
+  let sh = (await phone()).lastShare || {}; ok('the kit text goes to the share sheet', /-episode-kit\.txt$/.test(sh.name || '') && sh.text > 300 && sh.mime === 'text/plain', JSON.stringify(sh));
+  await page.getByRole('button', { name: 'Draw the route map' }).click(); await page.waitForSelector('.kitpic img', { timeout: 60000 }); await page.getByRole('button', { name: 'Share the picture' }).click(); await page.waitForTimeout(1500);
+  sh = (await phone()).lastShare || {}; ok('the route map picture goes to the share sheet as a PNG', /-route-map\.png$/.test(sh.name || '') && sh.b64 > 20000 && sh.mime === 'image/png' && sh.text === 0, JSON.stringify(sh));
   await page.getByRole('button', { name: 'Delete' }).click(); await page.getByRole('button', { name: 'Really delete?' }).click(); await page.waitForTimeout(400);
   ok('deleting a log removes the phone file too', (await phone()).calls.includes('remove') && (await log()) === null);
   await page.click('#tab-list'); await page.locator('#list .item').first().click(); await page.waitForTimeout(600); await page.click('#lb-opt'); await page.waitForTimeout(300);
