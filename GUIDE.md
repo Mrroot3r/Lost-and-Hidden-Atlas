@@ -239,7 +239,8 @@ A state outside these nine also needs its outline added to `source/build/states.
 - GPS smoothing and the field log were tested with simulated location only.
 - The Android app's background recorder was compiled and its page logic tested against a stand-in, but nothing here can run it on a real phone. Whether it survives a long walk with the screen off depends on the phone maker's battery rules, and only field use will show it.
 - A web page cannot record location with the screen off; that is what the app is for. The website's own field log still needs the page open.
-- Not built yet: historical-markers layer, photo notes, GPX import, sharing a place together with the route to it, telling the user a newer app build exists.
+- Photo and video matching was tested with made-up files only. How a given camera app stamps its files (above all videos) can differ by phone maker; if matches look shifted, that is the first thing to check.
+- Not built yet: historical-markers layer, GPX import, photos in exports, sharing a place together with the route to it, telling the user a newer app build exists.
 
 ## 11. Privacy
 
@@ -256,7 +257,7 @@ The app is the same Atlas page inside an Android shell (Capacitor 8), in `androi
 | `source/src/boot.js` | Start-up inside the app. Picks the newest place data on the phone, starts `app.js`, and exposes `window.ATLAS`: data refresh, old maps, calls to the recorder |
 | `android-app/scripts/make-www.js` | Copies the built site into `android-app/www/` and makes the page start through `boot.js`. Old maps and `sw.js` are left out |
 | `android-app/android/app/src/main/java/com/losthiddenatlas/app/TrackService.java` | The recorder: a foreground service that listens to GPS, smooths fixes, and appends points to a file |
-| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings` |
+| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings`, and for photos `media`, `thumb`, `openMedia` |
 | `.../TrackStore.java`, `MainActivity.java` | The track files (`lat,lon,seconds` per line); the Back button |
 | `.github/workflows/app.yml` | Builds, signs and publishes the app |
 
@@ -267,6 +268,13 @@ The app is the same Atlas page inside an Android shell (Capacitor 8), in `androi
 **The Atlas address** defaults to the GitHub Pages site (`DEF` in `boot.js`) and can be changed in the app under Guide, "Where the app gets its places". To move the Atlas to another host: copy the whole built site there, make the server send `Access-Control-Allow-Origin: *` (the app's page runs at `https://localhost`, so without that header every fetch is refused), then either type the new address into the app or change `DEF` and release a new build.
 
 **How recording works.** The page calls `start`; the plugin asks for location and notification permission and starts `TrackService`, which records on its own from then on. The page is only a viewer: while visible it asks for `points` it has not seen every few seconds, and catches up in one go when reopened. If Android kills the service, the points already written are safe; when the app is next opened, `resumeLog()` sees "should be recording, is not running" and starts the service again in the same log. Android may also restart the service by itself, which only works if the user chose "Allow all the time" for location.
+
+**Photos and video.** When a log ends (or on "Find photos and video"), the page asks the phone for the photos and videos its camera saved during the log (`media`), and `placeMedia()` in `app.js` files them. Nothing is copied; a log keeps a short reference per item in `l.media`. The rules:
+
+- A photo's place is where the track was at the second it was taken (`trackPos()`), not the camera's own GPS tag.
+- A photo joins the next note written within 25 m of that place (photo first, then the note), else the note before it within 25 m; otherwise it stays on the track by itself. Distance, not time, decides, so standing and talking between the photo and the note does not break the match. A choice the user makes by hand (`fx`) survives a rescan.
+- A video is a stretch of time, drawn as the part of the track walked while it ran. Its end is the file's last-written time and its start is that minus its length; the "taken" time is the fallback. Each note inside a video shows its position in that video, which is what an editor needs.
+- Screenshots and screen recordings are ignored. Photos need the Android "Photos and videos" permission; with "selected photos only", items are missing and the app says so.
 
 **Building.** Every pull request that touches the app is compiled by the `app` workflow. After a merge it publishes a release with `lost-hidden-atlas.apk`; the newest is always at `https://github.com/mrroot3r/Lost-and-Hidden-Atlas/releases/latest`. Pull requests get a pre-release marked TEST so the owner can install the change before merging. To build locally (Node 22, JDK 21, Android SDK 36):
 
@@ -279,5 +287,5 @@ cd android && ./gradlew assembleDebug        # app/build/outputs/apk/debug/app-d
 
 **Testing, and its limits.** `tools/app_smoke.js` runs the app's page in a desktop browser against a stand-in recorder and checks start, a refused permission, catching up after the page was away, recovery after a kill, stop, share, delete and the Back button. It does not run any Java. Nothing in this workflow can install the app on a phone, so permission prompts, the notification, recording with the screen off, and each phone maker's battery rules can only be checked by the owner. Say exactly that in the pull request, and tell the owner what to try. The app's Guide tab has a "Copy app status" button whose output (permissions, GPS fixes received and kept, last error) is the first thing to ask for when a recording goes wrong.
 
-**Keep it small.** No analytics, no accounts, no extra permissions. The app asks for location, notifications (for the recording notice) and exemption from battery optimisation, and nothing else.
+**Keep it small.** No analytics, no accounts, no extra permissions. The app asks for location, notifications (for the recording notice), exemption from battery optimisation, and read access to photos and videos (asked only when the user taps "Find photos and video"), and nothing else.
 

@@ -780,9 +780,10 @@ function stopLog(){ if(!rec) return;
     AT.call('stop').catch(()=>{}).then(natSync).then(()=>{ stopLog.flushed=true; try{ stopLog(); }finally{ stopLog.flushed=false; } }); return; }
   clearInterval(natTick); const l=rec; l.t1=Math.round(Date.now()/1000); rec=null; delete U.rec; dropAwake(); clearRec(); syncRec();
   if(!l.pts.length&&!l.notes.length){ U.logs=U.logs.filter(x=>x!==l); saveNow(); banner('Nothing was recorded, so the log was discarded.',false,5000); if(view==='log') renderLog(); return; }
-  saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log'); }
+  saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log');
+  if(NATIVE) scanMedia(l,false).catch(()=>{}); }
 function noteMark(n,l){ const num=l.notes.indexOf(n)+1; const m=L.marker([n.la,n.lo],{keyboard:false,icon:L.divIcon({className:'notepin',html:String(num),iconSize:[22,22],iconAnchor:[11,11]})}); m._note=n;
-  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); return m; }
+  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); m.on('popupopen',()=>{ const c=m.getPopup().getContent(), ph=photosOf(l,n); const oldS=c.querySelector('.phs'); if(oldS) oldS.remove(); if(ph.length&&NATIVE){ c.append(mediaStrip(l,ph.slice(0,6))); m.getPopup().update(); } }); return m; }
 function clearRec(){ if(recLine){ map.removeLayer(recLine); recLine=null; } recMarks.forEach(m=>map.removeLayer(m)); recMarks=[]; }
 function drawRec(){ if(!map||!rec) return; clearRec();
   recLine=L.polyline(rec.pts.map(p=>[p[0],p[1]]),{color:TRK,weight:4,opacity:0.9,interactive:false}).addTo(map);
@@ -795,9 +796,63 @@ function goNote(l,n,row){
   map.setView([n.la,n.lo],Math.max(map.getZoom(),18)); if(m){ if(goNote.top&&goNote.top!==m) goNote.top.setZIndexOffset(0); goNote.top=m; m.setZIndexOffset(1000); m.openPopup(); }
   goNote.at=l.id+':'+l.notes.indexOf(n); document.querySelectorAll('.lognotes li.on').forEach(x=>x.classList.remove('on'));
   const r=row&&row.isConnected?row:document.querySelector('.lognotes li[data-k="'+goNote.at+'"]'); if(r) r.classList.add('on'); }
+/* ---- photos and video taken during a log (Android app only) ----
+   The app asks the phone which photos and videos the camera saved during the log. Nothing is copied: a log keeps a short
+   reference per item in l.media = [{k:'i'|'v', id, n:name, t:seconds, d:video length, la, lo, nt:time of the note it belongs to, fx:set by hand}].
+   A photo's place is where the track was at the second it was taken. It joins the next note written within MEDIA_NEAR
+   metres of that place (photo first, then the note), else the note before it; otherwise it stays on the track by itself.
+   A video is a stretch of time, so it is the part of the track walked while it ran. */
+const MEDIA_NEAR=25;
+function trackPos(l,t){ const p=l.pts, n=p.length-1; if(n<0) return null; const end=l.t1||p[n][2];
+  if(t<=p[0][2]) return t>=l.t0-90?[p[0][0],p[0][1]]:null; if(t>=p[n][2]) return t<=end+90?[p[n][0],p[n][1]]:null;
+  let a=0,b=n; while(b-a>1){ const m=(a+b)>>1; if(p[m][2]<=t) a=m; else b=m; }
+  const f=p[b][2]>p[a][2]?(t-p[a][2])/(p[b][2]-p[a][2]):0; return [+(p[a][0]+(p[b][0]-p[a][0])*f).toFixed(6),+(p[a][1]+(p[b][1]-p[a][1])*f).toFixed(6)]; }
+const vids=l=>(l.media||[]).filter(m=>m.k==='v'), photosOf=(l,n)=>(l.media||[]).filter(m=>m.k==='i'&&m.nt===n.t), loosePhotos=l=>(l.media||[]).filter(m=>m.k==='i'&&!l.notes.some(n=>n.t===m.nt));
+function clipAt(l,t){ const v=vids(l); for(let i=0;i<v.length;i++) if(t>=v[i].t&&t<=v[i].t+v[i].d) return {n:i+1,at:t-v[i].t,v:v[i]}; return null; }
+function noteFor(l,m){ if(m.la==null) return null; const ns=l.notes.filter(n=>n.la!=null), near=n=>n&&hav(m.la,m.lo,n.la,n.lo)*1609.34<=MEDIA_NEAR;
+  const next=ns.find(n=>n.t>=m.t), prev=ns.filter(n=>n.t<m.t).pop(); return near(next)?next.t:near(prev)?prev.t:null; }
+function placeMedia(l,raw){ const t0=l.t0, t1=l.t1||Math.round(Date.now()/1000), old={}, out=[]; (l.media||[]).forEach(m=>{ old[m.k+m.id]=m; });
+  const inWalk=(a,b)=>a<=t1+60&&b>=t0-60;
+  raw.forEach(r=>{ if(/screenshot|screen ?record/i.test(r.bucket||'')) return; const tk=Math.round((r.taken||0)/1000);
+    if(r.kind==='video'){ const d=Math.round((r.duration||0)/1000); let end=r.modified||0, start=end-d;   /* the file was last written when filming stopped */
+      if(!end||!inWalk(start,end)){ if(tk&&inWalk(tk-d,tk)){ end=tk; start=tk-d; } else if(tk&&inWalk(tk,tk+d)){ start=tk; end=tk+d; } else return; }
+      const p=trackPos(l,Math.min(Math.max(start,t0),t1)); out.push({k:'v',id:r.id,n:r.name||'video',t:start,d:d,la:p?p[0]:null,lo:p?p[1]:null}); }
+    else { const t=tk&&inWalk(tk,tk)?tk:(r.modified&&inWalk(r.modified,r.modified)?r.modified:0); if(!t) return;
+      const p=trackPos(l,t), m={k:'i',id:r.id,n:r.name||'photo',t:t,la:p?p[0]:null,lo:p?p[1]:null}, was=old['i'+r.id];
+      if(was&&was.fx){ m.fx=1; if(was.nt!=null) m.nt=was.nt; } else { const nt=noteFor(l,m); if(nt!=null) m.nt=nt; }
+      out.push(m); } });
+  out.sort((a,b)=>a.t-b.t); l.media=out; return out; }
+function scanMedia(l,ask){ if(!NATIVE) return Promise.reject(new Error('Photos can only be matched in the Android app.'));
+  return AT.call('media',{from:l.t0-60,to:(l.t1||Math.round(Date.now()/1000))+60,ask:!!ask}).then(r=>{ placeMedia(l,(r&&r.items)||[]); l.mscan=Math.round(Date.now()/1000); l.macc=(r&&r.access)||'all'; saveNow();
+    if(shownLog===l.id) showLog(l,false); if(view==='log') renderLog(); return l.media; }); }
+const thumbs=new Map();
+function thumb(m,size){ const k=m.k+m.id+':'+size; if(!thumbs.has(k)) thumbs.set(k,AT.call('thumb',{id:m.id,kind:m.k==='v'?'video':'image',size:size}).then(r=>r.data,e=>{ thumbs.delete(k); throw e; })); return thumbs.get(k); }
+function thumbBtn(l,m){ const b=el('button',{class:'ph'+(m.k==='v'?' vid':''),type:'button','aria-label':(m.k==='v'?'Video ':'Photo ')+m.n});
+  if(NATIVE) thumb(m,256).then(d=>{ b.append(el('img',{src:d,alt:''})); },()=>{ b.classList.add('gone'); }); else b.classList.add('gone');
+  b.addEventListener('click',e=>{ e.stopPropagation(); goMedia(l,m); }); return b; }
+function mediaStrip(l,list){ const d=el('div',{class:'phs'}); list.forEach(m=>d.append(thumbBtn(l,m))); return d; }
+/* go to one photo or video on the map and open a card for it */
+function goMedia(l,m){ if(!map) return; if(rec!==l&&shownLog!==l.id){ showLog(l,false); if(view==='log') renderLog(); }
+  const tm=new Date(m.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'}), box=el('div',{class:'ctx mpop'}); let pop=null;
+  if(NATIVE){ const im=el('img',{alt:''}); box.append(im); thumb(m,640).then(d=>{ im.src=d; im.onload=()=>pop&&pop.update(); },()=>im.remove()); }
+  if(m.k==='v'){ const n=vids(l).indexOf(m)+1; box.append(el('b',{text:'Video '+n+' · '+hms(m.d)+' long'}),el('span',{class:'mx',text:m.n}),el('span',{class:'mx',text:'Starts '+hms(m.t-l.t0)+' into the log · '+tm}));
+    const inside=l.notes.filter(x=>x.t>=m.t&&x.t<=m.t+m.d); if(inside.length) box.append(el('span',{class:'mx',text:'Notes in it: '+inside.map(x=>hms(x.t-m.t)+' '+x.x).join(' · ')})); }
+  else { const c=clipAt(l,m.t); box.append(el('b',{text:'Photo · '+tm}),el('span',{class:'mx',text:m.n+' · '+hms(m.t-l.t0)+' into the log'+(c?' · video '+c.n+' at '+hms(c.at):'')})); }
+  if(NATIVE) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>AT.call('openMedia',{id:m.id,kind:m.k==='v'?'video':'image'}).catch(e=>banner((e&&e.message)||'Could not open it.',true,6000))},m.k==='v'?'Play the video':'Open the photo'));
+  if(m.k==='i'&&l.notes.length){ const sl=el('select',{'aria-label':'Attach this photo to a note'},el('option',{value:''},'Not attached to a note')); l.notes.forEach((x,i)=>sl.append(el('option',{value:String(x.t)},(i+1)+'. '+x.x)));
+    sl.value=l.notes.some(x=>x.t===m.nt)?String(m.nt):''; sl.addEventListener('change',()=>{ if(sl.value) m.nt=+sl.value; else delete m.nt; m.fx=1; saveNow(); map.closePopup(); if(shownLog===l.id) showLog(l,false); if(view==='log') renderLog(); });
+    box.append(el('label',{class:'mx'},'Belongs to ',sl)); }
+  let at=m.la!=null?[m.la,m.lo]:map.getCenter();
+  if(m.k==='v'){ const seg=l.pts.filter(p=>p[2]>=m.t&&p[2]<=m.t+m.d).map(p=>[p[0],p[1]]); if(seg.length>1) map.fitBounds(L.latLngBounds(seg).pad(0.3),{maxZoom:18}); else if(m.la!=null) map.setView(at,Math.max(map.getZoom(),17)); }
+  else if(m.la!=null) map.setView(at,Math.max(map.getZoom(),18));
+  pop=L.popup({maxWidth:250,autoPanPaddingTopLeft:[10,10]}).setLatLng(at).setContent(box).openOn(map); }
 function hideLog(){ shownLayers.forEach(x=>map&&map.removeLayer(x)); shownLayers=[]; shownLog=null; }
 function showLog(l,fit){ hideLog(); if(!map) return; shownLog=l.id; const ll2=l.pts.map(p=>[p[0],p[1]]);
   if(ll2.length>1) shownLayers.push(L.polyline(ll2,{color:'#ffffff',weight:6,opacity:0.8,interactive:false}).addTo(map),L.polyline(ll2,{color:TRK,weight:3.5,opacity:0.95,interactive:false}).addTo(map));
+  vids(l).forEach((m,i)=>{ const seg=l.pts.filter(p=>p[2]>=m.t&&p[2]<=m.t+m.d).map(p=>[p[0],p[1]]), a=trackPos(l,Math.max(m.t,l.t0)), b=trackPos(l,Math.min(m.t+m.d,l.t1||m.t+m.d)); if(a) seg.unshift(a); if(b) seg.push(b);
+    if(seg.length>1) shownLayers.push(L.polyline(seg,{color:'#f5a524',weight:13,opacity:0.75,interactive:false}).addTo(map).bringToBack());   /* the stretch walked while filming */
+    if(m.la!=null){ const k=L.marker([m.la,m.lo],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'vidpin',html:'\u25B6 '+(i+1),iconSize:[34,20],iconAnchor:[17,30]})}); k.on('click',()=>goMedia(l,m)); shownLayers.push(k.addTo(map)); } });
+  loosePhotos(l).forEach(m=>{ if(m.la==null) return; const k=L.marker([m.la,m.lo],{keyboard:false,zIndexOffset:-200,icon:L.divIcon({className:'phpin',html:'',iconSize:[14,14],iconAnchor:[7,7]})}); k.on('click',()=>goMedia(l,m)); shownLayers.push(k.addTo(map)); });
   l.notes.forEach(n=>{ if(n.la!=null){ shownLayers.push(noteMark(n,l).addTo(map)); ll2.push([n.la,n.lo]); } });
   if(fit&&ll2.length) map.fitBounds(L.latLngBounds(ll2).pad(0.25),{maxZoom:18}); }
 function syncRec(){ const bar=$('#recbar'); if(!bar) return; clearInterval(recTick);
@@ -809,7 +864,9 @@ function gpx(l){ const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&
     l.notes.filter(n=>n.la!=null).map(n=>'<wpt lat="'+n.la+'" lon="'+n.lo+'"><time>'+iso(n.t)+'</time><name>'+esc(n.x)+'</name></wpt>\n').join('')+
     '<trk><name>'+esc(l.name)+'</name><trkseg>\n'+l.pts.map(p=>'<trkpt lat="'+p[0]+'" lon="'+p[1]+'"><time>'+iso(p[2])+'</time></trkpt>\n').join('')+'</trkseg></trk>\n</gpx>\n'; }
 function notesText(l){ const tm=t=>new Date(t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
-  return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString()+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')).join('\n'):'No notes.')+'\n'; }
+  return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString()+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,n.t))+(p=>p.length?'  [photos: '+p.map(m=>m.n).join(', ')+']':'')(photosOf(l,n))).join('\n'):'No notes.')+'\n'+
+    (vids(l).length?'\nVideos\n'+vids(l).map((m,i)=>(i+1)+'  '+m.n+'  starts '+hms(m.t-l.t0)+' into the log ('+tm(m.t)+'), '+hms(m.d)+' long').join('\n')+'\n':'')+
+    (loosePhotos(l).length?'\nPhotos not attached to a note\n'+loosePhotos(l).map(m=>hms(m.t-l.t0)+'  '+tm(m.t)+'  '+m.n+(m.la!=null?'  ('+m.la+', '+m.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,m.t))).join('\n')+'\n':''); }
 async function sendFile(name,text,type,btn){
   if(NATIVE){ try{ await AT.call('share',{name:name,text:text,mime:type}); }catch(e){ copy(text,btn); banner('Sharing failed, so the text was copied instead.',true,5000); } return; }
   const blob=new Blob([text],{type:type});
@@ -845,8 +902,18 @@ function renderLog(){
     const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
       el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,gx,cp,ren,del),
       site?el('p',{style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>select(site,true)},'Open '+site.name)):null);
-    if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{text:n.x})); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
+    if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{class:'nx',text:n.x})); const cl=clipAt(l,n.t), ph=photosOf(l,n); if(cl) li.append(el('span',{class:'clip',title:'Position in video '+cl.n,text:'\u25B6'+cl.n+' '+hms(cl.at)})); if(ph.length) li.append(mediaStrip(l,ph)); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
       box.append(el('details',{open:shown},el('summary',{text:l.notes.length+(l.notes.length===1?' note':' notes')}),ul)); }
+    const med=l.media||[], vd=vids(l), lp=loosePhotos(l), np=med.length-vd.length, plural=(n,w)=>n+' '+w+(n===1?'':'s');
+    if(NATIVE||med.length){ const row=el('div',{class:'row',style:'margin-top:8px;align-items:center'});
+      if(NATIVE){ const fb=el('button',{class:'btn sm',type:'button'},l.mscan?'Look again for photos':'Find photos and video');
+        fb.addEventListener('click',()=>{ fb.disabled=true; fb.textContent='Looking…'; scanMedia(l,true).then(m=>{ banner(m.length?'Found '+plural(m.filter(x=>x.k==='i').length,'photo')+' and '+plural(vids(l).length,'video')+' from this walk.':'No photos or videos from this walk were found on the phone.',false,6000); },
+          e=>{ banner((e&&e.message)||'The phone\'s photos could not be read.',true,10000); renderLog(); }); }); row.append(fb); }
+      row.append(el('span',{class:'snote',text:med.length?plural(np,'photo')+' · '+plural(vd.length,'video'):(l.mscan?'None found for this walk.':'')})); box.append(row);
+      if(NATIVE&&l.macc==='some') box.append(el('p',{class:'snote',style:'margin-top:6px'},'Android is only letting the Atlas see photos you picked by hand, so some may be missing. ',el('button',{class:'btn sm',type:'button',onclick:()=>AT.call('appSettings')},'Open permissions'),' and set Photos and videos to "Allow all".')); }
+    if(vd.length){ const ul=el('ul',{class:'lognotes'}); vd.forEach((m,i)=>{ const li=el('li',{role:'button',tabindex:'0'},el('span',{class:'num vn',text:'\u25B6'+(i+1)}),el('span',{class:'mono',text:hms(m.t-l.t0)}),el('span',{class:'nx',text:hms(m.d)+' long · '+m.n})); li.addEventListener('click',()=>goMedia(l,m)); ul.append(li); });
+      box.append(el('details',{open:shown},el('summary',{text:plural(vd.length,'video')+' (time shown is where each starts in the log)'}),ul)); }
+    if(lp.length) box.append(el('details',{open:shown},el('summary',{text:plural(lp.length,'photo')+' not attached to a note'}),mediaStrip(l,lp)));
     v.append(box); });
 }
 function resumeLog(){
@@ -1245,7 +1312,7 @@ function renderGuide(){
         el('button',{class:'btn sm',type:'button',onclick:()=>{ if(!AT.setBase(addr.value)){ res.textContent=' That is not a web address.'; return; } addr.value=AT.base; run(); }},'Use this address'),
         el('button',{class:'btn sm',type:'button',onclick:()=>{ AT.setBase(AT.def); addr.value=AT.base; run(); }},'Back to the original')),
       NATIVE?(()=>{ const line=el('p',{class:'mono',style:'font-size:12px',text:'App status: reading…'}), cb=el('button',{class:'btn sm',type:'button'},'Copy app status'); let last='';
-        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
+        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · photos '+(st.media||'?')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
         cb.addEventListener('click',()=>copy(last||line.textContent,cb)); return el('div',null,line,el('div',{class:'row'},cb)); })():null,
       P('Change the address only if the Atlas moves to a new home. The new site must be a copy of this one and must allow other sites to read it (the Access-Control-Allow-Origin header).')])); }
   const stor=el('p',{text:'Checking…'}), sl=el('ul',{class:'links'});
