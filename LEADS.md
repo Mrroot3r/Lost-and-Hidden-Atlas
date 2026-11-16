@@ -15,7 +15,22 @@ Places someone read about while researching but did not add, with what is missin
 | Worcester streetcar substations and carhouses | Worcester County, MA | Wikipedia says several survive | Which ones, and where |
 | Mountain Mills | Whitingham, VT | Said to be a village drowned by Harriman Reservoir | A source |
 | Glass House / Rensselaer Glass Factory | Sand Lake, NY | Early glass works | A source and a coordinate |
-| Petersburg Pass ski area | Petersburgh, NY | Abandoned ski area on the Taconic crest | A source for dates and what remains |
+| Flight of Five Locks | Lockport, NY | Wikipedia: a five-step staircase lock that carried the Erie Canal over the Niagara Escarpment, since restored; the article's dates did not come through | Dates, what a visitor may walk, a coordinate |
+| Erie Beach amusement park | Fort Erie, Ontario | Recalled as lakeside ruins of an amusement park across from Buffalo; the Wikipedia article 'Erie Beach, Ontario' gave nothing usable | A source and a coordinate |
+| Niagara Gorge Railroad (Great Gorge Route) | Niagara Falls to Lewiston, NY | Wikipedia: a trolley line at water level in the gorge, 1895 until a rock slide on September 17, 1935; Devil's Hole and Whirlpool state parks have a trail along the gorge bottom | A source that says the trail is on the old trolley bed, and what remains |
+| Great Northern Elevator | Buffalo, NY | Wikipedia: world's largest elevator when finished in 1897; a wall fell in the windstorm of December 11, 2021; demolished September 2022 to May 2023 | Nothing left to find; add only as `gone` if a series wants it |
+| Victory Mills | Victory, NY | Wikipedia: 1918 textile mill, burned on May 31, 2025 and demolished | Nothing left to find; add only as `gone` |
+| Farnams lime works | Cheshire, MA | Wikipedia: lime quarries and plant from 1874, US Gypsum 1927 to 1969; village buildings stand | What is left of the kilns and quarries and whether any of it is public |
+| Tifft Nature Preserve | Buffalo, NY | Wikipedia: a coal and iron ore transfer yard by 1900, then a dump, a preserve since 1976 | What industrial remains can be seen on the trails |
+| Lebanon Springs Union Free School | New Lebanon, NY | Wikipedia: 1913 school; the listing includes the remains of a railroad trestle over Wyomanock Creek | Present state of the school and whether the trestle can be reached |
+| High Falls Conservation Area | Philmont, NY | Recalled as a waterfall preserve with mill remains; the land trust's page refused the fetch | A source read in full and a coordinate |
+| Wolf Hollow | Glenville, NY | Recalled as an old road through a ravine, closed to cars | A source for its history and who may walk it |
+| Rip Van Winkle House | Palenville, NY | Recalled as a ruin on the old mountain road to the Catskill Mountain House | A source and a coordinate |
+| Staalesen Vanderheyden Preserve | Troy, NY | Recalled as a preserve round an old city reservoir | A source and a coordinate |
+| Willard Asylum for the Chronic Insane | Willard, NY | Wikipedia: state asylum opened 1869; a drug treatment center opened on the campus in 1995; 400 patients' suitcases were found in an attic that year | Who holds the campus now, whether any of it can be seen from a public road, the cemetery |
+| Chenango Canal Summit Level | Bouckville, NY | A National Register listing in Madison County; the Wikipedia title redirects to the general Chenango Canal article (canal ran 1834 to 1878, Utica to Binghamton) | A source for what survives at the summit level and where to walk it |
+| Erie Canal Village | Rome, NY | Recalled as a closed museum village on the old canal | A source and a coordinate |
+| Black River Canal Warehouse | Boonville, NY | A National Register listing; not read | A source; pairs with the Five Lock Combine entry |
 | Mount Hope Furnace | Fort Ann, NY | Iron furnace | A source and a coordinate |
 | Sam's Point berry-picker shacks | Cragsmoor, NY | Said to stand along the old road | A source |
 | Dungeon Rock | Lynn, MA | In Lynn Woods Reservation; the article read says only that it became a tourist attraction in the 1850s | A source for the tunnel's story and whether it is open; a coordinate |
