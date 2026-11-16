@@ -18,3 +18,28 @@ Places someone read about while researching but did not add, with what is missin
 | Petersburg Pass ski area | Petersburgh, NY | Abandoned ski area on the Taconic crest | A source for dates and what remains |
 | Mount Hope Furnace | Fort Ann, NY | Iron furnace | A source and a coordinate |
 | Sam's Point berry-picker shacks | Cragsmoor, NY | Said to stand along the old road | A source |
+| Dungeon Rock | Lynn, MA | In Lynn Woods Reservation; the article read says only that it became a tourist attraction in the 1850s | A source for the tunnel's story and whether it is open; a coordinate |
+| Williamsburg Reservoir dam (1874 Mill River flood) | Williamsburg, MA | Dam failed May 16, 1874, killing 139; Wikipedia says the reservoir site is reached by a public hiking trail | The dam site's coordinate and the trailhead |
+| Putnam Memorial State Park encampment remains | Redding, CT | 1778–79 winter camp, Connecticut's oldest state park | A source describing what remains in the woods; the article read does not |
+| Alvira bunkers | Union County, PA | Recalled as a wartime ordnance works with bunkers on state game lands; the Wikipedia title 'Alvira' did not resolve to an article about it | A source read in full and a coordinate |
+| Austin Dam ruins | Austin, PA | OpenStreetMap maps an 'Austin Dam Overlook' at 41.65308, -78.08446; the Wikipedia text could not be parsed | A source read in full |
+| Ricketts | Sullivan and Wyoming Counties, PA | Lumber town 1890–1913, last house torn down in the 1930s | A source for what, if anything, remains |
+| Greenbanks Hollow | Danville, VT | Wikipedia covers only the 1886 covered bridge | A source for the mill village and its remains |
+| Old Hill Village | Hill, NH | Village relocated in 1941 for the Franklin Falls Dam | A source for what remains of the old streets and how to reach them; a coordinate |
+| Shelving Rock (Knapp estate) | Fort Ann, NY | Recalled as estate remains on state land above Lake George | A source and a coordinate |
+| Wurtsboro lead mine | Mamakating, NY | Recalled as a mine on the Shawangunk Ridge in state forest | A source and a coordinate |
+| Sterling Furnace and Sterling Forest mines | Tuxedo, NY | Wikipedia says the Sterling Iron Works mined here until the 1920s | A source for which ruins can be visited; coordinates |
+| Knickerbocker Ice Company foundation | Rockland Lake, NY | Wikipedia: closed 1924, 1926 fire, foundation remains with a plaque | A coordinate for the foundation |
+| Thornton Gore | Thornton, NH | Recalled as hill-farm cellar holes in the White Mountain National Forest | A source and a coordinate |
+| Mount Monadnock Halfway House site | Jaffrey, NH | Recalled as a hotel site on the mountain | A source and a coordinate |
+| Cunningham Tower | Cornwall, CT | Recalled as a stone tower in Mohawk State Forest | A source and a coordinate |
+| Gillette's railroad | East Haddam, CT | Recalled as remains of a private miniature railroad in Gillette Castle State Park | A source for what remains |
+| Dudleytown | Cornwall, CT | Well-known abandoned settlement; recalled as private land closed to visitors | Do not add unless a source shows legal public access |
+| Cliffdale Manor | Alpine, NJ | Recalled as estate ruins in Palisades Interstate Park | A source and a coordinate |
+| Brooksbrae brick factory | Manchester, NJ | Recalled as Pine Barrens factory ruins | A source, ownership and a coordinate |
+| Estellville glassworks and Bethlehem Loading Company | Estell Manor, NJ | Recalled as ruins in a county park | A source and coordinates |
+| Hoosac Tunnel and Wilmington Railroad grade | Wilmington, VT | Wikipedia article has no coordinates | Which part is a public trail; a coordinate |
+| Forestdale iron furnace | Brandon, VT | Recalled as a state-owned furnace stack | A source and a coordinate |
+| Mauch Chunk Switchback Railway | Jim Thorpe, PA | Wikipedia article read only for its coordinate | What remains along the trail |
+| Laquin, and the Ghost Town Trail towns | Bradford and Indiana Counties, PA | Wikipedia articles exist | What remains at each |
+| Hastings and Swan Island (Perkins Township) | Maine | Recalled as an abandoned logging village and an abandoned island town | Sources and coordinates |

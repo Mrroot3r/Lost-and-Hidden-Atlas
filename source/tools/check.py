@@ -6,7 +6,7 @@ import sys,os,re,json,glob,importlib
 REPO=os.path.abspath(sys.argv[1] if len(sys.argv)>1 else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
 err=[]; warn=[]
-CAT='amuse hotel canal rail industry burial town civic fort water inst light landmark'.split()
+CAT='amuse hotel canal rail industry burial town civic fort water inst light landmark lidar'.split()
 ST='ruins traces standing marker gone water'.split(); PREC='exact site area'.split()
 ACC='public view ask permit boat'.split(); EFF='drive walk hike boat'.split(); CONF=('', 'verified','mixed','lead')
 app=open(os.path.join(REPO,'source','src','app.js'),encoding='utf-8').read()
