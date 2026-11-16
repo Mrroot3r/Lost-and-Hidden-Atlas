@@ -78,14 +78,22 @@ else:
     if f"const V='{v}'" not in rd('sw.js'): err.append('sw.js version does not match index.html (rebuild needed)')
     if f'app.js?v={v}' not in idx: err.append('index.html does not reference this build of app.js')
 if rd('app.js')!=rd('source','src','app.js'): err.append('app.js in the root differs from source/src/app.js: edit the source and rebuild, never the root file')
+# the Android app reads boot.js and version.json from the built site
+if os.path.exists(os.path.join(REPO,'source','src','boot.js')):
+    if not os.path.exists(os.path.join(REPO,'boot.js')) or rd('boot.js')!=rd('source','src','boot.js'): err.append('boot.js in the root differs from source/src/boot.js (rebuild needed)')
+    try:
+        if mm and json.loads(rd('version.json')).get('v')!=D.get('v'): err.append('version.json does not match index.html (rebuild needed); the Android app would never see the new places')
+    except Exception: err.append('version.json is missing or unreadable (rebuild needed)')
 for need in('data/lines.json','data/leads.json','leaflet.js','GUIDE.md','CLAUDE.md','source/build/states.json'):
     if not os.path.exists(os.path.join(REPO,need)): err.append('missing '+need)
 # ---- nothing personal in a public repository ----
 MAIL=re.compile(r'[\w.+-]+@[\w-]+\.[\w.]+'); OKMAIL=('noreply@anthropic.com','users.noreply.github.com','example.com','2x.png')
 for dp,dn,fn in os.walk(REPO):
     if '.git' in dp.split(os.sep): continue
+    if os.path.relpath(dp,REPO).split(os.sep)[0]=='android-app':   # downloaded packages and build output of the Android app are not ours to check
+        dn[:]=[d for d in dn if d not in('node_modules','www','build','.gradle','assets','capacitor-cordova-android-plugins')]
     for f in fn:
-        if not f.endswith(('.md','.py','.js','.json','.html','.sh','.txt','.css','.yml')): continue
+        if not f.endswith(('.md','.py','.js','.json','.html','.sh','.txt','.css','.yml','.java','.xml','.gradle','.properties')): continue
         p=os.path.join(dp,f)
         if os.path.getsize(p)>3_000_000: continue
         for a in set(MAIL.findall(open(p,encoding='utf-8',errors='ignore').read())):

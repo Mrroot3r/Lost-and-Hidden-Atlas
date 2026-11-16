@@ -11,3 +11,4 @@ Read `GUIDE.md` before doing anything. The short version:
 - Run `check.py` and the smoke test before opening the pull request.
 - The owner uses the Atlas on an Android phone in the field. Test at phone size first.
 - Places you read about but could not add go in `LEADS.md`.
+- The Android app is in `android-app/` (GUIDE.md section 12). It runs the same `source/src/app.js`. You cannot run it on a phone from here: after any change to the field log, data loading or the app's Java, run `tools/app_smoke.js`, and say in the pull request what only the owner can test. Never commit a signing key.

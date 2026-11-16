@@ -27,6 +27,8 @@ The site is static files on GitHub Pages. There is no server and no account. A v
 | `data/lines.json` | Old rail, trolley and canal lines; fetched after load |
 | `data/leads.json` | Unchecked leads from OpenStreetMap; fetched when the Leads layer is turned on |
 | `topo/<place-id>.webp` | One cropped old USGS map per place; fetched when the place is opened |
+| `boot.js`, `version.json` | Used only by the Android app (section 12): its start-up script, and the small file it reads to see whether the places have changed |
+| `android-app/` | The Android app: the same page in an app shell, plus a background recorder for the field log |
 | `source/` | Everything the site is generated from |
 | `source/tools/states.py` | The base for every state: its regions, start cities and what is wired up for it |
 | `LEADS.md` | Places someone read about but did not add, and why |
@@ -222,6 +224,8 @@ A state outside these nine also needs its outline added to `source/build/states.
 - The app must still work when a data file fails to load or the phone is offline. Show a short message; never a blank screen.
 - Bump nothing by hand: `make.py` stamps a version into `index.html`, the script URL and `sw.js` on every build.
 - The app also builds as a single self-contained file (`dist/Lost-and-Hidden-Atlas.html`). It detects that mode by the presence of an inline `d-topo` block.
+- The same `app.js` runs inside the Android app. Anything app-only sits behind `AT` (running in the app) or `NATIVE` (the phone's recorder is available); the website must behave exactly as before when both are false. Run `tools/app_smoke.js` as well as `tools/smoke.js` after touching the field log, old maps, or data loading.
+- Installed apps keep their copy of `app.js` until the owner installs a new build, but they fetch new place data straight away. So place data must stay readable by older app code: **add fields, never rename or remove one the app reads.**
 
 ## 10. Known gaps
 
@@ -233,9 +237,47 @@ A state outside these nine also needs its outline added to `source/build/states.
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
 - GPS smoothing and the field log were tested with simulated location only.
-- A web page cannot record location with the screen off. An Android app wrapper with background location is planned.
-- Not built yet: historical-markers layer, photo notes, GPX import.
+- The Android app's background recorder was compiled and its page logic tested against a stand-in, but nothing here can run it on a real phone. Whether it survives a long walk with the screen off depends on the phone maker's battery rules, and only field use will show it.
+- A web page cannot record location with the screen off; that is what the app is for. The website's own field log still needs the page open.
+- Not built yet: historical-markers layer, photo notes, GPX import, sharing a place together with the route to it, telling the user a newer app build exists.
 
 ## 11. Privacy
 
 The repository and site are public. Do not commit anything personal about the owner or about private landowners: no email addresses, no mailing addresses, no notes exported from someone's browser. The owner lookup deliberately shows owner names from public parcel files but not mailing addresses. `check.py` fails if it finds an email address in the repository.
+
+## 12. The Android app
+
+The app is the same Atlas page inside an Android shell (Capacitor 8), in `android-app/`. It exists for three things a web page cannot do: record a field log with the screen off or the app in the background, open with no signal from the very first launch, and stay installed on the phone.
+
+**What is where**
+
+| Path | Role |
+|---|---|
+| `source/src/boot.js` | Start-up inside the app. Picks the newest place data on the phone, starts `app.js`, and exposes `window.ATLAS`: data refresh, old maps, calls to the recorder |
+| `android-app/scripts/make-www.js` | Copies the built site into `android-app/www/` and makes the page start through `boot.js`. Old maps and `sw.js` are left out |
+| `android-app/android/app/src/main/java/com/losthiddenatlas/app/TrackService.java` | The recorder: a foreground service that listens to GPS, smooths fixes, and appends points to a file |
+| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings` |
+| `.../TrackStore.java`, `MainActivity.java` | The track files (`lat,lon,seconds` per line); the Back button |
+| `.github/workflows/app.yml` | Builds, signs and publishes the app |
+
+`android-app/www/`, `node_modules/` and Gradle build folders are generated and not committed.
+
+**Where the app gets places.** The page, `app.js`, the lines and the leads are built into the app, so it always opens. A few seconds after start, and when a connection returns, it reads `version.json` from the Atlas address. If the build number there is newer, it downloads `index.html` (for the `d-sites` block), `data/lines.json` and `data/leads.json`, keeps them on the phone, and offers to reload. Old maps are fetched one at a time from `topo/` the first time a place is opened and kept after that.
+
+**The Atlas address** defaults to the GitHub Pages site (`DEF` in `boot.js`) and can be changed in the app under Guide, "Where the app gets its places". To move the Atlas to another host: copy the whole built site there, make the server send `Access-Control-Allow-Origin: *` (the app's page runs at `https://localhost`, so without that header every fetch is refused), then either type the new address into the app or change `DEF` and release a new build.
+
+**How recording works.** The page calls `start`; the plugin asks for location and notification permission and starts `TrackService`, which records on its own from then on. The page is only a viewer: while visible it asks for `points` it has not seen every few seconds, and catches up in one go when reopened. If Android kills the service, the points already written are safe; when the app is next opened, `resumeLog()` sees "should be recording, is not running" and starts the service again in the same log. Android may also restart the service by itself, which only works if the user chose "Allow all the time" for location.
+
+**Building.** Every pull request that touches the app is compiled by the `app` workflow. After a merge it publishes a release with `lost-hidden-atlas.apk`; the newest is always at `https://github.com/mrroot3r/Lost-and-Hidden-Atlas/releases/latest`. Pull requests get a pre-release marked TEST so the owner can install the change before merging. To build locally (Node 22, JDK 21, Android SDK 36):
+
+```
+cd android-app && npm ci && node scripts/make-www.js && npx cap sync android
+cd android && ./gradlew assembleDebug        # app/build/outputs/apk/debug/app-debug.apk
+```
+
+**Signing.** Android only installs an update over an existing app if both are signed with the same key. The key is not in the repository. The workflow reads it from two repository secrets, `ATLAS_KEYSTORE_B64` and `ATLAS_KEYSTORE_PASSWORD`; without them it still compiles the app but does not publish it. Never commit the key or print it in a log. If the key is lost, every user has to uninstall and reinstall, which wipes their notes unless they exported a backup first.
+
+**Testing, and its limits.** `tools/app_smoke.js` runs the app's page in a desktop browser against a stand-in recorder and checks start, a refused permission, catching up after the page was away, recovery after a kill, stop, share, delete and the Back button. It does not run any Java. Nothing in this workflow can install the app on a phone, so permission prompts, the notification, recording with the screen off, and each phone maker's battery rules can only be checked by the owner. Say exactly that in the pull request, and tell the owner what to try. The app's Guide tab has a "Copy app status" button whose output (permissions, GPS fixes received and kept, last error) is the first thing to ask for when a recording goes wrong.
+
+**Keep it small.** No analytics, no accounts, no extra permissions. The app asks for location, notifications (for the recording notice) and exemption from battery optimisation, and nothing else.
+

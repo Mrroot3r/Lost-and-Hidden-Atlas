@@ -89,6 +89,9 @@ web=('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta n
  '<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+head+'</head>\n<body>\n'+body+web_scripts+'</body>\n</html>\n')
 open(WEB+'index.html','w').write(web)
 open(WEB+'.nojekyll','w').write('')
+# for the Android app: its start-up script, and a small file it reads to see whether the places have changed
+open(WEB+'boot.js','w').write(open(R+'src/boot.js').read())
+open(WEB+'version.json','w').write(json.dumps({'v':V,'places':len(S),'built':data['built']}))
 open(WEB+'sw.js','w').write(open(R+'src/sw.js').read().replace('__V__',V))
 tot=sum(os.path.getsize(os.path.join(dp,f)) for dp,_,fs in os.walk(WEB) for f in fs)
 print('hosted copy: index',len(web)//1024,'KB, app',len(app)//1024,'KB, lines',os.path.getsize(WEB+'data/lines.json')//1024,'KB,',len(topo),'old maps; total',tot//1024,'KB; version',V)

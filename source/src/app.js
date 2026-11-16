@@ -4,10 +4,14 @@
 const D=JSON.parse(document.getElementById('d-sites').textContent);
 const BASE=D.sites, HUBS=D.hubs;
 let TOPO=null;
+/* AT is set by boot.js when this runs inside the Android app; NATIVE means the phone's recorder is available too */
+const AT=window.ATLAS||null, NATIVE=!!(AT&&AT.native);
 const HOSTED=!document.getElementById('d-topo');   /* hosted copy: old maps, lines and leads are separate files fetched when needed */
 const VQ=D.v?'?v='+D.v:'';
 const topoImg=s=>{ if(!s||!s.tm) return null; if(HOSTED) return 'topo/'+s.id+'.webp'+(s.tm.v?'?'+s.tm.v:''); if(!TOPO){ try{TOPO=JSON.parse(document.getElementById('d-topo').textContent);}catch(e){TOPO={};} } return TOPO[s.id]?'data:image/webp;base64,'+TOPO[s.id]:null; };
-function topoWarm(list){ if(!HOSTED) return; list.forEach(x=>{ const u=topoImg(x); if(u) fetch(u).catch(()=>{}); }); }
+/* the address of a place's old map; in the app it is fetched once and then kept on the phone, so this is a promise */
+function topoSrc(s){ if(!s||!s.tm) return Promise.resolve(null); if(AT) return AT.topo(s.id,s.tm.v).catch(()=>null); return Promise.resolve(topoImg(s)); }
+function topoWarm(list){ if(!HOSTED) return; list.forEach(x=>{ if(AT){ topoSrc(x); return; } const u=topoImg(x); if(u) fetch(u).catch(()=>{}); }); }
 
 const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Rail, trolley & bridges','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],burial:['Burial grounds','#6b4fa0'],town:['Ghost & drowned towns','#2e9e4a'],civic:['Downtown losses','#c79a00'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Standing landmarks','#8a8f94']};
 const ST={ruins:'Ruins you can see',traces:'Traces: grades, piers, earthworks',standing:'Still standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
@@ -510,7 +514,7 @@ let linesWait=null, linesTold=false;
 function linesData(){ if(LINES) return LINES; const n=document.getElementById('d-lines'); if(!n){ loadLines(); return []; }
   try{ LINES=JSON.parse(n.textContent); }catch(e){ LINES=[]; } return prepLines(LINES); }
 function loadLines(){ if(linesWait||LINES) return;
-  linesWait=fetch('data/lines.json'+VQ).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(a=>{ LINES=prepLines(a); drawLines();
+  linesWait=(AT?AT.fetch('data/lines.json'):fetch('data/lines.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(a=>{ LINES=prepLines(a); drawLines();
       if(sel&&view==='detail'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'')){ const v=$('#v-detail'), y=v.scrollTop; renderDetail(sel); v.scrollTop=y; } })
     .catch(()=>{ linesWait=null; if(!linesTold){ linesTold=true; banner('Old rail and canal lines could not load. They will try again when you are back online.',true,7000); } }); }
 function distToPart(lat,lon,part){ const kx=Math.cos(rad(lat))*111320, ky=110540; let best=1e12;
@@ -611,7 +615,7 @@ function drawLeads(){
   if(!U.ui.leads){ if(leadGrp) map.removeLayer(leadGrp); return; }
   if(!LEADS){ const n=document.getElementById('d-leads');
     if(n){ try{ LEADS=JSON.parse(n.textContent); }catch(e){ LEADS={t:[],p:[]}; } }
-    else { if(!drawLeads.wait) drawLeads.wait=fetch('data/leads.json'+VQ).then(r=>r.json()).then(j=>{ LEADS=j; drawLeads(); }).catch(()=>{ drawLeads.wait=null; banner('Leads could not load. Check your signal and tap Leads again.',true,6000); }); return; } }
+    else { if(!drawLeads.wait) drawLeads.wait=(AT?AT.fetch('data/leads.json'):fetch('data/leads.json'+VQ)).then(r=>r.json()).then(j=>{ LEADS=j; drawLeads(); }).catch(()=>{ drawLeads.wait=null; banner('Leads could not load. Check your signal and tap Leads again.',true,6000); }); return; } }
   if(!leadGrp){
     leadGrp=L.layerGroup();
     LEADS.p.forEach(p=>{ const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false}).addTo(leadGrp);
@@ -716,7 +720,7 @@ function locate(){
     navigator.geolocation.clearWatch(geo.id); geo.id=null; geo.f=null; geo.ll=null; mark(false);
     if(U.last){ placeDot(U.last.ll,false); saveNow(); banner('Location off. The grey dot marks where you last were.',false,4000); }
     return; }
-  const fail=msg=>{ if(geo.id!==null){ try{ navigator.geolocation.clearWatch(geo.id); }catch(e){} } geo.id=null; geo.f=null; geo.ll=null; mark(false); if(geo.dot&&U.last) placeDot(U.last.ll,false); banner(msg,true,12000); if(rec) stopLog(); };
+  const fail=msg=>{ if(geo.id!==null){ try{ navigator.geolocation.clearWatch(geo.id); }catch(e){} } geo.id=null; geo.f=null; geo.ll=null; mark(false); if(geo.dot&&U.last) placeDot(U.last.ll,false); banner(msg,true,12000); if(rec&&!NATIVE) stopLog(); };
   if(!navigator.geolocation){ fail('This browser has no location service.'); return; }
   geo.first=true; geo.f=null; mark(true); banner('Finding you…',false,6000);
   try{ geo.id=navigator.geolocation.watchPosition(g=>{ const c=g.coords, t=g.timestamp||Date.now(), p=gpsFilter(c,t); if(!p) return;
@@ -739,23 +743,42 @@ const hms=s=>{ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600),m=Math.fl
 const logSummary=l=>trackMi(l.pts).toFixed(2)+' mi · '+hms((l.t1||Math.round(Date.now()/1000))-l.t0)+' · '+l.notes.length+(l.notes.length===1?' note':' notes');
 async function keepAwake(){ try{ if(navigator.wakeLock&&!document.hidden) wake=await navigator.wakeLock.request('screen'); }catch(e){ wake=null; } }
 function dropAwake(){ try{ if(wake) wake.release(); }catch(e){} wake=null; }
-document.addEventListener('visibilitychange',()=>{ if(document.hidden) saveNow(); else if(rec) keepAwake(); });
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) saveNow(); else if(rec){ if(NATIVE) natSync().then(()=>syncRec()); else keepAwake(); } });
 window.addEventListener('pagehide',saveNow);
+/* In the Android app the phone records the track itself, screen off or not, and saves points to a file.
+   This page only reads them: natSync() collects any points it has not seen yet. */
+let natBusy=null, natTick=0;
+function natSync(){ if(!NATIVE||!rec) return Promise.resolve(0); if(natBusy) return natBusy; const l=rec;
+  natBusy=AT.call('points',{logId:l.id,from:l.nat||0}).then(r=>{ const a=(r&&r.points)||[];
+      a.forEach(p=>{ l.pts.push([p[0],p[1],p[2]]); if(recLine&&rec===l) recLine.addLatLng([p[0],p[1]]); });
+      if(a.length){ l.nat=(l.nat||0)+a.length; saveSlow(); } return a.length; }).catch(()=>0).then(n=>{ natBusy=null; return n; });
+  return natBusy; }
+function natWatch(){ clearInterval(natTick); natTick=setInterval(()=>{ if(!rec){ clearInterval(natTick); return; } if(!document.hidden) natSync(); },2500); }
 function startLog(s){
   if(rec) return;
-  if(!map||!navigator.geolocation){ banner('A field log needs the map and your location, which are not available here.',true,8000); return; }
+  if(!map||(!NATIVE&&!navigator.geolocation)){ banner('A field log needs the map and your location, which are not available here.',true,8000); return; }
   if(!Array.isArray(U.logs)) U.logs=[];
   const log={id:'log'+Date.now().toString(36),name:(s?s.name:'Field log')+' · '+new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),site:s?s.id:null,t0:Math.round(Date.now()/1000),t1:null,pts:[],notes:[]};
   U.logs.unshift(log); U.rec=log.id; rec=log; saveNow(); hideLog();
+  if(NATIVE){ log.nat=0; drawRec(); syncRec(); if(view==='log') renderLog();
+    AT.call('start',{logId:log.id,title:log.name}).then(st=>{ if(rec!==log) return; natWatch();
+        banner(st&&st.gps===false?'Location is switched off on this phone. Turn it on and the log will start filling in.':'Recording. It keeps going with the screen off or the app in the background.',!!(st&&st.gps===false),8000);
+        if(geo.id===null) locate(); if(view==='log') renderLog(); },
+      e=>{ if(rec===log){ rec=null; delete U.rec; clearRec(); syncRec(); } U.logs=U.logs.filter(x=>x!==log); saveNow(); if(view==='log') renderLog();
+        banner('Recording could not start. '+((e&&e.message)||'Permission was refused.'),true,12000); });
+    return; }
   if(geo.id===null) locate(); else banner('Recording. Keep this page open and the screen on.',false,6000);
   keepAwake(); drawRec(); syncRec(); if(view==='log') renderLog(); }
-function recPoint(p,acc,t){ if(!rec||acc>35) return; const pts=rec.pts,last=pts[pts.length-1];
+function recPoint(p,acc,t){ if(!rec||NATIVE||acc>35) return; const pts=rec.pts,last=pts[pts.length-1];
   if(last&&hav(last[0],last[1],p[0],p[1])*1609.34<4) return;
   pts.push([+p[0].toFixed(5),+p[1].toFixed(5),Math.round(t/1000)]); if(recLine) recLine.addLatLng([p[0],p[1]]); saveSlow(); }
-function addNote(text){ if(!rec) return; const p=geo.f?[geo.f.lat,geo.f.lon]:null, n={t:Math.round(Date.now()/1000),x:(text||'').trim()||'Mark'};
+function addNote(text){ if(!rec) return; const lp=rec.pts[rec.pts.length-1], p=geo.f?[geo.f.lat,geo.f.lon]:(NATIVE&&lp?[lp[0],lp[1]]:null), n={t:Math.round(Date.now()/1000),x:(text||'').trim()||'Mark'};
   if(p){ n.la=+p[0].toFixed(5); n.lo=+p[1].toFixed(5); } rec.notes.push(n); saveNow(); drawRec(); syncRec(); if(view==='log') renderLog();
   banner('Note saved at '+hms(n.t-rec.t0)+(p?'.':'. No GPS fix yet, so it has a time but no position.'),false,3000); }
-function stopLog(){ if(!rec) return; const l=rec; l.t1=Math.round(Date.now()/1000); rec=null; delete U.rec; dropAwake(); clearRec(); syncRec();
+function stopLog(){ if(!rec) return;
+  if(NATIVE&&!stopLog.flushed){ /* stop the phone's recorder first, then collect the last points it saved */
+    AT.call('stop').catch(()=>{}).then(natSync).then(()=>{ stopLog.flushed=true; try{ stopLog(); }finally{ stopLog.flushed=false; } }); return; }
+  clearInterval(natTick); const l=rec; l.t1=Math.round(Date.now()/1000); rec=null; delete U.rec; dropAwake(); clearRec(); syncRec();
   if(!l.pts.length&&!l.notes.length){ U.logs=U.logs.filter(x=>x!==l); saveNow(); banner('Nothing was recorded, so the log was discarded.',false,5000); if(view==='log') renderLog(); return; }
   saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log'); }
 function noteMark(n,l){ const m=L.marker([n.la,n.lo],{keyboard:false,icon:L.divIcon({className:'notepin',html:'',iconSize:[16,16],iconAnchor:[8,8]})});
@@ -779,7 +802,9 @@ function gpx(l){ const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&
     '<trk><name>'+esc(l.name)+'</name><trkseg>\n'+l.pts.map(p=>'<trkpt lat="'+p[0]+'" lon="'+p[1]+'"><time>'+iso(p[2])+'</time></trkpt>\n').join('')+'</trkseg></trk>\n</gpx>\n'; }
 function notesText(l){ const tm=t=>new Date(t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
   return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString()+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')).join('\n'):'No notes.')+'\n'; }
-async function sendFile(name,text,type,btn){ const blob=new Blob([text],{type:type});
+async function sendFile(name,text,type,btn){
+  if(NATIVE){ try{ await AT.call('share',{name:name,text:text,mime:type}); }catch(e){ copy(text,btn); banner('Sharing failed, so the text was copied instead.',true,5000); } return; }
+  const blob=new Blob([text],{type:type});
   try{ const f=new File([blob],name,{type:type}); if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:name}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
   try{ const a=el('a',{href:URL.createObjectURL(blob),download:name}); document.body.append(a); a.click(); a.remove(); }catch(e){ copy(text,btn); } }
 function renderLog(){
@@ -789,7 +814,15 @@ function renderLog(){
       el('div',{class:'row'},el('button',{class:'btn pri',type:'button',onclick:()=>{ $('#rec-note').click(); }},'+ Note here'),el('button',{class:'btn',type:'button',onclick:stopLog},'Stop and save'))); }
   else { top.append(el('p',{text:'Records where you walk and lets you drop timed notes on the spot. Afterwards you get the track for mapping and a note list with times to line up against your footage.'}),
       el('div',{class:'row'},el('button',{class:'btn pri',type:'button',onclick:()=>startLog(null)},'Start a field log'),sel?el('button',{class:'btn',type:'button',onclick:()=>startLog(sel)},'Start at '+sel.name):null)); }
-  top.append(el('p',{class:'snote',style:'margin-top:8px',text:'It only records while this page is open and the screen is on. The Atlas keeps the screen awake while it records, where the phone allows. Logs are saved in this browser and are included in your backup.'}));
+  if(NATIVE){ top.append(el('p',{class:'snote',style:'margin-top:8px',text:'Recording carries on with the screen off or the app in the background; Android shows a notification while it runs. If Android stops the app, the track so far is kept and the log picks up when you open the Atlas again.'}));
+    const tips=el('div',{class:'row',style:'margin-top:8px'}); top.append(tips);
+    AT.call('status').then(st=>{
+      if(st.gps===false) tips.before(el('p',{class:'pn',text:'Location is switched off on this phone, so nothing can be recorded until it is on.'}));
+      if(st.battery===false) tips.append(el('button',{class:'btn sm',type:'button',onclick:()=>AT.call('battery')},'Stop Android pausing it'));
+      if(st.background===false) tips.append(el('button',{class:'btn sm',type:'button',onclick:()=>AT.call('appSettings')},'Allow location all the time'));
+      if(st.battery===false||st.background===false) tips.after(el('p',{class:'snote',style:'margin-top:6px',text:(st.battery===false?'"Stop Android pausing it" asks Android not to shut the app down to save battery, the usual reason a recording ends early. ':'')+(st.background===false?'"Allow location all the time" is optional: under Permissions, Location. It lets Android restart a recording by itself.':'')}));
+    }).catch(()=>{}); }
+  else top.append(el('p',{class:'snote',style:'margin-top:8px',text:'It only records while this page is open and the screen is on. The Atlas keeps the screen awake while it records, where the phone allows. Logs are saved in this browser and are included in your backup.'}));
   v.append(top);
   const done=U.logs.filter(l=>l!==rec);
   if(!done.length){ v.append(el('p',{class:'pad',style:'color:var(--mute);padding-block:12px',text:rec?'':'No saved logs yet.'})); return; }
@@ -798,8 +831,8 @@ function renderLog(){
     const title=el('b',{text:l.name});
     const ren=el('button',{class:'btn sm',type:'button',onclick:()=>{ const i=el('input',{type:'text','aria-label':'Log name'}); i.value=l.name; const ok=()=>{ l.name=i.value.trim()||l.name; saveNow(); renderLog(); }; i.addEventListener('keydown',e=>{ if(e.key==='Enter') ok(); }); i.addEventListener('blur',ok); title.replaceWith(i); i.focus(); }},'Rename');
     const cp=el('button',{class:'btn sm',type:'button'},'Copy notes'); cp.addEventListener('click',()=>copy(notesText(l),cp));
-    const gx=el('button',{class:'btn sm',type:'button'},'GPX track'); gx.addEventListener('click',()=>sendFile(fn+'.gpx',gpx(l),'application/gpx+xml',gx));
-    const del=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; del.addEventListener('click',()=>{ if(!armed){ armed=true; del.textContent='Really delete?'; setTimeout(()=>{ armed=false; del.textContent='Delete'; },4000); return; } if(shownLog===l.id) hideLog(); U.logs=U.logs.filter(x=>x!==l); saveNow(); renderLog(); });
+    const gx=el('button',{class:'btn sm',type:'button'},NATIVE?'Share route (GPX)':'GPX track'); gx.addEventListener('click',()=>sendFile(fn+'.gpx',gpx(l),'application/gpx+xml',gx));
+    const del=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; del.addEventListener('click',()=>{ if(!armed){ armed=true; del.textContent='Really delete?'; setTimeout(()=>{ armed=false; del.textContent='Delete'; },4000); return; } if(shownLog===l.id) hideLog(); U.logs=U.logs.filter(x=>x!==l); saveNow(); if(NATIVE) AT.call('remove',{logId:l.id}).catch(()=>{}); renderLog(); });
     const site=l.site&&byId(l.site);
     const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
       el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,gx,cp,ren,del),
@@ -808,7 +841,21 @@ function renderLog(){
       box.append(el('details',{open:shown},el('summary',{text:l.notes.length+(l.notes.length===1?' note':' notes')}),ul)); }
     v.append(box); });
 }
-function resumeLog(){ if(!U.rec) return; const l=logById(U.rec); if(!l){ delete U.rec; return; }
+function resumeLog(){
+  if(NATIVE){ AT.call('status').then(st=>{
+      let l=U.rec?logById(U.rec):null;
+      if(st.recording&&st.logId&&(!l||l.id!==st.logId)){ /* the phone is recording a log this page has no record of: adopt it */
+        l=logById(st.logId); if(!Array.isArray(U.logs)) U.logs=[];
+        if(!l){ l={id:st.logId,name:'Field log · recovered',site:null,t0:Math.round((st.started||Date.now())/1000),t1:null,pts:[],notes:[],nat:0}; U.logs.unshift(l); }
+        U.rec=l.id; saveNow(); }
+      if(!l){ if(U.rec){ delete U.rec; saveNow(); } return; }
+      rec=l; drawRec(); syncRec();
+      if(st.recording&&st.logId===l.id){ const go=()=>{ natSync().then(()=>{ drawRec(); syncRec(); if(view==='log') renderLog(); }); natWatch(); };
+        if(st.running) go(); else AT.call('start',{logId:l.id,title:l.name}).then(go,go);   /* Android had stopped the recorder: start it again in the same log */
+        setTimeout(()=>banner(st.running?'Your field log is still recording.':'Android had paused the recording. It is running again in the same log.',!st.running,7000),1200); }
+      else natSync().then(()=>{ l.t1=l.pts.length?l.pts[l.pts.length-1][2]:l.t0; rec=null; delete U.rec; saveNow(); clearRec(); syncRec(); if(view==='log') renderLog(); });
+    }).catch(()=>{}); return; }
+  if(!U.rec) return; const l=logById(U.rec); if(!l){ delete U.rec; return; }
   const lastT=l.pts.length?l.pts[l.pts.length-1][2]:l.t0;
   if(map&&navigator.geolocation&&Date.now()/1000-lastT<1800){ rec=l; locate(); keepAwake(); drawRec(); syncRec(); setTimeout(()=>banner('Picked your field log back up where it stopped.',false,6000),1200); }
   else { l.t1=lastT; delete U.rec; saveNow(); } }
@@ -848,8 +895,11 @@ function drawSel(){
 }
 function showHist(){
   if(!map) return; if(histLayer){ map.removeLayer(histLayer); histLayer=null; }
-  if(!sel||!U.ui.hist||!sel.tm) return; const src=topoImg(sel); if(!src) return; const b=sel.tm.b;
-  histLayer=L.imageOverlay(src,[[b[0],b[1]],[b[2],b[3]]],{pane:'hist',opacity:U.ui.histOp,interactive:false}).addTo(map);
+  if(!sel||!U.ui.hist||!sel.tm) return; const who=sel, b=sel.tm.b;
+  topoSrc(who).then(src=>{ if(sel!==who||!U.ui.hist) return;
+    if(!src){ if(AT) banner(navigator.onLine===false?'This place\'s old map is not on the phone yet. It needs a signal the first time.':'The old map for this place could not be loaded.',true,6000); return; }
+    if(histLayer) map.removeLayer(histLayer);
+    histLayer=L.imageOverlay(src,[[b[0],b[1]],[b[2],b[3]]],{pane:'hist',opacity:U.ui.histOp,interactive:false}).addTo(map); });
 }
 function onMapClick(e){
   if(asking){ setAsking(false); whoPopup({lat:e.latlng.lat,lon:e.latlng.lng}); return; }
@@ -951,12 +1001,12 @@ function renderDetail(s){
       el('button',{class:'btn sm',type:'button',onclick:look('streets',null,15,false)},'Streets')));
   }
   if(s.tm){
-    const src=topoImg(s);
+    const pic=el('img',{alt:s.tm.y+' USGS map around '+s.name}); topoSrc(s).then(u=>{ if(u) pic.src=u; else pic.remove(); });
     const ck=el('input',{type:'checkbox',id:'d-hist',checked:!!U.ui.hist,onchange:e=>{U.ui.hist=e.target.checked;save();showHist();syncBar();}});
     sc.append(el('div',{class:'hist'},
       el('label',{class:'lopt',for:'d-hist'},ck,el('span',null,'Lay the '+s.tm.y+' USGS map over whatever layer is showing',el('small',{text:s.tm.q+' sheet, 1:'+Number(s.tm.sc).toLocaleString()+'. Old surveys can sit 50–100 m off; match roads and streams.'}))),
       el('input',{type:'range',id:'d-hist-op',min:'0.1',max:'1',step:'0.05',value:String(U.ui.histOp),'aria-label':'Old map strength',oninput:e=>{U.ui.histOp=+e.target.value;save();if(histLayer)histLayer.setOpacity(U.ui.histOp);}}),
-      src?el('img',{src:src,alt:s.tm.y+' USGS map around '+s.name,loading:'lazy'}):null));
+      pic));
   }
   const grid=el('div',{class:'scout',style:'margin-top:8px'}); scoutLinks(p,s.town).forEach(l=>grid.append(ext(l[1],l[0],'btn sm'))); sc.append(grid);
   if(map&&!schematic) sc.append(el('h3',{text:'Take it offline',style:'margin-top:14px'}),offlineBox(s.id,[p],s.name));
@@ -1174,6 +1224,22 @@ function renderGuide(){
     el('label',{class:'field',for:'bk-in',style:'margin-top:10px'},el('span',{text:'Restore'}),inp),
     el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>load(inp.value)},'Restore from pasted text'),file,msg),
     P('To grow the master list, use "Copy my additions for Claude" and paste it into a chat. Claude can fold them into the Atlas with drive times and old-map overlays.')]));
+  if(AT){ const info=el('p'), res=el('span',{class:'note-saved'}), addr=el('input',{type:'url',id:'at-base','aria-label':'Atlas address',autocomplete:'off'}); addr.value=AT.base;
+    const show=()=>{ info.textContent='Place data: build '+AT.dataV+(AT.fromCache?', downloaded from the address below.':', as built into the app.')+(AT.pending?' Build '+AT.pending+' is downloaded and loads the next time the app starts.':''); };
+    const run=()=>{ res.textContent=' Checking…'; return AT.check().then(r=>{ show(); res.textContent=r.state==='same'?' You have the latest.':' New data downloaded'+(r.places?' ('+r.places+' places)':'')+'.'; if(r.state!=='same') res.append(' ',el('button',{class:'btn sm',type:'button',onclick:()=>location.reload()},'Load it now')); },
+      e=>{ res.textContent=' '+(navigator.onLine===false?'No signal.':'Could not read that address: '+((e&&e.message)||'no answer')+'.'); }); };
+    show();
+    v.append(sec('Where the app gets its places',false,[
+      P('The app works with no signal using the places built into it. When it has a connection it looks for newer places, lines and leads at the address below and keeps them on the phone.'),
+      info,el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:run},'Check for new places'),res),
+      el('label',{class:'field',for:'at-base',style:'margin-top:10px'},el('span',{text:'Atlas address'}),addr),
+      el('div',{class:'row',style:'margin-top:6px'},
+        el('button',{class:'btn sm',type:'button',onclick:()=>{ if(!AT.setBase(addr.value)){ res.textContent=' That is not a web address.'; return; } addr.value=AT.base; run(); }},'Use this address'),
+        el('button',{class:'btn sm',type:'button',onclick:()=>{ AT.setBase(AT.def); addr.value=AT.base; run(); }},'Back to the original')),
+      NATIVE?(()=>{ const line=el('p',{class:'mono',style:'font-size:12px',text:'App status: reading…'}), cb=el('button',{class:'btn sm',type:'button'},'Copy app status'); let last='';
+        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
+        cb.addEventListener('click',()=>copy(last||line.textContent,cb)); return el('div',null,line,el('div',{class:'row'},cb)); })():null,
+      P('Change the address only if the Atlas moves to a new home. The new site must be a copy of this one and must allow other sites to read it (the Access-Control-Allow-Origin header).')])); }
   const stor=el('p',{text:'Checking…'}), sl=el('ul',{class:'links'});
   const fillStor=async()=>{ await tcScan(); let q=''; try{ const e=await navigator.storage.estimate(); if(e&&e.quota) q=' This browser allows the Atlas about '+mb(e.quota)+'.'; }catch(x){}
     stor.textContent='Saved for offline: '+TC.pinN+' tiles, '+mb(TC.pinSize)+'. Recently viewed: '+mb(TC.size)+' (oldest dropped past 150 MB).'+q;
@@ -1183,8 +1249,8 @@ function renderGuide(){
   const offSec=sec('Offline maps and storage',false,[P('The Atlas keeps a copy of every leaf-off, LiDAR, topo and lot-line tile it loads, so zooming back out or coming back to a place is instant. Areas you save from a place page or the trip are kept until you delete them.'),stor,sl,el('div',{class:'row'},clr),
     P('For offline use, open the Atlas from the downloaded file or your own web address, not the online copy in Claude. On iPhone, Safari may clear saved tiles if you do not open the Atlas for a few weeks; adding it to your Home Screen helps.')]);
   if(HOSTED){ const all=BASE.filter(x=>x.tm), ab=el('button',{class:'btn sm',type:'button'},'Keep every old map on this phone ('+all.length+' maps, about '+Math.round(all.length*0.031)+' MB)'), am=el('span',{class:'note-saved'});
-    ab.addEventListener('click',async()=>{ ab.disabled=true; let ok=0,bad=0; for(let i=0;i<all.length;i+=6){ await Promise.all(all.slice(i,i+6).map(x=>fetch(topoImg(x)).then(r=>{ if(r.ok) ok++; else bad++; },()=>{ bad++; }))); am.textContent=' '+(ok+bad)+' of '+all.length; } am.textContent=' Done: '+ok+' kept'+(bad?', '+bad+' failed':'')+'.'; ab.disabled=false; });
-    offSec.lastChild.append(el('p',{text:'This hosted copy keeps itself on the phone after the first visit, so it opens with no signal. Old survey maps are fetched one place at a time as you open them; saving a place for offline keeps its old map too.'}),el('div',{class:'row'},ab,am)); }
+    ab.addEventListener('click',async()=>{ ab.disabled=true; let ok=0,bad=0; for(let i=0;i<all.length;i+=6){ await Promise.all(all.slice(i,i+6).map(x=>(AT?topoSrc(x).then(u=>!!u):fetch(topoImg(x)).then(r=>r.ok,()=>false)).then(good=>{ if(good) ok++; else bad++; }))); am.textContent=' '+(ok+bad)+' of '+all.length; } am.textContent=' Done: '+ok+' kept'+(bad?', '+bad+' failed':'')+'.'; ab.disabled=false; });
+    offSec.lastChild.append(el('p',{text:(AT?'The app opens with no signal: the place list, lines and leads are built in.':'This hosted copy keeps itself on the phone after the first visit, so it opens with no signal.')+' Old survey maps are fetched one place at a time as you open them; saving a place for offline keeps its old map too.'}),el('div',{class:'row'},ab,am)); }
   offSec.addEventListener('toggle',()=>{ if(offSec.open) fillStor(); }); v.append(offSec);
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),
@@ -1227,7 +1293,21 @@ if(window.matchMedia('(min-width:821px)').matches) $('#filters').open=false;
 buildHome(); buildFilters(); renderList(); $('#trip-n').textContent=U.trip.length;
 if(window.L){ initMap(); buildBar(); resumeLog(); }
 else { $('#map').append(el('div',{class:'pad',style:'padding-block:40px;max-width:46ch;margin:auto',text:'The map library could not load, most likely because this device is offline. The list, place pages and links still work. Reload when you are back online.'})); $('#lbar').hidden=true; }
-if(HOSTED&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(HOSTED&&!AT&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+/* the phone's Back button, in the app: close whatever is open; returning false lets Android put the app in the background */
+window.atlasBack=()=>{
+  if(!$('#sheet').hidden){ closeSheet(); return true; }
+  if(adding||pickingHome||asking){ $('#add-cancel').click(); return true; }
+  if(!$('#rec-form').hidden){ $('#rec-form').hidden=true; return true; }
+  if(map&&map._popup&&map._popup.isOpen&&map._popup.isOpen()){ map.closePopup(); return true; }
+  if($('#app').classList.contains('mapbig')){ $('#app').classList.remove('mapbig'); buildBar(); setTimeout(()=>map&&map.invalidateSize(),60); return true; }
+  if(view==='detail'&&sel){ deselect(); return true; }
+  if(view!=='list'){ showView(sel?'detail':'list'); return true; }
+  return false; };
+/* in the app: look for newer places shortly after start, and again when a connection comes back */
+if(AT){ const look=()=>AT.check().then(r=>{ if(r.state==='updated'){ banner('New places downloaded'+(r.places?' ('+r.places+' in all)':'')+'. Tap here to load them.',false); $('#banner').onclick=()=>location.reload(); } },()=>{});
+  setTimeout(look,5000); window.addEventListener('online',()=>{ if(Date.now()-AT.checked>36e5) look(); });
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&Date.now()-AT.checked>6*36e5) look(); }); }
 (function fromHash(){ const id=decodeURIComponent((location.hash||'').replace(/^#/,'')); const s=id&&byId(id); if(s) select(s,true); })();
 window.addEventListener('hashchange',()=>{ const id=decodeURIComponent((location.hash||'').replace(/^#/,'')); const s=id&&byId(id); if(s&&(!sel||sel.id!==s.id)) select(s,true); });
 })();

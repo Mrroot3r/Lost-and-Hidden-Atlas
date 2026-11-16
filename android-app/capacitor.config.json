@@ -1,0 +1,8 @@
+{
+  "appId": "com.losthiddenatlas.app",
+  "appName": "Lost & Hidden Atlas",
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  }
+}
