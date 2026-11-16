@@ -371,7 +371,7 @@ function initMap(){
   map.attributionControl.setPrefix(false);
   map.createPane('cmp').style.zIndex=250;
   map.createPane('hist').style.zIndex=350;
-  map.on('moveend',()=>{ if(U.ui.land) drawLand(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
+  map.on('moveend',()=>{ if(U.ui.land) drawLand(); if(view==='near'&&NM.org==='map') nmDraw(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
   if(!LD[U.ui.base]) U.ui.base='streets';
   setBase(U.ui.base,true);
   map.on('zoomend',onZoom); onZoom();
@@ -483,6 +483,7 @@ function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawSca
 function pushPrefs(){ if(NATIVE) AT.call('configure',{units:pref('units'),step:STEP(),every:({fine:1000,normal:2000,coarse:5000})[pref('detail')]||2000,buzz:!!pref('buzz')}).catch(()=>{}); }
 function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme(); drawScale(); pushPrefs();
   if(k==='trk'){ if(rec) drawRec(); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
+  if(k==='units'){ const nv=$('#v-near'); if(nv) nv.textContent=''; if(view==='near') renderNear(); nmPush(true); }
   if(k==='units'||k==='clock'){ renderList(); if(sel&&view==='detail') renderDetail(sel); if(view==='log') renderLog(); if(view==='trip') renderTrip(); syncRec(); } }
 function showSettings(on){ sheetMode=on?'set':'map'; $('#sheet-t').textContent=on?'Settings':'Map options'; const g=$('#sheet-set'); g.setAttribute('aria-label',on?'Back to map options':'Settings'); g.classList.toggle('back',!!on);
   if(on) buildSettings(); else buildSheet(); $('#sheet-b').scrollTop=0; }
@@ -698,9 +699,7 @@ let LEADS=null, leadGrp=null;
 function drawLeads(){
   if(!map) return;
   if(!U.ui.leads){ if(leadGrp) map.removeLayer(leadGrp); return; }
-  if(!LEADS){ const n=document.getElementById('d-leads');
-    if(n){ try{ LEADS=JSON.parse(n.textContent); }catch(e){ LEADS={t:[],p:[]}; } }
-    else { if(!drawLeads.wait) drawLeads.wait=(AT?AT.fetch('data/leads.json'):fetch('data/leads.json'+VQ)).then(r=>r.json()).then(j=>{ LEADS=j; drawLeads(); }).catch(()=>{ drawLeads.wait=null; banner('Leads could not load. Check your signal and tap Leads again.',true,6000); }); return; } }
+  if(!LEADS){ leadsLoad(); if(!LEADS) return; }
   if(!leadGrp){
     leadGrp=L.layerGroup();
     LEADS.p.forEach(p=>{ const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false}).addTo(leadGrp);
@@ -723,10 +722,10 @@ const XL={
 Object.keys(XL).forEach(k=>{ XL[k].k=k; XL[k].data=null; XL[k].idx=null; XL[k].layer=null; XL[k].wait=null; });
 const xlOn=k=>!!(U.ui.xl&&U.ui.xl[k]);
 const xlShow=(k,x)=>k!=='vanished'||x[2]!==1||!!(U.ui.xl&&U.ui.xl.schools);     /* old school sites are two thirds of the file: off unless asked for */
-function xlLoad(k){ const X=XL[k]; if(X.data||X.wait) return;
+function xlLoad(k,quiet){ const X=XL[k]; if(X.data||X.wait) return;
   X.wait=(AT?AT.fetch(X.file):fetch(X.file+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
-    .then(j=>{ X.data=j; X.idx={}; j.p.forEach(x=>{ const g=Math.floor(x[0]*20)+','+Math.floor(x[1]*20); (X.idx[g]=X.idx[g]||[]).push(x); }); drawXL(k); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); })
-    .catch(()=>{ X.wait=null; banner('That layer could not load. Check your signal and switch it on again.',true,6000); }); }
+    .then(j=>{ X.data=j; X.idx={}; j.p.forEach(x=>{ const g=Math.floor(x[0]*20)+','+Math.floor(x[1]*20); (X.idx[g]=X.idx[g]||[]).push(x); }); drawXL(k); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
+    .catch(()=>{ X.wait=null; if(!quiet||xlOn(k)) banner('That layer could not load. Check your signal and switch it on again.',true,6000); }); }
 function xlInView(k,b){ const X=XL[k], out=[]; if(!X.idx) return out;
   for(let i=Math.floor(b.getSouth()*20);i<=Math.floor(b.getNorth()*20);i++) for(let j=Math.floor(b.getWest()*20);j<=Math.floor(b.getEast()*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(k,x)&&b.contains([x[0],x[1]])) out.push(x); });
   return out; }
@@ -773,10 +772,10 @@ function pockZoom(){ if(!U.ui.pockets||!pockGrp) return; const z=map.getZoom(), 
   const want=PKT.filter(t=>pockTier[t]&&z>=+t.slice(1)).join();       /* plain pockets underneath, the richest town centres on top */
   if(want!==pockGrp._want){ pockGrp._want=want; pockGrp.clearLayers(); want.split(',').forEach(t=>{ if(t) pockGrp.addLayer(pockTier[t]); }); }
   POCK.k.forEach(k=>{ if(!k.c||z<pockFrom(k)) return; k.c.setRadius(pockPx(k,z)); const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; k.c.setStyle({fillOpacity:ff}); } }); }
-function pockLoad(){ if(POCK||pockWait) return;
+function pockLoad(quiet){ if(POCK||pockWait) return;
   pockWait=(AT?AT.fetch('data/pockets.json'):fetch('data/pockets.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
-    .then(j=>{ POCK=j; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); })
-    .catch(()=>{ pockWait=null; banner('Historic pockets could not load. Check your signal and turn them on again.',true,6000); }); }
+    .then(j=>{ POCK=j; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
+    .catch(()=>{ pockWait=null; if(!quiet||U.ui.pockets) banner('Historic pockets could not load. Check your signal and turn them on again.',true,6000); }); }
 /* after "old town centres only" is switched: draw the discs afresh */
 function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.c=null; k.f=null; }); drawPockets(); }
 function drawPockets(){
@@ -942,7 +941,7 @@ function gpsFilter(c,t){
   f.lat+=k*(c.latitude-f.lat); f.lon+=k*(c.longitude-f.lon); f.v=(1-k)*f.v;
   return [f.lat,f.lon]; }
 function locate(){
-  const mark=on=>{ const b=$('#lb-loc'); if(b) b.setAttribute('aria-pressed',String(on)); };
+  const mark=on=>{ const b=$('#lb-loc'); if(b) b.setAttribute('aria-pressed',String(on)); if(!on) geo.acc=null; setTimeout(()=>nmDraw(true),0); };
   if(geo.id!==null){
     if(rec){ if(geo.ll) map.setView(geo.ll,Math.max(map.getZoom(),16)); banner('Location stays on while a field log is recording.',false,4000); return; }
     navigator.geolocation.clearWatch(geo.id); geo.id=null; geo.f=null; geo.ll=null; mark(false);
@@ -952,7 +951,7 @@ function locate(){
   if(!navigator.geolocation){ fail('This browser has no location service.'); return; }
   geo.first=true; geo.f=null; mark(true); banner('Finding you…',false,6000);
   try{ geo.id=navigator.geolocation.watchPosition(g=>{ const c=g.coords, t=g.timestamp||Date.now(), p=gpsFilter(c,t); if(!p) return;
-      const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); recPoint(p,c.accuracy||50,t);
+      const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); recPoint(p,c.accuracy||50,t); geo.acc=c.accuracy||50; nmFix(p,geo.acc);
       /* follow: if the dot was on screen and has now walked off it, bring the map along */
       if(pref('follow')&&!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
       if(geo.first){ geo.first=false; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,Math.max(map.getZoom(),16)); }
@@ -961,6 +960,116 @@ function locate(){
       fail('Could not get a GPS fix. Step into the open and try again.'); },
     {enableHighAccuracy:true,maximumAge:2000,timeout:25000}); }catch(e){ fail('Location is not available here.'); }
 }
+
+/* ---------- near me ----------
+   The Near tab: everything within a few miles of where you stand, nearest first, each with an arrow and a distance,
+   and an alert (a buzz on a phone) when you walk close to one. It reads the places, the OpenStreetMap leads, the
+   vanished places, the old mines and quarries, and the old town centres (listed, never buzzed).
+   Settings live in U.ui.nm: r = list radius in miles, al = alert distance in metres (0 = off), k = which kinds are in.
+   A target is {id,k,la,lo,n,t,o}: id is stable ('p:'+place id, 'l:'+position, 'v:'+GNIS id, 'm:'+USGS id, 'c:'+position).
+   In the Android app the page cannot run with the screen off, so while a field log records the list of targets is handed
+   to the recorder (FieldLog.targets -> TrackService), which does the buzzing itself. */
+const NMK={p:['Places','#d6338a'],l:['Leads','#c9a700'],v:['Vanished','#ff8a3d'],m:['Mines','#8c97a3'],c:['Towns','#6d5bd0']};
+const NMR=[[1,'1 mi','1.5 km'],[3,'3 mi','5 km'],[5,'5 mi','8 km'],[10,'10 mi','16 km']], NMA=[[0,'Off','Off'],[50,'160 ft','50 m'],[100,'330 ft','100 m'],[200,'660 ft','200 m']];
+const nmLab=(T,v)=>{ const c=T.find(c=>c[0]===v); return c?(KM()?c[2]:c[1]):(T===NMA?v+' m':v+' mi'); };
+const NM={org:'me',ver:0,cand:null,in:new Set(),goal:null,hd:null,drawn:0,dt:0,touch:0,push:null,line:null,ring:null,more:false,cmp:false};
+function nmSet(){ const o=U.ui.nm||{}; return {r:+o.r||3,al:o.al!=null?+o.al:100,k:Object.assign({p:1,l:1,v:1,m:1,c:1},o.k||{})}; }
+function nmSave(ch){ const S=nmSet(); Object.assign(S,ch); U.ui.nm=S; save(); NM.ver++; NM.cand=null; NM.more=false; nmEnsure(true); nmPush(true); nmDraw(true); }
+const brg=(a,b,c,d)=>{ const y=Math.sin(rad(d-b))*Math.cos(rad(c)), x=Math.cos(rad(a))*Math.sin(rad(c))-Math.sin(rad(a))*Math.cos(rad(c))*Math.cos(rad(d-b)); return (Math.atan2(y,x)*180/Math.PI+360)%360; };
+const dirTxt=b=>['N','NE','E','SE','S','SW','W','NW'][Math.round(b/45)%8];
+const nmDist=mi=>{ if(KM()){ const m=mi*1609.344; return m<950?Math.max(10,Math.round(m/10)*10)+' m':(m/1000).toFixed(m<20000?1:0)+' km'; } const f=mi*5280; return f<1000?Math.max(10,Math.round(f/10)*10)+' ft':mi.toFixed(mi<1?2:mi<10?1:0)+' mi'; };
+/* fetch whichever lead files the chosen kinds need; each tells nmLoaded() when it arrives */
+function leadsLoad(quiet){ if(LEADS) return; const n=document.getElementById('d-leads');
+  if(n){ try{ LEADS=JSON.parse(n.textContent); }catch(e){ LEADS={t:[],p:[]}; } return; }
+  if(!leadsLoad.wait) leadsLoad.wait=(AT?AT.fetch('data/leads.json'):fetch('data/leads.json'+VQ)).then(r=>r.json()).then(j=>{ LEADS=j; drawLeads(); nmLoaded(); }).catch(()=>{ leadsLoad.wait=null; if(!quiet||U.ui.leads) banner('Leads could not load. Check your signal and tap Leads again.',true,6000); }); }
+function nmEnsure(force){ const t=Date.now(); if(!force&&t-(NM.ens||0)<60000) return; NM.ens=t; const S=nmSet(); if(S.k.l) leadsLoad(true); if(S.k.v) xlLoad('vanished',true); if(S.k.m) xlLoad('mines',true); if(S.k.c) pockLoad(true); }
+function nmLoaded(){ NM.ver++; NM.cand=null; clearTimeout(NM.lt); NM.lt=setTimeout(()=>nmPush(false),1200); nmDraw(true); }
+/* every target of the chosen kinds within rmi miles of c */
+function nmCollect(c,rmi){ const S=nmSet(), out=[], add=(id,k,la,lo,n,t,o)=>{ if(hav(c[0],c[1],la,lo)<=rmi) out.push({id:id,k:k,la:la,lo:lo,n:n,t:t,o:o}); };
+  if(S.k.p) sites().forEach(s=>{ const q=pos(s), my=U.status[s.id]; add('p:'+s.id,'p',q.lat,q.lon,s.name,[s.cat==='lidar'?'LiDAR find, not verified':STS[s.st],s.town,my?MY[my]:''].filter(Boolean).join(' · '),s); });
+  if(S.k.l&&LEADS) LEADS.p.forEach(p=>add('l:'+p[0]+','+p[1],'l',p[0],p[1],p[3]||LEADS.t[p[2]],(p[3]?LEADS.t[p[2]]+' · ':'')+'unchecked lead',p));
+  [['v','vanished'],['m','mines']].forEach(q=>{ const X=XL[q[1]]; if(!S.k[q[0]]||!X.idx) return; const dla=rmi/69+0.002, dlo=rmi/(69*Math.cos(rad(c[0])))+0.002;
+    for(let i=Math.floor((c[0]-dla)*20);i<=Math.floor((c[0]+dla)*20);i++) for(let j=Math.floor((c[1]-dlo)*20);j<=Math.floor((c[1]+dlo)*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(q[1],x)) add(q[0]+':'+x[4],q[0],x[0],x[1],x[3]||X.data.t[x[2]],xlLine(q[1],x)+' · unchecked lead',x); }); });
+  if(S.k.c&&POCK) POCK.k.forEach(k=>{ if(pockC(k)) add('c:'+k[0]+','+k[1],'c',k[0],k[1],k[7],'Old town centre'+(k[12]?' · '+k[12]:''),k); });
+  return out; }
+/* the candidates round p, kept until you have moved a quarter of a mile or something changed */
+function nmCands(p){ const S=nmSet(), c=NM.cand; if(c&&c.v===NM.ver&&c.r===S.r&&hav(p[0],p[1],c.c[0],c.c[1])<0.25) return c.a;
+  NM.cand={v:NM.ver,r:S.r,c:p.slice(),a:nmCollect(p,S.r+0.3)}; return NM.cand.a; }
+/* where the list is measured from: you, the place you last were, or the middle of the map */
+function nmOrigin(){ if(NM.org==='map'&&map){ const c=map.getCenter(); return {p:[c.lat,c.lng],how:'map'}; }
+  if(geo.ll) return {p:geo.ll,how:'live'}; if(U.last&&U.last.ll) return {p:U.last.ll,how:'last'}; return null; }
+function nmOpen(t){ if(!map) return; const z=Math.max(map.getZoom(),15);
+  if(t.k==='p'){ select(t.o,true); return; }
+  map.setView([t.la,t.lo],z); if(t.k==='l') leadPopup(t.o); else if(t.k==='c') pockPopup(t.o,L.latLng(t.la,t.lo)); else xlPopup(t.k==='v'?'vanished':'mines',t.o); }
+/* "point me there": a big arrow and distance for one target, and a dashed line to it on the map */
+function nmGoal(t,fit){ NM.goal=t||null; nmGoalDraw();
+  if(t&&fit&&map){ const o=nmOrigin(); if(o&&hav(o.p[0],o.p[1],t.la,t.lo)<60) map.fitBounds(L.latLngBounds([o.p,[t.la,t.lo]]).pad(0.25),{maxZoom:17}); else map.setView([t.la,t.lo],Math.max(map.getZoom(),15)); }
+  nmDraw(true); }
+function nmGoalDraw(){ if(!map) return; const t=NM.goal, o=t&&nmOrigin();
+  if(!t){ if(NM.line){ map.removeLayer(NM.line); NM.line=null; } if(NM.ring){ map.removeLayer(NM.ring); NM.ring=null; } return; }
+  if(!NM.ring) NM.ring=L.circleMarker([t.la,t.lo],{radius:13,color:'#e11d74',weight:3,fill:false,interactive:false}).addTo(map); else NM.ring.setLatLng([t.la,t.lo]);
+  if(o&&o.how!=='map'){ if(!NM.line) NM.line=L.polyline([o.p,[t.la,t.lo]],{color:'#e11d74',weight:2.5,dashArray:'7 7',interactive:false}).addTo(map); else NM.line.setLatLngs([o.p,[t.la,t.lo]]); }
+  else if(NM.line){ map.removeLayer(NM.line); NM.line=null; } }
+const nmArrow=(b,big)=>{ const s=el('span',{class:'nmarrow'+(big?' big':''),'data-b':String(Math.round(b)),'aria-hidden':'true'}); s.innerHTML='<svg viewBox="0 0 24 24" width="'+(big?54:22)+'" height="'+(big?54:22)+'"><path d="M12 2.5 18.5 20 12 16.2 5.5 20z" fill="currentColor"/></svg>'; s.style.transform='rotate('+nmTurn(b)+'deg)'; return s; };
+const nmTurn=b=>Math.round(NM.hd==null?b:(b-NM.hd+360)%360);
+function nmSpin(){ document.querySelectorAll('#v-near .nmarrow').forEach(n=>{ n.style.transform='rotate('+nmTurn(+n.getAttribute('data-b'))+'deg)'; }); }
+/* the phone's compass, while the Near tab is showing: arrows then point from the way the phone is held */
+function nmHeading(e){ let h=null;
+  if(typeof e.webkitCompassHeading==='number') h=e.webkitCompassHeading;
+  else if(e.absolute&&e.alpha!=null){ const x=rad(e.beta||0), y=rad(e.gamma||0), z=rad(e.alpha);
+    /* east and north parts of two arrows fixed to the phone: out of its top edge (right when it lies flattish), and out of its back (right when it is held upright) */
+    const te=-Math.sin(z)*Math.cos(x), tn=Math.cos(z)*Math.cos(x), be=-Math.cos(z)*Math.sin(y)-Math.sin(z)*Math.sin(x)*Math.cos(y), bn=-Math.sin(z)*Math.sin(y)+Math.cos(z)*Math.sin(x)*Math.cos(y);
+    const top=te*te+tn*tn>=be*be+bn*bn; h=Math.atan2(top?te:be,top?tn:bn)*180/Math.PI; if(!isFinite(h)) return; }
+  if(h==null) return; h=(h+((screen.orientation&&screen.orientation.angle)||0)+360)%360;
+  const was=NM.hd; if(was!=null){ let d=h-was; if(d>180) d-=360; if(d<-180) d+=360; if(Math.abs(d)<2) return; h=(was+d*0.5+360)%360; }
+  NM.hd=h; if(was==null) nmDraw(true); else if(!nmHeading.raf) nmHeading.raf=requestAnimationFrame(()=>{ nmHeading.raf=0; nmSpin(); }); }
+function nmCompass(on){ if(on===NM.cmp) return; NM.cmp=on; const f=on?'addEventListener':'removeEventListener';
+  window[f]('deviceorientationabsolute',nmHeading); window[f]('deviceorientation',nmHeading); if(!on) NM.hd=null; }
+function nmAgo(t){ const m=Math.round((Date.now()-t)/60000); return m<2?'just now':m<90?m+' min ago':m<2880?Math.round(m/60)+' h ago':Math.round(m/1440)+' days ago'; }
+function renderNear(){ const v=$('#v-near'); if(!v) return;
+  if(!v.firstChild){   /* the controls are built once; nmDraw() fills in what changes */
+    const S=nmSet(), rs=el('select',{id:'near-r','aria-label':'How far to look'},NMR.map(c=>el('option',{value:String(c[0]),text:'Within '+(KM()?c[2]:c[1])}))), as=el('select',{id:'near-al','aria-label':'Alert me when this close'},NMA.map(c=>el('option',{value:String(c[0]),text:c[0]?'Alert within '+(KM()?c[2]:c[1]):'No alert'})));
+    rs.value=String(S.r); as.value=String(S.al); rs.addEventListener('change',()=>nmSave({r:+rs.value})); as.addEventListener('change',()=>nmSave({al:+as.value}));
+    v.append(el('div',{class:'pad nmtop'},el('div',{id:'near-st'}),el('div',{class:'nmrow'},rs,as),el('div',{class:'presets',id:'near-k'}),el('p',{class:'nmnote',id:'near-note'})),el('div',{id:'near-goal',hidden:''}),el('ul',{id:'near-list'}));
+    ['pointerdown','touchstart'].forEach(k=>v.addEventListener(k,()=>{ NM.touch=Date.now(); },{passive:true})); }
+  nmDraw(true); }
+function nmDraw(now){ if(view!=='near') return; const v=$('#v-near'); if(!v||!v.firstChild) return; const t=Date.now();
+  if(!now&&(t-NM.drawn<1500||t-NM.touch<700)){ clearTimeout(NM.dt); NM.dt=setTimeout(nmDraw,800); return; }
+  NM.drawn=t; const S=nmSet(), o=nmOrigin(), st=$('#near-st'), ul=$('#near-list'), top=v.scrollTop; NM.how=o?o.how:null; st.textContent=''; ul.textContent='';
+  const btn=(txt,fn,cls)=>el('button',{class:'btn sm'+(cls?' '+cls:''),type:'button',onclick:fn},txt);
+  const useMap=btn(NM.org==='map'?'Use where I am':'Use map centre',()=>{ NM.org=NM.org==='map'?'me':'map'; NM.cand=null; if(NM.org==='me'&&geo.id===null&&map) locate(); nmDraw(true); });
+  const find=()=>btn('Find me',()=>{ if(map) locate(); nmDraw(true); },'pri');
+  if(!o) st.append(...[el('b',{text:geo.id!==null?'Finding you…':'Near me needs to know where you are.'}),geo.id!==null?null:find(),useMap].filter(Boolean));
+  else st.append(...[el('b',{text:o.how==='live'?'From where you are'+(geo.acc?', good to '+Math.round(geo.acc)+' m':''):o.how==='map'?'From the middle of the map':geo.id!==null?'Finding you… Showing where you last were':'From where you last were, '+nmAgo(U.last.t)}),o.how==='last'&&geo.id===null?find():null,useMap].filter(Boolean));
+  const kb=$('#near-k'); kb.textContent=''; let all=[];
+  if(o){ all=nmCands(o.p).map(x=>{ x.mi=hav(o.p[0],o.p[1],x.la,x.lo); x.b=brg(o.p[0],o.p[1],x.la,x.lo); return x; }).filter(x=>x.mi<=S.r).sort((a,b)=>a.mi-b.mi); }
+  const wait={l:!LEADS,v:!XL.vanished.data,m:!XL.mines.data,c:!POCK};
+  Object.keys(NMK).forEach(k=>{ const n=all.filter(x=>x.k===k).length; kb.append(el('button',{class:'chip',type:'button','aria-pressed':String(!!S.k[k]),title:k==='c'?'Old town centres are listed but never set off the alert':k==='v'?'Old school sites are left out unless they are switched on under More, Vanished places':'',onclick:()=>{ const kk=Object.assign({},nmSet().k); kk[k]=kk[k]?0:1; nmSave({k:kk}); }},el('span',{class:'sw',style:'--c:'+NMK[k][1]}),NMK[k][0]+(S.k[k]&&o?(wait[k]?' …':' '+n):''))); });
+  $('#near-note').textContent=(NM.hd!=null?'Compass on: arrows point the way to walk. ':'Arrows: up is north. ')+(S.al?(navigator.vibrate?'Buzzes':'A notice shows')+' within '+nmLab(NMA,S.al)+' of a place or lead'+(NATIVE?' (screen off: only while a log records).':'.'):'');
+  const g=$('#near-goal'), G=NM.goal; g.textContent=''; g.hidden=!G;
+  if(G){ const far=o?hav(o.p[0],o.p[1],G.la,G.lo):null, b=o?brg(o.p[0],o.p[1],G.la,G.lo):0;
+    g.append(...[o?nmArrow(b,true):null,el('div',null,el('b',{class:'nmbig',text:o?nmDist(far)+' '+dirTxt(b):'Waiting for your position'}),el('span',{text:G.n}),el('small',{text:G.t})),
+      el('div',{class:'nmgo'},btn('Details',()=>nmOpen(G)),btn('Stop',()=>nmGoal(null)))].filter(Boolean)); nmGoalDraw(); }
+  if(o&&!all.length) ul.append(el('li',{class:'empty pad',text:Object.keys(wait).some(k=>S.k[k]&&wait[k])?'Loading the lead lists…':'Nothing on file within '+nmLab(NMR,S.r)+'. Try a wider circle, or switch on more kinds above.'}));
+  const cap=NM.more?400:60, frag=document.createDocumentFragment();
+  all.slice(0,cap).forEach(x=>frag.append(el('li',null,el('button',{class:'item pad nmitem'+(G&&G.id===x.id?' cur':''),type:'button','data-id':x.id,onclick:()=>nmGoal(x,true)},
+    nmArrow(x.b),el('span',null,el('b',{text:x.n}),el('small',null,el('span',{class:'sw',style:'--c:'+NMK[x.k][1]}),x.t)),el('span',{class:'mins'},nmDist(x.mi),el('i',{text:dirTxt(x.b)}))))));
+  ul.append(frag); if(all.length>cap) ul.append(el('li',{class:'pad',style:'padding-block:10px'},btn('Show all '+all.length,()=>{ NM.more=true; nmDraw(true); })));
+  v.scrollTop=top; }
+/* every GPS fix comes through here: refresh the list, and alert when something has come within range */
+function nmFix(p,acc){ nmDraw(NM.org==='me'&&NM.how!=='live'); if(NM.goal) nmGoalDraw(); const S=nmSet(); if(!S.al) return; nmEnsure(); if(NATIVE&&rec) nmPush(false); if(acc>35) return;
+  let hit=null, more=0; nmCands(p).forEach(x=>{ if(x.k==='c') return; const m=hav(p[0],p[1],x.la,x.lo)*1609.344;
+    if(m<=S.al){ if(!NM.in.has(x.id)){ NM.in.add(x.id); if(!hit||m<hit.m){ if(hit) more++; hit={x:x,m:m}; } else more++; } } else if(m>S.al*2+30) NM.in.delete(x.id); });
+  if(!hit) return; const x=hit.x;
+  if(!(NATIVE&&rec)){ try{ if(navigator.vibrate) navigator.vibrate([260,140,260]); }catch(e){} }   /* while a log records in the app, the recorder buzzes */
+  banner('Close by: '+x.n+', about '+nmDist(hit.m/1609.344)+' '+dirTxt(brg(p[0],p[1],x.la,x.lo))+(more?', and '+more+' more':'')+'. Tap to point me there.',false,20000);
+  $('#banner').onclick=()=>{ $('#banner').hidden=true; showView('near'); nmGoal(x,true); }; }
+/* in the Android app: hand the recorder everything within 25 miles, so it can buzz with the screen off */
+function nmPush(force){ if(!NATIVE) return; const S=nmSet(), p=geo.ll||(U.last&&U.last.ll);
+  if(!S.al||!p){ if(force||NM.push){ NM.push=null; AT.call('targets',{r:0,list:[]}).catch(()=>{}); } return; }
+  if(!force&&NM.push&&NM.push.v===NM.ver&&hav(p[0],p[1],NM.push.c[0],NM.push.c[1])<8) return;
+  const list=nmCollect(p,25).filter(x=>x.k!=='c').map(x=>{ x.mi=hav(p[0],p[1],x.la,x.lo); return x; }).sort((a,b)=>a.mi-b.mi).slice(0,4000).map(x=>[+(+x.la).toFixed(5),+(+x.lo).toFixed(5),x.id,String(x.n||'').slice(0,60)]);
+  NM.push={c:p.slice(),v:NM.ver,n:list.length}; AT.call('targets',{r:S.al,list:list}).catch(()=>{}); }
 
 /* field log: a GPS track with timed notes, kept in this browser */
 let rec=null, recLine=null, recMarks=[], shownLog=null, shownLayers=[], wake=null, recTick=0;
@@ -993,7 +1102,7 @@ function startLog(s){
   const log={id:'log'+Date.now().toString(36),name:(s?s.name:'Field log')+' · '+new Date().toLocaleDateString(undefined,{month:'short',day:'numeric'}),site:s?s.id:null,t0:Math.round(Date.now()/1000),t1:null,pts:[],notes:[]};
   U.logs.unshift(log); U.rec=log.id; rec=log; saveNow(); hideLog();
   if(NATIVE){ log.nat=0; drawRec(); syncRec(); if(view==='log') renderLog();
-    AT.call('start',{logId:log.id,title:log.name}).then(st=>{ if(rec!==log) return; natWatch();
+    AT.call('start',{logId:log.id,title:log.name}).then(st=>{ if(rec!==log) return; natWatch(); nmEnsure(true); nmPush(true);
         banner(st&&st.gps===false?'Location is switched off on this phone. Turn it on and the log will start filling in.':'Recording. It keeps going in the background. To drop a pin without leaving the camera, pull down the notifications and tap Mark here.',!!(st&&st.gps===false),8000);
         if(geo.id===null) locate(); if(view==='log') renderLog(); },
       e=>{ if(rec===log){ rec=null; delete U.rec; clearRec(); syncRec(); } U.logs=U.logs.filter(x=>x!==log); saveNow(); if(view==='log') renderLog();
@@ -1213,7 +1322,7 @@ function resumeLog(){
         if(!l){ l={id:st.logId,name:'Field log · recovered',site:null,t0:Math.round((st.started||Date.now())/1000),t1:null,pts:[],notes:[],nat:0}; U.logs.unshift(l); }
         U.rec=l.id; saveNow(); }
       if(!l){ if(U.rec){ delete U.rec; saveNow(); } return; }
-      rec=l; drawRec(); syncRec();
+      rec=l; drawRec(); syncRec(); nmEnsure(true); nmPush(true);
       if(st.recording&&st.logId===l.id){ const go=()=>{ natSync().then(()=>{ drawRec(); syncRec(); if(view==='log') renderLog(); }); natWatch(); };
         if(st.running) go(); else AT.call('start',{logId:l.id,title:l.name}).then(go,go);   /* Android had stopped the recorder: start it again in the same log */
         setTimeout(()=>banner(st.running?'Your field log is still recording.':'Android had paused the recording. It is running again in the same log.',!st.running,7000),1200); }
@@ -1295,8 +1404,9 @@ function onContext(e){
 
 /* ---------- views ---------- */
 let view='list';
-function showView(v){ view=v; ['list','detail','trip','log','guide'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
-  $('#tab-list').setAttribute('aria-selected',String(v==='list'||v==='detail')); $('#tab-trip').setAttribute('aria-selected',String(v==='trip')); $('#tab-guide').setAttribute('aria-selected',String(v==='guide')); $('#tab-log').setAttribute('aria-selected',String(v==='log'));
+function showView(v){ view=v; ['list','detail','trip','log','guide','near'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
+  $('#tab-list').setAttribute('aria-selected',String(v==='list'||v==='detail')); $('#tab-trip').setAttribute('aria-selected',String(v==='trip')); $('#tab-guide').setAttribute('aria-selected',String(v==='guide')); $('#tab-log').setAttribute('aria-selected',String(v==='log')); $('#tab-near').setAttribute('aria-selected',String(v==='near'));
+  nmCompass(v==='near'); if(v==='near'){ nmEnsure(true); renderNear(); if(NM.org==='me'&&geo.id===null&&U.last&&map) locate(); }
   if(v==='trip') renderTrip(); if(v==='guide') renderGuide(); if(v==='log') renderLog(); }
 function refresh(){ buildFilters(); renderList(); syncMarkers(); $('#trip-n').textContent=U.trip.length; if(view==='trip') renderTrip(); }
 function select(s,fly){
@@ -1577,6 +1687,12 @@ function renderGuide(){
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
   const ser=el('div',{class:'series'}); D.series.forEach(s=>{ const n=BASE.filter(x=>(x.tags||[]).indexOf(s.tag)>=0).length;
     ser.append(el('button',{type:'button',onclick:()=>{ clearF(); $('#q').value=''; F.tag=s.tag; showView('list'); refresh(); fitVisible(); }},el('b',{text:s.title+' · '+n+' stops'}),el('small',{text:s.note}))); });
+  v.append(sec('Near me: what is close, and a buzz when you pass it',false,[
+    P('The Near tab lists everything on file within a few miles of where you stand, nearest first: the places, the unchecked leads, vanished places, old mines and quarries, and old town centres. Each row has an arrow, a distance and a compass direction. Tap a row and the top of the tab turns into one big arrow and distance for that spot, with a dashed line to it on the map. Tap Stop to let it go.'),
+    P('If the phone has a compass the arrows turn as you turn, so the arrow points the way to walk from the top of the phone. Without one, arrows are map directions: up is north, the same as the map.'),
+    P('With an alert distance set, the phone buzzes and a notice shows when you come within that distance of a place or lead. It fires once for each spot, and again only after you have walked well away and come back. Old town centres are listed but never set it off.'),
+    P(NATIVE?'With the screen off, the buzz works only while a field log is recording, because the recorder is what keeps the GPS running. The notification then names what you are near. The app gives the recorder everything within 25 miles each time it is opened.':'In a browser the alert works only while this page is open, the screen is on and location is switched on. In the Android app it also works with the screen off while a field log is recording.'),
+    P('Lead positions are rough. A vanished place or an old mine can be a hundred metres or more from its dot, so treat the buzz as "look around here", and check whose land it is before you leave the trail.')]));
   v.append(sec('Video series ideas',false,[P('Each one filters the map to its stops. Timing assumes leaf-off months, November to April, for anything in the woods.'),ser]));
   const air=el('div',{class:'tk'}); D.aerial.forEach(t=>air.append(el('div',null,ext(t[2],t[0]),el('span',{text:t[1]}))));
   v.append(sec('Old air photos and maps',false,[P('No free service streams 1940s–50s air photos for this region as a map layer, so the Atlas builds in what can be streamed (state flights back to the 1990s, LiDAR, and scanned USGS sheets) and links out for the rest. Every place page has an "Old air photos" button that opens the spot in Historic Aerials.'),air]));
@@ -1679,6 +1795,7 @@ window.atlasBack=()=>{
   if(map&&map._popup&&map._popup.isOpen&&map._popup.isOpen()){ map.closePopup(); return true; }
   if($('#app').classList.contains('mapbig')){ $('#app').classList.remove('mapbig'); buildBar(); setTimeout(()=>map&&map.invalidateSize(),60); return true; }
   if(view==='detail'&&sel){ deselect(); return true; }
+  if(view==='near'&&NM.goal){ nmGoal(null); return true; }
   if(view!=='list'){ showView(sel?'detail':'list'); return true; }
   return false; };
 /* in the app: look for newer places shortly after start, and again when a connection comes back */

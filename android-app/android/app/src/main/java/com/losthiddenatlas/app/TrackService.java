@@ -12,6 +12,7 @@ import android.content.pm.ServiceInfo;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.AudioAttributes;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -28,7 +29,8 @@ import java.util.Locale;
 /**
  * Records a field log with the screen off or the app in the background.
  * It runs as a foreground service (Android shows a notification while it records), listens to GPS,
- * smooths the fixes, and appends accepted points to a file through TrackStore.
+ * smooths the fixes, and appends accepted points to a file through TrackStore. It also does the "Near me" buzz:
+ * the page hands it a list of places and leads (NearList), and it vibrates when the phone comes within range of one.
  * The page is not involved: it reads the file when it is next visible.
  */
 public class TrackService extends Service implements LocationListener {
@@ -66,6 +68,13 @@ public class TrackService extends Service implements LocationListener {
     private int markCount = 0;
     private double meters = 0;
     private long lastNoteUpdate = 0;
+
+    // "Near me": places and leads the page handed over (FieldLogPlugin.targets). The phone buzzes when one comes within range.
+    private final NearList near = new NearList();
+    private long nearStamp = -1; // which version of the list file is loaded
+    private long nearLooked = 0;
+    private String nearLine = ""; // what the notification says we are near
+    private long nearUntil = 0;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -112,6 +121,10 @@ public class TrackService extends Service implements LocationListener {
         haveFix = false;
         haveLast = false;
         badRun = 0;
+        near.forget();
+        nearStamp = -1;
+        nearLooked = 0;
+        nearLine = "";
         List<double[]> have = TrackStore.read(this, logId, 0);
         count = have.size();
         markCount = TrackStore.readMarks(this, logId, 0).size();
@@ -152,6 +165,7 @@ public class TrackService extends Service implements LocationListener {
         lastFixAt = System.currentTimeMillis();
         double[] p = filter(l.getLatitude(), l.getLongitude(), acc, l.hasSpeed() ? l.getSpeed() : -1f, t);
         if (p == null || acc > MAX_ACCURACY_M) return;
+        checkNear(p[0], p[1]); // before the "have we moved" test: a list the page has just sent must not wait for the next step
         if (haveLast) {
             double d = dist(lastLat, lastLon, p[0], p[1]);
             if (d < minStep) return;
@@ -171,6 +185,45 @@ public class TrackService extends Service implements LocationListener {
                 nm.notify(NOTE_ID, note(status()));
             } catch (Exception ignored) {}
         }
+    }
+
+    /**
+     * "Near me": buzzes when a place or lead comes within range, and names it in the notification.
+     * The list file is looked at again at most every 15 seconds, and re-read only when the page has rewritten it.
+     */
+    private void checkNear(double lat, double lon) {
+        long now = System.currentTimeMillis();
+        if (now - nearLooked >= 15000L) {
+            nearLooked = now;
+            long stamp = TrackStore.nearStamp(this);
+            if (stamp != nearStamp) {
+                nearStamp = stamp;
+                try {
+                    near.load(TrackStore.readNear(this));
+                } catch (Exception e) {
+                    lastError = "near-me list: " + e;
+                }
+            }
+        }
+        NearList.Hit hit = near.check(lat, lon);
+        if (hit == null) return;
+        nearLine = hit.line("km".equals(getSharedPreferences(PREFS, MODE_PRIVATE).getString("units", "mi")));
+        nearUntil = now + 10L * 60L * 1000L;
+        try {
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (v != null) {
+                long[] pattern = { 0, 260, 140, 260 }; // two longer buzzes, unlike the single short one for "Mark here"
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // sent as an alarm so that a silenced ringer does not swallow it: the walker asked for this buzz
+                    AudioAttributes aa = new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_ALARM).setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+                    v.vibrate(VibrationEffect.createWaveform(pattern, -1), aa);
+                } else v.vibrate(pattern, -1);
+            }
+        } catch (Exception ignored) {}
+        try {
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.notify(NOTE_ID, note(status()));
+        } catch (Exception ignored) {}
     }
 
     /** "Mark here": saves a timed pin where the phone is now. The page turns it into a note that can be named later. */
@@ -257,10 +310,13 @@ public class TrackService extends Service implements LocationListener {
         open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         PendingIntent markIntent = PendingIntent.getService(this, 1, new Intent(this, TrackService.class).setAction(ACTION_MARK), PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        return new NotificationCompat.Builder(this, CHANNEL)
+        boolean nearNow = !nearLine.isEmpty() && System.currentTimeMillis() < nearUntil; // for ten minutes after a buzz, say what it was for
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL);
+        if (nearNow) b.setStyle(new NotificationCompat.BigTextStyle().bigText("Near " + nearLine + "\n" + text));
+        return b
             .setSmallIcon(R.drawable.ic_stat_track)
             .setContentTitle(title)
-            .setContentText(text)
+            .setContentText(nearNow ? "Near " + nearLine : text)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)

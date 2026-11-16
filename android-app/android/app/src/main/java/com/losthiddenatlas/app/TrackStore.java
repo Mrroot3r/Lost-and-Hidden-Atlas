@@ -3,8 +3,12 @@ package com.losthiddenatlas.app;
 import android.content.Context;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -102,5 +106,44 @@ final class TrackStore {
             }
         } catch (Exception ignored) {}
         return out;
+    }
+
+    // ---- "Near me": the places and leads the recorder should buzz near, as the page last handed them over (see NearList) ----
+
+    private static File near(Context c) {
+        return new File(c.getFilesDir(), "near.txt");
+    }
+
+    /** Replaces the list in one step, so the recorder never reads half a file. */
+    static synchronized void writeNear(Context c, String text) throws IOException {
+        File tmp = new File(c.getFilesDir(), "near.txt.tmp");
+        try (FileOutputStream o = new FileOutputStream(tmp)) {
+            o.write(text.getBytes(StandardCharsets.UTF_8));
+        }
+        if (!tmp.renameTo(near(c))) throw new IOException("could not replace near.txt");
+    }
+
+    /** The saved list, or null when there is none. */
+    static synchronized String readNear(Context c) {
+        File f = near(c);
+        if (!f.exists()) return null;
+        try (FileInputStream in = new FileInputStream(f)) {
+            byte[] b = new byte[(int) f.length()];
+            int n = 0;
+            while (n < b.length) {
+                int r = in.read(b, n, b.length - n);
+                if (r < 0) break;
+                n += r;
+            }
+            return new String(b, 0, n, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /** Changes whenever the list is rewritten; 0 when there is no list. */
+    static synchronized long nearStamp(Context c) {
+        File f = near(c);
+        return f.exists() ? f.lastModified() * 31L + f.length() : 0L;
     }
 }

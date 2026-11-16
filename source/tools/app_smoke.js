@@ -32,6 +32,7 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
         { kind: 'image', id: 1, name: 'P1.jpg', taken: (o.from + 62) * 1000, modified: o.from + 62, bucket: 'Camera' },
         { kind: 'image', id: 2, name: 'shot.png', taken: (o.from + 63) * 1000, modified: o.from + 63, bucket: 'Screenshots' },
         { kind: 'video', id: 3, name: 'V1.mp4', taken: (o.from + 70) * 1000, modified: o.from + 70, duration: 5000, bucket: 'Camera' }] })
+      else if (m === 'targets') { s.targets = { r: o.r, n: (o.list || []).length, first: (o.list || [])[0] }; res({}); }   // Near me: what the recorder should buzz near
       else if (m === 'marks') res({ marks: (s.marks || []).slice(o.from || 0) })
       else if (m === 'saveBackup') res({ where: 'Download/Lost Hidden Atlas/' + o.name, bytes: o.text.length })
       else if (m === 'thumb') res({ data: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' })
@@ -53,6 +54,7 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   await page.evaluate(() => { window.__denyStart = false; }); await page.getByRole('button', { name: 'Start a field log', exact: true }).click(); await page.waitForTimeout(5000);
   await page.click('#rec-note'); await page.fill('#rec-text', 'cellar hole'); await page.keyboard.press('Enter'); await page.waitForTimeout(500);   // adding a note also saves the log
   let l = await log(); ok('recording: points arrive from the phone', l && l.rec && l.pts >= 6, l && l.pts);
+  const tg = (await phone()).targets || {}; ok('Near me: the recorder is handed the places and leads to buzz near', tg.r === 100 && tg.n > 20 && Array.isArray(tg.first) && tg.first.length === 4 && typeof tg.first[2] === 'string', JSON.stringify(tg).slice(0, 120));
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('mock-phone')); s.marks = [[null, null, Math.round(Date.now() / 1000)]]; localStorage.setItem('mock-phone', JSON.stringify(s)); }); await page.waitForTimeout(3200);   // "Mark here" tapped on the notification
   ok('a mark from the notification becomes a note with a position', await page.evaluate(() => { const l = JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).logs[0]; const n = l.notes.find(x => x.mk); return !!(n && n.x === 'Mark 1' && n.la != null); }));
   const before = (await log()).pts; await page.goto('about:blank'); await page.waitForTimeout(4000); await page.goto(URL0); await page.waitForTimeout(4500);
@@ -79,6 +81,11 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   ok('Settings open from the gear and hold the data-source section', (await page.locator('#sheet-t').textContent()) === 'Settings' && await page.locator('#at-base').count() === 1);
   await page.selectOption('#set-units', 'km'); await page.waitForTimeout(300);
   ok('settings reach the recorder', (await phone()).calls.includes('configure'));
+  await page.click('#sheet-x'); await page.click('#tab-near'); await page.waitForTimeout(2500);   // opening Near switches location on
+  ok('Near tab lists what is close, nearest first', await page.locator('#near-list .nmitem').count() > 3 && /From where you are/.test(await page.locator('#near-st').innerText()), (await page.locator('#near-list .nmitem').count()) + ' rows; ' + (await page.locator('#near-st').innerText()).replace(/\s+/g, ' ').slice(0, 60) + '; ' + (await page.locator('#near-list .nmitem').first().innerText()).replace(/\s+/g, ' ').slice(0, 60));
+  await page.selectOption('#near-al', '0'); await page.waitForTimeout(600);
+  ok('Near me: switching the alert off reaches the recorder', ((await phone()).targets || {}).r === 0);
+  await page.click('#lb-opt'); await page.waitForTimeout(300);
   await page.click('#sheet-x'); await page.click('#tab-log'); await page.waitForTimeout(300);
   ok('no script errors', errs.length === 0, errs.join(' | ').slice(0, 300));
   await browser.close(); console.log(fails.length ? fails.length + ' FAILED' : 'app smoke test passed'); process.exit(fails.length ? 1 : 0);
