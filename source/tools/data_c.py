@@ -24,10 +24,10 @@ N('schaghticoke-powder','Schaghticoke Powder Company site','Schaghticoke','renss
   'Josiah and Nicholas Masters founded the powder works in 1813. At its height it covered about 100 acres with some 20 buildings on the south bank of the Hoosic River, half a mile southeast of the village.',
   'Not established. Powder mills were spread out on purpose and often leave blast walls, wheel pits and a raceway; check LiDAR along the south bank before going.','',
   'Ownership not checked. Use "What\'s here" on the map to look up the parcel before you walk in.',[W('Schaghticoke Powder Company')],conf='lead'),
-N('vischer-ferry-lock19','Vischer Ferry: Erie Canal Lock 19 and Clute\'s Dry Dock','Clifton Park','sar','canal','ruins',42.78603,-73.82098,'site','public','walk','canal','1840s canal',
-  'A long stretch of the enlarged Erie Canal left behind when the Barge Canal moved into the river. The preserve keeps the watered canal prism, the double Lock 19 and Clute\'s Dry Dock, where boats were built and repaired.',
-  'Lock 19\'s cut-stone chambers at the west end, and the dry dock about 2.5 miles east at 42.79394, -73.77666.','',
-  'Vischer Ferry Nature and Historic Preserve. The Canal Corporation owns the land and the Town of Clifton Park keeps the trails; open sunrise to sunset.',[],conf='mixed'),
+N('vischer-ferry-lock19','Vischer Ferry: Erie Canal Lock 19 and Clute\'s Dry Dock','Clifton Park','sar','canal','ruins',42.78603,-73.82098,'site','public','walk','canal','1825 canal',
+  'The preserve keeps an original section of the Erie Canal and its towpath, built in 1825, and its main entrance has an 1862 Whipple truss bridge of the kind once used to cross the canal. Lock 19 and Clute\'s Dry Dock are mapped inside it on OpenStreetMap; their history was not confirmed from a source this round.',
+  'The lock chambers at the pin, and the dry dock about 2.5 miles east at 42.79394, -73.77666, as mapped.','',
+  'Vischer Ferry Nature and Historic Preserve. The Canal Corporation owns the land and the Town of Clifton Park keeps the trails.',[W('Vischer Ferry Nature and Historic Preserve')],conf='mixed'),
 N('mechanicville-hydro','Mechanicville Hydroelectric Plant','Mechanicville','sar','industry','standing',42.8781,-73.6797,'site','view','drive','','1897–98',
   'Built in 1897–98 on the Hudson, with Charles Steinmetz among the engineers tied to it. It is one of the earliest hydroelectric stations of its kind still standing.',
   'The long brick powerhouse on the river.','','Working plant; view from the public road or the river.',[W('Mechanicville Hydroelectric Plant')]),
@@ -199,3 +199,7 @@ PNC={'feeder-five-combines':GEO,'rogers-island':GEO+' (visitors center)','dionon
 # field reports from the user
 FR={'luna-park':'Field report, November 2026: rails are still in the brush and can be seen from the edge. A passer-by confirmed more remains further in. The brush was too thick to get through; he said it is easier in winter on snowshoes.'}
 EXTRA_C={'pepacton':' New York City bought the land from 1942; 974 people were moved out of four hamlets (Arena, Pepacton, Shavertown and Union Grove). The dam was finished in 1954 and the valley was full by 1955. The water also covered about a quarter of the Delaware & Northern Railroad.'}
+
+# what build_sites.py reads
+BATCH={'key':'albany','label':'Around Albany','added':'2026-11-14'}
+PLACES=C; PIN_NOTES=PNC

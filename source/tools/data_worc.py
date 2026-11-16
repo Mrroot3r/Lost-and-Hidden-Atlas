@@ -71,3 +71,7 @@ N('becker-leicester','Becker College, Leicester campus','Leicester','worc','inst
 ]
 PNX={x['id']:WK for x in X}
 PNX.update({'worcester-cold-storage':GEO,'worcester-common-burials':GEO,'oread-castle':GEO+' (the park)','clinton-tunnel':GEO+' (Clamshell Road)','heywood-wakefield':GEO,'wcsr-remains':'Pin is downtown Worcester only; nothing is located yet.','becker-leicester':'Pin is the centre of Leicester; not checked.','quinsigamond-causeway':WK+' It marks the lake.'})
+
+# what build_sites.py reads
+BATCH={'key':'worcester','label':'Worcester deep pass','added':'2026-11-15 17:45'}
+PLACES=X; PIN_NOTES=PNX

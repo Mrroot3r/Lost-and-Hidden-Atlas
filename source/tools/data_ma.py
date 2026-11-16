@@ -221,3 +221,7 @@ PNM.update({'stanley-woolen-mill':'Pin is the village of Uxbridge; the mill itse
  'rutland-prison-camp':GEO+' (Prison Camp Road)','blackstone-canal-uxbridge':GEO+' (River Bend Farm visitor center)','quabbin-enfield':GEO+' (Enfield Lookout)','mount-tom-ski':GEO+' (Mt Tom Ski Road)',
  'mount-holyoke-summit':GEO,'middlesex-canal':GEO+' (canal museum)','bear-dens':'Pin is Franklin Park; the dens are in Long Crouch Woods north of the zoo.','pleasant-street-incline':GEO+' (Elliot Norton Park)',
  'haywardville':GEO+' (Virginia Wood area)','fort-warren':GEO})
+
+# what build_sites.py reads
+BATCH={'key':'mass','label':'Massachusetts','added':'2026-11-15 14:00'}
+PLACES=M; PIN_NOTES=PNM

@@ -1,6 +1,6 @@
 # Working on the Lost & Hidden Atlas
 
-This is the handoff guide. It tells a new contributor, human or AI model, what the Atlas is, how it is built, and how to add places without lowering its quality. Read it before changing anything.
+This is the handoff guide. It tells a new contributor, human or AI model, what the Atlas is, how it is built, how to add places without lowering its quality, and how a change gets published. Read it before changing anything.
 
 ## 1. What the Atlas is
 
@@ -21,50 +21,95 @@ The site is static files on GitHub Pages. There is no server and no account. A v
 
 | File | Role |
 |---|---|
-| `index.html` | Page, styles, and two inline JSON blocks: `d-sites` (places, start cities, guide text) and `d-base` (outline map used only if tiles cannot load) |
+| `index.html` | Page, styles, and two inline JSON blocks: `d-sites` (places, batches, start cities, guide text) and `d-base` (outline map used only if tiles cannot load) |
 | `app.js` | The whole app: one plain-JavaScript file, no framework, Leaflet for the map |
 | `sw.js` | Service worker: page is fetched fresh when online, served from cache when not; versioned files and `topo/` images are cached once |
 | `data/lines.json` | Old rail, trolley and canal lines; fetched after load |
 | `data/leads.json` | Unchecked leads from OpenStreetMap; fetched when the Leads layer is turned on |
 | `topo/<place-id>.webp` | One cropped old USGS map per place; fetched when the place is opened |
 | `source/` | Everything the site is generated from |
+| `source/tools/states.py` | The base for every state: its regions, start cities and what is wired up for it |
+| `LEADS.md` | Places someone read about but did not add, and why |
 
 **Never edit the files in the repository root by hand.** They are build output. Edit `source/` and rebuild.
 
-Map layers come from public services, chosen per state by `regionOf()` in `app.js`:
+Map layers come from public services, chosen per state. `regionOf()` in `app.js` works out the state of any point from simplified Census outlines of the nine Northeast states (`source/build/states.json`), so nobody has to describe a border by hand.
 
 - Streets and satellite: Esri. Current and old topo: USGS and Esri.
-- Leaf-off aerial and LiDAR: New York (NYS ITS, slow export services, heavily cached), Massachusetts (MassGIS tiles), Vermont (VCGI tiles), Rhode Island (RIGIS image services at `maps.edc.uri.edu/rigis`: the March 2026 3-inch flight, and the 2022 LiDAR elevation service shaded on request the same way as New York's, so the light direction setting works there too). Other states fall back to Esri satellite and world hillshade.
-- Public land: USGS PAD-US. Owner lookup and lot lines: NYS tax parcels (only some counties share owner names), NYS DEC, MassGIS parcels (statewide).
+- Leaf-off aerial and LiDAR: New York (NYS ITS, slow export services, heavily cached), Massachusetts (MassGIS tiles), Vermont (VCGI tiles), Rhode Island (RIGIS image services at `maps.edc.uri.edu/rigis`: the March 2026 flight and the 2022 LiDAR elevation service, shaded on request like New York's). Other states fall back to Esri satellite and world hillshade.
+- Public land: USGS PAD-US. Owner lookup and lot lines: NYS tax parcels (only some counties share owner names), NYS DEC, MassGIS parcels (statewide). None yet for Rhode Island.
 - Drive times: OSRM, precomputed at build time from the start cities in `tools/drive.py`.
 
-## 3. Building and publishing
+## 3. How a change gets published
+
+**Nothing goes straight to `main`.** Merging to `main` publishes the site within about a minute, so every change travels as a pull request that the owner merges.
+
+1. Start from a fresh clone of `main` and build a workspace (commands below).
+2. Make the change in the workspace, rebuild, run the checks and tests.
+3. `publish.sh` puts the result on a **new branch**. Commit once, push the branch, open a pull request into `main`.
+4. **Stop there.** Do not merge your own pull request, even if you can. Say in the pull request what changed, what you verified, and what you could not.
+5. GitHub runs `check` on the pull request (place-list validation, source and build in step, a phone-size test that the site opens). The owner merges when it is green, using **Squash and merge** so each change is one commit.
+
+**Undoing a change.** Each merged pull request is one commit that holds both the source and the built site, so undoing it restores the previous site exactly.
+
+- Owner: open the merged pull request on GitHub, press **Revert**, and merge the pull request it creates.
+- Model: `git revert <commit>` on a new branch, then a pull request as usual. Never force-push or reset `main`.
+- Visitors' saved notes are untouched by a revert. Notes on a place that disappears stay stored and return if the place does.
+
+**If `main` moved while you worked.** Build output always conflicts. Take `main`'s version of everything outside `source/`, merge `source/` by hand, then run setup, build and publish again. Keep one data pull request open at a time to avoid this.
+
+### Commands
 
 ```bash
 git clone --depth 1 https://github.com/mrroot3r/lost-and-hidden-atlas repo
-bash repo/source/tools/setup.sh /path/to/work     # builds a working folder from the clone
+bash repo/source/tools/setup.sh /path/to/work     # builds a clean working folder; reports missing dependencies
 export ATLAS=/path/to/work
+# ... edit $ATLAS/src and $ATLAS/tools ...
 bash $ATLAS/tools/all.sh                          # rebuilds everything into $ATLAS/dist/web
-(cd $ATLAS/dist && python3 -m http.server 8766) & # serve it
-node $ATLAS/tools/smoke.js http://localhost:8766/web/   # phone-size smoke test, needs Playwright
-bash $ATLAS/tools/publish.sh repo                 # copies the build and sources into the clone and stages them
+(cd $ATLAS/dist && python3 -m http.server 8766) &
+node $ATLAS/tools/smoke.js http://localhost:8766/web/ [place-id]   # phone-size test; give a new place's id to test its tiles
+bash $ATLAS/tools/publish.sh repo my-branch-name  # copies build and sources onto a new branch, stages, runs check.py
+git -C repo commit && git -C repo push -u origin my-branch-name
+# open the pull request (REST works where the gh pr commands do not):
+gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls -f title="..." -f head=my-branch-name -f base=main -f body="..."
 ```
 
-Then review `git status`, commit, and push to `main`. GitHub Pages redeploys in about a minute. Check that `sw.js` on the live site shows the new version string.
+`setup.sh` replaces the workspace's `src/`, `tools/` and `build/topo/` so nothing stale survives from an earlier session; files it does not recognise are moved to `stray/` and listed. It keeps `cache/` and `research/`.
 
-Needs Python 3 with `requests`, plus `rasterio` and `Pillow` for old-map crops, and Node with Playwright for tests.
+Needs Python 3 with `requests`; `Pillow` and `rasterio` for old-map crops and pin checks; `shapely` only for rebuilding lines; Node with Playwright for tests.
 
 What `all.sh` runs, in order: `build_sites.py` (merge place lists) → `drive.py` (drive times) → `padus.py` (public-land status per pin) → `leads.py` → `make.py` (assemble the site) → `export.py` (CSV and KML).
 
-Not part of `all.sh`, run only when needed:
+Run only when needed:
 
 - `python3 tools/topo_all.py <id> <id> …` cuts old-map crops for new places. It downloads large USGS scans, so run it only for new ids.
+- `python3 tools/pincheck.py --batch <key>` makes contact sheets of every new pin on an aerial (section 6).
 - `tools/lines.py` rebuilds the rail and canal lines. It needs raw downloads that are not in the repository. Run it only when adding a region.
-- `tools/osm_leads.py`, `tools/osm_worc.py` download leads. The Overpass servers fail often; the scripts rotate mirrors. Split big areas into small boxes.
+- `tools/osm_leads.py`, `tools/osm_worc.py` download leads from Overpass.
+
+### What a cloud session usually cannot reach
+
+Check these once and move on; do not spend time retrying.
+
+| Service | What happens | Do instead |
+|---|---|---|
+| Wikipedia search and query API | HTTP 429 for minutes at a time, even batched and paced | `tools/wiki_raw.py`, which reads one article at a time as raw text |
+| Overpass (OpenStreetMap queries) | Blocked or timing out on most mirrors | Skip leads for now and record it in section 10; try small boxes on the `maps.mail.ru` mirror |
+| Everything else used here (ArcGIS geocoder, state image services, OSRM, USGS TNM, PAD-US) | Has worked | |
 
 ## 4. The place record
 
-Places are Python calls to `N(...)` in `source/tools/data_*.py` (`data_c.py`, `data_ma.py` and `data_worc.py` are the cleanest examples). `data_a.py` is the original catalogue and has an older shape; leave it alone.
+Places are Python calls to `N(...)` in `source/tools/data_*.py`. Each file is one **batch**. `data_ri.py` and `data_worc.py` are the cleanest examples. `data_a.py` and `data_b.py` are the original catalogue and have an older shape; leave them alone.
+
+A batch file must define three names, and then `build_sites.py` picks it up by itself. No other code changes are needed:
+
+```python
+BATCH={'key':'ct','label':'Connecticut','added':'2026-12-01'}   # key: short and unique; added: sorts batches, newest last
+PLACES=[ N(...), N(...) ]
+PIN_NOTES={'place-id':'One sentence on where the coordinate came from.'}
+```
+
+The app shows the newest batch as a quick filter and lists every batch under Filters, "Added in".
 
 ```python
 N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
@@ -73,8 +118,8 @@ N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
 
 | Field | Meaning and allowed values |
 |---|---|
-| `id` | Unique lowercase slug with hyphens. Never rename one: saved notes are keyed to it |
-| `reg` | Region code from `REG` in `app.js` (for example `worc`, `pv`, `berk`, `adk`, `cat`). A new region needs a new entry there |
+| `id` | Unique lowercase slug with hyphens. Ids are shared across every state, and common names repeat (`queens-fort` exists in New York), so give a new place a town or state suffix when in doubt: `queens-fort-exeter`. **Never rename a published id**: saved notes are keyed to it |
+| `reg` | Region code from `tools/states.py`. Every Northeast state already has regions; pick the one the place is in. `check.py` fails if the pin is not inside that region's state |
 | `cat` | `amuse` `hotel` `canal` `rail` `industry` `burial` `town` `civic` `fort` `water` `inst` `light` `landmark` |
 | `st` | What is left: `ruins` `traces` (grades, piers, earthworks) `standing` `marker` `gone` `water` (drowned) |
 | `prec` | `exact` (on the structure, about 30 m) · `site` (inside the footprint, about 150 m) · `area` (right vicinity only, about 500 m) |
@@ -87,31 +132,39 @@ N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
 | `hook` | Optional one-line video angle |
 | `accn` | Access note: who owns or manages it, hours, fees, hazards |
 | `links` | Sources as `[label, url]` pairs. `W('Article title')` makes a Wikipedia link |
-| `conf` | Leave empty when sourced. `'mixed'` when the outline is sourced but some details are not. `'lead'` when the entry is unverified |
+| `conf` | Empty when sourced. `'mixed'` when the outline is sourced but a detail is unconfirmed or sources disagree. `'lead'` when the entry is unverified |
 | `th`, `thn` | Parking or trailhead `[lat, lon]` and its name, when the pin is not where you park |
 
-Each data file also has a pin-note dictionary (`PNC`, `PNM`, `PNX`) mapping id to one sentence on **where the coordinate came from**. Every new place needs one.
-
-To add a batch: create `data_<area>.py`, then import it in `build_sites.py` the way `data_worc.py` is imported.
+`python3 source/tools/check.py` validates all of this without a network. `publish.sh` runs it, and so does GitHub on every pull request.
 
 ## 5. Research rules
 
 These are what keep the Atlas trustworthy. They are not optional.
 
-1. **Every fact needs a source you actually read.** Dates, names, numbers and "what remains" claims come from the linked source. If you cannot source a detail, leave it out or write "not confirmed" in the text and set `conf`.
+1. **Every fact needs a source you actually read.** Dates, names, numbers and "what remains" claims come from the linked source. If you cannot source a detail, leave it out or write "not confirmed" and set `conf`.
 2. **Do not fill gaps from memory.** A model's recollection of a place is a lead to check, never a fact to publish. This matters most for what survives on the ground, which changes.
-3. **Be honest about the pin.** Coordinates from a Wikipedia infobox, an OpenStreetMap feature, an address lookup or a trail log are each fine if the pin note says so. If the coordinate marks a town, a road or a park entrance and not the ruin, say that and use `prec='area'`. Never invent or nudge a coordinate.
-4. **Say what is left, not what was there.** A demolished site is `gone`, however famous. Check for recent demolition, fire or redevelopment.
-5. **Access is part of the entry.** Name the owner or manager when known. Private or unknown means `ask` or `view`. Active railroads, mines, tunnels and sealed buildings get a plain warning. Never describe a way in.
-6. **Write plainly.** Short sentences, no hype, no filler. Put the facts in your own words; do not copy source sentences.
-7. **Prefer places with something to find.** Ruins and traces first, then standing landmarks with a story, then vanished sites that matter to a series.
-8. **Stay inside what the user can reach.** Their base is Albany, New York; a second base is Worcester, Massachusetts.
+3. **When sources disagree, say so.** Give both versions in the text ("the closing year is not confirmed: the articles give both 1995 and November 1994"), set `conf='mixed'`, and do not pick one.
+4. **Be honest about the pin, and look at it.** A coordinate from a Wikipedia infobox, an OpenStreetMap feature, an address lookup or a trail log is fine if the pin note says so. But such coordinates are often off the structure: in the Rhode Island batch 5 of 28 were visibly wrong on the aerial. Run the pin check in section 6 on every new pin. Move a pin only when you can see the right spot; otherwise keep it, use `prec='area'`, and say what the aerial showed. Never invent or nudge a coordinate blind.
+5. **Say what is left, not what was there.** A demolished site is `gone`, however famous. Check for recent demolition, fire or redevelopment.
+6. **Access is part of the entry.** Legal access detail is wanted and useful: who owns or manages the land, where to park, which trail or public path reaches it, hours, fees, permits, who to ask. Private or unknown means `ask` or `view`. Active railroads, mines, tunnels and sealed buildings get a plain warning. The one thing that stays out is how to get past a barrier into somewhere closed: a fence, a locked gate, a sealed building, a closed bridge. If that is the only "access" a source describes, write that the place is closed.
+7. **Write plainly.** Short sentences, no hype, no filler. Put the facts in your own words; do not copy source sentences.
+8. **Prefer places with something to find.** Ruins and traces first, then standing landmarks with a story, then vanished sites that matter to a series.
+9. **Record what you did not add.** A place you read about but could not source or locate goes in `LEADS.md` with one line on what is missing.
 
-Sources that have worked: Wikipedia and National Register listings (facts and coordinates), state park and land-trust pages (access, trail maps), OpenStreetMap `historic=ruins` and related tags (leads and coordinates), town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places. Wikipedia rate-limits hard: batch titles (`tools/wiki_ma.py`, `tools/wiki_wt.py`), pause between calls, send a real User-Agent, cache to disk. From a shared cloud address the API answers 429 for minutes at a time even at that pace; fetching one article at a time as raw wikitext (`index.php?title=…&action=raw`), a few seconds apart, got through when the API did not. Before trusting a pin, pull a 300 m square of the state leaf-off aerial around it: that caught a Wikipedia coordinate that lands on the shoreline beside a fort instead of on it.
+## 6. Research workflow
 
-## 6. Handing research to a cheaper model
+1. **Collect exact titles.** Guessed article titles fail (the Ladd School is "The Ladd School"). Open a list page first and copy names from it: "National Register of Historic Places listings in *county*", "List of amusement parks in *state*", a state's "Category:" pages, state park and land-trust site indexes.
+2. **Read each article:** `python3 tools/wiki_raw.py "Exact title" …` prints its coordinates and opening text; add `-g 'closed|demol|remain|ruin'` to pull only the sentences about what happened and what is left. Other sources that have worked: state park and land-trust pages (access, trail maps), National Park Service pages, town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places.
+3. **Write the entries** in a new `data_<area>.py` with its `BATCH`, `PLACES` and `PIN_NOTES`.
+4. **Build the list:** `python3 tools/build_sites.py`. It stops on a duplicate id or a missing pin note.
+5. **Check every pin:** `python3 tools/pincheck.py --batch <key>` writes contact sheets to `research/`: one 300 m aerial square per pin with a 30 m ring. Look at every tile. Fix what you can see, downgrade what you cannot, and record in the pin note what the aerial showed.
+6. **Cut old maps** for the new ids with `topo_all.py`, then run `all.sh`.
+7. **Test:** the smoke test with one of the new place ids, then open a few new places in a browser at phone size.
+8. **Publish** as a pull request (section 3). List in it anything you could not verify.
 
-Give it this guide's sections 4 and 5 and a prompt like the one below. Have a stronger model, or a person, spot-check a sample before publishing.
+## 7. Handing research to a cheaper model
+
+Give it sections 4, 5 and 6 and a prompt like the one below. Have a stronger model, or a person, spot-check a sample before the pull request is merged; "what remains today" and coordinates are where cheaper models slip.
 
 ```
 You are adding places to the Lost & Hidden Atlas, a map of ruins and lost
@@ -121,34 +174,48 @@ ruins, traces or a standing landmark with a story.
 For each place, read at least one source and return one Python N(...) call
 in the format below, plus one pin-note line. Rules:
 - Use only facts stated in a source you opened. Link every source.
+- If sources disagree, give both versions and set conf='mixed'.
 - If you cannot confirm what remains today, say "Not confirmed" in `look`
   and set conf='mixed' or conf='lead'.
 - Give the coordinate's origin in the pin note. If it marks a town, road or
   park and not the site itself, say so and use prec='area'.
-- State who owns or manages the land if a source says. Otherwise acc='ask'
-  or 'view'. Never describe how to get into a building or past a fence.
+- Give legal access detail when a source has it: owner or manager, parking,
+  trail, hours, fees. Otherwise acc='ask' or 'view'. Do not describe how to
+  get past a fence, a lock or a sealed entrance.
+- Use a region code from tools/states.py for the state the place is in.
 - Plain short sentences in your own words. No hype.
-- Skip a place rather than guess.
+- Skip a place rather than guess, and list it with what was missing.
 
 <paste the field table from section 4 and one example entry>
-
-Finish with a list of anything you could not verify.
 ```
 
-Then, for the batch: add the file, hook it into `build_sites.py`, run `build_sites.py` to catch duplicate ids, run `topo_all.py` for the new ids, run `all.sh`, run the smoke test, open a few of the new places and compare each pin with the leaf-off aerial and LiDAR.
+## 8. Opening a new state or area
 
-## 7. Adding a new state or region
+The base is already in place for all nine Northeast states: New York, Massachusetts, Rhode Island, Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania. For each, `tools/states.py` lists its regions and start cities (the capital and the main cities), the map covers it, state detection works, and satellite imagery and a world hillshade load as a fallback. **To start work in any of them, you only add a batch of places** (section 6) using that state's region codes.
 
-1. Add region codes to `REG` in `app.js`.
-2. Extend `regionOf()` and its border tables so tiles pick the right state. Test with known cities on both sides of each border.
-3. Add that state's leaf-off and LiDAR tile services to `leafUrl()` and `lidarUrl()` if it publishes them. Check they send CORS headers and note their deepest zoom.
-4. Widen `maxBounds` in `initMap()`, the box in `lines.py`, and the box in `basegeo.py`.
-5. Add old rail and canal lines for the area and rebuild `lines.json`.
-6. Add a parcel-owner lookup if the state publishes one (`lookup()` in `app.js`).
-7. Consider a new start city in `drive.py`.
-8. Update the legal notes in the in-app Guide: trespass law differs by state.
+| State | Places so far | Leaf-off and LiDAR | Owner lookup | Law note in the app |
+|---|---|---|---|---|
+| New York | Capital Region outward; none yet in NYC, central, western or northern regions | State services | Some counties | Yes |
+| Massachusetts | Statewide first pass, Worcester County deeper | State services | Statewide | Yes |
+| Rhode Island | First pass | State services | No | Yes |
+| Vermont | A few in the south | State services | No | No |
+| Connecticut | Two in the northwest | Fallback only | No | No |
+| New Hampshire, Maine, New Jersey, Pennsylvania | None | Fallback only | No | No |
 
-## 8. Changing the app
+Beyond adding places, these make a state better. Do them when asked, or note in section 10 that they are still open.
+
+| Step | When | What to do |
+|---|---|---|
+| Law note | With the first batch for a state | Add the state's trespass basics to the in-app Guide and set `legal` to `True` in `states.py`. Read the statute; do not paraphrase from memory |
+| State imagery | When the state publishes it | Add its leaf-off and LiDAR services to `leafUrl()` and `lidarUrl()`. Check they send CORS headers, note their deepest zoom, and look at a tile over open water (some services return black there). Then test with `node tools/smoke.js <url> <place-id>` |
+| Rail and canal lines | Can wait | Widen the box in `lines.py`, add the state's old lines, rebuild `lines.json` |
+| Leads | Can wait | Overpass download for the state |
+| Owner lookup and lot lines | Can wait | Add to `lookup()` and `drawLots()` if the state publishes parcels with owner names |
+| A new region or start city | When a state's regions are too coarse | Add it in `states.py`. Do not rename a region code that published places use |
+
+A state outside these nine also needs its outline added to `source/build/states.json`, an entry in `states.py`, and wider `maxBounds` in `initMap()`.
+
+## 9. Changing the app
 
 - `app.js` is one file with sections marked by comments. State is the object `U`; `save()` persists it. Add new saved fields to `U0()` so old backups still load.
 - The phone layout is the main one: a scrolling icon bar under the map, an options sheet with a fixed Done button, four tabs (Places, Trip, Log, Guide). Keep touch targets large. Test at phone size first.
@@ -156,18 +223,19 @@ Then, for the batch: add the file, hook it into `build_sites.py`, run `build_sit
 - Bump nothing by hand: `make.py` stamps a version into `index.html`, the script URL and `sw.js` on every build.
 - The app also builds as a single self-contained file (`dist/Lost-and-Hidden-Atlas.html`). It detects that mode by the presence of an inline `d-topo` block.
 
-## 9. Known gaps
+## 10. Known gaps
 
-- Most pins added in November 2026 were not checked against imagery. Their pin notes say so.
-- Leads are missing for greater Boston, the South Shore and Cape Cod.
+- Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial, and none was moved.
+- Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have the base only: regions, start cities and fallback imagery. They have no law note in the app, and the last four have no places.
+- Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
+- The Rhode Island LiDAR service returns black or blank tiles over open water.
+- Leads are missing for greater Boston, the South Shore, Cape Cod and Rhode Island.
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
 - GPS smoothing and the field log were tested with simulated location only.
 - A web page cannot record location with the screen off. An Android app wrapper with background location is planned.
-- Rhode Island is a first pass: 28 places in `data_ri.py`, each pin looked at once on the state leaf-off aerial but none walked. Not done there: owner lookup and lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), leads (Overpass could not be reached), and a rebuild of the rail and canal lines.
-- Rhode Island leads read about but not added, for want of a source or a coordinate: Ramtail Factory (Foster), Hunt's Mills (East Providence), Enchanted Forest (Hope Valley, 1971–2005), Whale Rock Light foundation, Warren powerhouse ruins, Windswept ruins (Narragansett), Stillwater mill (Smithfield).
 - Not built yet: historical-markers layer, photo notes, GPX import.
 
-## 10. Privacy
+## 11. Privacy
 
-The repository and site are public. Do not commit anything personal about the owner or about private landowners: no email addresses, no mailing addresses, no notes exported from someone's browser. The owner lookup deliberately shows owner names from public parcel files but not mailing addresses.
+The repository and site are public. Do not commit anything personal about the owner or about private landowners: no email addresses, no mailing addresses, no notes exported from someone's browser. The owner lookup deliberately shows owner names from public parcel files but not mailing addresses. `check.py` fails if it finds an email address in the repository.
