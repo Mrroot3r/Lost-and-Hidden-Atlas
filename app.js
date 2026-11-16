@@ -781,12 +781,20 @@ function stopLog(){ if(!rec) return;
   clearInterval(natTick); const l=rec; l.t1=Math.round(Date.now()/1000); rec=null; delete U.rec; dropAwake(); clearRec(); syncRec();
   if(!l.pts.length&&!l.notes.length){ U.logs=U.logs.filter(x=>x!==l); saveNow(); banner('Nothing was recorded, so the log was discarded.',false,5000); if(view==='log') renderLog(); return; }
   saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log'); }
-function noteMark(n,l){ const m=L.marker([n.la,n.lo],{keyboard:false,icon:L.divIcon({className:'notepin',html:'',iconSize:[16,16],iconAnchor:[8,8]})});
-  m.bindPopup(el('div',{class:'ctx'},el('b',{text:n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); return m; }
+function noteMark(n,l){ const num=l.notes.indexOf(n)+1; const m=L.marker([n.la,n.lo],{keyboard:false,icon:L.divIcon({className:'notepin',html:String(num),iconSize:[22,22],iconAnchor:[11,11]})}); m._note=n;
+  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); return m; }
 function clearRec(){ if(recLine){ map.removeLayer(recLine); recLine=null; } recMarks.forEach(m=>map.removeLayer(m)); recMarks=[]; }
 function drawRec(){ if(!map||!rec) return; clearRec();
   recLine=L.polyline(rec.pts.map(p=>[p[0],p[1]]),{color:TRK,weight:4,opacity:0.9,interactive:false}).addTo(map);
   rec.notes.forEach(n=>{ if(n.la!=null) recMarks.push(noteMark(n,rec).addTo(map)); }); }
+/* tapping a note in the Log tab: show that log if it is not on the map, go to the note's pin and open it */
+function goNote(l,n,row){
+  if(!map) return; if(n.la==null){ banner('That note was written before the phone had a location, so it has no pin.',false,5000); return; }
+  if(rec!==l&&shownLog!==l.id){ showLog(l,false); if(view==='log') renderLog(); }
+  const m=(rec===l?recMarks:shownLayers).find(x=>x._note===n);
+  map.setView([n.la,n.lo],Math.max(map.getZoom(),18)); if(m){ if(goNote.top&&goNote.top!==m) goNote.top.setZIndexOffset(0); goNote.top=m; m.setZIndexOffset(1000); m.openPopup(); }
+  goNote.at=l.id+':'+l.notes.indexOf(n); document.querySelectorAll('.lognotes li.on').forEach(x=>x.classList.remove('on'));
+  const r=row&&row.isConnected?row:document.querySelector('.lognotes li[data-k="'+goNote.at+'"]'); if(r) r.classList.add('on'); }
 function hideLog(){ shownLayers.forEach(x=>map&&map.removeLayer(x)); shownLayers=[]; shownLog=null; }
 function showLog(l,fit){ hideLog(); if(!map) return; shownLog=l.id; const ll2=l.pts.map(p=>[p[0],p[1]]);
   if(ll2.length>1) shownLayers.push(L.polyline(ll2,{color:'#ffffff',weight:6,opacity:0.8,interactive:false}).addTo(map),L.polyline(ll2,{color:TRK,weight:3.5,opacity:0.95,interactive:false}).addTo(map));
@@ -837,7 +845,7 @@ function renderLog(){
     const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
       el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,gx,cp,ren,del),
       site?el('p',{style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>select(site,true)},'Open '+site.name)):null);
-    if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach(n=>ul.append(el('li',null,el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{text:n.x}))));
+    if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{text:n.x})); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
       box.append(el('details',{open:shown},el('summary',{text:l.notes.length+(l.notes.length===1?' note':' notes')}),ul)); }
     v.append(box); });
 }
