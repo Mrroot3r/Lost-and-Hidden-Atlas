@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lost &amp; Hidden Atlas</string>
+    <string name="title_activity_main">Atlas</string>
+    <string name="package_name">com.losthiddenatlas.app</string>
+    <string name="custom_url_scheme">com.losthiddenatlas.app</string>
+</resources>

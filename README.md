@@ -4,6 +4,8 @@ A map tool for finding abandoned sites and ruins across upstate New York and Mas
 
 **Open it:** https://mrroot3r.github.io/Lost-and-Hidden-Atlas/
 
+**Android app:** the newest build is at https://github.com/mrroot3r/Lost-and-Hidden-Atlas/releases/latest (download `lost-hidden-atlas.apk` on the phone and open it). The app opens with no signal, fetches new places from the site by itself, and records a field log with the screen off.
+
 ## What is in this repository
 
 | Path | What it is |
@@ -15,6 +17,8 @@ A map tool for finding abandoned sites and ruins across upstate New York and Mas
 | `data/leads.json` | Unchecked leads from OpenStreetMap, loaded when the Leads layer is switched on |
 | `topo/` | One old USGS survey map per place, loaded when that place is opened |
 | `source/` | The files the site is built from |
+| `boot.js`, `version.json` | Read by the Android app only |
+| `android-app/` | The Android app |
 | `GUIDE.md` | How the Atlas works and how to add places to it. Start here if you want to help |
 
 Notes, progress, field logs and added places are saved in the visitor's own browser. Nothing is uploaded here.

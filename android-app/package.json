@@ -1,0 +1,17 @@
+{
+  "name": "lost-hidden-atlas-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Android wrapper for the Lost & Hidden Atlas",
+  "scripts": {
+    "www": "node scripts/make-www.js",
+    "sync": "node scripts/make-www.js && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/core": "8.6.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2"
+  }
+}
