@@ -52,6 +52,8 @@ Map layers come from public services, chosen per state. `regionOf()` in `app.js`
 4. **Stop there.** Do not merge your own pull request, even if you can. Say in the pull request what changed, what you verified, and what you could not.
 5. GitHub runs `check` on the pull request (place-list validation, source and build in step, a phone-size test that the site opens). The owner merges when it is green, using **Squash and merge** so each change is one commit.
 
+**If the push is refused.** A cloud session's built-in GitHub login is often read-only or expired, and `git push` fails with a 401 or 403 or "invalid credentials". Do not retry and do not look for another login. Attach the repository to the session with write access first (in Claude: the `add_repo` tool with `access: "push"`, then `register_repo_root`), then push again. If attaching is declined, stop and tell the owner; never paste a token into a file or a command.
+
 **Undoing a change.** Each merged pull request is one commit that holds both the source and the built site, so undoing it restores the previous site exactly.
 
 - Owner: open the merged pull request on GitHub, press **Revert**, and merge the pull request it creates.
@@ -209,7 +211,7 @@ Beyond adding places, these make a state better. Do them when asked, or note in 
 
 | Step | When | What to do |
 |---|---|---|
-| Law note | With the first batch for a state | Add the state's trespass basics to the in-app Guide and set `legal` to `True` in `states.py`. Read the statute; do not paraphrase from memory |
+| Law note | **Optional. Only when the owner asks** | Add the state's trespass basics to the in-app Guide and set `legal` to `True` in `states.py`. Read the statute; do not paraphrase from memory. A batch is complete without it: the owner's position is that knowing the local law is up to whoever visits. What is never optional is the access line on each place (who owns it, whether it is open, closed or posted) |
 | State imagery | When the state publishes it | Add its leaf-off and LiDAR services to `leafUrl()` and `lidarUrl()`. Check they send CORS headers, note their deepest zoom, and look at a tile over open water (some services return black there). Then test with `node tools/smoke.js <url> <place-id>` |
 | Rail and canal lines | Can wait | Widen the box in `lines.py`, add the state's old lines, rebuild `lines.json` |
 | Leads | Can wait | Overpass download for the state |
@@ -227,12 +229,27 @@ setup.sh, find candidates from list pages, read a source for every fact, write o
 look at every pin with pincheck.py and say in each pin note what the aerial showed, cut old maps, run
 all.sh, check.py and the smoke test, add what you could not source to LEADS.md, and open a pull request
 that says what you verified and what you could not. Do not push to main or merge. Aim for <N> places,
-ruins and traces first. If the state has no law note in the app, say so in the pull request.
+ruins and traces first.
 ```
 
 Name the area and a number; everything else is in the guide. If the area is a city the Atlas has no start city for, the session should add one to `tools/states.py` (the table above).
 
-A state outside these nine also needs its outline added to `source/build/states.json`, an entry in `states.py`, and wider `maxBounds` in `initMap()`. Missouri was added this way in November 2026: the outline is the Census 1:20,000,000 cartographic boundary file (`cb_2023_us_state_20m`, downloadable from www2.census.gov) simplified with shapely to 0.01 degrees, stored as one closed ring of `[lon, lat, …]` like the others. `maxBounds` now reaches 35.7° N and 96.0° W. `tools/pincheck.py` used to send every point west of New York to the New York leaf-off service; its test is now limited to the Northeast.
+### A state outside the Northeast
+
+Missouri (Kansas City) was added this way in November 2026. A new state needs five things besides its batch of places, all in the same pull request:
+
+1. **Outline.** Add the state to `source/build/states.json` under its two-letter key. The outline is the Census 1:20,000,000 cartographic boundary file (`cb_2023_us_state_20m`, from www2.census.gov), simplified with shapely to 0.01 degrees and stored like the others: one closed ring as a flat list `[lon, lat, lon, lat, …]`. State detection (which imagery and which law note apply) reads this file.
+2. **Entry in `tools/states.py`:** key, name, `imagery` (say "fallback" unless you add state services), `owners`, `legal: False`, its region codes, and at least one start city (`hubs`) with coordinates. The build works out drive times from every start city.
+3. **Map limits.** `MAXB` near the top of `source/src/app.js` is the box the map can be moved inside, as `[[south, west], [north, east]]`. Widen it to hold the new state with a margin. If you skip this the new pins exist but the map springs back before reaching them. `minZoom` is 5, which shows the whole box on a phone.
+4. **`tools/pincheck.py`** picks an aerial service by a rough box per state. Anything outside those boxes falls back to Esri satellite. If you add state imagery, add its box; check that the New York box (it once swallowed everything west of New York) does not cover the new state.
+5. **Known gaps.** Write in section 10 what the state does not have yet (state imagery, owner lookup, lines, leads).
+
+**The live site and the installed app do not show any of this until the pull request is merged.** The Android app carries its own copy of `app.js`, so a change to the map limits or settings reaches the phone only with the next app build (the pull request's `app` check publishes a test build; the merge publishes the release). New places alone arrive through the app's data refresh without a new build.
+
+**Where the map opens.** Nobody has to pick a start city for a far-away area. The map reopens where it was last left, and until the reader chooses a start place by hand, drive times count from the start city nearest to their location (or last known location). A reader whose device has no location (a desktop with location turned off) can choose a start city, pick a spot on the map, or type a town, address, ZIP code or coordinates under the gear in Map options. Typed names are looked up with OpenStreetMap's Nominatim; typed coordinates are not sent anywhere.
+
+**Old-map crops.** `tools/topo_all.py` cuts a crop for every new place except those in the `landmark` category, which it skips on purpose (a standing landmark is on the current map). If a `landmark` place is really a trace on the ground, such as trail ruts, and an old map would help, give it a more specific category or pass its id after removing the skip for that run; do not report the missing crop as a failure.
+
 
 ## 9. Changing the app
 
@@ -248,14 +265,15 @@ A state outside these nine also needs its outline added to `source/build/states.
 ## 10. Known gaps
 
 - Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial, and none was moved.
-- Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have regions, start cities, fallback imagery and a first handful of places each, but no law note in the app. Read the state's trespass statute and add the note before sending anyone far off a marked trail there.
+- Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have regions, start cities, fallback imagery and a first handful of places each, and no law note in the app (optional, see section 8).
 - The "Ruins in the woods" batch (November 2026) has no trailhead coordinates: access notes name the road or lot. Most of its pins sit under tree cover and could not be confirmed on an aerial; `tools/pincheck.py` had no leaf-off imagery outside New York. Its Pennsylvania and Maine entries were written from one Wikipedia article each.
 - The LiDAR tools (section 13) work in New York only, were tried on one wildlife area, and are tuned for 1:62,500 sheets and cellar-hole-sized pits. Stone walls, mill races and charcoal hearths are not detected. The four `lidar` places have not been visited.
 - Pins taken from OpenStreetMap through Nominatim (`tools/nom.py`) are a named mapped feature, which is usually closer than an article coordinate, but for a tunnel or a long path the point is the middle of the line.
 - Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
 - Leads are missing for greater Boston, the South Shore, Cape Cod, Rhode Island and Missouri.
-- Missouri (Kansas City) is a first pass: no law note in the app, no state leaf-off or LiDAR, no owner lookup, no rail lines. Pins were checked on Esri satellite only. Old-map crops are cut for every new place except `landmark` ones, which `topo_all.py` skips by design. The app still opens on Albany, and drive times list Albany first until the user picks Kansas City as home.
+- The start-place changes of November 2026 (map reopens where it was left, nearest start city chosen from location, typed start place) were tested in a desktop browser at phone size only, not on a phone or in the Android app. The typed lookup depends on OpenStreetMap's public Nominatim service, which is for light use.
+- Missouri (Kansas City) is a first pass: no law note in the app, no state leaf-off or LiDAR, no owner lookup, no rail lines. Pins were checked on Esri satellite only. Old-map crops are cut for every new place except `landmark` ones (section 8).
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
 - GPS smoothing and the field log were tested with simulated location only.

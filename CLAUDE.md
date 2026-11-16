@@ -9,6 +9,8 @@ Read `GUIDE.md` before doing anything. The short version:
 - All nine Northeast states, and Missouri (Kansas City only), already have regions, start cities and map coverage in `tools/states.py`. To work in any of them you only add a batch of places: one `data_<area>.py` file with `BATCH`, `PLACES` and `PIN_NOTES`. Never rename a published place `id`.
 - Never commit personal information; the repository is public.
 - Run `check.py` and the smoke test before opening the pull request.
+- If `git push` is refused, attach the repository to the session with push access, then push again (GUIDE.md section 3). Do not retry or look for another login.
+- A state's trespass-law note is optional and done only when the owner asks. The access line on each place is not optional.
 - The owner uses the Atlas on an Android phone in the field. Test at phone size first.
 - Places you read about but could not add go in `LEADS.md`.
 - Places found on LiDAR that nobody has written up go in the `lidar` category as unverified leads, with a parcel check for every one (GUIDE.md section 13). Never write a private landowner's name or address into the repository.
