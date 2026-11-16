@@ -1,0 +1,10 @@
+{"name": "Taconic Ridge State Forest", "code": "trsf", "state": "done", "swept": "2026-11-16", "buildings": 121, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif", "NY_Hoosick_129756_1897_62500_geo.tif"],
+"cands":[
+{"id":"trsf1","lat":42.79556,"lon":-73.316688,"depth":0.84,"size":[9,7],"dist":25,"blat":42.79578,"blon":-73.31676,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"published","place":"lidar-spencer-hollow-walled-yard","batch":"lidar3","when":"2026-11-16"},
+{"id":"trsf2","lat":42.724899,"lon":-73.28791,"depth":0.78,"size":[10,11],"dist":23,"blat":42.72472,"blon":-73.28806,"sheet":"NY_Berlin_123252_1888_62500_geo.tif","year":1888,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"trsf3","lat":42.795591,"lon":-73.31711,"depth":0.67,"size":[6,8],"dist":35,"blat":42.79578,"blon":-73.31676,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"trsf4","lat":42.578488,"lon":-73.327988,"depth":0.63,"size":[5,8],"dist":50,"blat":42.57834,"blon":-73.32741,"sheet":"NY_Berlin_123252_1888_62500_geo.tif","year":1888,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"trsf5","lat":42.795803,"lon":-73.31438,"depth":1.01,"size":[4,5],"dist":15,"blat":42.79592,"blon":-73.31429,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"trsf6","lat":42.574468,"lon":-73.329561,"depth":0.66,"size":[7,5],"dist":58,"blat":42.57445,"blon":-73.32885,"sheet":"NY_Berlin_123252_1888_62500_geo.tif","year":1888,"status":"new"},
+{"id":"trsf7","lat":42.805783,"lon":-73.297721,"depth":0.62,"size":[7,5],"dist":65,"blat":42.80636,"blon":-73.29787,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"new"}
+]}

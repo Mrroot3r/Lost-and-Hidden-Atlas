@@ -1,0 +1,6 @@
+{"name": "Pittstown State Forest", "code": "psf", "state": "done", "swept": "2026-11-16", "buildings": 35, "sheets": ["NY_Cohoes_140533_1893_62500_geo.tif", "NY_Hoosick_129756_1897_62500_geo.tif"],
+"cands":[
+{"id":"psf1","lat":42.813366,"lon":-73.46247,"depth":1.03,"size":[13,6],"dist":30,"blat":42.81349,"blon":-73.4628,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"no","why":"road","note":"a parking area","when":"2026-11-16"},
+{"id":"psf2","lat":42.821766,"lon":-73.464638,"depth":0.98,"size":[7,6],"dist":55,"blat":42.82166,"blon":-73.46398,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"published","place":"lidar-kautz-hollow-ringed-pit","batch":"lidar4","when":"2026-11-16"},
+{"id":"psf3","lat":42.815688,"lon":-73.444445,"depth":0.62,"size":[7,5],"dist":31,"blat":42.81596,"blon":-73.44439,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"}
+]}

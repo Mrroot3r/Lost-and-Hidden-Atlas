@@ -1,0 +1,5 @@
+{"name": "Keyserkill State Forest", "code": "ksf", "state": "done", "swept": "2026-11-16", "buildings": 14, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif", "NY_Schoharie_129440_1898_62500_geo.tif"],
+"cands":[
+{"id":"ksf1","lat":42.491083,"lon":-74.374887,"depth":1.4,"size":[10,5],"dist":63,"blat":42.49072,"blon":-74.37547,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"natural","note":"in stream gullies","when":"2026-11-16"},
+{"id":"ksf2","lat":42.484247,"lon":-74.371255,"depth":0.84,"size":[6,7],"dist":39,"blat":42.48424,"blon":-74.37078,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"published","place":"lidar-juried-road-cellar","batch":"lidar4","when":"2026-11-16"}
+]}

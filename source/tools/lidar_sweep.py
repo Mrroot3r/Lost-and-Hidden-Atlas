@@ -45,11 +45,14 @@ if len(sys.argv)>1 and sys.argv[1]=='rank':
     sys.exit()
 S=load()
 REDO='--redo' in sys.argv
+DEADLINE=float(os.environ.get('LIDAR_DEADLINE') or 0)     # set by tools/lidar.py: stop cleanly at this time and say so (exit code 3)
 for uf in [a for a in sys.argv[1:] if a!='--redo']:
     unit=json.load(open(uf)); name=unit.get('name') or os.path.basename(uf)
     if name in S['units'] and REDO:   # look for buildings again (new sheet rules): forget what was found for this unit
         S['units']=[u for u in S['units'] if u!=name] if isinstance(S['units'],list) else {k:v for k,v in S['units'].items() if k!=name}
         S['cands']=[c for c in S['cands'] if c.get('unit')!=name]
+        import glob
+        for f in glob.glob('research/lidar/sw_'+re.sub(r'[^a-z0-9]+','',name.lower())[:18]+'_b_*.txt'): os.remove(f)
     if name in S['units']: print('skip (done):',name); continue
     P=list(pts(unit['rings'])); xs=[p[0] for p in P]; ys=[p[1] for p in P]
     pre='research/lidar/sw_'+re.sub(r'[^a-z0-9]+','',name.lower())[:18]
@@ -69,15 +72,24 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
         if ss:
             quad=ss[0][1].split('_')[1]
             want.setdefault(quad,ss[0])
-    nb=0; found=[]
+    nb=0; found=[]; MISSED=[]
     for quad,(year,fn,url,bb) in want.items():
         tif='cache/topo/'+urllib.parse.quote(fn) if os.path.exists('cache/topo/'+urllib.parse.quote(fn)) else 'cache/topo/'+fn
         if not os.path.exists(tif):
             g=subprocess.run([sys.executable,'tools/lidar_sheet.py','get',url],capture_output=True,text=True)
             tif=(g.stdout.strip().splitlines() or [''])[-1]
-            if not os.path.exists(tif): print('  sheet download failed',fn); continue
-        b=subprocess.run([sys.executable,'tools/lidar_buildings.py',uf,pre,tif],capture_output=True,text=True)
-        for line in b.stdout.splitlines():
+            if not os.path.exists(tif): print('  sheet download failed',fn); MISSED.append(fn); continue
+        bcf=lambda f: pre+'_b_'+re.sub(r'[^A-Za-z0-9]+','',f)[:60]+'.txt'
+        bc=bcf(fn)                           # this sheet's buildings, kept so a run that is cut off need not repeat it
+        if os.path.exists(bc): bout=open(bc).read()
+        else:
+            if DEADLINE and time.time()>DEADLINE:
+                print(f"{name}: PARTIAL: time is up with {sum(1 for v in want.values() if not os.path.exists(bcf(v[1])))} of {len(want)} old sheets still to read. Run the same command again to carry on."); sys.exit(3)
+            print(f"  reading the {year} {quad} sheet for buildings (this step cannot be split; it can take a minute or more)...",flush=True)
+            b=subprocess.run([sys.executable,'tools/lidar_buildings.py',uf,pre,tif],capture_output=True,text=True)
+            if b.returncode!=0: print('  buildings step failed on',fn,b.stderr[-200:]); sys.exit(5)
+            bout=b.stdout; open(bc+'.part','w').write(bout); os.replace(bc+'.part',bc)
+        for line in bout.splitlines():
             m=re.match(r'(-?\d+\.\d+) (-?\d+\.\d+) (\[.*\])$',line.strip())
             if not m: continue
             la,lo=float(m.group(1)),float(m.group(2))
@@ -87,7 +99,9 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
             for dist,pla,plo,dep,size in eval(m.group(3)):
                 w,h=[int(x) for x in size.split('x')]
                 found.append({'unit':name,'lat':la,'lon':lo,'plat':pla,'plon':plo,'dist':dist,'depth':dep,'size':[w,h],'sheet':fn,'year':year})
-    S['units'][name]={'file':uf,'buildings':nb,'pits':len(found),'sheets':[v[1] for v in want.values()]}
+    if MISSED and not os.environ.get('LIDAR_ALLOW_GAPS'):       # a sheet that would not download is tried again by the next run
+        print(f"{name}: PARTIAL: {len(MISSED)} old sheet(s) could not be downloaded. Run the same command again."); sys.exit(3)
+    S['units'][name]={'file':uf,'buildings':nb,'pits':len(found),'sheets':[v[1] for v in want.values() if v[1] not in MISSED]}
     S['cands']+=found
     json.dump(S,open(OUT,'w'))
     print(f"{name}: {nb} map buildings, {len(found)} pits beside one, sheets {[v[1].split('_')[1]+' '+str(v[0]) for v in want.values()]}, {int(time.time()-t0)} s",flush=True)

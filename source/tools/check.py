@@ -44,6 +44,7 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if not hasattr(m,need): err.append(f'{name}: missing {need}')
     if not hasattr(m,'PLACES'): continue
     k=getattr(m,'BATCH',{}).get('key')
+    if 'TODO' in str(getattr(m,'BATCH',{}).get('label','')): err.append(f'{name}: the batch label still says TODO')
     if k in keys: err.append(f'{name}: batch key {k} is already used')
     keys.add(k)
     for p in m.PLACES:
@@ -60,6 +61,8 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if p['reg'] in REG_STATE and stt!=REG_STATE[p['reg']]: err.append(f"{w}: the pin is in {stt or 'no listed state'} but region '{p['reg']}' belongs to {REG_STATE[p['reg']]}; check the coordinate and the region")
         if p.get('th') and not(isinstance(p['th'],(list,tuple)) and len(p['th'])==2): err.append(f'{w}: th must be [lat, lon]')
         if not p['story'].strip(): err.append(f'{w}: empty story')
+        # a drafted place (tools/lidar.py draft) is not finished while any of its text still says TODO
+        if any('TODO' in str(p.get(k) or '') for k in ('id','name','town','reg','years','story','look','hook','accn')) or 'TODO' in str(m.PIN_NOTES.get(i) or ''): err.append(f'{w}: a text still says TODO; finish the draft (LIDAR.md step 6)')
         if not m.PIN_NOTES.get(i): err.append(f'{w}: no pin note saying where the coordinate came from')
         if not p.get('links') and (p.get('conf') or '')!='lead': err.append(f"{w}: no source link (allowed only when conf='lead')")
         if p['acc'] in('ask','view','permit','boat') and not p.get('accn'): warn.append(f'{w}: access is {p["acc"]} but there is no access note')
@@ -93,6 +96,22 @@ try:
         if not os.path.exists(os.path.join(REPO,'data','pock',k+'.json')): err.append(f'data/pockets.json lists {k} but data/pock/{k}.json is missing (the workspace lost build/pock: run setup.sh again, or tools/pockets.py)')
     if not pj.get('k'): err.append('data/pockets.json holds no pockets')
 except Exception: pass
+# ---- the LiDAR ledger (source/lidar/units, kept by tools/lidar.py; LIDAR.md) ----
+LSEEN={}
+for f in sorted(glob.glob(os.path.join(REPO,'source','lidar','units','*.json'))):
+    rel=os.path.relpath(f,REPO)
+    try: u=json.load(open(f,encoding='utf-8'))
+    except Exception as e: err.append(f'{rel}: not valid JSON ({str(e)[:60]}); it is written by tools/lidar.py, not by hand'); continue
+    if not u.get('name') or not re.fullmatch(r'[a-z]+',u.get('code') or ''): err.append(f'{rel}: no unit name or letter code'); continue
+    for c in u.get('cands',[]):
+        ci=c.get('id','?')
+        if ci in LSEEN: err.append(f'{rel}: candidate id {ci} is also in {LSEEN[ci]}')
+        LSEEN[ci]=rel
+        if not str(ci).startswith(u['code']): err.append(f'{rel}: candidate {ci} does not carry the unit code {u["code"]}')
+        if c.get('status') not in('new','no','maybe','yes','published'): err.append(f'{rel}: {ci} has status {c.get("status")!r}')
+        if c.get('status')=='published' and c.get('place') not in ids: err.append(f'{rel}: {ci} is marked published as {c.get("place")!r}, but no place list has that id (lost draft? run: python3 tools/lidar.py mark {ci} yes)')
+        if c.get('status')=='no' and not c.get('why'): err.append(f'{rel}: {ci} is set aside with no reason word')
+        if ((c.get('check') or {}).get('parcel') or {}).get('kind')=='PRIVATE' and c.get('status')=='published': err.append(f'{rel}: {ci} is published but its tax parcel is private')
 # ---- nothing personal in a public repository ----
 MAIL=re.compile(r'[\w.+-]+@[\w-]+\.[\w.]+'); OKMAIL=('noreply@anthropic.com','users.noreply.github.com','example.com','2x.png')
 for dp,dn,fn in os.walk(REPO):

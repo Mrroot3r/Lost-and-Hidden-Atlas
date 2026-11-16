@@ -24,7 +24,8 @@ if sys.argv[1]=='maps':
     sys.exit()
 if sys.argv[1]=='get':
     p='cache/topo/'+sys.argv[2].split('/')[-1]; os.makedirs('cache/topo',exist_ok=True)
-    if not os.path.exists(p): open(p,'wb').write(urllib.request.urlopen(urllib.request.Request(sys.argv[2],headers=UA),timeout=600).read())
+    if not os.path.exists(p):      # written under another name first: a download that is cut off leaves no broken sheet behind
+        open(p+'.part','wb').write(urllib.request.urlopen(urllib.request.Request(sys.argv[2],headers=UA),timeout=600).read()); os.replace(p+'.part',p)
     print(p); sys.exit()
 from lidar_dem import dem,shade,merc
 from topocrop import crop

@@ -1,0 +1,11 @@
+{"name": "Dutch Settlement State Forest", "code": "dssf", "state": "done", "swept": "2026-11-16", "buildings": 37, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif", "NY_Berne_123269_1900_62500_geo.tif"],
+"cands":[
+{"id":"dssf1","lat":42.627434,"lon":-74.264657,"depth":1.02,"size":[13,8],"dist":50,"blat":42.62788,"blon":-74.26472,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"faint","when":"2026-11-16"},
+{"id":"dssf2","lat":42.620081,"lon":-74.262868,"depth":0.73,"size":[6,5],"dist":44,"blat":42.62036,"blon":-74.26324,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"dssf3","lat":42.621406,"lon":-74.241536,"depth":0.7,"size":[7,10],"dist":21,"blat":42.6213,"blon":-74.24175,"sheet":"NY_Berne_123269_1900_62500_geo.tif","year":1900,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"dssf4","lat":42.626773,"lon":-74.25981,"depth":0.62,"size":[9,9],"dist":34,"blat":42.62658,"blon":-74.25949,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"dssf5","lat":42.624537,"lon":-74.249898,"depth":0.74,"size":[9,11],"dist":57,"blat":42.62411,"blon":-74.24951,"sheet":"NY_Berne_123269_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"dssf6","lat":42.628417,"lon":-74.265481,"depth":0.72,"size":[6,9],"dist":86,"blat":42.62788,"blon":-74.26472,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"},
+{"id":"dssf7","lat":42.623337,"lon":-74.246998,"depth":0.84,"size":[8,16],"dist":22,"blat":42.62326,"blon":-74.24725,"sheet":"NY_Berne_123269_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"dssf8","lat":42.622336,"lon":-74.244924,"depth":0.74,"size":[4,5],"dist":26,"blat":42.62214,"blon":-74.24476,"sheet":"NY_Berne_123269_1900_62500_geo.tif","year":1900,"status":"new"}
+]}

@@ -1,0 +1,17 @@
+{"name": "South Mountain State Forest", "code": "smsf", "state": "done", "swept": "2026-11-16", "buildings": 34, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif"],
+"cands":[
+{"id":"smsf1","lat":42.391782,"lon":-74.273988,"depth":1.11,"size":[12,6],"dist":14,"blat":42.39168,"blon":-74.27389,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"road","note":"about 20 m from a gravel road and may be a road pit; it is in LEADS.md","when":"2026-11-16"},
+{"id":"smsf2","lat":42.387385,"lon":-74.271557,"depth":1.06,"size":[8,7],"dist":31,"blat":42.38766,"blon":-74.27156,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"smsf3","lat":42.388009,"lon":-74.271715,"depth":0.81,"size":[6,8],"dist":41,"blat":42.38766,"blon":-74.27156,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","when":"2026-11-16","late":[1945,"NY_Livingstonville_130298_1945_24000_geo.tif"],"seen":"2026-11-16","why":"coarse"},
+{"id":"smsf4","lat":42.384986,"lon":-74.275369,"depth":0.65,"size":[5,5],"dist":9,"blat":42.38505,"blon":-74.27543,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"smsf5","lat":42.376776,"lon":-74.258647,"depth":0.63,"size":[5,5],"dist":28,"blat":42.37682,"blon":-74.25898,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf6","lat":42.395833,"lon":-74.265482,"depth":0.6,"size":[5,6],"dist":43,"blat":42.39589,"blon":-74.26497,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf7","lat":42.386428,"lon":-74.274025,"depth":0.75,"size":[8,6],"dist":55,"blat":42.38603,"blon":-74.27442,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf8","lat":42.396871,"lon":-74.26342,"depth":0.7,"size":[8,5],"dist":64,"blat":42.39741,"blon":-74.26314,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf9","lat":42.386814,"lon":-74.271611,"depth":0.67,"size":[7,6],"dist":58,"blat":42.38666,"blon":-74.27228,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf10","lat":42.396031,"lon":-74.26522,"depth":0.91,"size":[12,14],"dist":26,"blat":42.39589,"blon":-74.26497,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf11","lat":42.387322,"lon":-74.272469,"depth":0.63,"size":[6,5],"dist":75,"blat":42.38666,"blon":-74.27228,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf12","lat":42.366674,"lon":-74.272163,"depth":0.66,"size":[8,4],"dist":16,"blat":42.36659,"blon":-74.27201,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf13","lat":42.371139,"lon":-74.287196,"depth":0.72,"size":[4,6],"dist":78,"blat":42.37049,"blon":-74.28683,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"smsf14","lat":42.385593,"lon":-74.276111,"depth":0.63,"size":[5,4],"dist":82,"blat":42.38505,"blon":-74.27543,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"}
+]}

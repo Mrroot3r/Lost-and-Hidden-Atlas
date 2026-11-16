@@ -1,0 +1,9 @@
+{"name": "Rural Grove State Forest", "code": "rgsf", "state": "done", "swept": "2026-11-16", "buildings": 14, "sheets": ["NY_Fonda_139538_1896_62500_geo.tif"],
+"cands":[
+{"id":"rgsf1","lat":42.856308,"lon":-74.382386,"depth":0.7,"size":[9,6],"dist":40,"blat":42.85649,"blon":-74.38197,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"rgsf2","lat":42.85664,"lon":-74.416116,"depth":0.64,"size":[10,12],"dist":30,"blat":42.85637,"blon":-74.41612,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
+{"id":"rgsf3","lat":42.865632,"lon":-74.400383,"depth":0.83,"size":[8,6],"dist":88,"blat":42.86532,"blon":-74.40138,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"new"},
+{"id":"rgsf4","lat":42.864891,"lon":-74.401056,"depth":0.73,"size":[6,9],"dist":55,"blat":42.86532,"blon":-74.40138,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"new"},
+{"id":"rgsf5","lat":42.859088,"lon":-74.409775,"depth":0.67,"size":[7,11],"dist":70,"blat":42.85941,"blon":-74.40904,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"new"},
+{"id":"rgsf6","lat":42.856591,"lon":-74.382668,"depth":0.65,"size":[9,7],"dist":58,"blat":42.85649,"blon":-74.38197,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"new"}
+]}
