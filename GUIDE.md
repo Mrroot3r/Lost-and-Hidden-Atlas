@@ -25,6 +25,7 @@ The site is static files on GitHub Pages. There is no server and no account. A v
 | `app.js` | The whole app: one plain-JavaScript file, no framework, Leaflet for the map |
 | `sw.js` | Service worker: page is fetched fresh when online, served from cache when not; versioned files and `topo/` images are cached once |
 | `data/lines.json` | Old rail, trolley and canal lines; fetched after load |
+| `data/pockets.json` | Historic pockets: where historical markers and National Register listings bunch together, with the single markers and listings; fetched only when the layer is turned on |
 | `data/leads.json` | Unchecked leads from OpenStreetMap; fetched when the Leads layer is turned on |
 | `topo/<place-id>.webp` | One cropped old USGS map per place; fetched when the place is opened |
 | `boot.js`, `version.json` | Used only by the Android app (section 12): its start-up script, and the small file it reads to see whether the places have changed |
@@ -250,6 +251,25 @@ The old rail, trolley and canal lines and the leads layer exist for all of New Y
 
 What the layer route loses compared with a full OpenStreetMap download: a line tagged only as `abandoned:railway=…` with no `railway=abandoned` is missing (about 5% by length in the Capital Region, where both were available to compare), and old names kept in tags such as `old_name` are missing, so more lines are unnamed. Leads from the layers are thinner than from Overpass: only mapped historic points and ruined or abandoned buildings.
 
+### Historic pockets for a new state
+
+The owner's idea: showing every historical plaque is clutter, and most plaques mark something that is gone, but where many sit close together, with listed buildings among them, there is usually an old town centre worth walking. The layer ("Historic pockets" in Map options) draws one purple disc for each such pocket. The single markers and listings appear only from zoom 15. New York is done (1397 pockets from 14908 markers and 6492 National Register listings).
+
+To add a state:
+
+1. `python3 tools/nrhp_state.py "<STATE NAME>" <key>` downloads the National Register listings from the National Park Service (public domain).
+2. `python3 tools/hmdb_state.py "<State Name>" <key>` downloads each county's list of markers from HMdb.org: number, title, town and position only. It takes about 40 minutes for a state the size of New York because it waits between pages.
+3. Add the key to `KEYS` in `tools/pockets.py`, run it, then `all.sh`. It keeps the pockets of every state whose raw files you do not have.
+4. Look at a few towns at phone size with the layer on.
+
+**The rules for HMdb.org data, which are not optional:**
+
+- Its copyright page allows copying its information without asking only for uses that are **not commercial**, and only when it is **credited to HMdb.org with a link**. The app credits and links every marker it shows and names HMdb.org in the Guide. Never store inscriptions or photos. Do not reuse the marker data in anything that earns money without written permission from HMdb.org.
+- It shows the first 500 markers of any list without signing in and asks for a sign-in beyond that. **Never sign in and never work around that limit** (for example by cutting a county into towns). A county with more than 500 markers stays incomplete, and `hmdb_state.py` prints which ones. The owner can register (free) and download a full list by hand if a county matters.
+- Wait several seconds between pages, as the tool does.
+
+How a pocket is made (`tools/pockets.py`): markers and listings closer than 220 m are chained together; a chain needs a weight of 5 (a marker counts 1, a listed place 2, a district 3 to 30 by its contributing buildings); a chain longer than 900 m is cut into 600 m blocks so a whole downtown reads as several walks. The name is the largest historic district inside it, or the town most of its markers name.
+
 ### A province, territory or country that is not listed yet
 
 Every US state and Canadian province was set up this way in November 2026, so this is only needed for somewhere new (a Canadian territory, Mexico, Puerto Rico). It needs five things besides its batch of places, all in the same pull request:
@@ -297,6 +317,8 @@ Every US state and Canadian province was set up this way in November 2026, so th
 - Canada has no old-map crops, no public-land status and no law note. Hawaii's only start city is Honolulu, so a place on another island shows a rough drive estimate that means little.
 - State and province outlines added in November 2026 are coarse (simplified to roughly 1 to 5 km) and pushed about 3 km out to sea. A pin within a kilometre or two of a state line can be read as the neighbouring state; `check.py` will say so. If the coordinate is right, remake that outline more finely with `outlines.py` (lower its tolerance) before changing the pin.
 - Rail, trolley and canal lines and leads (November 2026) cover all of New York and Massachusetts. Outside the Capital Region and the Hudson Valley, New York's come from the hosted OpenStreetMap layers (see section 8 for what that loses). Buffalo's and New York City's yards show as dense bundles of parallel abandoned tracks, and many street-railway lines in New York City are drawn as plain abandoned railroad because OpenStreetMap does not name them. None of the new lines was checked on the ground or against an old map. No other state has lines yet.
+- **Come back to: Overpass.** New York's old lines and leads outside the Capital Region and Hudson Valley were built from Esri's hosted copies of OpenStreetMap because Overpass could not be reached (November 16, 2026). That loses lines tagged only as `abandoned:railway=…` (about 5% by length where both could be compared), old names kept in tags such as `old_name`, and most leads. Run `python3 tools/overpass_check.py` at the start of a session that touches lines. When it reports a usable mirror: download New York with the queries in `tools/osm_fetch.py` (in tiles of half a degree or less), save the results in the same shape as `cache/osm/ny_rail.json`, `ny_canal.json` and `ny_leads.json`, rerun `lines.py` and `leads.py`, and compare the kilometre totals that `lines.py` prints with the ones in pull request 10. Do the same for any state added from the hosted layers since.
+- Historic pockets (November 2026) cover New York only. They were made from lists and were not walked: a pocket says that plaques and listings are dense, not that anything is left to see. National Register positions are approximate, often one coordinate from the nomination form, and some listings no longer stand. HMdb.org shows only the first 500 markers of a list without a sign-in, so these counties are short and their pockets undercounted: Albany (597), Erie (678), Kings (684), Nassau (543), New York (2311), Orange (619), Saratoga (653), Suffolk (532). Marker counts are also only as good as HMdb.org's volunteers have made them.
 - Missouri (Kansas City) is a first pass: no law note in the app, no state leaf-off or LiDAR, no owner lookup, no rail lines. Pins were checked on Esri satellite only. Old-map crops are cut for every new place except `landmark` ones (section 8).
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.

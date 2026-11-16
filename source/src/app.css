@@ -341,3 +341,7 @@ details>.phs{margin:8px 0 0}
 .swatches button{width:38px;height:38px;border-radius:50%;background:var(--c);border:3px solid var(--panel);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
 .swatches button[aria-checked="true"]{box-shadow:0 0 0 3px var(--ink,currentColor)}
 #sheet-set .gear{width:24px;height:24px}
+
+#sheet-b .pocklist{display:flex;flex-direction:column;gap:6px;margin:6px 0 4px}
+#sheet-b .pocklist .btn{justify-content:flex-start;text-align:left;flex-wrap:wrap;white-space:normal;min-height:40px}
+#sheet-b .pocklist .btn small{color:var(--mute);font-weight:400}
