@@ -156,3 +156,7 @@ PNR.update({
  'hillsdale-mill-village':WK+' It is a district coordinate, not the mill.',
  'charlestown-naval-airfield':WK+' It is the airfield coordinate.',
 })
+
+# what build_sites.py reads
+BATCH={'key':'ri','label':'Rhode Island','added':'2026-11-15 19:00'}
+PLACES=R; PIN_NOTES=PNR

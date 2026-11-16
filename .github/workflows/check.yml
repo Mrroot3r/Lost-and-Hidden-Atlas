@@ -1,0 +1,24 @@
+name: check
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Place lists are valid and the built site matches the sources
+        run: python3 source/tools/check.py .
+      - name: App script parses
+        run: node -e "new Function(require('fs').readFileSync('source/src/app.js','utf8'))"
+      - name: The site opens at phone size
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8766 &
+          sleep 2
+          node source/tools/smoke.js http://localhost:8766/

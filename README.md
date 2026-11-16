@@ -21,7 +21,7 @@ Notes, progress, field logs and added places are saved in the visitor's own brow
 
 ## Helping out
 
-New places, corrected pins and field reports are welcome. `GUIDE.md` explains the place format and the research rules that keep the map trustworthy.
+New places, corrected pins and field reports are welcome. `GUIDE.md` explains the place format and the research rules that keep the map trustworthy. Changes come in as pull requests; nothing is pushed straight to `main`, because merging publishes the site.
 
 ## Data credits
 

@@ -14,7 +14,7 @@ with open(R+'dist/lost-hidden-atlas-places.csv','w',newline='',encoding='utf-8-s
         th=s.get('th') or ['','']
         w.writerow([s['name'],s['town'],s.get('years',''),CAT[s['cat']],ST[s['st']],PREC[s['prec']],s['lat'],s['lon'],ACC[s['acc']],EFF[s['eff']],th[0],th[1],s['dt']['alb'][0],s['dt']['sch'][0],s['dt']['troy'][0],s['dt']['sar'][0],{'verified':'Verified','lead':'Lead','mixed':'Partly verified','reference':'Reference'}[s['conf']],'Yes' if s.get('now') else '',(TM.get(s['id']) or {}).get('y',''),s.get('story',''),s.get('look',''),s.get('accn',''),s.get('pn',''),f"https://www.google.com/maps/search/?api=1&query={s['lat']},{s['lon']}",' | '.join(l[1] for l in s.get('links',[]))])
 e=html.escape
-k=['<?xml version="1.0" encoding="UTF-8"?>','<kml xmlns="http://www.opengis.net/kml/2.2"><Document>','<name>Lost &amp; Hidden Atlas</name>','<description>Lost and hidden places across upstate New York, Massachusetts and Rhode Island. Built November 15, 2026.</description>']
+k=['<?xml version="1.0" encoding="UTF-8"?>','<kml xmlns="http://www.opengis.net/kml/2.2"><Document>','<name>Lost &amp; Hidden Atlas</name>','<description>Lost and hidden places across upstate New York, Massachusetts and Rhode Island. Built '+__import__('datetime').date.today().strftime('%B %-d, %Y')+'.</description>']
 for c,col in COL.items():
     k.append(f'<Style id="c-{c}"><IconStyle><color>{col}</color><scale>1.0</scale><Icon><href>http://maps.google.com/mapfiles/kml/paddle/wht-blank.png</href></Icon></IconStyle><LabelStyle><scale>0.8</scale></LabelStyle></Style>')
 for c,label in CAT.items():

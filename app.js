@@ -82,7 +82,7 @@ async function fetchDT(){
 }
 
 /* ---------- filters ---------- */
-const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,fresh:false,my:'any',hideDone:false};
+const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,fresh:'',my:'any',hideDone:false};
 function match(s){
   if(F.line&&!F.line.ids.has(s.id)) return false;
   if(F.q){ const hay=(s.name+' '+(s.name2||'')+' '+(s.town||'')+' '+(s.years||'')+' '+(s.story||'')+' '+(s.look||'')).toLowerCase();
@@ -98,26 +98,25 @@ function match(s){
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
-  if(F.fresh&&!(F.fresh===2?(s.new===2||s.new===3):F.fresh===4?s.new===4:s.new)) return false;
+  if(F.fresh&&s.new!==F.fresh) return false;
   const my=U.status[s.id]||'';
   if(F.my==='mine'){ if(!s.mine) return false; } else if(F.my!=='any'&&my!==F.my) return false;
   if(F.hideDone&&(my==='filmed'||my==='skip')) return false;
   return true;
 }
 function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.fresh=false;F.my='any';F.hideDone=false; }
-const PRESETS=[
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.fresh='';F.my='any';F.hideDone=false; }
+/* batches of places, oldest first; each data file names its own, so a new state needs no change here */
+const BATCHES=D.batches||[];
+const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
   ['Worcester County',()=>{ F.reg='worc'; }],
-  ['New: Rhode Island',()=>{ F.fresh=4; }],
-  ['New: Massachusetts',()=>{ F.fresh=2; }],
-  ['New: around Albany',()=>{ F.fresh=true; F.max=135; }],
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
   ['Trolley parks',()=>{ F.tag='trolleyparks'; }],
   ['Within 30 min',()=>{ F.max=30; }],
   ['Changing now',()=>{ F.now=true; }],
   ['Standing landmarks',()=>{ F.cat.add('landmark'); }],
   ['Pins to confirm',()=>{ F.lead=true; }]
-];
+]);
 function chipGroup(label,map,set,colors){
   const g=el('div',{class:'fgrp'},el('span',{class:'lbl',text:label}));
   const box=el('div',{class:'chips'});
@@ -145,8 +144,9 @@ function buildFilters(){
   const my=el('select',{id:'f-my',onchange:e=>{F.my=e.target.value;refresh();}},el('option',{value:'any',text:'Any'}),Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})),el('option',{value:'mine',text:'Places I added'}));
   my.value=F.my;
   fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Video series'}),ser),el('label',{class:'field'},el('span',{text:'My progress'}),my)));
+  if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
-  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('On open public land','pub'),tog('Added November 2026','fresh'),tog('Hide filmed and skipped','hideDone'))));
+  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
   fb.append(el('div',null,el('button',{class:'btn sm',type:'button',onclick:()=>{clearF();$('#q').value='';refresh();}},'Clear all filters')));
   const pr=$('#presets'); pr.textContent='';
   PRESETS.forEach(p=>pr.append(el('button',{class:'chip',type:'button',onclick:()=>{clearF();$('#q').value='';p[1]();refresh();}},p[0])));
@@ -1188,7 +1188,7 @@ function renderGuide(){
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),
     P('Drive times from Albany, Schenectady, Troy and Saratoga Springs were calculated by road with no traffic, so add a little. Pick your own start point from "Drive times from."'),
-    P('The November 2026 expansions added '+BASE.filter(s=>s.new).length+' places: first the two-hour circle around Albany, then Massachusetts with Worcester County first, then a first pass at Rhode Island. Their pins come from the source named in each pin note and most were not checked on imagery, so read the pin note before you drive.'),
+    P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
     P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }

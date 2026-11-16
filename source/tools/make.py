@@ -46,7 +46,7 @@ aerial=[
  ['USGS topoView','Every edition of every USGS sheet, free, with a timeline. The Atlas old-map overlays are cut from these.','https://ngmdb.usgs.gov/topoview/viewer/'],
 ]
 V=datetime.datetime.now().strftime('%y%m%d%H%M')
-data={'v':V,'built':datetime.date(2026,11,15).strftime('%B %-d, %Y'),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules}
+data={'v':V,'batches':json.load(open(R+'build/batches.json')),'built':datetime.date.today().strftime('%B %-d, %Y'),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules}
 def js(o): return json.dumps(o,separators=(',',':'),ensure_ascii=False).replace('</','<\\/')
 css=open(R+'src/app.css').read()
 lcss=open(R+'cache/leaflet.min.css').read()

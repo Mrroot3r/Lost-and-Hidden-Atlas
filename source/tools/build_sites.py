@@ -2,14 +2,25 @@ import json,sys,re
 sys.path.insert(0,'tools')
 from data_a import A
 from data_b import B
-from data_c import C,PNC,FR,EXTRA_C
-from data_ma import M,PNM
-from data_worc import X,PNX
-from data_ri import R,PNR
-C=C+M+X+R; PNC=dict(PNC); PNC.update(PNM); PNC.update(PNX); PNC.update(PNR)
-NEW2={m['id'] for m in M}
-NEW3={x['id'] for x in X}
-NEW4={r['id'] for r in R}
+from data_c import FR,EXTRA_C
+# Every tools/data_*.py file (other than the original catalogue files data_a and data_b) is a batch.
+# It must define BATCH={'key','label','added'}, PLACES (a list of N(...) records) and PIN_NOTES (id -> one sentence).
+import glob,os,importlib
+BATCHES=[]; C=[]; PNC={}; BATCH_OF={}
+for f in sorted(glob.glob('tools/data_*.py')):
+    name=os.path.basename(f)[:-3]
+    if name in ('data_a','data_b'): continue
+    m=importlib.import_module(name)
+    for need in ('BATCH','PLACES','PIN_NOTES'):
+        if not hasattr(m,need): raise SystemExit(f'{name}.py must define {need} (see GUIDE.md section 4)')
+    bt=dict(m.BATCH); bt['n']=len(m.PLACES); bt['file']=name; BATCHES.append(bt)
+    for p in m.PLACES:
+        if not m.PIN_NOTES.get(p['id']): raise SystemExit(f"{name}.py: place '{p['id']}' has no pin note")
+        BATCH_OF[p['id']]=bt['key']
+    C+=m.PLACES; PNC.update(m.PIN_NOTES)
+BATCHES.sort(key=lambda x:(x['added'],x['file']))
+assert len({x['key'] for x in BATCHES})==len(BATCHES),'two batches share a key'
+json.dump(BATCHES,open('build/batches.json','w'))
 E=json.load(open('src/entries.json')); L=json.load(open('src/landmarks.json')); G2=json.load(open('src/g2.json'))
 def conf_of(s):
     s=s.lower()
@@ -53,17 +64,15 @@ for i,r in enumerate(L):
         story=r['why']+'.',look='',hook='',accn=r['visit']+'. Open the Google Maps link for current hours.',links=[],now=False))
 from pinnotes import PN,EXTRA_LOOK
 PN=dict(PN); PN.update(PNC)
-NEWIDS={c['id'] for c in C}
 for s in sites:
     if s['id'] in PN: s['pn']=PN[s['id']]
     if s['id'] in EXTRA_LOOK: s['look']=(s['look']+EXTRA_LOOK[s['id']]).strip()
     if s['id'] in FR: s['fr']=FR[s['id']]
-    if s['id'] in NEWIDS: s['new']=True
-    if s['id'] in NEW2: s['new']=2
-    if s['id'] in NEW3: s['new']=3
-    if s['id'] in NEW4: s['new']=4
+    if s['id'] in BATCH_OF: s['new']=BATCH_OF[s['id']]
     if s['id'] in EXTRA_C: s['story']=(s['story']+EXTRA_C[s['id']]).strip()
-ids=[s['id'] for s in sites]; assert len(ids)==len(set(ids)),[i for i in ids if ids.count(i)>1]
+ids=[s['id'] for s in sites]
+dup=sorted({i for i in ids if ids.count(i)>1})
+if dup: raise SystemExit('Duplicate place ids: '+', '.join(dup)+'. Ids are shared across every state, so add a town or state suffix to the NEW one (queens-fort-exeter). Never rename an id that is already published.')
 json.dump(sites,open('build/sites.json','w'),indent=1,ensure_ascii=False)
 from collections import Counter
 print(len(sites),Counter(s['cat'] for s in sites),Counter(s['st'] for s in sites),Counter(s['prec'] for s in sites),Counter(s['reg'] for s in sites))
