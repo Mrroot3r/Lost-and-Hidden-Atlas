@@ -79,7 +79,12 @@ for d in ('data','topo'):
 for i in topo: shutil.copyfile(R+f'build/topo/{i}.webp',WEB+f'topo/{i}.webp')
 open(WEB+'data/lines.json','w').write(open(R+'build/lines.json').read())
 open(WEB+'data/leads.json','w').write(open(R+'build/leads.json').read())
-if os.path.exists(R+'build/pockets.json'): open(WEB+'data/pockets.json','w',encoding='utf-8').write(open(R+'build/pockets.json',encoding='utf-8').read())   # historic pockets (tools/pockets.py); fetched only when the layer is turned on
+if os.path.exists(R+'build/pockets.json'):       # historic pockets (tools/pockets.py); fetched only when the layer is turned on
+    pj=json.load(open(R+'build/pockets.json',encoding='utf-8'))
+    for part in ('m','r','d'): pj.setdefault(part,[])     # empty, for an Android app built before the detail moved to one file per state
+    open(WEB+'data/pockets.json','w',encoding='utf-8').write(json.dumps(pj,separators=(',',':'),ensure_ascii=False))
+    os.makedirs(WEB+'data/pock')
+    for k in pj.get('s',{}): shutil.copyfile(R+f'build/pock/{k}.json',WEB+f'data/pock/{k}.json')   # one state's markers and listings, fetched when the map is zoomed in there
 open(WEB+'app.js','w').write(app)
 open(WEB+'leaflet.js','w').write(open(R+'cache/leaflet.min.js').read())
 web_scripts=('<script src="leaflet.js?v=1.9.4"></script>\n'

@@ -84,8 +84,15 @@ if os.path.exists(os.path.join(REPO,'source','src','boot.js')):
     try:
         if mm and json.loads(rd('version.json')).get('v')!=D.get('v'): err.append('version.json does not match index.html (rebuild needed); the Android app would never see the new places')
     except Exception: err.append('version.json is missing or unreadable (rebuild needed)')
-for need in('data/lines.json','data/leads.json','leaflet.js','GUIDE.md','CLAUDE.md','source/build/states.json'):
+for need in('data/lines.json','data/leads.json','data/pockets.json','leaflet.js','GUIDE.md','CLAUDE.md','source/build/states.json'):
     if not os.path.exists(os.path.join(REPO,need)): err.append('missing '+need)
+# the historic-pockets layer: every state it lists needs its detail file, or zooming in there shows nothing
+try:
+    pj=json.loads(rd('data','pockets.json'))
+    for k in pj.get('s',{}):
+        if not os.path.exists(os.path.join(REPO,'data','pock',k+'.json')): err.append(f'data/pockets.json lists {k} but data/pock/{k}.json is missing (the workspace lost build/pock: run setup.sh again, or tools/pockets.py)')
+    if not pj.get('k'): err.append('data/pockets.json holds no pockets')
+except Exception: pass
 # ---- nothing personal in a public repository ----
 MAIL=re.compile(r'[\w.+-]+@[\w-]+\.[\w.]+'); OKMAIL=('noreply@anthropic.com','users.noreply.github.com','example.com','2x.png')
 for dp,dn,fn in os.walk(REPO):
