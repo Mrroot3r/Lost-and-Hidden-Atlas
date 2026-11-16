@@ -58,6 +58,16 @@ const LS='lost-hidden-atlas-v1';
 const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:true,canal:true,rail:false}}});
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
+/* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
+const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true};
+const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
+const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
+const KM=()=>pref('units')==='km';
+const fmtMi=(mi,dg)=>KM()?(mi*1.609344).toFixed(dg)+' km':(+mi).toFixed(dg)+' mi';            /* a distance measured in miles, shown in the chosen unit */
+const miTxt=mi=>KM()?Math.round(mi*1.609344)+' km':mi+' mi';
+const STEP=()=>({fine:2,normal:4,coarse:10})[pref('detail')]||4;                                 /* metres between saved track points */
+function applyTheme(){ const t=pref('theme'), r=document.documentElement; if(t==='light'||t==='dark') r.setAttribute('data-theme',t); else r.removeAttribute('data-theme'); r.style.setProperty('--trk',pref('trk')); }
+applyTheme();
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
 
 const sites=()=>BASE.concat(U.custom);
@@ -186,7 +196,7 @@ function renderList(){
       dot(s),
       el('span',null,el('b',{text:s.name}),el('small',{text:[s.town,s.years].filter(Boolean).join(' · ')}),
         el('small',null,STS[s.st],s.now?' · changing now':'',s.prec==='area'?' · rough pin':'',my?' · '+MY[my]:'',U.trip.indexOf(s.id)>=0?' · in trip':'')),
-      el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:d.mi+' mi'})))));
+      el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:miTxt(d.mi)})))));
   });
   ul.append(frag);
 }
@@ -338,7 +348,7 @@ function initMap(){
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
   map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:7,zoomSnap:1,worldCopyJump:false,maxBounds:[[38.7,-81.0],[47.7,-66.5]],maxBoundsViscosity:0.6}).setView([42.82,-73.86],9);
   L.control.zoom({position:'bottomright'}).addTo(map);
-  L.control.scale({position:'bottomleft',imperial:true,metric:true}).addTo(map);
+  drawScale();
   map.attributionControl.setPrefix(false);
   map.createPane('cmp').style.zIndex=250;
   map.createPane('hist').style.zIndex=350;
@@ -448,10 +458,47 @@ function buildBar(){
   fx.append(el('button',{class:'lb',type:'button',id:'lb-big',title:'Make the map fill the screen','aria-label':big?'Show the list':'Bigger map',onclick:()=>{ $('#app').classList.toggle('mapbig'); buildBar(); if(map) setTimeout(()=>map.invalidateSize(),60); }},ico(big?'list':'big'),el('span',{class:'lt',text:big?'List':'Full'})));
   syncBar(); }
 function syncBar(){ BAR.forEach(b=>{ const n=document.getElementById('lb-'+b[0]); if(n) n.setAttribute('aria-pressed',String(barState(b[0]))); }); if(!$('#sheet').hidden) buildSheet(); }
-function openSheet(){ buildSheet(); $('#sheet').hidden=false; $('#scrim').hidden=false; try{ $('#sheet-x').focus({preventScroll:true}); }catch(e){} }
+let sheetMode='map';
+function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawScale.c); drawScale.c=L.control.scale({position:'bottomleft',imperial:!KM(),metric:KM()}).addTo(map); }
+/* send the recorder's settings to the phone; it reads them when a recording starts and when a mark is dropped */
+function pushPrefs(){ if(NATIVE) AT.call('configure',{units:pref('units'),step:STEP(),every:({fine:1000,normal:2000,coarse:5000})[pref('detail')]||2000,buzz:!!pref('buzz')}).catch(()=>{}); }
+function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme(); drawScale(); pushPrefs();
+  if(k==='trk'){ if(rec) drawRec(); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
+  if(k==='units'||k==='clock'){ renderList(); if(sel&&view==='detail') renderDetail(sel); if(view==='log') renderLog(); if(view==='trip') renderTrip(); syncRec(); } }
+function showSettings(on){ sheetMode=on?'set':'map'; $('#sheet-t').textContent=on?'Settings':'Map options'; const g=$('#sheet-set'); g.setAttribute('aria-label',on?'Back to map options':'Settings'); g.classList.toggle('back',!!on);
+  if(on) buildSettings(); else buildSheet(); $('#sheet-b').scrollTop=0; }
+function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classList.add('guide');
+  const H=t=>el('h3',{text:t});
+  const pick=(key,label,choices,sub)=>{ const id='set-'+key, x=el('select',{id:id},choices.map(c=>el('option',{value:String(c[0]),text:c[1]}))); x.value=String(pref(key));
+    x.addEventListener('change',()=>{ const c=choices.find(c=>String(c[0])===x.value); setPref(key,c?c[0]:x.value); }); return el('label',{class:'field setrow',for:id},el('span',{text:label}),x,sub?el('small',{class:'snote',text:sub}):null); };
+  const tog=(key,label,sub)=>{ const id='set-'+key; return el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!pref(key),onchange:e=>setPref(key,e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null)); };
+  const sw=el('div',{class:'swatches',role:'radiogroup','aria-label':'Track colour'}); [['#e11d74','Pink'],['#2563eb','Blue'],['#dc2626','Red'],['#7c3aed','Purple'],['#111827','Black']].forEach(c=>{ const b=el('button',{type:'button',role:'radio','aria-checked':String(pref('trk')===c[0]),'aria-label':c[1],title:c[1],style:'--c:'+c[0]}); b.addEventListener('click',()=>{ setPref('trk',c[0]); buildSettings(); }); sw.append(b); });
+  const hs=el('select',{id:'set-home'}); [...$('#home').children].forEach(n=>hs.append(n.cloneNode(true))); hs.value=U.home.id; hs.addEventListener('change',()=>{ const h=$('#home'); h.value=hs.value; if(hs.value==='pick') closeSheet(); h.dispatchEvent(new Event('change')); });
+  lb.append(H('Look and units'),
+    pick('theme','Theme',[['auto','Follow the phone'],['light','Light'],['dark','Dark']]),
+    pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
+    pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
+    el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),
+    H('Map'),
+    pick('open','The map opens on',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
+    tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
+    el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Drive times from'}),hs),
+    H('Field log'),
+    pick('detail','Track detail',[['fine','Fine: a point every 2 m'],['normal','Normal: every 4 m'],['coarse','Coarse: every 10 m']],NATIVE?'Coarse also checks GPS less often, which saves some battery on long days. Takes effect on the next recording.':'Takes effect on the next recording.'),
+    NATIVE?tog('buzz','Vibrate on "Mark here"','A short buzz so you know the pin was dropped without looking.'):null,
+    NATIVE?tog('autoPhotos','Find photos and video when a log ends'):null,
+    NATIVE?pick('near','A photo joins a note within',[[10,'10 m'],[25,'25 m'],[50,'50 m']],'After changing this, use "Look again for photos" on a log. Photos you placed by hand stay put.'):null,
+    H('Sharing and privacy'),
+    pick('trim','Trim the ends of a shared walk',[[0,'Do not trim'],[100,'First and last 100 m'],[200,'First and last 200 m'],[500,'First and last 500 m']],'Applies to "Share this walk" and the GPX file, so a shared walk does not show where you parked or live. Your own copy is not changed.'),
+    tog('previews','Include photo previews in a shared walk'),
+    H('Your data'),
+    NATIVE?tog('autoBackup','Save a backup file when a log ends','Download / Lost Hidden Atlas / atlas-backup.json on the phone.'):null);
+  dataSections(lb); }
+function openSheet(){ sheetMode='map'; $('#sheet-t').textContent='Map options'; $('#sheet-set').classList.remove('back'); $('#sheet-set').setAttribute('aria-label','Settings'); buildSheet(); $('#sheet').hidden=false; $('#scrim').hidden=false; try{ $('#sheet-x').focus({preventScroll:true}); }catch(e){} }
 function closeSheet(){ $('#sheet').hidden=true; $('#scrim').hidden=true; }
 function buildSheet(){
-  const lb=$('#sheet-b'), keep=lb.scrollTop; lb.textContent='';
+  if(sheetMode==='set') return;
+  const lb=$('#sheet-b'), keep=lb.scrollTop; lb.textContent=''; lb.classList.remove('guide');
   const H=t=>el('h3',{text:t}), note=t=>el('small',{class:'snote',text:t});
   const ck=(id,on,label,sub,fn)=>el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!on,onchange:e=>fn(e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null));
   if(schematic){ lb.append(el('p',{style:'margin:8px 0 0',text:LOCAL?'Live imagery could not load, so the map is showing a built-in outline. Old-map overlays and every scouting link still work. Reload when you are back online.':'This online copy cannot load live imagery, so the map is a built-in outline. Old-map overlays and every scouting link still work. Open the Atlas file, or host it, for satellite, leaf-off, LiDAR, public land and owner lookups.'})); }
@@ -648,7 +695,7 @@ async function lookup(p,box){
       el('dt',{text:'Owner'}),el('dd',{text:(a.OWNER1||'Not given')+(more>0?' (and '+more+' more record'+(more>1?'s':'')+' on this lot)':'')}),
       el('dt',{text:'Parcel'}),el('dd',{text:[a.SITE_ADDR,a.CITY].filter(Boolean).join(', ')||'No address'}),
       use?el('dt',{text:'Use'}):null,use?el('dd',{text:use+(uc?' ('+uc+')':'')}):null,
-      a.LOT_SIZE?el('dt',{text:'Size'}):null,a.LOT_SIZE?el('dd',{text:(+a.LOT_SIZE).toLocaleString()+(a.LOT_UNITS==='S'?' sq ft':' acres')}):null,
+      a.LOT_SIZE?el('dt',{text:'Size'}):null,a.LOT_SIZE?el('dd',{text:(+a.LOT_SIZE).toLocaleString([],{hour12:H12()})+(a.LOT_UNITS==='S'?' sq ft':' acres')}):null,
       a.PROP_ID?el('dt',{text:'Parcel ID'}):null,a.PROP_ID?el('dd',{class:'mono',text:a.PROP_ID}):null));
     box.append(ext('https://www.google.com/search?q='+encodeURIComponent((a.CITY||'')+' MA assessor property record '+(a.SITE_ADDR||a.PROP_ID||'')),'Find the assessor record','btn sm'));
     box.append(el('small',{class:'snote',text:'From the MassGIS parcel file'+(a.FY?', fiscal year '+a.FY:'')+', which can lag a sale. The town assessor has the mailing address for a permission letter.'}));
@@ -726,7 +773,7 @@ function locate(){
   try{ geo.id=navigator.geolocation.watchPosition(g=>{ const c=g.coords, t=g.timestamp||Date.now(), p=gpsFilter(c,t); if(!p) return;
       const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); recPoint(p,c.accuracy||50,t);
       /* follow: if the dot was on screen and has now walked off it, bring the map along */
-      if(!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
+      if(pref('follow')&&!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
       if(geo.first){ geo.first=false; banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,Math.max(map.getZoom(),16)); }
     },e=>{ if(e&&e.code===1){ fail(LOCAL||HOSTED?'Location was refused. Allow it for this page in your browser settings, then tap again.':'This online copy is not allowed to use your location. It works when the Atlas is opened as a file or from your own web address.'); return; }
       if(geo.f) return;   /* a passing timeout after we already had a fix: keep listening */
@@ -736,11 +783,11 @@ function locate(){
 
 /* field log: a GPS track with timed notes, kept in this browser */
 let rec=null, recLine=null, recMarks=[], shownLog=null, shownLayers=[], wake=null, recTick=0;
-const TRK='#e11d74';
+
 const logById=id=>(U.logs||[]).find(l=>l.id===id);
 const trackMi=pts=>{ let m=0; for(let i=1;i<pts.length;i++) m+=hav(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1]); return m; };
 const hms=s=>{ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60; return (h?h+':'+String(m).padStart(2,'0'):String(m))+':'+String(x).padStart(2,'0'); };
-const logSummary=l=>trackMi(l.pts).toFixed(2)+' mi · '+hms((l.t1||Math.round(Date.now()/1000))-l.t0)+' · '+l.notes.length+(l.notes.length===1?' note':' notes');
+const logSummary=l=>fmtMi(trackMi(l.pts),2)+' · '+hms((l.t1||Math.round(Date.now()/1000))-l.t0)+' · '+l.notes.length+(l.notes.length===1?' note':' notes');
 async function keepAwake(){ try{ if(navigator.wakeLock&&!document.hidden) wake=await navigator.wakeLock.request('screen'); }catch(e){ wake=null; } }
 function dropAwake(){ try{ if(wake) wake.release(); }catch(e){} wake=null; }
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) saveNow(); else if(rec){ if(NATIVE) natSync().then(()=>syncRec()); else keepAwake(); } });
@@ -774,7 +821,7 @@ function startLog(s){
   if(geo.id===null) locate(); else banner('Recording. Keep this page open and the screen on.',false,6000);
   keepAwake(); drawRec(); syncRec(); if(view==='log') renderLog(); }
 function recPoint(p,acc,t){ if(!rec||NATIVE||acc>35) return; const pts=rec.pts,last=pts[pts.length-1];
-  if(last&&hav(last[0],last[1],p[0],p[1])*1609.34<4) return;
+  if(last&&hav(last[0],last[1],p[0],p[1])*1609.34<STEP()) return;
   pts.push([+p[0].toFixed(5),+p[1].toFixed(5),Math.round(t/1000)]); if(recLine) recLine.addLatLng([p[0],p[1]]); saveSlow(); }
 function addNote(text){ if(!rec) return; const lp=rec.pts[rec.pts.length-1], p=geo.f?[geo.f.lat,geo.f.lon]:(NATIVE&&lp?[lp[0],lp[1]]:null), n={t:Math.round(Date.now()/1000),x:(text||'').trim()||'Mark'};
   if(p){ n.la=+p[0].toFixed(5); n.lo=+p[1].toFixed(5); } rec.notes.push(n); saveNow(); drawRec(); syncRec(); if(view==='log') renderLog();
@@ -785,9 +832,9 @@ function stopLog(){ if(!rec) return;
   clearInterval(natTick); const l=rec; l.t1=Math.round(Date.now()/1000); rec=null; delete U.rec; dropAwake(); clearRec(); syncRec();
   if(!l.pts.length&&!l.notes.length){ U.logs=U.logs.filter(x=>x!==l); saveNow(); banner('Nothing was recorded, so the log was discarded.',false,5000); if(view==='log') renderLog(); return; }
   saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log');
-  if(NATIVE) scanMedia(l,false).catch(()=>{}).then(()=>backupFile()).catch(()=>{}); }
+  if(NATIVE) (pref('autoPhotos')?scanMedia(l,false).catch(()=>{}):Promise.resolve()).then(()=>pref('autoBackup')?backupFile():null).catch(()=>{}); }
 function noteMark(n,l){ const num=l.notes.indexOf(n)+1; const m=L.marker([n.la,n.lo],{keyboard:false,icon:L.divIcon({className:'notepin',html:String(num),iconSize:[22,22],iconAnchor:[11,11]})}); m._note=n;
-  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); m.on('popupopen',()=>{ const c=m.getPopup().getContent(), ph=photosOf(l,n); c.querySelectorAll('.phs,.nacts').forEach(x=>x.remove()); if(ph.length) c.append(mediaStrip(l,ph.slice(0,6)));
+  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); m.on('popupopen',()=>{ const c=m.getPopup().getContent(), ph=photosOf(l,n); c.querySelectorAll('.phs,.nacts').forEach(x=>x.remove()); if(ph.length) c.append(mediaStrip(l,ph.slice(0,6)));
     const redo=()=>{ saveNow(); map.closePopup(); if(rec===l){ drawRec(); syncRec(); } else if(shownLog===l.id) showLog(l,false); if(view==='log') renderLog(); };
     const rn=el('button',{class:'btn sm',type:'button'},'Rename'); rn.addEventListener('click',()=>{ const i=el('input',{type:'text','aria-label':'Note text',style:'width:100%'}); i.value=n.x; let done=false; const ok=()=>{ if(done) return; done=true; const t=i.value.trim(); if(t&&t!==n.x){ n.x=t; delete n.mk; redo(); } else map.closePopup(); };
       i.addEventListener('keydown',e=>{ if(e.key==='Enter') ok(); }); i.addEventListener('blur',ok); c.querySelector('b').replaceWith(i); i.focus(); i.select(); });
@@ -796,7 +843,7 @@ function noteMark(n,l){ const num=l.notes.indexOf(n)+1; const m=L.marker([n.la,n
     c.append(el('div',{class:'nacts'},rn,dl,rec===l?null:ap)); m.getPopup().update(); }); return m; }
 function clearRec(){ if(recLine){ map.removeLayer(recLine); recLine=null; } recMarks.forEach(m=>map.removeLayer(m)); recMarks=[]; }
 function drawRec(){ if(!map||!rec) return; clearRec();
-  recLine=L.polyline(rec.pts.map(p=>[p[0],p[1]]),{color:TRK,weight:4,opacity:0.9,interactive:false}).addTo(map);
+  recLine=L.polyline(rec.pts.map(p=>[p[0],p[1]]),{color:pref('trk'),weight:4,opacity:0.9,interactive:false}).addTo(map);
   rec.notes.forEach(n=>{ if(n.la!=null) recMarks.push(noteMark(n,rec).addTo(map)); }); }
 /* tapping a note in the Log tab: show that log if it is not on the map, go to the note's pin and open it */
 function goNote(l,n,row){
@@ -809,17 +856,17 @@ function goNote(l,n,row){
 /* ---- photos and video taken during a log (Android app only) ----
    The app asks the phone which photos and videos the camera saved during the log. Nothing is copied: a log keeps a short
    reference per item in l.media = [{k:'i'|'v', id, n:name, t:seconds, d:video length, la, lo, nt:time of the note it belongs to, fx:set by hand}].
-   A photo's place is where the track was at the second it was taken. It joins the next note written within MEDIA_NEAR
+   A photo's place is where the track was at the second it was taken. It joins the next note written within pref('near')
    metres of that place (photo first, then the note), else the note before it; otherwise it stays on the track by itself.
    A video is a stretch of time, so it is the part of the track walked while it ran. */
-const MEDIA_NEAR=25;
+
 function trackPos(l,t){ const p=l.pts, n=p.length-1; if(n<0) return null; const end=l.t1||p[n][2];
   if(t<=p[0][2]) return t>=l.t0-90?[p[0][0],p[0][1]]:null; if(t>=p[n][2]) return t<=end+90?[p[n][0],p[n][1]]:null;
   let a=0,b=n; while(b-a>1){ const m=(a+b)>>1; if(p[m][2]<=t) a=m; else b=m; }
   const f=p[b][2]>p[a][2]?(t-p[a][2])/(p[b][2]-p[a][2]):0; return [+(p[a][0]+(p[b][0]-p[a][0])*f).toFixed(6),+(p[a][1]+(p[b][1]-p[a][1])*f).toFixed(6)]; }
 const vids=l=>(l.media||[]).filter(m=>m.k==='v'), photosOf=(l,n)=>(l.media||[]).filter(m=>m.k==='i'&&m.nt===n.t), loosePhotos=l=>(l.media||[]).filter(m=>m.k==='i'&&!l.notes.some(n=>n.t===m.nt));
 function clipAt(l,t){ const v=vids(l); for(let i=0;i<v.length;i++) if(t>=v[i].t&&t<=v[i].t+v[i].d) return {n:i+1,at:t-v[i].t,v:v[i]}; return null; }
-function noteFor(l,m){ if(m.la==null) return null; const ns=l.notes.filter(n=>n.la!=null), near=n=>n&&hav(m.la,m.lo,n.la,n.lo)*1609.34<=MEDIA_NEAR;
+function noteFor(l,m){ if(m.la==null) return null; const ns=l.notes.filter(n=>n.la!=null), near=n=>n&&hav(m.la,m.lo,n.la,n.lo)*1609.34<=(+pref('near')||25);
   const next=ns.find(n=>n.t>=m.t), prev=ns.filter(n=>n.t<m.t).pop(); return near(next)?next.t:near(prev)?prev.t:null; }
 function placeMedia(l,raw){ const t0=l.t0, t1=l.t1||Math.round(Date.now()/1000), old={}, out=[]; (l.media||[]).forEach(m=>{ old[m.k+m.id]=m; });
   const inWalk=(a,b)=>a<=t1+60&&b>=t0-60;
@@ -843,7 +890,7 @@ function thumbBtn(l,m){ const b=el('button',{class:'ph'+(m.k==='v'?' vid':''),ty
 function mediaStrip(l,list){ const d=el('div',{class:'phs'}); list.forEach(m=>d.append(thumbBtn(l,m))); return d; }
 /* go to one photo or video on the map and open a card for it */
 function goMedia(l,m){ if(!map) return; if(rec!==l&&shownLog!==l.id){ showLog(l,false); if(view==='log') renderLog(); }
-  const tm=new Date(m.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'}), box=el('div',{class:'ctx mpop'}); let pop=null;
+  const tm=new Date(m.t*1000).toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit',second:'2-digit'}), box=el('div',{class:'ctx mpop'}); let pop=null;
   const im=el('img',{alt:''}); box.append(im); thumb(m,640).then(d=>{ im.src=d; im.onload=()=>pop&&pop.update(); },()=>im.remove());
   if(m.k==='v'){ const n=vids(l).indexOf(m)+1; box.append(el('b',{text:'Video '+n+' · '+hms(m.d)+' long'}),el('span',{class:'mx',text:m.n}),el('span',{class:'mx',text:'Starts '+hms(m.t-l.t0)+' into the log · '+tm}));
     const inside=l.notes.filter(x=>x.t>=m.t&&x.t<=m.t+m.d); if(inside.length) box.append(el('span',{class:'mx',text:'Notes in it: '+inside.map(x=>hms(x.t-m.t)+' '+x.x).join(' · ')})); }
@@ -859,7 +906,7 @@ function goMedia(l,m){ if(!map) return; if(rec!==l&&shownLog!==l.id){ showLog(l,
   pop=L.popup({maxWidth:250,autoPan:m.k!=='v',autoPanPaddingTopLeft:[10,10]}).setLatLng(at).setContent(box).openOn(map); }
 function hideLog(){ shownLayers.forEach(x=>map&&map.removeLayer(x)); shownLayers=[]; shownLog=null; }
 function showLog(l,fit){ hideLog(); if(!map) return; shownLog=l.id; const ll2=l.pts.map(p=>[p[0],p[1]]);
-  if(ll2.length>1) shownLayers.push(L.polyline(ll2,{color:'#ffffff',weight:6,opacity:0.8,interactive:false}).addTo(map),L.polyline(ll2,{color:TRK,weight:3.5,opacity:0.95,interactive:false}).addTo(map));
+  if(ll2.length>1) shownLayers.push(L.polyline(ll2,{color:'#ffffff',weight:6,opacity:0.8,interactive:false}).addTo(map),L.polyline(ll2,{color:pref('trk'),weight:3.5,opacity:0.95,interactive:false}).addTo(map));
   vids(l).forEach((m,i)=>{ const seg=l.pts.filter(p=>p[2]>=m.t&&p[2]<=m.t+m.d).map(p=>[p[0],p[1]]), a=trackPos(l,Math.max(m.t,l.t0)), b=trackPos(l,Math.min(m.t+m.d,l.t1||m.t+m.d)); if(a) seg.unshift(a); if(b) seg.push(b);
     if(seg.length>1) shownLayers.push(L.polyline(seg,{color:'#f5a524',weight:13,opacity:0.75,interactive:false}).addTo(map).bringToBack());   /* the stretch walked while filming */
     if(m.la!=null){ const k=L.marker([m.la,m.lo],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'vidpin',html:'\u25B6 '+(i+1),iconSize:[34,20],iconAnchor:[17,30]})}); k.on('click',()=>goMedia(l,m)); shownLayers.push(k.addTo(map)); } });
@@ -868,20 +915,27 @@ function showLog(l,fit){ hideLog(); if(!map) return; shownLog=l.id; const ll2=l.
   if(fit&&ll2.length) map.fitBounds(L.latLngBounds(ll2).pad(0.25),{maxZoom:18}); }
 function syncRec(){ const bar=$('#recbar'); if(!bar) return; clearInterval(recTick);
   if(!rec){ bar.hidden=true; $('#rec-form').hidden=true; return; }
-  bar.hidden=false; const upd=()=>{ const lv=document.getElementById('log-live'); if(rec&&lv) lv.textContent=logSummary(rec); if(rec) $('#rec-t').textContent=hms(Date.now()/1000-rec.t0)+' · '+trackMi(rec.pts).toFixed(2)+' mi'+(rec.notes.length?' · '+rec.notes.length+(rec.notes.length===1?' note':' notes'):''); };
+  bar.hidden=false; const upd=()=>{ const lv=document.getElementById('log-live'); if(rec&&lv) lv.textContent=logSummary(rec); if(rec) $('#rec-t').textContent=hms(Date.now()/1000-rec.t0)+' · '+fmtMi(trackMi(rec.pts),2)+(rec.notes.length?' · '+rec.notes.length+(rec.notes.length===1?' note':' notes'):''); };
   upd(); recTick=setInterval(upd,1000); }
 function gpx(l){ const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]), iso=t=>new Date(t*1000).toISOString();
   return '<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Lost &amp; Hidden Atlas" xmlns="http://www.topografix.com/GPX/1/1">\n<metadata><name>'+esc(l.name)+'</name><time>'+iso(l.t0)+'</time></metadata>\n'+
     l.notes.filter(n=>n.la!=null).map(n=>'<wpt lat="'+n.la+'" lon="'+n.lo+'"><time>'+iso(n.t)+'</time><name>'+esc(n.x)+'</name></wpt>\n').join('')+
     '<trk><name>'+esc(l.name)+'</name><trkseg>\n'+l.pts.map(p=>'<trkpt lat="'+p[0]+'" lon="'+p[1]+'"><time>'+iso(p[2])+'</time></trkpt>\n').join('')+'</trkseg></trk>\n</gpx>\n'; }
-function notesText(l){ const tm=t=>new Date(t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
-  return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString()+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,n.t))+(p=>p.length?'  [photos: '+p.map(m=>m.n).join(', ')+']':'')(photosOf(l,n))).join('\n'):'No notes.')+'\n'+
+function notesText(l){ const tm=t=>new Date(t*1000).toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit',second:'2-digit'});
+  return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString([],{hour12:H12()})+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,n.t))+(p=>p.length?'  [photos: '+p.map(m=>m.n).join(', ')+']':'')(photosOf(l,n))).join('\n'):'No notes.')+'\n'+
     (vids(l).length?'\nVideos\n'+vids(l).map((m,i)=>(i+1)+'  '+m.n+'  starts '+hms(m.t-l.t0)+' into the log ('+tm(m.t)+'), '+hms(m.d)+' long').join('\n')+'\n':'')+
     (loosePhotos(l).length?'\nPhotos not attached to a note\n'+loosePhotos(l).map(m=>hms(m.t-l.t0)+'  '+tm(m.t)+'  '+m.n+(m.la!=null?'  ('+m.la+', '+m.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,m.t))).join('\n')+'\n':''); }
 /* A walk as one file another person can open in the Atlas: track, notes, where each video ran, and small previews of the photos. */
+/* For sharing: the walk with its first and last stretch cut off (Settings, "Trim the ends"), so a file does not show where it began. null = too short to trim. */
+function trimmed(l){ const cut=+pref('trim')||0, p=l.pts; if(!cut||l.imp||p.length<2) return l;
+  let a=-1,b=-1,d=0; for(let i=1;i<p.length;i++){ d+=hav(p[i-1][0],p[i-1][1],p[i][0],p[i][1])*1609.34; if(d>=cut){ a=i; break; } }
+  d=0; for(let i=p.length-2;i>=0;i--){ d+=hav(p[i+1][0],p[i+1][1],p[i][0],p[i][1])*1609.34; if(d>=cut){ b=i; break; } }
+  if(a<0||b<0||b-a<2) return null; const ta=p[a][2], tb=p[b][2];
+  return Object.assign({},l,{pts:p.slice(a,b+1),t0:ta,t1:tb,notes:l.notes.filter(n=>n.t>=ta&&n.t<=tb),media:(l.media||[]).filter(m=>m.t>=ta&&m.t+(m.d||0)<=tb)}); }
+const TOOSHORT='This walk is shorter than the ends you asked to trim, so nothing was shared. Change "Trim the ends" in Settings to share it.';
 function walkFile(l){ const o={atlas:'walk',v:1,name:l.name,t0:l.t0,t1:l.t1,pts:l.pts,notes:l.notes.map(n=>{ const c={t:n.t,x:n.x}; if(n.la!=null){ c.la=n.la; c.lo=n.lo; } return c; }),media:[]};
   return Promise.all((l.media||[]).map((m,i)=>{ const c={k:m.k,n:m.n,t:m.t}; if(m.la!=null){ c.la=m.la; c.lo=m.lo; } if(m.d!=null) c.d=m.d; if(m.nt!=null) c.nt=m.nt;
-    return i<80?thumb(m,400).then(d=>{ c.th=d; return c; },()=>c):c; })).then(ms=>{ o.media=ms; return JSON.stringify(o); }); }
+    return i<80&&pref('previews')?thumb(m,400).then(d=>{ c.th=d; return c; },()=>c):c; })).then(ms=>{ o.media=ms; return JSON.stringify(o); }); }
 function readWalk(text,fileName){ const num=x=>typeof x==='number'&&isFinite(x), id='log'+Date.now().toString(36);
   if(/^\s*</.test(text)){ /* a GPX file from any app */
     const d=new DOMParser().parseFromString(text,'application/xml'); if(d.querySelector('parsererror')) throw new Error('That GPX file could not be read.');
@@ -906,7 +960,7 @@ function openWalk(file){ const r=new FileReader(); r.onerror=()=>banner('That fi
     showView('log'); showLog(l,true); renderLog(); banner('Opened "'+l.name+'": '+logSummary(l)+'.',false,6000); };
   r.readAsText(file); }
 /* For editing footage: where each note and photo falls inside each video. */
-function editSheet(l){ const tc=x=>{ x=Math.max(0,Math.round(x)); return [Math.floor(x/3600),Math.floor(x%3600/60),x%60].map(v=>String(v).padStart(2,'0')).join(':'); }, tm=t=>new Date(t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
+function editSheet(l){ const tc=x=>{ x=Math.max(0,Math.round(x)); return [Math.floor(x/3600),Math.floor(x%3600/60),x%60].map(v=>String(v).padStart(2,'0')).join(':'); }, tm=t=>new Date(t*1000).toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit',second:'2-digit'});
   const out=[l.name,'Edit sheet: the time inside each video where a note was written or a photo was taken.',''], used=new Set();
   vids(l).forEach((m,i)=>{ out.push('VIDEO '+(i+1)+'   '+m.n+'   started '+tm(m.t)+'   length '+tc(m.d));
     const rows=l.notes.filter(n=>n.t>=m.t&&n.t<=m.t+m.d).map(n=>[n.t,'NOTE ',n.x,n]).concat((l.media||[]).filter(p=>p.k==='i'&&p.t>=m.t&&p.t<=m.t+m.d).map(p=>[p.t,'PHOTO',p.n+((nn=>nn?'  (with "'+nn.x+'")':'')(l.notes.find(n=>n.t===p.nt))),p])).sort((a,b)=>a[0]-b[0]);
@@ -948,12 +1002,12 @@ function renderLog(){
     const title=el('b',{text:l.name});
     const ren=el('button',{class:'btn sm',type:'button',onclick:()=>{ const i=el('input',{type:'text','aria-label':'Log name'}); i.value=l.name; const ok=()=>{ l.name=i.value.trim()||l.name; saveNow(); renderLog(); }; i.addEventListener('keydown',e=>{ if(e.key==='Enter') ok(); }); i.addEventListener('blur',ok); title.replaceWith(i); i.focus(); }},'Rename');
     const cp=el('button',{class:'btn sm',type:'button'},'Copy notes'); cp.addEventListener('click',()=>copy(notesText(l),cp));
-    const gx=el('button',{class:'btn sm',type:'button'},NATIVE?'Share route (GPX)':'GPX track'); gx.addEventListener('click',()=>sendFile(fn+'.gpx',gpx(l),'application/gpx+xml',gx));
-    const sw=el('button',{class:'btn sm',type:'button'},'Share this walk'); sw.addEventListener('click',()=>{ sw.disabled=true; sw.textContent='Packing…'; walkFile(l).then(t=>sendFile(fn+'.atlas.json',t,'application/json',sw)).catch(()=>banner('The walk could not be packed.',true,6000)).then(()=>{ sw.disabled=false; sw.textContent='Share this walk'; }); });
+    const gx=el('button',{class:'btn sm',type:'button'},NATIVE?'Share route (GPX)':'GPX track'); gx.addEventListener('click',()=>{ const tl=trimmed(l); if(!tl){ banner(TOOSHORT,true,10000); return; } sendFile(fn+'.gpx',gpx(tl),'application/gpx+xml',gx); });
+    const sw=el('button',{class:'btn sm',type:'button'},'Share this walk'); sw.addEventListener('click',()=>{ const tl=trimmed(l); if(!tl){ banner(TOOSHORT,true,10000); return; } sw.disabled=true; sw.textContent='Packing…'; walkFile(tl).then(t=>sendFile(fn+'.atlas.json',t,'application/json',sw)).catch(()=>banner('The walk could not be packed.',true,6000)).then(()=>{ sw.disabled=false; sw.textContent='Share this walk'; }); });
     const es=vids(l).length?el('button',{class:'btn sm',type:'button'},'Edit sheet'):null; if(es) es.addEventListener('click',()=>sendFile(fn+'-edit-sheet.txt',editSheet(l),'text/plain',es));
     const del=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; del.addEventListener('click',()=>{ if(!armed){ armed=true; del.textContent='Really delete?'; setTimeout(()=>{ armed=false; del.textContent='Delete'; },4000); return; } if(shownLog===l.id) hideLog(); U.logs=U.logs.filter(x=>x!==l); saveNow(); if(NATIVE) AT.call('remove',{logId:l.id}).catch(()=>{}); renderLog(); });
     const site=l.site&&byId(l.site);
-    const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
+    const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{hour12:H12(),dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
       el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,sw,gx,cp,es,ren,del),
       site?el('p',{style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>select(site,true)},'Open '+site.name)):null);
     if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{class:'nx',text:n.x})); const cl=clipAt(l,n.t), ph=photosOf(l,n); if(cl) li.append(el('span',{class:'clip',title:'Position in video '+cl.n,text:'\u25B6'+cl.n+' '+hms(cl.at)})); if(ph.length) li.append(mediaStrip(l,ph)); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
@@ -1096,7 +1150,7 @@ function renderDetail(s){
     tags));
   /* getting there */
   const times=el('div',{class:'times'});
-  times.append(el('div',{class:'time home'},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+d.mi+' mi'));
+  times.append(el('div',{class:'time home'},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+miTxt(d.mi)));
   /* the three nearest other start cities, not all of them */
   if(s.dt) HUBS.filter(h=>h.id!==U.home.id&&s.dt[h.id]).sort((a,b)=>s.dt[a.id][0]-s.dt[b.id][0]).slice(0,3).forEach(h=>times.append(el('div',{class:'time'},el('b',{text:fmtMin(s.dt[h.id][0])}),h.name)));
   const gd='https://www.google.com/maps/dir/?api=1&origin='+H.lat+','+H.lon+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
@@ -1133,7 +1187,7 @@ function renderDetail(s){
     const pic=el('img',{alt:s.tm.y+' USGS map around '+s.name}); topoSrc(s).then(u=>{ if(u) pic.src=u; else pic.remove(); });
     const ck=el('input',{type:'checkbox',id:'d-hist',checked:!!U.ui.hist,onchange:e=>{U.ui.hist=e.target.checked;save();showHist();syncBar();}});
     sc.append(el('div',{class:'hist'},
-      el('label',{class:'lopt',for:'d-hist'},ck,el('span',null,'Lay the '+s.tm.y+' USGS map over whatever layer is showing',el('small',{text:s.tm.q+' sheet, 1:'+Number(s.tm.sc).toLocaleString()+'. Old surveys can sit 50–100 m off; match roads and streams.'}))),
+      el('label',{class:'lopt',for:'d-hist'},ck,el('span',null,'Lay the '+s.tm.y+' USGS map over whatever layer is showing',el('small',{text:s.tm.q+' sheet, 1:'+Number(s.tm.sc).toLocaleString([],{hour12:H12()})+'. Old surveys can sit 50–100 m off; match roads and streams.'}))),
       el('input',{type:'range',id:'d-hist-op',min:'0.1',max:'1',step:'0.05',value:String(U.ui.histOp),'aria-label':'Old map strength',oninput:e=>{U.ui.histOp=+e.target.value;save();if(histLayer)histLayer.setOpacity(U.ui.histOp);}}),
       pic));
   }
@@ -1169,7 +1223,7 @@ function renderDetail(s){
   v.append(mine);
   /* nearby */
   const near=sites().filter(o=>o.id!==s.id).map(o=>{ const q=pos(o); return [o,hav(p.lat,p.lon,q.lat,q.lon)]; }).filter(x=>x[1]<=3).sort((a,b)=>a[1]-b[1]).slice(0,10);
-  if(near.length){ const ul=el('ul',{class:'near'}); near.forEach(x=>ul.append(el('li',null,el('button',{type:'button',onclick:()=>select(x[0],true)},dot(x[0]),' '+x[0].name),el('span',{text:x[1]<0.1?Math.round(x[1]*5280)+' ft':x[1].toFixed(1)+' mi'}))));
+  if(near.length){ const ul=el('ul',{class:'near'}); near.forEach(x=>ul.append(el('li',null,el('button',{type:'button',onclick:()=>select(x[0],true)},dot(x[0]),' '+x[0].name),el('span',{text:x[1]<0.1?(KM()?Math.round(x[1]*1609.34)+' m':Math.round(x[1]*5280)+' ft'):fmtMi(x[1],1)}))));
     v.append(el('div',{class:'sec pad'},el('h3',{text:'Close by, as the crow flies'}),ul)); }
   const nl=nearLines(p);
   if(nl.length){ const ul=el('ul',{class:'near'}); nl.forEach(x=>ul.append(el('li',null,el('button',{type:'button',onclick:()=>setLine(x.parts?{f:x.f,parts:x.parts}:{f:x.f})},el('span',{class:'sw'+(LK[x.f.k][2]?' dash':''),style:'--c:'+LK[x.f.k][1]}),' '+(x.f.n||('Unnamed '+LK[x.f.k][0].toLowerCase()))+(x.f.y?' ('+x.f.y+')':'')),el('span',{text:x.d<30?'on it':Math.round(x.d)+' m'}))));
@@ -1248,8 +1302,8 @@ function renderTrip(){
   box.append(ul);
   const pts=[H].concat(st.map(dest)).concat(trip.round?[H]:[]), r=roughMin(legMiles(pts));
   const sum=el('p',{style:'margin:10px 0'});
-  if(trip.real) sum.append(el('b',{class:'mono',text:fmtMin(trip.real.min)}),' driving, '+trip.real.mi+' mi by road, before stops and traffic.');
-  else sum.append(el('b',{class:'mono',text:'~'+fmtMin(r.min)}),' driving, about '+Math.round(r.mi)+' mi. Rough estimate from straight-line distance.');
+  if(trip.real) sum.append(el('b',{class:'mono',text:fmtMin(trip.real.min)}),' driving, '+miTxt(trip.real.mi)+' by road, before stops and traffic.');
+  else sum.append(el('b',{class:'mono',text:'~'+fmtMin(r.min)}),' driving, about '+miTxt(Math.round(r.mi))+'. Rough estimate from straight-line distance.');
   box.append(sum);
   const rt=el('input',{type:'checkbox',id:'trip-round',checked:trip.round,onchange:e=>{trip.round=e.target.checked;trip.real=null;renderTrip();}});
   box.append(el('label',{class:'lopt',for:'trip-round'},rt,el('span',null,'Round trip from '+H.name)));
@@ -1269,6 +1323,57 @@ function renderTrip(){
 
 /* ---------- guide ---------- */
 let guideBuilt=false;
+/* Backups, where the app gets its places, and offline storage: shown at the end of Settings. */
+function dataSections(v){
+  const sec=(title,open,kids)=>{ const b=el('div',{class:'gb'}); kids.forEach(k=>k&&b.append(k)); return el('details',{class:'pad',open:open},el('summary',{text:title}),b); };
+  const P=t=>el('p',{text:t});
+  /* your data */
+  const out=el('textarea',{id:'bk-out',readOnly:true,style:'min-height:90px;font-family:var(--fm);font-size:11.5px'});
+  const dump=()=>JSON.stringify(U);
+  const b1=el('button',{class:'btn sm',type:'button'},'Copy backup'); b1.addEventListener('click',()=>{ out.value=dump(); copy(out.value,b1); });
+  const b2=el('button',{class:'btn sm',type:'button',onclick:()=>{ out.value=dump(); try{ const a=el('a',{href:URL.createObjectURL(new Blob([out.value],{type:'application/json'})),download:'lost-hidden-atlas-backup.json'}); document.body.append(a); a.click(); a.remove(); }catch(e){} }},'Save backup file');
+  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status},null,1); out.value=t; copy(t,b3); });
+  const inp=el('textarea',{id:'bk-in',placeholder:'Paste a backup here',style:'min-height:60px;font-family:var(--fm);font-size:11.5px'});
+  const msg=el('span',{class:'note-saved'});
+  const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; save(); applyTheme(); drawScale(); pushPrefs(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
+  const file=el('input',{type:'file',id:'bk-file',accept:'.json,application/json',onchange:e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>load(String(r.result)); r.readAsText(f); }});
+  const bkf=NATIVE?(()=>{ const m2=el('span',{class:'note-saved'}), b=el('button',{class:'btn sm',type:'button'},'Save a backup file now'); b.addEventListener('click',()=>{ m2.textContent=' Saving…'; backupFile().then(r=>{ m2.textContent=' Saved to '+r.where+'.'; },e=>{ m2.textContent=' '+((e&&e.message)||'Could not save.'); }); });
+    return el('div',null,P('The app also saves a backup file by itself each time a field log ends: Download / Lost Hidden Atlas / atlas-backup.json on the phone. It stays there if the app is removed. To bring it back, use "Restore" below and pick that file.'),el('div',{class:'row'},b,m2)); })():null;
+  v.append(sec('Your data and backups',false,[bkf,
+    P('Your progress, notes, moved pins, added places and trip are saved in this browser on this device only. They do not sync. Back them up before you clear browser data, and restore on another device.'),
+    el('div',{class:'row'},b1,LOCAL?b2:null,b3),out,
+    el('label',{class:'field',for:'bk-in',style:'margin-top:10px'},el('span',{text:'Restore'}),inp),
+    el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>load(inp.value)},'Restore from pasted text'),file,msg),
+    P('To grow the master list, use "Copy my additions for Claude" and paste it into a chat. Claude can fold them into the Atlas with drive times and old-map overlays.')]));
+  if(AT){ const info=el('p'), res=el('span',{class:'note-saved'}), addr=el('input',{type:'url',id:'at-base','aria-label':'Atlas address',autocomplete:'off'}); addr.value=AT.base;
+    const show=()=>{ info.textContent='Place data: build '+AT.dataV+(AT.fromCache?', downloaded from the address below.':', as built into the app.')+(AT.pending?' Build '+AT.pending+' is downloaded and loads the next time the app starts.':''); };
+    const run=()=>{ res.textContent=' Checking…'; return AT.check().then(r=>{ show(); res.textContent=r.state==='same'?' You have the latest.':' New data downloaded'+(r.places?' ('+r.places+' places)':'')+'.'; if(r.state!=='same') res.append(' ',el('button',{class:'btn sm',type:'button',onclick:()=>location.reload()},'Load it now')); },
+      e=>{ res.textContent=' '+(navigator.onLine===false?'No signal.':'Could not read that address: '+((e&&e.message)||'no answer')+'.'); }); };
+    show();
+    v.append(sec('Where the app gets its places',false,[
+      P('The app works with no signal using the places built into it. When it has a connection it looks for newer places, lines and leads at the address below and keeps them on the phone.'),
+      info,el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:run},'Check for new places'),res),
+      el('label',{class:'field',for:'at-base',style:'margin-top:10px'},el('span',{text:'Atlas address'}),addr),
+      el('div',{class:'row',style:'margin-top:6px'},
+        el('button',{class:'btn sm',type:'button',onclick:()=>{ if(!AT.setBase(addr.value)){ res.textContent=' That is not a web address.'; return; } addr.value=AT.base; run(); }},'Use this address'),
+        el('button',{class:'btn sm',type:'button',onclick:()=>{ AT.setBase(AT.def); addr.value=AT.base; run(); }},'Back to the original')),
+      NATIVE?(()=>{ const line=el('p',{class:'mono',style:'font-size:12px',text:'App status: reading…'}), cb=el('button',{class:'btn sm',type:'button'},'Copy app status'); let last='';
+        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · photos '+(st.media||'?')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
+        cb.addEventListener('click',()=>copy(last||line.textContent,cb)); return el('div',null,line,el('div',{class:'row'},cb)); })():null,
+      P('Change the address only if the Atlas moves to a new home. The new site must be a copy of this one and must allow other sites to read it (the Access-Control-Allow-Origin header).')])); }
+  const stor=el('p',{text:'Checking…'}), sl=el('ul',{class:'links'});
+  const fillStor=async()=>{ await tcScan(); let q=''; try{ const e=await navigator.storage.estimate(); if(e&&e.quota) q=' This browser allows the Atlas about '+mb(e.quota)+'.'; }catch(x){}
+    stor.textContent='Saved for offline: '+TC.pinN+' tiles, '+mb(TC.pinSize)+'. Recently viewed: '+mb(TC.size)+' (oldest dropped past 150 MB).'+q;
+    sl.textContent=''; Object.keys(U.saved).forEach(k=>{ const a=U.saved[k]; sl.append(el('li',{text:(a.label||k)+' · '+a.mb+' · '+new Date(a.at).toLocaleDateString()})); }); };
+  const clr=el('button',{class:'btn sm',type:'button'},'Delete all saved map tiles'); let armed=false;
+  clr.addEventListener('click',async()=>{ if(!armed){ armed=true; clr.textContent='Really delete them?'; setTimeout(()=>{armed=false;clr.textContent='Delete all saved map tiles';},4000); return; } await tcClear(); U.saved={}; save(); armed=false; clr.textContent='Delete all saved map tiles'; fillStor(); });
+  const offSec=sec('Offline maps and storage',false,[P('The Atlas keeps a copy of every leaf-off, LiDAR, topo and lot-line tile it loads, so zooming back out or coming back to a place is instant. Areas you save from a place page or the trip are kept until you delete them.'),stor,sl,el('div',{class:'row'},clr),
+    P('For offline use, open the Atlas from the downloaded file or your own web address, not the online copy in Claude. On iPhone, Safari may clear saved tiles if you do not open the Atlas for a few weeks; adding it to your Home Screen helps.')]);
+  if(HOSTED){ const all=BASE.filter(x=>x.tm), ab=el('button',{class:'btn sm',type:'button'},'Keep every old map on this phone ('+all.length+' maps, about '+Math.round(all.length*0.031)+' MB)'), am=el('span',{class:'note-saved'});
+    ab.addEventListener('click',async()=>{ ab.disabled=true; let ok=0,bad=0; for(let i=0;i<all.length;i+=6){ await Promise.all(all.slice(i,i+6).map(x=>(AT?topoSrc(x).then(u=>!!u):fetch(topoImg(x)).then(r=>r.ok,()=>false)).then(good=>{ if(good) ok++; else bad++; }))); am.textContent=' '+(ok+bad)+' of '+all.length; } am.textContent=' Done: '+ok+' kept'+(bad?', '+bad+' failed':'')+'.'; ab.disabled=false; });
+    offSec.lastChild.append(el('p',{text:(AT?'The app opens with no signal: the place list, lines and leads are built in.':'This hosted copy keeps itself on the phone after the first visit, so it opens with no signal.')+' Old survey maps are fetched one place at a time as you open them; saving a place for offline keeps its old map too.'}),el('div',{class:'row'},ab,am)); }
+  offSec.addEventListener('toggle',()=>{ if(offSec.open) fillStor(); }); v.append(offSec);
+}
 function renderGuide(){
   if(guideBuilt) return; guideBuilt=true;
   const v=$('#v-guide'); const sec=(title,open,kids)=>{ const b=el('div',{class:'gb'}); kids.forEach(k=>k&&b.append(k)); return el('details',{class:'pad',open:open},el('summary',{text:title}),b); };
@@ -1341,52 +1446,8 @@ function renderGuide(){
     P('Every New York city, town and village must appoint a historian. They know where the ruins are and usually who owns them, so ask "what was here?" rather than "how do I get in?"'),
     fo,
     el('p',null,el('b',{text:'Sharing locations: '}),'name public-land sites openly, since that sends viewers somewhere legal. For fragile private sites, name the region and not the route, or hold the video until the owner is on side.')]));
-  /* your data */
-  const out=el('textarea',{id:'bk-out',readOnly:true,style:'min-height:90px;font-family:var(--fm);font-size:11.5px'});
-  const dump=()=>JSON.stringify(U);
-  const b1=el('button',{class:'btn sm',type:'button'},'Copy backup'); b1.addEventListener('click',()=>{ out.value=dump(); copy(out.value,b1); });
-  const b2=el('button',{class:'btn sm',type:'button',onclick:()=>{ out.value=dump(); try{ const a=el('a',{href:URL.createObjectURL(new Blob([out.value],{type:'application/json'})),download:'lost-hidden-atlas-backup.json'}); document.body.append(a); a.click(); a.remove(); }catch(e){} }},'Save backup file');
-  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status},null,1); out.value=t; copy(t,b3); });
-  const inp=el('textarea',{id:'bk-in',placeholder:'Paste a backup here',style:'min-height:60px;font-family:var(--fm);font-size:11.5px'});
-  const msg=el('span',{class:'note-saved'});
-  const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; save(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
-  const file=el('input',{type:'file',id:'bk-file',accept:'.json,application/json',onchange:e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>load(String(r.result)); r.readAsText(f); }});
-  const bkf=NATIVE?(()=>{ const m2=el('span',{class:'note-saved'}), b=el('button',{class:'btn sm',type:'button'},'Save a backup file now'); b.addEventListener('click',()=>{ m2.textContent=' Saving…'; backupFile().then(r=>{ m2.textContent=' Saved to '+r.where+'.'; },e=>{ m2.textContent=' '+((e&&e.message)||'Could not save.'); }); });
-    return el('div',null,P('The app also saves a backup file by itself each time a field log ends: Download / Lost Hidden Atlas / atlas-backup.json on the phone. It stays there if the app is removed. To bring it back, use "Restore" below and pick that file.'),el('div',{class:'row'},b,m2)); })():null;
-  v.append(sec('Your data and backups',false,[bkf,
-    P('Your progress, notes, moved pins, added places and trip are saved in this browser on this device only. They do not sync. Back them up before you clear browser data, and restore on another device.'),
-    el('div',{class:'row'},b1,LOCAL?b2:null,b3),out,
-    el('label',{class:'field',for:'bk-in',style:'margin-top:10px'},el('span',{text:'Restore'}),inp),
-    el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>load(inp.value)},'Restore from pasted text'),file,msg),
-    P('To grow the master list, use "Copy my additions for Claude" and paste it into a chat. Claude can fold them into the Atlas with drive times and old-map overlays.')]));
-  if(AT){ const info=el('p'), res=el('span',{class:'note-saved'}), addr=el('input',{type:'url',id:'at-base','aria-label':'Atlas address',autocomplete:'off'}); addr.value=AT.base;
-    const show=()=>{ info.textContent='Place data: build '+AT.dataV+(AT.fromCache?', downloaded from the address below.':', as built into the app.')+(AT.pending?' Build '+AT.pending+' is downloaded and loads the next time the app starts.':''); };
-    const run=()=>{ res.textContent=' Checking…'; return AT.check().then(r=>{ show(); res.textContent=r.state==='same'?' You have the latest.':' New data downloaded'+(r.places?' ('+r.places+' places)':'')+'.'; if(r.state!=='same') res.append(' ',el('button',{class:'btn sm',type:'button',onclick:()=>location.reload()},'Load it now')); },
-      e=>{ res.textContent=' '+(navigator.onLine===false?'No signal.':'Could not read that address: '+((e&&e.message)||'no answer')+'.'); }); };
-    show();
-    v.append(sec('Where the app gets its places',false,[
-      P('The app works with no signal using the places built into it. When it has a connection it looks for newer places, lines and leads at the address below and keeps them on the phone.'),
-      info,el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:run},'Check for new places'),res),
-      el('label',{class:'field',for:'at-base',style:'margin-top:10px'},el('span',{text:'Atlas address'}),addr),
-      el('div',{class:'row',style:'margin-top:6px'},
-        el('button',{class:'btn sm',type:'button',onclick:()=>{ if(!AT.setBase(addr.value)){ res.textContent=' That is not a web address.'; return; } addr.value=AT.base; run(); }},'Use this address'),
-        el('button',{class:'btn sm',type:'button',onclick:()=>{ AT.setBase(AT.def); addr.value=AT.base; run(); }},'Back to the original')),
-      NATIVE?(()=>{ const line=el('p',{class:'mono',style:'font-size:12px',text:'App status: reading…'}), cb=el('button',{class:'btn sm',type:'button'},'Copy app status'); let last='';
-        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · photos '+(st.media||'?')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
-        cb.addEventListener('click',()=>copy(last||line.textContent,cb)); return el('div',null,line,el('div',{class:'row'},cb)); })():null,
-      P('Change the address only if the Atlas moves to a new home. The new site must be a copy of this one and must allow other sites to read it (the Access-Control-Allow-Origin header).')])); }
-  const stor=el('p',{text:'Checking…'}), sl=el('ul',{class:'links'});
-  const fillStor=async()=>{ await tcScan(); let q=''; try{ const e=await navigator.storage.estimate(); if(e&&e.quota) q=' This browser allows the Atlas about '+mb(e.quota)+'.'; }catch(x){}
-    stor.textContent='Saved for offline: '+TC.pinN+' tiles, '+mb(TC.pinSize)+'. Recently viewed: '+mb(TC.size)+' (oldest dropped past 150 MB).'+q;
-    sl.textContent=''; Object.keys(U.saved).forEach(k=>{ const a=U.saved[k]; sl.append(el('li',{text:(a.label||k)+' · '+a.mb+' · '+new Date(a.at).toLocaleDateString()})); }); };
-  const clr=el('button',{class:'btn sm',type:'button'},'Delete all saved map tiles'); let armed=false;
-  clr.addEventListener('click',async()=>{ if(!armed){ armed=true; clr.textContent='Really delete them?'; setTimeout(()=>{armed=false;clr.textContent='Delete all saved map tiles';},4000); return; } await tcClear(); U.saved={}; save(); armed=false; clr.textContent='Delete all saved map tiles'; fillStor(); });
-  const offSec=sec('Offline maps and storage',false,[P('The Atlas keeps a copy of every leaf-off, LiDAR, topo and lot-line tile it loads, so zooming back out or coming back to a place is instant. Areas you save from a place page or the trip are kept until you delete them.'),stor,sl,el('div',{class:'row'},clr),
-    P('For offline use, open the Atlas from the downloaded file or your own web address, not the online copy in Claude. On iPhone, Safari may clear saved tiles if you do not open the Atlas for a few weeks; adding it to your Home Screen helps.')]);
-  if(HOSTED){ const all=BASE.filter(x=>x.tm), ab=el('button',{class:'btn sm',type:'button'},'Keep every old map on this phone ('+all.length+' maps, about '+Math.round(all.length*0.031)+' MB)'), am=el('span',{class:'note-saved'});
-    ab.addEventListener('click',async()=>{ ab.disabled=true; let ok=0,bad=0; for(let i=0;i<all.length;i+=6){ await Promise.all(all.slice(i,i+6).map(x=>(AT?topoSrc(x).then(u=>!!u):fetch(topoImg(x)).then(r=>r.ok,()=>false)).then(good=>{ if(good) ok++; else bad++; }))); am.textContent=' '+(ok+bad)+' of '+all.length; } am.textContent=' Done: '+ok+' kept'+(bad?', '+bad+' failed':'')+'.'; ab.disabled=false; });
-    offSec.lastChild.append(el('p',{text:(AT?'The app opens with no signal: the place list, lines and leads are built in.':'This hosted copy keeps itself on the phone after the first visit, so it opens with no signal.')+' Old survey maps are fetched one place at a time as you open them; saving a place for offline keeps its old map too.'}),el('div',{class:'row'},ab,am)); }
-  offSec.addEventListener('toggle',()=>{ if(offSec.open) fillStor(); }); v.append(offSec);
+  v.append(sec('Settings, backups and storage',false,[P('Backups, restoring, offline map storage and the app\'s own settings are under the gear: tap More under the map, then the gear next to Done.'),
+    el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>{ openSheet(); showSettings(true); }},'Open settings'))]));
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),
     P('Drive times from Albany, Schenectady, Troy and Saratoga Springs were calculated by road with no traffic, so add a little. Pick your own start point from "Drive times from."'),
@@ -1421,12 +1482,13 @@ $('#rec-note').addEventListener('click',()=>{ const f=$('#rec-form'); f.hidden=!
 $('#rec-form').addEventListener('submit',e=>{ e.preventDefault(); addNote($('#rec-text').value); $('#rec-form').hidden=true; });
 { const b=$('#rec-stop'); let armed=false; b.addEventListener('click',()=>{ if(!armed){ armed=true; b.textContent='Tap again to stop'; setTimeout(()=>{ armed=false; b.textContent='Stop'; },3500); return; } armed=false; b.textContent='Stop'; stopLog(); }); }
 $('#add-cancel').addEventListener('click',()=>{ adding=false; pickingHome=false; asking=false; stage.classList.remove('adding'); $('#addbar').hidden=true; syncBar(); });
-$('#sheet-x').addEventListener('click',closeSheet); $('#scrim').addEventListener('click',closeSheet);
+$('#sheet-x').addEventListener('click',closeSheet); $('#sheet-set').addEventListener('click',()=>showSettings(sheetMode!=='set')); $('#scrim').addEventListener('click',closeSheet);
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('#sheet').hidden){ closeSheet(); } else if(adding||pickingHome||asking){ $('#add-cancel').click(); } else if(view==='detail'&&sel&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))) deselect(); } });
 if(window.matchMedia('(min-width:821px)').matches) $('#filters').open=false;
 
 buildHome(); buildFilters(); renderList(); $('#trip-n').textContent=U.trip.length;
-if(window.L){ initMap(); buildBar(); resumeLog(); }
+if(pref('open')!=='last'&&LD[pref('open')]) U.ui.base=pref('open');
+if(window.L){ initMap(); buildBar(); resumeLog(); pushPrefs(); }
 else { $('#map').append(el('div',{class:'pad',style:'padding-block:40px;max-width:46ch;margin:auto',text:'The map library could not load, most likely because this device is offline. The list, place pages and links still work. Reload when you are back online.'})); $('#lbar').hidden=true; }
 if(HOSTED&&!AT&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* the phone's Back button, in the app: close whatever is open; returning false lets Android put the app in the background */

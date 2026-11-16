@@ -224,6 +224,7 @@ A state outside these nine also needs its outline added to `source/build/states.
 - The app must still work when a data file fails to load or the phone is offline. Show a short message; never a blank screen.
 - Bump nothing by hand: `make.py` stamps a version into `index.html`, the script URL and `sw.js` on every build.
 - The app also builds as a single self-contained file (`dist/Lost-and-Hidden-Atlas.html`). It detects that mode by the presence of an inline `d-topo` block.
+- **Settings** live under the gear in the map options sheet (`buildSettings()`). Each one is a key in `SET0`, read with `pref(key)` and stored in `U.set`; add a new setting by adding its default to `SET0`, a row in `buildSettings()`, and a `pref()` call where it applies. Distances go through `fmtMi()`/`miTxt()` and clock times pass `hour12:H12()`, so new text respects the units and clock settings. Backups, the app's data source and offline storage are the collapsible sections at the end of Settings (`dataSections()`), not in the Guide.
 - The same `app.js` runs inside the Android app. Anything app-only sits behind `AT` (running in the app) or `NATIVE` (the phone's recorder is available); the website must behave exactly as before when both are false. Run `tools/app_smoke.js` as well as `tools/smoke.js` after touching the field log, old maps, or data loading.
 - Installed apps keep their copy of `app.js` until the owner installs a new build, but they fetch new place data straight away. So place data must stay readable by older app code: **add fields, never rename or remove one the app reads.**
 
@@ -240,6 +241,7 @@ A state outside these nine also needs its outline added to `source/build/states.
 - The Android app's background recorder was compiled and its page logic tested against a stand-in, but nothing here can run it on a real phone. Whether it survives a long walk with the screen off depends on the phone maker's battery rules, and only field use will show it.
 - A web page cannot record location with the screen off; that is what the app is for. The website's own field log still needs the page open.
 - Photo and video matching was tested with made-up files only. How a given camera app stamps its files (above all videos) can differ by phone maker; if matches look shifted, that is the first thing to check.
+- Still to confirm on a real walk: the coarse track-detail setting (a point every 10 m, GPS every 5 s) and kilometres in the recording notification. Vibrate on "Mark here" was confirmed by the owner.
 - Marks, walk sharing, the edit sheet and the backup file were tested in a browser against a stand-in; the notification button and the Downloads file have not run on a real phone.
 - A shared walk has to be opened from inside the Atlas (Log tab); tapping the file in another app does not open the Atlas yet. Shared walks carry small previews, not the photos themselves.
 - Not built yet: historical-markers layer, full-size photos in exports, telling the user a newer app build exists.
@@ -259,7 +261,7 @@ The app is the same Atlas page inside an Android shell (Capacitor 8), in `androi
 | `source/src/boot.js` | Start-up inside the app. Picks the newest place data on the phone, starts `app.js`, and exposes `window.ATLAS`: data refresh, old maps, calls to the recorder |
 | `android-app/scripts/make-www.js` | Copies the built site into `android-app/www/` and makes the page start through `boot.js`. Old maps and `sw.js` are left out |
 | `android-app/android/app/src/main/java/com/losthiddenatlas/app/TrackService.java` | The recorder: a foreground service that listens to GPS, smooths fixes, and appends points to a file |
-| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings`, for photos `media`, `thumb`, `openMedia`; `marks` (pins from the notification) and `saveBackup` |
+| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings`, for photos `media`, `thumb`, `openMedia`; `marks` (pins from the notification), `saveBackup`, and `configure` (the recorder's settings: units, point spacing, GPS interval, vibrate) |
 | `.../TrackStore.java`, `MainActivity.java` | The track files (`lat,lon,seconds` per line); the Back button |
 | `.github/workflows/app.yml` | Builds, signs and publishes the app |
 
