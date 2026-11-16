@@ -187,6 +187,77 @@ public class FieldLogPlugin extends Plugin {
         call.resolve(o);
     }
 
+    /** marks({logId, from}) -> {marks: [[lat or null, lon or null, seconds], ...]}: pins dropped from the notification. */
+    @PluginMethod
+    public void marks(PluginCall call) {
+        String id = call.getString("logId");
+        if (!TrackStore.validId(id)) {
+            call.reject("That log has no usable id.");
+            return;
+        }
+        Integer from = call.getInt("from", 0);
+        JSArray arr = new JSArray();
+        try {
+            for (double[] p : TrackStore.readMarks(getContext(), id, from == null ? 0 : Math.max(0, from))) {
+                JSArray one = new JSArray();
+                if (Double.isNaN(p[0])) {
+                    one.put(org.json.JSONObject.NULL);
+                    one.put(org.json.JSONObject.NULL);
+                } else {
+                    one.put(p[0]);
+                    one.put(p[1]);
+                }
+                one.put((long) p[2]);
+                arr.put(one);
+            }
+        } catch (Exception ignored) {}
+        JSObject o = new JSObject();
+        o.put("marks", arr);
+        call.resolve(o);
+    }
+
+    /**
+     * saveBackup({name, text}): writes a file to Download/Lost Hidden Atlas on the phone's shared storage,
+     * where it survives the app being uninstalled. Replaces the previous file of the same name that this install wrote.
+     */
+    @PluginMethod
+    public void saveBackup(PluginCall call) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            call.reject("Backup files need Android 10 or newer. Use Copy backup instead.");
+            return;
+        }
+        String name = call.getString("name", "atlas-backup.json").replaceAll("[^A-Za-z0-9._-]", "_");
+        String text = call.getString("text", "");
+        String folder = "Download/Lost Hidden Atlas";
+        ContentResolver cr = getContext().getContentResolver();
+        Uri table = MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+        try {
+            try {
+                cr.delete(table, "_display_name=? AND relative_path LIKE ?", new String[] { name, folder + "%" });
+            } catch (Exception ignored) {} // a file left by an earlier install is not ours to delete; the new one gets a numbered name
+            android.content.ContentValues v = new android.content.ContentValues();
+            v.put(MediaStore.MediaColumns.DISPLAY_NAME, name);
+            v.put(MediaStore.MediaColumns.MIME_TYPE, "application/json");
+            v.put(MediaStore.MediaColumns.RELATIVE_PATH, folder);
+            v.put(MediaStore.MediaColumns.IS_PENDING, 1);
+            Uri uri = cr.insert(table, v);
+            if (uri == null) throw new Exception("the phone refused to create the file");
+            try (java.io.OutputStream out = cr.openOutputStream(uri)) {
+                if (out == null) throw new Exception("the file could not be opened");
+                out.write(text.getBytes(StandardCharsets.UTF_8));
+            }
+            v.clear();
+            v.put(MediaStore.MediaColumns.IS_PENDING, 0);
+            cr.update(uri, v, null, null);
+            JSObject o = new JSObject();
+            o.put("where", folder + "/" + name);
+            o.put("bytes", text.length());
+            call.resolve(o);
+        } catch (Exception e) {
+            call.reject("The backup file could not be written: " + e.getMessage());
+        }
+    }
+
     @PluginMethod
     public void remove(PluginCall call) {
         String id = call.getString("logId");

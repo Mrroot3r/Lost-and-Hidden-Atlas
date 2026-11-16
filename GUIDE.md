@@ -240,7 +240,9 @@ A state outside these nine also needs its outline added to `source/build/states.
 - The Android app's background recorder was compiled and its page logic tested against a stand-in, but nothing here can run it on a real phone. Whether it survives a long walk with the screen off depends on the phone maker's battery rules, and only field use will show it.
 - A web page cannot record location with the screen off; that is what the app is for. The website's own field log still needs the page open.
 - Photo and video matching was tested with made-up files only. How a given camera app stamps its files (above all videos) can differ by phone maker; if matches look shifted, that is the first thing to check.
-- Not built yet: historical-markers layer, GPX import, photos in exports, sharing a place together with the route to it, telling the user a newer app build exists.
+- Marks, walk sharing, the edit sheet and the backup file were tested in a browser against a stand-in; the notification button and the Downloads file have not run on a real phone.
+- A shared walk has to be opened from inside the Atlas (Log tab); tapping the file in another app does not open the Atlas yet. Shared walks carry small previews, not the photos themselves.
+- Not built yet: historical-markers layer, full-size photos in exports, telling the user a newer app build exists.
 
 ## 11. Privacy
 
@@ -257,7 +259,7 @@ The app is the same Atlas page inside an Android shell (Capacitor 8), in `androi
 | `source/src/boot.js` | Start-up inside the app. Picks the newest place data on the phone, starts `app.js`, and exposes `window.ATLAS`: data refresh, old maps, calls to the recorder |
 | `android-app/scripts/make-www.js` | Copies the built site into `android-app/www/` and makes the page start through `boot.js`. Old maps and `sw.js` are left out |
 | `android-app/android/app/src/main/java/com/losthiddenatlas/app/TrackService.java` | The recorder: a foreground service that listens to GPS, smooths fixes, and appends points to a file |
-| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings`, and for photos `media`, `thumb`, `openMedia` |
+| `.../FieldLogPlugin.java` | What the page can ask the phone to do: `start`, `stop`, `points`, `status`, `remove`, `share`, `battery`, `appSettings`, for photos `media`, `thumb`, `openMedia`; `marks` (pins from the notification) and `saveBackup` |
 | `.../TrackStore.java`, `MainActivity.java` | The track files (`lat,lon,seconds` per line); the Back button |
 | `.github/workflows/app.yml` | Builds, signs and publishes the app |
 
@@ -275,6 +277,14 @@ The app is the same Atlas page inside an Android shell (Capacitor 8), in `androi
 - A photo joins the next note written within 25 m of that place (photo first, then the note), else the note before it within 25 m; otherwise it stays on the track by itself. Distance, not time, decides, so standing and talking between the photo and the note does not break the match. A choice the user makes by hand (`fx`) survives a rescan.
 - A video is a stretch of time, drawn as the part of the track walked while it ran. Its end is the file's last-written time and its start is that minus its length; the "taken" time is the fallback. Each note inside a video shows its position in that video, which is what an editor needs.
 - Screenshots and screen recordings are ignored. Photos need the Android "Photos and videos" permission; with "selected photos only", items are missing and the app says so.
+
+**Marks, sharing and backups.**
+
+- The recording notification has a **Mark here** button. The service writes the time and position to `<log>.marks.csv`; the page reads new ones with `marks` alongside the points and turns each into a note called "Mark N", which can be renamed from its card on the map.
+- A note's card has Rename, Delete and **Add to the Atlas**, which opens the add-a-place form filled in from the note. The place remembers its note (`from: {log, t}`) and shows that note's photos.
+- **Share this walk** packs one log into a `.atlas.json` file (`walkFile()`): track, notes, video stretches and 400-pixel photo previews. **Open a shared walk or GPX file** in the Log tab reads it (`readWalk()`), on the website as well as in the app. Opened logs are marked `imp`; their media carry `x` and are never looked up on the receiving phone, because another phone's photo numbers mean nothing there.
+- **Edit sheet** lists, per video, the time inside it of every note and photo.
+- When a log ends, the app writes everything to `Download/Lost Hidden Atlas/atlas-backup.json` (`saveBackup`), which survives uninstalling. It is restored through the normal backup restore.
 
 **Building.** Every pull request that touches the app is compiled by the `app` workflow. After a merge it publishes a release with `lost-hidden-atlas.apk`; the newest is always at `https://github.com/mrroot3r/Lost-and-Hidden-Atlas/releases/latest`. Pull requests get a pre-release marked TEST so the owner can install the change before merging. To build locally (Node 22, JDK 21, Android SDK 36):
 

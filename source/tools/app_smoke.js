@@ -32,6 +32,8 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
         { kind: 'image', id: 1, name: 'P1.jpg', taken: (o.from + 62) * 1000, modified: o.from + 62, bucket: 'Camera' },
         { kind: 'image', id: 2, name: 'shot.png', taken: (o.from + 63) * 1000, modified: o.from + 63, bucket: 'Screenshots' },
         { kind: 'video', id: 3, name: 'V1.mp4', taken: (o.from + 70) * 1000, modified: o.from + 70, duration: 5000, bucket: 'Camera' }] })
+      else if (m === 'marks') res({ marks: (s.marks || []).slice(o.from || 0) })
+      else if (m === 'saveBackup') res({ where: 'Download/Lost Hidden Atlas/' + o.name, bytes: o.text.length })
       else if (m === 'thumb') res({ data: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' })
       else res({});
       put(s); }) };
@@ -51,6 +53,8 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   await page.evaluate(() => { window.__denyStart = false; }); await page.getByRole('button', { name: 'Start a field log', exact: true }).click(); await page.waitForTimeout(5000);
   await page.click('#rec-note'); await page.fill('#rec-text', 'cellar hole'); await page.keyboard.press('Enter'); await page.waitForTimeout(500);   // adding a note also saves the log
   let l = await log(); ok('recording: points arrive from the phone', l && l.rec && l.pts >= 6, l && l.pts);
+  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem('mock-phone')); s.marks = [[null, null, Math.round(Date.now() / 1000)]]; localStorage.setItem('mock-phone', JSON.stringify(s)); }); await page.waitForTimeout(3200);   // "Mark here" tapped on the notification
+  ok('a mark from the notification becomes a note with a position', await page.evaluate(() => { const l = JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).logs[0]; const n = l.notes.find(x => x.mk); return !!(n && n.x === 'Mark 1' && n.la != null); }));
   const before = (await log()).pts; await page.goto('about:blank'); await page.waitForTimeout(4000); await page.goto(URL0); await page.waitForTimeout(4500);
   l = await log(); ok('page away 4 s: the points recorded meanwhile are collected', l.rec && l.pts >= before + 8, before + ' -> ' + l.pts);
   // Android killed the recorder: it still wants to record but is not running
@@ -60,7 +64,8 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   await page.click('#rec-stop'); await page.waitForTimeout(200); await page.click('#rec-stop'); await page.waitForTimeout(1500);
   l = await log(); const ph = await phone(); const saved = (ph.frozen[l.id] || []).length;
   ok('stop: every point the phone saved is in the log', !l.rec && !!l.t1 && l.pts === saved, l.pts + ' of ' + saved);
-  ok('the note was kept', l.notes === 1);
+  ok('the note and the mark were kept', l.notes === 2);
+  ok('a backup file is written when a log ends', (await phone()).calls.includes('saveBackup'));
   ok('photos and video from the walk are matched when it ends; screenshots are left out', l.media === 'i:P1.jpg,v:V1.mp4', l.media);
   ok('the log lists them', /1 photo · 1 video/.test(await page.locator('.logitem').first().innerText()));
   await page.getByRole('button', { name: 'Share route (GPX)' }).click(); await page.waitForTimeout(400);
