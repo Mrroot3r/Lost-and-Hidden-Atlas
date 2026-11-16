@@ -8,6 +8,8 @@ Read `GUIDE.md` before doing anything. The short version:
 - Look at every new pin on the aerial with `tools/pincheck.py` before proposing it.
 - Every US state, the District of Columbia and the ten Canadian provinces already have an outline, a region, a start city and map coverage (`tools/states.py`, `tools/outlines.py`), and 40 states and 7 provinces have one worked example each in `tools/data_states.py`. To work in any of them you only add a batch of places: one `data_<area>.py` file with `BATCH`, `PLACES` and `PIN_NOTES`. Never rename a published place `id`.
 - Old rail, trolley and canal lines and the leads layer exist for New York and Massachusetts only. To add them for another state follow GUIDE.md section 8, "Lines and leads for a new state" (`tools/osm_layers.py`, `tools/ohm_state.py`, then `lines.py` and `leads.py`).
+- The historic-pockets layer (GUIDE.md section 8) uses marker lists from HMdb.org. Its terms: not for commercial use, always credited to HMdb.org with a link, titles and positions only. Never sign in to it and never work around its 500-markers-per-list limit.
+- Run `tools/overpass_check.py` before touching the rail and canal lines: GUIDE.md section 10 has a standing note to re-download New York from Overpass once it answers.
 - Never commit personal information; the repository is public.
 - Run `check.py` and the smoke test before opening the pull request.
 - If `git push` is refused, attach the repository to the session with push access, then push again (GUIDE.md section 3). Do not retry or look for another login.

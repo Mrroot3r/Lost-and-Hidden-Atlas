@@ -21,7 +21,7 @@ A.setBase=function(u){ var n=norm(u); if(!n) return false; A.base=n; A.pending='
 /* calls into the phone: FieldLog.start, stop, points, status, share ... (see FieldLogPlugin.java) */
 A.call=function(method,options){ return native?cap.nativePromise('FieldLog',method,options||{}):Promise.reject(new Error('This only works in the Android app.')); };
 
-/* data/lines.json and data/leads.json: a downloaded copy if there is one, otherwise the copy built into the app */
+/* data/lines.json, data/leads.json and data/pockets.json: a downloaded copy if there is one, otherwise the copy built into the app */
 A.fetch=function(path){ var p=path.split('?')[0]; if(!A.fromCache) return fetch(p);
   return store(DATA).then(function(c){ return c.match(p); }).then(function(r){ return r||fetch(p); },function(){ return fetch(p); }); };
 
@@ -37,10 +37,10 @@ A.check=function(){ var b=A.base;
     A.checked=Date.now(); var out={state:'same',v:A.dataV,remote:ver.v};
     if(!ver.v||ver.v===A.dataV||!(ver.v>A.bundledV)) return out;
     if(ver.v===A.pending){ out.state='ready'; out.v=ver.v; return out; }
-    return Promise.all([get(b+'index.html').then(function(r){ return r.text(); }),get(b+'data/lines.json'),get(b+'data/leads.json')]).then(function(rs){
+    return Promise.all([get(b+'index.html').then(function(r){ return r.text(); }),get(b+'data/lines.json'),get(b+'data/leads.json'),get(b+'data/pockets.json').then(function(r){ return r; },function(){ return null; })]).then(function(rs){
       var m=/<script type="application\/json" id="d-sites">([\s\S]*?)<\/script>/.exec(rs[0]); if(!m) throw new Error('That address does not hold an Atlas.');
       var j=JSON.parse(m[1]); if(!j||!j.sites||j.sites.length<50||j.v!==ver.v) throw new Error('The Atlas at that address is mid-update. Try again in a minute.');
-      return store(DATA).then(function(c){ return c.put('data/lines.json',rs[1]).then(function(){ return c.put('data/leads.json',rs[2]); }).then(function(){ return c.put(SITES,new Response(m[1],{headers:{'content-type':'application/json'}})); }); })
+      return store(DATA).then(function(c){ return c.put('data/lines.json',rs[1]).then(function(){ return c.put('data/leads.json',rs[2]); }).then(function(){ return rs[3]?c.put('data/pockets.json',rs[3]):null; }).then(function(){ return c.put(SITES,new Response(m[1],{headers:{'content-type':'application/json'}})); }); })
         .then(function(){ A.pending=ver.v; out.state='updated'; out.v=ver.v; out.places=j.sites.length; return out; }); }); }); };
 
 /* forget downloaded data and go back to what the app was built with */

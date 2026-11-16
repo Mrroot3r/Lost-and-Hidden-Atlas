@@ -79,6 +79,7 @@ for d in ('data','topo'):
 for i in topo: shutil.copyfile(R+f'build/topo/{i}.webp',WEB+f'topo/{i}.webp')
 open(WEB+'data/lines.json','w').write(open(R+'build/lines.json').read())
 open(WEB+'data/leads.json','w').write(open(R+'build/leads.json').read())
+if os.path.exists(R+'build/pockets.json'): open(WEB+'data/pockets.json','w',encoding='utf-8').write(open(R+'build/pockets.json',encoding='utf-8').read())   # historic pockets (tools/pockets.py); fetched only when the layer is turned on
 open(WEB+'app.js','w').write(app)
 open(WEB+'leaflet.js','w').write(open(R+'cache/leaflet.min.js').read())
 web_scripts=('<script src="leaflet.js?v=1.9.4"></script>\n'
