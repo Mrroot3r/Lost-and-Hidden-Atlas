@@ -14,7 +14,7 @@ else: ids=a; tag='picked'
 if not ids: sys.exit('no places matched')
 PX=420; HALF=150
 ESRI='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export'
-STATE=[('New York leaf-off',lambda la,lo:lo<-73.3 or (la<42.0 and lo<-73.48),'https://orthos.its.ny.gov/arcgis/rest/services/wms/Latest/MapServer/export'),
+STATE=[('New York leaf-off',lambda la,lo:la>40.4 and -80.0<lo and (lo<-73.3 or (la<42.0 and lo<-73.48)),'https://orthos.its.ny.gov/arcgis/rest/services/wms/Latest/MapServer/export'),
        ('Rhode Island March 2026',lambda la,lo:la<42.02 and -71.9<lo<-71.1,'https://maps.edc.uri.edu/rigis/rest/services/IMG/RI_202603_RGB_3in_web/ImageServer/exportImage')]
 def merc(la,lo): return lo*20037508.34/180, math.log(math.tan((90+la)*math.pi/360))*20037508.34/math.pi
 def grab(url,la,lo):

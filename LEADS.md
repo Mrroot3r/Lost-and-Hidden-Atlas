@@ -43,3 +43,10 @@ Places someone read about while researching but did not add, with what is missin
 | Mauch Chunk Switchback Railway | Jim Thorpe, PA | Wikipedia article read only for its coordinate | What remains along the trail |
 | Laquin, and the Ghost Town Trail towns | Bradford and Indiana Counties, PA | Wikipedia articles exist | What remains at each |
 | Hastings and Swan Island (Perkins Township) | Maine | Recalled as an abandoned logging village and an abandoned island town | Sources and coordinates |
+| First Electric Park and the Heim bottling plant | East Bottoms, Kansas City, MO | First Electric Park ran 1899–1906 beside the Heim brewery; the city's Heim Electric Park now sits on its footprint, and J. Rieger & Co. distills in the old bottling plant (Clio, KC Public Library) | A pin check on the playground and the bottling plant; a source for anything left of the park itself |
+| Imperial Brewing Company Brewery | Southwest Boulevard, Kansas City, MO | Wikipedia: abandoned brewery, fires from 2012, completely demolished in 2023 | Nothing left to find; add only as `gone` if a series wants it |
+| Kansas City Speedway (Bannister Federal Complex) | South Kansas City, MO | Wikipedia: 1922 wooden board track near 95th and Troost, later the federal complex | A source for the track's end and for what, if anything, remains after the complex's redevelopment |
+| Camp Lake of the Woods and Camp Hope lodges | Swope Park, Kansas City, MO | KC Parks master plan and Flatland: former segregated summer camps; Hope Lodge stands empty | A source for dates and access; a coordinate |
+| Thomas J. Pendergast headquarters | 1908 Main St, Kansas City, MO | Wikipedia (Tom Pendergast): the political boss ruled from this two-story building; on the Kansas City register | A source on its present use; a pin check |
+| WILLIAM S. MITCHELL dredge | Missouri River, Kansas City, MO | National Register list: destroyed in the 1993 flood | Whether any wreckage remains |
+| Quindaro ruins | Kansas City, Kansas | Limestone ruins of an 1850s Underground Railroad town; trail reported closed except on booked tours | A Kansas region in `states.py` first; a source on current legal access |

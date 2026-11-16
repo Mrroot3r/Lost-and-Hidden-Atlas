@@ -4,7 +4,7 @@ This is the handoff guide. It tells a new contributor, human or AI model, what t
 
 ## 1. What the Atlas is
 
-A phone-first map tool for finding lost buildings, ruins and abandoned sites, made for a YouTube creator who explores them on foot. It began around Albany, New York and now covers upstate New York and Massachusetts, with a first pass at Rhode Island. The plan is to grow across the Northeast.
+A phone-first map tool for finding lost buildings, ruins and abandoned sites, made for a YouTube creator who explores them on foot. It began around Albany, New York and now covers upstate New York and Massachusetts, with a first pass at Rhode Island. The plan is to grow across the Northeast. Kansas City, Missouri has a first batch too, the first area outside the Northeast.
 
 Live site: https://mrroot3r.github.io/Lost-and-Hidden-Atlas/
 
@@ -203,6 +203,7 @@ The base is already in place for all nine Northeast states: New York, Massachuse
 | Vermont | A few in the south, two farther north | State services | No | No |
 | Connecticut | Five | Fallback only | No | No |
 | New Hampshire, Maine, New Jersey, Pennsylvania | A first handful each, all woods ruins on public or preserve land (the "Ruins in the woods" batch) | Fallback only | No | No |
+| Missouri | Kansas City only (region `kcmo`, start city Kansas City), first batch November 2026 | Fallback only | No | No |
 
 Beyond adding places, these make a state better. Do them when asked, or note in section 10 that they are still open.
 
@@ -231,7 +232,7 @@ ruins and traces first. If the state has no law note in the app, say so in the p
 
 Name the area and a number; everything else is in the guide. If the area is a city the Atlas has no start city for, the session should add one to `tools/states.py` (the table above).
 
-A state outside these nine also needs its outline added to `source/build/states.json`, an entry in `states.py`, and wider `maxBounds` in `initMap()`.
+A state outside these nine also needs its outline added to `source/build/states.json`, an entry in `states.py`, and wider `maxBounds` in `initMap()`. Missouri was added this way in November 2026: the outline is the Census 1:20,000,000 cartographic boundary file (`cb_2023_us_state_20m`, downloadable from www2.census.gov) simplified with shapely to 0.01 degrees, stored as one closed ring of `[lon, lat, …]` like the others. `maxBounds` now reaches 35.7° N and 96.0° W. `tools/pincheck.py` used to send every point west of New York to the New York leaf-off service; its test is now limited to the Northeast.
 
 ## 9. Changing the app
 
@@ -253,7 +254,8 @@ A state outside these nine also needs its outline added to `source/build/states.
 - Pins taken from OpenStreetMap through Nominatim (`tools/nom.py`) are a named mapped feature, which is usually closer than an article coordinate, but for a tunnel or a long path the point is the middle of the line.
 - Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
-- Leads are missing for greater Boston, the South Shore, Cape Cod and Rhode Island.
+- Leads are missing for greater Boston, the South Shore, Cape Cod, Rhode Island and Missouri.
+- Missouri (Kansas City) is a first pass: no law note in the app, no state leaf-off or LiDAR, no owner lookup, no rail lines. Pins were checked on Esri satellite only. Old-map crops are cut for every new place except `landmark` ones, which `topo_all.py` skips by design. The app still opens on Albany, and drive times list Albany first until the user picks Kansas City as home.
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
 - GPS smoothing and the field log were tested with simulated location only.

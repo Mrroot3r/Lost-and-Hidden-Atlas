@@ -346,7 +346,7 @@ function initMap(){
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
-  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:7,zoomSnap:1,worldCopyJump:false,maxBounds:[[38.7,-81.0],[47.7,-66.5]],maxBoundsViscosity:0.6}).setView([42.82,-73.86],9);
+  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:7,zoomSnap:1,worldCopyJump:false,maxBounds:[[35.7,-96.0],[47.7,-66.5]],maxBoundsViscosity:0.6}).setView([42.82,-73.86],9);
   L.control.zoom({position:'bottomright'}).addTo(map);
   drawScale();
   map.attributionControl.setPrefix(false);
