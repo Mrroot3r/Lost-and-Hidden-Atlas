@@ -751,7 +751,11 @@ let natBusy=null, natTick=0;
 function natSync(){ if(!NATIVE||!rec) return Promise.resolve(0); if(natBusy) return natBusy; const l=rec;
   natBusy=AT.call('points',{logId:l.id,from:l.nat||0}).then(r=>{ const a=(r&&r.points)||[];
       a.forEach(p=>{ l.pts.push([p[0],p[1],p[2]]); if(recLine&&rec===l) recLine.addLatLng([p[0],p[1]]); });
-      if(a.length){ l.nat=(l.nat||0)+a.length; saveSlow(); } return a.length; }).catch(()=>0).then(n=>{ natBusy=null; return n; });
+      if(a.length){ l.nat=(l.nat||0)+a.length; saveSlow(); } return a.length; })
+    .then(n=>AT.call('marks',{logId:l.id,from:l.nmk||0}).then(r=>{ const a=(r&&r.marks)||[];   /* pins dropped with the notification's "Mark here" button */
+      a.forEach(k=>{ const q=k[0]!=null?[k[0],k[1]]:trackPos(l,k[2]), nn={t:k[2],x:'Mark '+(l.notes.filter(x=>x.mk).length+1),mk:1}; if(q){ nn.la=+(+q[0]).toFixed(5); nn.lo=+(+q[1]).toFixed(5); } l.notes.push(nn); });
+      if(a.length){ l.nmk=(l.nmk||0)+a.length; l.notes.sort((x,y)=>x.t-y.t); saveNow(); if(rec===l){ drawRec(); syncRec(); } if(view==='log') renderLog(); } return n; },()=>n))
+    .catch(()=>0).then(n=>{ natBusy=null; return n; });
   return natBusy; }
 function natWatch(){ clearInterval(natTick); natTick=setInterval(()=>{ if(!rec){ clearInterval(natTick); return; } if(!document.hidden) natSync(); },2500); }
 function startLog(s){
@@ -762,7 +766,7 @@ function startLog(s){
   U.logs.unshift(log); U.rec=log.id; rec=log; saveNow(); hideLog();
   if(NATIVE){ log.nat=0; drawRec(); syncRec(); if(view==='log') renderLog();
     AT.call('start',{logId:log.id,title:log.name}).then(st=>{ if(rec!==log) return; natWatch();
-        banner(st&&st.gps===false?'Location is switched off on this phone. Turn it on and the log will start filling in.':'Recording. It keeps going with the screen off or the app in the background.',!!(st&&st.gps===false),8000);
+        banner(st&&st.gps===false?'Location is switched off on this phone. Turn it on and the log will start filling in.':'Recording. It keeps going in the background. To drop a pin without leaving the camera, pull down the notifications and tap Mark here.',!!(st&&st.gps===false),8000);
         if(geo.id===null) locate(); if(view==='log') renderLog(); },
       e=>{ if(rec===log){ rec=null; delete U.rec; clearRec(); syncRec(); } U.logs=U.logs.filter(x=>x!==log); saveNow(); if(view==='log') renderLog();
         banner('Recording could not start. '+((e&&e.message)||'Permission was refused.'),true,12000); });
@@ -780,9 +784,16 @@ function stopLog(){ if(!rec) return;
     AT.call('stop').catch(()=>{}).then(natSync).then(()=>{ stopLog.flushed=true; try{ stopLog(); }finally{ stopLog.flushed=false; } }); return; }
   clearInterval(natTick); const l=rec; l.t1=Math.round(Date.now()/1000); rec=null; delete U.rec; dropAwake(); clearRec(); syncRec();
   if(!l.pts.length&&!l.notes.length){ U.logs=U.logs.filter(x=>x!==l); saveNow(); banner('Nothing was recorded, so the log was discarded.',false,5000); if(view==='log') renderLog(); return; }
-  saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log'); }
+  saveNow(); banner('Field log saved: '+logSummary(l)+'.',false,6000); showLog(l,true); showView('log');
+  if(NATIVE) scanMedia(l,false).catch(()=>{}).then(()=>backupFile()).catch(()=>{}); }
 function noteMark(n,l){ const num=l.notes.indexOf(n)+1; const m=L.marker([n.la,n.lo],{keyboard:false,icon:L.divIcon({className:'notepin',html:String(num),iconSize:[22,22],iconAnchor:[11,11]})}); m._note=n;
-  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); return m; }
+  m.bindPopup(el('div',{class:'ctx'},el('b',{text:num+'. '+n.x}),el('span',{style:'color:#5b6660',text:hms(n.t-l.t0)+' in · '+new Date(n.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})})),{maxWidth:240}); m.on('popupopen',()=>{ const c=m.getPopup().getContent(), ph=photosOf(l,n); c.querySelectorAll('.phs,.nacts').forEach(x=>x.remove()); if(ph.length) c.append(mediaStrip(l,ph.slice(0,6)));
+    const redo=()=>{ saveNow(); map.closePopup(); if(rec===l){ drawRec(); syncRec(); } else if(shownLog===l.id) showLog(l,false); if(view==='log') renderLog(); };
+    const rn=el('button',{class:'btn sm',type:'button'},'Rename'); rn.addEventListener('click',()=>{ const i=el('input',{type:'text','aria-label':'Note text',style:'width:100%'}); i.value=n.x; let done=false; const ok=()=>{ if(done) return; done=true; const t=i.value.trim(); if(t&&t!==n.x){ n.x=t; delete n.mk; redo(); } else map.closePopup(); };
+      i.addEventListener('keydown',e=>{ if(e.key==='Enter') ok(); }); i.addEventListener('blur',ok); c.querySelector('b').replaceWith(i); i.focus(); i.select(); });
+    const dl=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; dl.addEventListener('click',()=>{ if(!armed){ armed=true; dl.textContent='Really delete?'; return; } l.notes=l.notes.filter(x=>x!==n); (l.media||[]).forEach(x=>{ if(x.nt===n.t&&!l.notes.some(y=>y.t===n.t)) delete x.nt; }); redo(); });
+    const pl=n.pl&&byId(n.pl), ap=el('button',{class:'btn sm',type:'button'},pl?'Open its place':'Add to the Atlas'); ap.addEventListener('click',()=>{ map.closePopup(); if(pl){ select(pl,true); return; } openForm({lat:n.la,lon:n.lo,name:n.x,story:'Found on a field log on '+new Date(n.t*1000).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})+'.',from:{log:l.id,t:n.t}}); });
+    c.append(el('div',{class:'nacts'},rn,dl,rec===l?null:ap)); m.getPopup().update(); }); return m; }
 function clearRec(){ if(recLine){ map.removeLayer(recLine); recLine=null; } recMarks.forEach(m=>map.removeLayer(m)); recMarks=[]; }
 function drawRec(){ if(!map||!rec) return; clearRec();
   recLine=L.polyline(rec.pts.map(p=>[p[0],p[1]]),{color:TRK,weight:4,opacity:0.9,interactive:false}).addTo(map);
@@ -795,9 +806,64 @@ function goNote(l,n,row){
   map.setView([n.la,n.lo],Math.max(map.getZoom(),18)); if(m){ if(goNote.top&&goNote.top!==m) goNote.top.setZIndexOffset(0); goNote.top=m; m.setZIndexOffset(1000); m.openPopup(); }
   goNote.at=l.id+':'+l.notes.indexOf(n); document.querySelectorAll('.lognotes li.on').forEach(x=>x.classList.remove('on'));
   const r=row&&row.isConnected?row:document.querySelector('.lognotes li[data-k="'+goNote.at+'"]'); if(r) r.classList.add('on'); }
+/* ---- photos and video taken during a log (Android app only) ----
+   The app asks the phone which photos and videos the camera saved during the log. Nothing is copied: a log keeps a short
+   reference per item in l.media = [{k:'i'|'v', id, n:name, t:seconds, d:video length, la, lo, nt:time of the note it belongs to, fx:set by hand}].
+   A photo's place is where the track was at the second it was taken. It joins the next note written within MEDIA_NEAR
+   metres of that place (photo first, then the note), else the note before it; otherwise it stays on the track by itself.
+   A video is a stretch of time, so it is the part of the track walked while it ran. */
+const MEDIA_NEAR=25;
+function trackPos(l,t){ const p=l.pts, n=p.length-1; if(n<0) return null; const end=l.t1||p[n][2];
+  if(t<=p[0][2]) return t>=l.t0-90?[p[0][0],p[0][1]]:null; if(t>=p[n][2]) return t<=end+90?[p[n][0],p[n][1]]:null;
+  let a=0,b=n; while(b-a>1){ const m=(a+b)>>1; if(p[m][2]<=t) a=m; else b=m; }
+  const f=p[b][2]>p[a][2]?(t-p[a][2])/(p[b][2]-p[a][2]):0; return [+(p[a][0]+(p[b][0]-p[a][0])*f).toFixed(6),+(p[a][1]+(p[b][1]-p[a][1])*f).toFixed(6)]; }
+const vids=l=>(l.media||[]).filter(m=>m.k==='v'), photosOf=(l,n)=>(l.media||[]).filter(m=>m.k==='i'&&m.nt===n.t), loosePhotos=l=>(l.media||[]).filter(m=>m.k==='i'&&!l.notes.some(n=>n.t===m.nt));
+function clipAt(l,t){ const v=vids(l); for(let i=0;i<v.length;i++) if(t>=v[i].t&&t<=v[i].t+v[i].d) return {n:i+1,at:t-v[i].t,v:v[i]}; return null; }
+function noteFor(l,m){ if(m.la==null) return null; const ns=l.notes.filter(n=>n.la!=null), near=n=>n&&hav(m.la,m.lo,n.la,n.lo)*1609.34<=MEDIA_NEAR;
+  const next=ns.find(n=>n.t>=m.t), prev=ns.filter(n=>n.t<m.t).pop(); return near(next)?next.t:near(prev)?prev.t:null; }
+function placeMedia(l,raw){ const t0=l.t0, t1=l.t1||Math.round(Date.now()/1000), old={}, out=[]; (l.media||[]).forEach(m=>{ old[m.k+m.id]=m; });
+  const inWalk=(a,b)=>a<=t1+60&&b>=t0-60;
+  raw.forEach(r=>{ if(/screenshot|screen ?record/i.test(r.bucket||'')) return; const tk=Math.round((r.taken||0)/1000);
+    if(r.kind==='video'){ const d=Math.round((r.duration||0)/1000); let end=r.modified||0, start=end-d;   /* the file was last written when filming stopped */
+      if(!end||!inWalk(start,end)){ if(tk&&inWalk(tk-d,tk)){ end=tk; start=tk-d; } else if(tk&&inWalk(tk,tk+d)){ start=tk; end=tk+d; } else return; }
+      const p=trackPos(l,Math.min(Math.max(start,t0),t1)); out.push({k:'v',id:r.id,n:r.name||'video',t:start,d:d,la:p?p[0]:null,lo:p?p[1]:null}); }
+    else { const t=tk&&inWalk(tk,tk)?tk:(r.modified&&inWalk(r.modified,r.modified)?r.modified:0); if(!t) return;
+      const p=trackPos(l,t), m={k:'i',id:r.id,n:r.name||'photo',t:t,la:p?p[0]:null,lo:p?p[1]:null}, was=old['i'+r.id];
+      if(was&&was.fx){ m.fx=1; if(was.nt!=null) m.nt=was.nt; } else { const nt=noteFor(l,m); if(nt!=null) m.nt=nt; }
+      out.push(m); } });
+  out.sort((a,b)=>a.t-b.t); l.media=out; return out; }
+function scanMedia(l,ask){ if(!NATIVE) return Promise.reject(new Error('Photos can only be matched in the Android app.'));
+  return AT.call('media',{from:l.t0-60,to:(l.t1||Math.round(Date.now()/1000))+60,ask:!!ask}).then(r=>{ placeMedia(l,(r&&r.items)||[]); l.mscan=Math.round(Date.now()/1000); l.macc=(r&&r.access)||'all'; saveNow();
+    if(shownLog===l.id) showLog(l,false); if(view==='log') renderLog(); return l.media; }); }
+const thumbs=new Map();
+function thumb(m,size){ if(m.th) return Promise.resolve(m.th); if(m.x||!NATIVE) return Promise.reject(new Error('no preview')); const k=m.k+m.id+':'+size; if(!thumbs.has(k)) thumbs.set(k,AT.call('thumb',{id:m.id,kind:m.k==='v'?'video':'image',size:size}).then(r=>r.data,e=>{ thumbs.delete(k); throw e; })); return thumbs.get(k); }
+function thumbBtn(l,m){ const b=el('button',{class:'ph'+(m.k==='v'?' vid':''),type:'button','aria-label':(m.k==='v'?'Video ':'Photo ')+m.n});
+  thumb(m,256).then(d=>{ b.append(el('img',{src:d,alt:''})); },()=>{ b.classList.add('gone'); });
+  b.addEventListener('click',e=>{ e.stopPropagation(); goMedia(l,m); }); return b; }
+function mediaStrip(l,list){ const d=el('div',{class:'phs'}); list.forEach(m=>d.append(thumbBtn(l,m))); return d; }
+/* go to one photo or video on the map and open a card for it */
+function goMedia(l,m){ if(!map) return; if(rec!==l&&shownLog!==l.id){ showLog(l,false); if(view==='log') renderLog(); }
+  const tm=new Date(m.t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'}), box=el('div',{class:'ctx mpop'}); let pop=null;
+  const im=el('img',{alt:''}); box.append(im); thumb(m,640).then(d=>{ im.src=d; im.onload=()=>pop&&pop.update(); },()=>im.remove());
+  if(m.k==='v'){ const n=vids(l).indexOf(m)+1; box.append(el('b',{text:'Video '+n+' · '+hms(m.d)+' long'}),el('span',{class:'mx',text:m.n}),el('span',{class:'mx',text:'Starts '+hms(m.t-l.t0)+' into the log · '+tm}));
+    const inside=l.notes.filter(x=>x.t>=m.t&&x.t<=m.t+m.d); if(inside.length) box.append(el('span',{class:'mx',text:'Notes in it: '+inside.map(x=>hms(x.t-m.t)+' '+x.x).join(' · ')})); }
+  else { const c=clipAt(l,m.t); box.append(el('b',{text:'Photo · '+tm}),el('span',{class:'mx',text:m.n+' · '+hms(m.t-l.t0)+' into the log'+(c?' · video '+c.n+' at '+hms(c.at):'')})); }
+  if(NATIVE&&!m.x) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>AT.call('openMedia',{id:m.id,kind:m.k==='v'?'video':'image'}).catch(e=>banner((e&&e.message)||'Could not open it.',true,6000))},m.k==='v'?'Play the video':'Open the photo'));
+  if(m.k==='i'&&l.notes.length){ const sl=el('select',{'aria-label':'Attach this photo to a note'},el('option',{value:''},'Not attached to a note')); l.notes.forEach((x,i)=>sl.append(el('option',{value:String(x.t)},(i+1)+'. '+x.x)));
+    sl.value=l.notes.some(x=>x.t===m.nt)?String(m.nt):''; sl.addEventListener('change',()=>{ if(sl.value) m.nt=+sl.value; else delete m.nt; m.fx=1; saveNow(); map.closePopup(); if(shownLog===l.id) showLog(l,false); if(view==='log') renderLog(); });
+    box.append(el('label',{class:'mx'},'Belongs to ',sl)); }
+  let at=m.la!=null?[m.la,m.lo]:map.getCenter();
+  if(m.k==='v'){ const seg=l.pts.filter(p=>p[2]>=m.t&&p[2]<=m.t+m.d).map(p=>[p[0],p[1]]); if(seg.length>1){ at=seg.reduce((a,b)=>b[0]>a[0]?b:a);   /* the card hangs above the stretch's northern end, and the map leaves room for it, so the card never covers the stretch */
+      map.fitBounds(L.latLngBounds(seg),{paddingTopLeft:[24,Math.min(200,Math.round(map.getSize().y*0.55))],paddingBottomRight:[24,24],maxZoom:18,animate:false}); } else if(m.la!=null) map.setView(at,Math.max(map.getZoom(),17)); }
+  else if(m.la!=null) map.setView(at,Math.max(map.getZoom(),18));
+  pop=L.popup({maxWidth:250,autoPan:m.k!=='v',autoPanPaddingTopLeft:[10,10]}).setLatLng(at).setContent(box).openOn(map); }
 function hideLog(){ shownLayers.forEach(x=>map&&map.removeLayer(x)); shownLayers=[]; shownLog=null; }
 function showLog(l,fit){ hideLog(); if(!map) return; shownLog=l.id; const ll2=l.pts.map(p=>[p[0],p[1]]);
   if(ll2.length>1) shownLayers.push(L.polyline(ll2,{color:'#ffffff',weight:6,opacity:0.8,interactive:false}).addTo(map),L.polyline(ll2,{color:TRK,weight:3.5,opacity:0.95,interactive:false}).addTo(map));
+  vids(l).forEach((m,i)=>{ const seg=l.pts.filter(p=>p[2]>=m.t&&p[2]<=m.t+m.d).map(p=>[p[0],p[1]]), a=trackPos(l,Math.max(m.t,l.t0)), b=trackPos(l,Math.min(m.t+m.d,l.t1||m.t+m.d)); if(a) seg.unshift(a); if(b) seg.push(b);
+    if(seg.length>1) shownLayers.push(L.polyline(seg,{color:'#f5a524',weight:13,opacity:0.75,interactive:false}).addTo(map).bringToBack());   /* the stretch walked while filming */
+    if(m.la!=null){ const k=L.marker([m.la,m.lo],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'vidpin',html:'\u25B6 '+(i+1),iconSize:[34,20],iconAnchor:[17,30]})}); k.on('click',()=>goMedia(l,m)); shownLayers.push(k.addTo(map)); } });
+  loosePhotos(l).forEach(m=>{ if(m.la==null) return; const k=L.marker([m.la,m.lo],{keyboard:false,zIndexOffset:-200,icon:L.divIcon({className:'phpin',html:'',iconSize:[14,14],iconAnchor:[7,7]})}); k.on('click',()=>goMedia(l,m)); shownLayers.push(k.addTo(map)); });
   l.notes.forEach(n=>{ if(n.la!=null){ shownLayers.push(noteMark(n,l).addTo(map)); ll2.push([n.la,n.lo]); } });
   if(fit&&ll2.length) map.fitBounds(L.latLngBounds(ll2).pad(0.25),{maxZoom:18}); }
 function syncRec(){ const bar=$('#recbar'); if(!bar) return; clearInterval(recTick);
@@ -809,7 +875,48 @@ function gpx(l){ const esc=s=>String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&
     l.notes.filter(n=>n.la!=null).map(n=>'<wpt lat="'+n.la+'" lon="'+n.lo+'"><time>'+iso(n.t)+'</time><name>'+esc(n.x)+'</name></wpt>\n').join('')+
     '<trk><name>'+esc(l.name)+'</name><trkseg>\n'+l.pts.map(p=>'<trkpt lat="'+p[0]+'" lon="'+p[1]+'"><time>'+iso(p[2])+'</time></trkpt>\n').join('')+'</trkseg></trk>\n</gpx>\n'; }
 function notesText(l){ const tm=t=>new Date(t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
-  return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString()+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')).join('\n'):'No notes.')+'\n'; }
+  return l.name+'\nStarted '+new Date(l.t0*1000).toLocaleString()+' · '+logSummary(l)+'\n\n'+(l.notes.length?l.notes.map(n=>hms(n.t-l.t0)+'  '+tm(n.t)+'  '+n.x+(n.la!=null?'  ('+n.la+', '+n.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,n.t))+(p=>p.length?'  [photos: '+p.map(m=>m.n).join(', ')+']':'')(photosOf(l,n))).join('\n'):'No notes.')+'\n'+
+    (vids(l).length?'\nVideos\n'+vids(l).map((m,i)=>(i+1)+'  '+m.n+'  starts '+hms(m.t-l.t0)+' into the log ('+tm(m.t)+'), '+hms(m.d)+' long').join('\n')+'\n':'')+
+    (loosePhotos(l).length?'\nPhotos not attached to a note\n'+loosePhotos(l).map(m=>hms(m.t-l.t0)+'  '+tm(m.t)+'  '+m.n+(m.la!=null?'  ('+m.la+', '+m.lo+')':'')+(c=>c?'  [video '+c.n+' at '+hms(c.at)+']':'')(clipAt(l,m.t))).join('\n')+'\n':''); }
+/* A walk as one file another person can open in the Atlas: track, notes, where each video ran, and small previews of the photos. */
+function walkFile(l){ const o={atlas:'walk',v:1,name:l.name,t0:l.t0,t1:l.t1,pts:l.pts,notes:l.notes.map(n=>{ const c={t:n.t,x:n.x}; if(n.la!=null){ c.la=n.la; c.lo=n.lo; } return c; }),media:[]};
+  return Promise.all((l.media||[]).map((m,i)=>{ const c={k:m.k,n:m.n,t:m.t}; if(m.la!=null){ c.la=m.la; c.lo=m.lo; } if(m.d!=null) c.d=m.d; if(m.nt!=null) c.nt=m.nt;
+    return i<80?thumb(m,400).then(d=>{ c.th=d; return c; },()=>c):c; })).then(ms=>{ o.media=ms; return JSON.stringify(o); }); }
+function readWalk(text,fileName){ const num=x=>typeof x==='number'&&isFinite(x), id='log'+Date.now().toString(36);
+  if(/^\s*</.test(text)){ /* a GPX file from any app */
+    const d=new DOMParser().parseFromString(text,'application/xml'); if(d.querySelector('parsererror')) throw new Error('That GPX file could not be read.');
+    const sec=e=>{ const t=e.querySelector('time'), v=t?Date.parse(t.textContent):NaN; return isFinite(v)?Math.round(v/1000):null; }, ll=e=>[+(+e.getAttribute('lat')).toFixed(6),+(+e.getAttribute('lon')).toFixed(6)];
+    let pts=[...d.querySelectorAll('trkpt,rtept')].map(e=>{ const p=ll(e); return [p[0],p[1],sec(e)]; }).filter(p=>num(p[0])&&num(p[1]));
+    const base=(pts.find(p=>p[2]!=null)||[0,0,Math.round(Date.now()/1000)])[2]; pts=pts.map((p,i)=>[p[0],p[1],p[2]!=null?p[2]:base+i*2]);
+    const notes=[...d.querySelectorAll('wpt')].map((e,i)=>{ const p=ll(e), nm=e.querySelector('name'); return {t:sec(e)!=null?sec(e):base+i,x:(nm&&nm.textContent.trim())||'Waypoint '+(i+1),la:+p[0].toFixed(5),lo:+p[1].toFixed(5)}; }).filter(n=>num(n.la)&&num(n.lo)).sort((a,b)=>a.t-b.t);
+    if(!pts.length&&!notes.length) throw new Error('That GPX file has no track or waypoints in it.');
+    const nm=d.querySelector('metadata > name, trk > name'); return {id:id,name:((nm&&nm.textContent.trim())||fileName.replace(/\.gpx$/i,'')||'GPX track')+' (opened)',site:null,t0:pts.length?pts[0][2]:notes[0].t,t1:pts.length?pts[pts.length-1][2]:notes[notes.length-1].t,pts:pts,notes:notes,imp:1}; }
+  let j; try{ j=JSON.parse(text); }catch(e){ throw new Error('That file is not a shared walk or a GPX track.'); }
+  if(j&&'status' in j&&'logs' in j) throw new Error('That is a full Atlas backup. Restore it under Guide, "Your data and backups".');
+  if(!j||j.atlas!=='walk'||!Array.isArray(j.pts)||!Array.isArray(j.notes)) throw new Error('That file is not a shared walk or a GPX track.');
+  const pts=j.pts.filter(p=>Array.isArray(p)&&num(p[0])&&num(p[1])&&num(p[2])).slice(0,60000).map(p=>[p[0],p[1],p[2]]);
+  const notes=j.notes.filter(n=>n&&num(n.t)&&typeof n.x==='string').slice(0,2000).map(n=>{ const c={t:n.t,x:n.x.slice(0,300)}; if(num(n.la)&&num(n.lo)){ c.la=n.la; c.lo=n.lo; } return c; });
+  const media=(Array.isArray(j.media)?j.media:[]).filter(m=>m&&(m.k==='i'||m.k==='v')&&num(m.t)).slice(0,500).map((m,i)=>{ const c={k:m.k,id:'x'+i,x:1,n:String(m.n||'').slice(0,120),t:m.t}; if(num(m.la)&&num(m.lo)){ c.la=m.la; c.lo=m.lo; } if(num(m.d)) c.d=m.d; else if(m.k==='v') c.d=0; if(num(m.nt)) c.nt=m.nt; if(typeof m.th==='string'&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(m.th)&&m.th.length<400000) c.th=m.th; return c; });
+  if(!pts.length&&!notes.length) throw new Error('That walk is empty.');
+  return {id:id,name:String(j.name||'Shared walk').slice(0,120)+' (shared)',site:null,t0:num(j.t0)?j.t0:(pts[0]||notes[0])[2]||notes[0].t,t1:num(j.t1)?j.t1:null,pts:pts,notes:notes,media:media,imp:1}; }
+function openWalk(file){ const r=new FileReader(); r.onerror=()=>banner('That file could not be read.',true,6000);
+  r.onload=()=>{ let l; try{ l=readWalk(String(r.result),file.name||''); }catch(e){ banner((e&&e.message)||'That file could not be opened.',true,9000); return; }
+    if(!Array.isArray(U.logs)) U.logs=[]; U.logs.unshift(l);
+    try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ if(l.media&&l.media.some(m=>m.th)){ l.media.forEach(m=>{ delete m.th; }); try{ localStorage.setItem(LS,JSON.stringify(U)); banner('Opened, but without photo previews: there was not enough room to keep them.',true,9000); }catch(e2){ U.logs.shift(); banner('There is not enough storage left to keep that walk.',true,9000); return; } } else { U.logs.shift(); banner('There is not enough storage left to keep that walk.',true,9000); return; } }
+    showView('log'); showLog(l,true); renderLog(); banner('Opened "'+l.name+'": '+logSummary(l)+'.',false,6000); };
+  r.readAsText(file); }
+/* For editing footage: where each note and photo falls inside each video. */
+function editSheet(l){ const tc=x=>{ x=Math.max(0,Math.round(x)); return [Math.floor(x/3600),Math.floor(x%3600/60),x%60].map(v=>String(v).padStart(2,'0')).join(':'); }, tm=t=>new Date(t*1000).toLocaleTimeString([],{hour:'numeric',minute:'2-digit',second:'2-digit'});
+  const out=[l.name,'Edit sheet: the time inside each video where a note was written or a photo was taken.',''], used=new Set();
+  vids(l).forEach((m,i)=>{ out.push('VIDEO '+(i+1)+'   '+m.n+'   started '+tm(m.t)+'   length '+tc(m.d));
+    const rows=l.notes.filter(n=>n.t>=m.t&&n.t<=m.t+m.d).map(n=>[n.t,'NOTE ',n.x,n]).concat((l.media||[]).filter(p=>p.k==='i'&&p.t>=m.t&&p.t<=m.t+m.d).map(p=>[p.t,'PHOTO',p.n+((nn=>nn?'  (with "'+nn.x+'")':'')(l.notes.find(n=>n.t===p.nt))),p])).sort((a,b)=>a[0]-b[0]);
+    rows.forEach(r=>{ used.add(r[3]); out.push('  '+tc(r[0]-m.t)+'   '+r[1]+'  '+r[2]); }); if(!rows.length) out.push('  (no notes or photos during this video)'); out.push(''); });
+  const rest=l.notes.filter(n=>!used.has(n)).map(n=>[n.t,'NOTE ',n.x]).concat((l.media||[]).filter(p=>p.k==='i'&&!used.has(p)).map(p=>[p.t,'PHOTO',p.n])).sort((a,b)=>a[0]-b[0]);
+  if(rest.length){ out.push('NOT DURING ANY VIDEO   (time into the walk, clock time)'); rest.forEach(r=>out.push('  '+tc(r[0]-l.t0)+'   '+tm(r[0])+'   '+r[1]+'  '+r[2])); out.push(''); }
+  return out.join('\n'); }
+/* In the app: keep a copy of everything in the phone's Downloads, where it survives the app being removed. */
+let lastBackup=0;
+function backupFile(){ if(!NATIVE) return Promise.reject(new Error('Only in the Android app.')); return AT.call('saveBackup',{name:'atlas-backup.json',text:JSON.stringify(U)}).then(r=>{ lastBackup=Date.now(); return r; }); }
 async function sendFile(name,text,type,btn){
   if(NATIVE){ try{ await AT.call('share',{name:name,text:text,mime:type}); }catch(e){ copy(text,btn); banner('Sharing failed, so the text was copied instead.',true,5000); } return; }
   const blob=new Blob([text],{type:type});
@@ -831,6 +938,8 @@ function renderLog(){
       if(st.battery===false||st.background===false) tips.after(el('p',{class:'snote',style:'margin-top:6px',text:(st.battery===false?'"Stop Android pausing it" asks Android not to shut the app down to save battery, the usual reason a recording ends early. ':'')+(st.background===false?'"Allow location all the time" is optional: under Permissions, Location. It lets Android restart a recording by itself.':'')}));
     }).catch(()=>{}); }
   else top.append(el('p',{class:'snote',style:'margin-top:8px',text:'It only records while this page is open and the screen is on. The Atlas keeps the screen awake while it records, where the phone allows. Logs are saved in this browser and are included in your backup.'}));
+  const pick=el('input',{type:'file',id:'walk-file',hidden:true,onchange:e=>{ const f=e.target.files[0]; e.target.value=''; if(f) openWalk(f); }});
+  top.append(el('div',{class:'row',style:'margin-top:10px'},el('button',{class:'btn sm',type:'button',onclick:()=>pick.click()},'Open a shared walk or GPX file'),pick));
   v.append(top);
   const done=U.logs.filter(l=>l!==rec);
   if(!done.length){ v.append(el('p',{class:'pad',style:'color:var(--mute);padding-block:12px',text:rec?'':'No saved logs yet.'})); return; }
@@ -840,13 +949,25 @@ function renderLog(){
     const ren=el('button',{class:'btn sm',type:'button',onclick:()=>{ const i=el('input',{type:'text','aria-label':'Log name'}); i.value=l.name; const ok=()=>{ l.name=i.value.trim()||l.name; saveNow(); renderLog(); }; i.addEventListener('keydown',e=>{ if(e.key==='Enter') ok(); }); i.addEventListener('blur',ok); title.replaceWith(i); i.focus(); }},'Rename');
     const cp=el('button',{class:'btn sm',type:'button'},'Copy notes'); cp.addEventListener('click',()=>copy(notesText(l),cp));
     const gx=el('button',{class:'btn sm',type:'button'},NATIVE?'Share route (GPX)':'GPX track'); gx.addEventListener('click',()=>sendFile(fn+'.gpx',gpx(l),'application/gpx+xml',gx));
+    const sw=el('button',{class:'btn sm',type:'button'},'Share this walk'); sw.addEventListener('click',()=>{ sw.disabled=true; sw.textContent='Packing…'; walkFile(l).then(t=>sendFile(fn+'.atlas.json',t,'application/json',sw)).catch(()=>banner('The walk could not be packed.',true,6000)).then(()=>{ sw.disabled=false; sw.textContent='Share this walk'; }); });
+    const es=vids(l).length?el('button',{class:'btn sm',type:'button'},'Edit sheet'):null; if(es) es.addEventListener('click',()=>sendFile(fn+'-edit-sheet.txt',editSheet(l),'text/plain',es));
     const del=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; del.addEventListener('click',()=>{ if(!armed){ armed=true; del.textContent='Really delete?'; setTimeout(()=>{ armed=false; del.textContent='Delete'; },4000); return; } if(shownLog===l.id) hideLog(); U.logs=U.logs.filter(x=>x!==l); saveNow(); if(NATIVE) AT.call('remove',{logId:l.id}).catch(()=>{}); renderLog(); });
     const site=l.site&&byId(l.site);
     const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
-      el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,gx,cp,ren,del),
+      el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,sw,gx,cp,es,ren,del),
       site?el('p',{style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>select(site,true)},'Open '+site.name)):null);
-    if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{text:n.x})); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
+    if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{class:'nx',text:n.x})); const cl=clipAt(l,n.t), ph=photosOf(l,n); if(cl) li.append(el('span',{class:'clip',title:'Position in video '+cl.n,text:'\u25B6'+cl.n+' '+hms(cl.at)})); if(ph.length) li.append(mediaStrip(l,ph)); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
       box.append(el('details',{open:shown},el('summary',{text:l.notes.length+(l.notes.length===1?' note':' notes')}),ul)); }
+    const med=l.media||[], vd=vids(l), lp=loosePhotos(l), np=med.length-vd.length, plural=(n,w)=>n+' '+w+(n===1?'':'s');
+    if((NATIVE&&!l.imp)||med.length){ const row=el('div',{class:'row',style:'margin-top:8px;align-items:center'});
+      if(NATIVE&&!l.imp){ const fb=el('button',{class:'btn sm',type:'button'},l.mscan?'Look again for photos':'Find photos and video');
+        fb.addEventListener('click',()=>{ fb.disabled=true; fb.textContent='Looking…'; scanMedia(l,true).then(m=>{ banner(m.length?'Found '+plural(m.filter(x=>x.k==='i').length,'photo')+' and '+plural(vids(l).length,'video')+' from this walk.':'No photos or videos from this walk were found on the phone.',false,6000); },
+          e=>{ banner((e&&e.message)||'The phone\'s photos could not be read.',true,10000); renderLog(); }); }); row.append(fb); }
+      row.append(el('span',{class:'snote',text:med.length?plural(np,'photo')+' · '+plural(vd.length,'video'):(l.mscan?'None found for this walk.':'')})); box.append(row);
+      if(NATIVE&&l.macc==='some') box.append(el('p',{class:'snote',style:'margin-top:6px'},'Android is only letting the Atlas see photos you picked by hand, so some may be missing. ',el('button',{class:'btn sm',type:'button',onclick:()=>AT.call('appSettings')},'Open permissions'),' and set Photos and videos to "Allow all".')); }
+    if(vd.length){ const ul=el('ul',{class:'lognotes'}); vd.forEach((m,i)=>{ const li=el('li',{role:'button',tabindex:'0'},el('span',{class:'num vn',text:'\u25B6'+(i+1)}),el('span',{class:'mono',text:hms(m.t-l.t0)}),el('span',{class:'nx',text:hms(m.d)+' long · '+m.n})); li.addEventListener('click',()=>goMedia(l,m)); ul.append(li); });
+      box.append(el('details',{open:shown},el('summary',{text:plural(vd.length,'video')+' (time shown is where each starts in the log)'}),ul)); }
+    if(lp.length) box.append(el('details',{open:shown},el('summary',{text:plural(lp.length,'photo')+' not attached to a note'}),mediaStrip(l,lp)));
     v.append(box); });
 }
 function resumeLog(){
@@ -1041,6 +1162,9 @@ function renderDetail(s){
       U.moved[s.id]?el('button',{class:'btn sm',type:'button',onclick:()=>{ delete U.moved[s.id]; save(); refresh(); select(s,true); }},'Put pin back'):null,
       s.mine?el('button',{class:'btn sm',type:'button',onclick:()=>openForm(s)},'Edit'):null,
       s.mine?delBtn(s):null,sv),
+    (()=>{ const fl=s.from&&logById(s.from.log), fn=fl&&fl.notes.find(x=>x.t===s.from.t); if(!fn) return null; const ph=photosOf(fl,fn);   /* a place made from a field-log note keeps its photos and its walk */
+      return el('div',{style:'margin-top:10px'},el('p',{class:'snote',text:'From your field log "'+fl.name+'", note "'+fn.x+'".'}),ph.length?mediaStrip(fl,ph):null,
+        el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>{ showLog(fl,true); banner('Showing the walk that found it.',false,4000); }},'Show the walk on the map'))); })(),
     storeOK?null:el('p',{style:'color:var(--warn);font-size:12.5px;margin-top:8px',text:'This browser is not saving data right now, so notes will be lost when you close the page.'}));
   v.append(mine);
   /* nearby */
@@ -1060,7 +1184,7 @@ function delBtn(s){ const b=el('button',{class:'btn sm',type:'button'},'Delete')
 
 /* add / edit your own place */
 function openForm(seed){
-  const editing=!!seed.id, s=editing?seed:{lat:seed.lat,lon:seed.lon,name:seed.name||'',town:'',years:'',cat:'industry',st:'ruins',prec:'site',acc:seed.story?'ask':'public',eff:'walk',story:seed.story||'',link:''};
+  const editing=!!seed.id, s=editing?seed:{lat:seed.lat,lon:seed.lon,name:seed.name||'',town:'',years:'',cat:'industry',st:'ruins',prec:'site',acc:seed.story?'ask':'public',eff:'walk',story:seed.story||'',link:'',from:seed.from};
   const v=$('#v-detail'); v.textContent=''; showView('detail');
   const f=(id,label,node)=>el('label',{class:'field',for:id,style:'margin-top:8px'},el('span',{text:label}),node);
   const opt=(map,val,id)=>{ const x=el('select',{id:id},Object.keys(map).map(k=>el('option',{value:k,text:Array.isArray(map[k])?map[k][0]:map[k]}))); x.value=val; return x; };
@@ -1074,8 +1198,9 @@ function openForm(seed){
   const form=el('form',{class:'pad',style:'padding-block:12px',onsubmit:e=>{ e.preventDefault();
     if(!name.value.trim()){ err.textContent='Give the place a name.'; name.focus(); return; }
     let url=link.value.trim(); if(url&&!/^https?:\/\//i.test(url)){ err.textContent='Links need to start with http:// or https://'; link.focus(); return; }
-    const o={id:editing?s.id:'my-'+Date.now().toString(36),mine:true,name:name.value.trim(),name2:'',town:town.value.trim(),years:years.value.trim(),reg:s.reg||'',cat:cat.value,st:st.value,prec:prec.value,acc:acc.value,eff:eff.value,conf:'lead',lat:s.lat,lon:s.lon,tags:[],story:story.value.trim(),look:'',hook:'',accn:'',links:url?[['Source',url]]:[],now:false};
+    const o={id:editing?s.id:'my-'+Date.now().toString(36),mine:true,name:name.value.trim(),name2:'',town:town.value.trim(),years:years.value.trim(),reg:s.reg||'',cat:cat.value,st:st.value,prec:prec.value,acc:acc.value,eff:eff.value,conf:'lead',lat:s.lat,lon:s.lon,tags:[],story:story.value.trim(),look:'',hook:'',accn:'',links:url?[['Source',url]]:[],now:false,from:s.from};
     if(editing) U.custom=U.custom.map(x=>x.id===o.id?o:x); else U.custom.push(o);
+    if(o.from){ const fl=logById(o.from.log), fn=fl&&fl.notes.find(x=>x.t===o.from.t); if(fn){ fn.pl=o.id; saveNow(); } }
     save(); refresh(); select(o,false); }},
     el('button',{class:'btn sm',type:'button',onclick:()=>{ if(editing) select(seed,false); else deselect(); }},'← Cancel'),
     el('h2',{style:'font-size:22px;margin-top:8px',text:editing?'Edit your place':'Add a place'}),
@@ -1226,7 +1351,9 @@ function renderGuide(){
   const msg=el('span',{class:'note-saved'});
   const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; save(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
   const file=el('input',{type:'file',id:'bk-file',accept:'.json,application/json',onchange:e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>load(String(r.result)); r.readAsText(f); }});
-  v.append(sec('Your data and backups',false,[
+  const bkf=NATIVE?(()=>{ const m2=el('span',{class:'note-saved'}), b=el('button',{class:'btn sm',type:'button'},'Save a backup file now'); b.addEventListener('click',()=>{ m2.textContent=' Saving…'; backupFile().then(r=>{ m2.textContent=' Saved to '+r.where+'.'; },e=>{ m2.textContent=' '+((e&&e.message)||'Could not save.'); }); });
+    return el('div',null,P('The app also saves a backup file by itself each time a field log ends: Download / Lost Hidden Atlas / atlas-backup.json on the phone. It stays there if the app is removed. To bring it back, use "Restore" below and pick that file.'),el('div',{class:'row'},b,m2)); })():null;
+  v.append(sec('Your data and backups',false,[bkf,
     P('Your progress, notes, moved pins, added places and trip are saved in this browser on this device only. They do not sync. Back them up before you clear browser data, and restore on another device.'),
     el('div',{class:'row'},b1,LOCAL?b2:null,b3),out,
     el('label',{class:'field',for:'bk-in',style:'margin-top:10px'},el('span',{text:'Restore'}),inp),
@@ -1245,7 +1372,7 @@ function renderGuide(){
         el('button',{class:'btn sm',type:'button',onclick:()=>{ if(!AT.setBase(addr.value)){ res.textContent=' That is not a web address.'; return; } addr.value=AT.base; run(); }},'Use this address'),
         el('button',{class:'btn sm',type:'button',onclick:()=>{ AT.setBase(AT.def); addr.value=AT.base; run(); }},'Back to the original')),
       NATIVE?(()=>{ const line=el('p',{class:'mono',style:'font-size:12px',text:'App status: reading…'}), cb=el('button',{class:'btn sm',type:'button'},'Copy app status'); let last='';
-        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
+        AT.call('status').then(st=>{ last=JSON.stringify(Object.assign({data:AT.dataV,base:AT.base},st)); line.textContent='App '+(st.version||'?')+' · Android API '+st.android+' · '+st.phone+' · location '+(st.fine?'allowed':'NOT allowed')+(st.background?' (all the time)':'')+' · battery '+(st.battery?'unrestricted':'restricted')+' · photos '+(st.media||'?')+' · GPS '+(st.gps?'on':'OFF')+(st.recording?' · recording: '+st.fixes+' fixes, '+st.kept+' kept, last '+st.lastFixAgo+' s ago at '+Math.round(st.lastAccuracy)+' m':'')+(st.error?' · last error: '+st.error:''); },()=>{ line.textContent='App status could not be read.'; });
         cb.addEventListener('click',()=>copy(last||line.textContent,cb)); return el('div',null,line,el('div',{class:'row'},cb)); })():null,
       P('Change the address only if the Atlas moves to a new home. The new site must be a copy of this one and must allow other sites to read it (the Access-Control-Allow-Origin header).')])); }
   const stor=el('p',{text:'Checking…'}), sl=el('ul',{class:'links'});

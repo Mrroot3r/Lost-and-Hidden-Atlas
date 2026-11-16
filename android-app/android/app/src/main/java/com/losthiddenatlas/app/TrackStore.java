@@ -66,5 +66,41 @@ final class TrackStore {
     static synchronized void delete(Context c, String id) {
         File f = file(c, id);
         if (f.exists()) f.delete();
+        File m = marks(c, id);
+        if (m.exists()) m.delete();
+    }
+
+    // ---- marks: pins dropped from the notification's "Mark here" button, one "lat,lon,seconds" line each ----
+
+    private static File marks(Context c, String id) {
+        return new File(file(c, id).getParentFile(), id + ".marks.csv");
+    }
+
+    /** lat and lon may be NaN when the phone had no position yet; the page then places the mark from the track. */
+    static synchronized void appendMark(Context c, String id, double lat, double lon, long seconds) {
+        try (FileWriter w = new FileWriter(marks(c, id), true)) {
+            if (Double.isNaN(lat) || Double.isNaN(lon)) w.write(String.format(Locale.US, ",,%d\n", seconds));
+            else w.write(String.format(Locale.US, "%.5f,%.5f,%d\n", lat, lon, seconds));
+        } catch (Exception ignored) {}
+    }
+
+    static synchronized List<double[]> readMarks(Context c, String id, int from) {
+        List<double[]> out = new ArrayList<>();
+        File f = marks(c, id);
+        if (!f.exists()) return out;
+        try (BufferedReader r = new BufferedReader(new FileReader(f))) {
+            String line;
+            int i = 0;
+            while ((line = r.readLine()) != null) {
+                if (i++ < from) continue;
+                String[] p = line.split(",", -1);
+                if (p.length < 3) continue;
+                try {
+                    boolean none = p[0].isEmpty() || p[1].isEmpty();
+                    out.add(new double[] { none ? Double.NaN : Double.parseDouble(p[0]), none ? Double.NaN : Double.parseDouble(p[1]), Double.parseDouble(p[2]) });
+                } catch (NumberFormatException ignored) {}
+            }
+        } catch (Exception ignored) {}
+        return out;
     }
 }

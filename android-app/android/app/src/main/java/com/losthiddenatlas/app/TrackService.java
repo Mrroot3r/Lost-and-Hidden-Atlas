@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Locale;
 public class TrackService extends Service implements LocationListener {
 
     static final String PREFS = "fieldlog";
+    static final String ACTION_MARK = "com.losthiddenatlas.app.MARK"; // sent by the notification's "Mark here" button
     static volatile boolean running = false;
     // for the status readout in the app: how many GPS fixes arrived, how many were kept, and how good the last one was
     static volatile int fixes = 0;
@@ -59,6 +61,7 @@ public class TrackService extends Service implements LocationListener {
     private boolean haveLast = false;
     private double lastLat, lastLon;
     private int count = 0;
+    private int markCount = 0;
     private double meters = 0;
     private long lastNoteUpdate = 0;
 
@@ -94,6 +97,7 @@ public class TrackService extends Service implements LocationListener {
         }
         if (running && !logId.equals(activeId)) halt(); // a different log was started without stopping the first
         if (!running) begin();
+        if (running && intent != null && ACTION_MARK.equals(intent.getAction())) mark();
         return START_STICKY;
     }
 
@@ -108,6 +112,7 @@ public class TrackService extends Service implements LocationListener {
         badRun = 0;
         List<double[]> have = TrackStore.read(this, logId, 0);
         count = have.size();
+        markCount = TrackStore.readMarks(this, logId, 0).size();
         meters = 0;
         for (int i = 1; i < have.size(); i++) meters += dist(have.get(i - 1)[0], have.get(i - 1)[1], have.get(i)[0], have.get(i)[1]);
         if (count > 0) {
@@ -158,9 +163,35 @@ public class TrackService extends Service implements LocationListener {
             lastNoteUpdate = now;
             try {
                 NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                nm.notify(NOTE_ID, note(String.format(Locale.US, "Recording · %.2f mi", meters / 1609.34)));
+                nm.notify(NOTE_ID, note(status()));
             } catch (Exception ignored) {}
         }
+    }
+
+    /** "Mark here": saves a timed pin where the phone is now. The page turns it into a note that can be named later. */
+    private void mark() {
+        double lat = Double.NaN, lon = Double.NaN;
+        if (haveFix && System.currentTimeMillis() - lastFixAt < 30000L) {
+            lat = fLat;
+            lon = fLon;
+        } else if (haveLast) { // standing still: the last saved point is where we are
+            lat = lastLat;
+            lon = lastLon;
+        }
+        TrackStore.appendMark(this, logId, lat, lon, System.currentTimeMillis() / 1000L);
+        markCount++;
+        try {
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.notify(NOTE_ID, note(status()));
+        } catch (Exception ignored) {}
+        try {
+            Toast.makeText(getApplicationContext(), "Marked (" + markCount + ")", Toast.LENGTH_SHORT).show();
+        } catch (Exception ignored) {}
+    }
+
+    private String status() {
+        String s = String.format(Locale.US, "Recording · %.2f mi", meters / 1609.34);
+        return markCount > 0 ? s + " · " + markCount + (markCount == 1 ? " mark" : " marks") : s;
     }
 
     /** Trusts a fix by its stated accuracy and loosens up when the phone is really moving. Returns null for a fix to ignore. */
@@ -210,6 +241,7 @@ public class TrackService extends Service implements LocationListener {
         Intent open = new Intent(this, MainActivity.class);
         open.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pi = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent markIntent = PendingIntent.getService(this, 1, new Intent(this, TrackService.class).setAction(ACTION_MARK), PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
         return new NotificationCompat.Builder(this, CHANNEL)
             .setSmallIcon(R.drawable.ic_stat_track)
             .setContentTitle(title)
@@ -219,6 +251,7 @@ public class TrackService extends Service implements LocationListener {
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setContentIntent(pi)
+            .addAction(0, "Mark here", markIntent)
             .build();
     }
 
