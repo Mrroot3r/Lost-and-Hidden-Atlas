@@ -203,6 +203,32 @@ public class FieldLogPlugin extends Plugin {
         call.resolve();
     }
 
+    /**
+     * targets({r, list: [[lat, lon, id, name], ...]}): the places and leads the recorder should buzz near ("Near me").
+     * r is the alert distance in metres; 0 switches it off. The recorder picks the new list up within a few seconds.
+     */
+    @PluginMethod
+    public void targets(PluginCall call) {
+        try {
+            Double r = call.getDouble("r");
+            StringBuilder text = new StringBuilder();
+            text.append(r == null || r.isNaN() ? 0.0 : r).append('\n');
+            JSArray list = call.getArray("list");
+            int n = list == null ? 0 : list.length();
+            for (int i = 0; i < n; i++) {
+                org.json.JSONArray a = list.optJSONArray(i);
+                if (a == null || a.length() < 3) continue;
+                double lat = a.optDouble(0, Double.NaN), lon = a.optDouble(1, Double.NaN);
+                if (Double.isNaN(lat) || Double.isNaN(lon)) continue;
+                text.append(NearList.row(lat, lon, a.optString(2, ""), a.optString(3, ""))).append('\n');
+            }
+            TrackStore.writeNear(getContext(), text.toString());
+            call.resolve();
+        } catch (Exception e) {
+            call.reject("The near-me list could not be saved.");
+        }
+    }
+
     /** marks({logId, from}) -> {marks: [[lat or null, lon or null, seconds], ...]}: pins dropped from the notification. */
     @PluginMethod
     public void marks(PluginCall call) {

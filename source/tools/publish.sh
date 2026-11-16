@@ -17,9 +17,9 @@ fi
 rm -rf data topo
 cp -a "$W/dist/web/." ./
 mkdir -p source/src source/tools source/build
-rm -f source/tools/*.py source/tools/*.sh source/tools/*.js
+rm -f source/tools/*.py source/tools/*.sh source/tools/*.js source/tools/*.java
 cp "$W"/src/* source/src/
-cp "$W"/tools/*.py "$W"/tools/*.sh "$W"/tools/*.js source/tools/
+cp "$W"/tools/*.py "$W"/tools/*.sh "$W"/tools/*.js "$W"/tools/*.java source/tools/
 cp "$W/build/base.json" "$W/build/hubs.json" "$W/build/padus.json" "$W/build/states.json" source/build/
 cp "$W/build/topo/meta.json" source/build/topo-meta.json
 cp "$W/cache/leaflet.min.css" source/build/leaflet.min.css

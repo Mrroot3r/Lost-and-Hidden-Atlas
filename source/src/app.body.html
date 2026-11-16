@@ -10,6 +10,7 @@
       </div>
       <nav class="tabs" role="tablist" aria-label="Sections">
         <button role="tab" id="tab-list" data-view="list" aria-selected="true">Places</button>
+        <button role="tab" id="tab-near" data-view="near" aria-selected="false">Near</button>
         <button role="tab" id="tab-trip" data-view="trip" aria-selected="false">Trip<span class="n" id="trip-n">0</span></button>
         <button role="tab" id="tab-log" data-view="log" aria-selected="false">Log</button>
         <button role="tab" id="tab-guide" data-view="guide" aria-selected="false">Guide</button>
@@ -45,6 +46,7 @@
     </section>
 
     <section class="view" id="v-detail" hidden></section>
+    <section class="view" id="v-near" hidden aria-labelledby="tab-near"></section>
     <section class="view" id="v-trip" hidden aria-labelledby="tab-trip"></section>
     <section class="view" id="v-log" hidden aria-labelledby="tab-log"></section>
     <section class="view guide" id="v-guide" hidden aria-labelledby="tab-guide"></section>
