@@ -156,7 +156,7 @@ These are what keep the Atlas trustworthy. They are not optional.
 ## 6. Research workflow
 
 1. **Collect exact titles.** Guessed article titles fail (the Ladd School is "The Ladd School"). Open a list page first and copy names from it: "National Register of Historic Places listings in *county*", "List of amusement parks in *state*", a state's "Category:" pages, state park and land-trust site indexes.
-2. **Read each article:** `python3 tools/wiki_raw.py "Exact title" …` prints its coordinates and opening text; add `-g 'closed|demol|remain|ruin'` to pull only the sentences about what happened and what is left. Other sources that have worked: state park and land-trust pages (access, trail maps), National Park Service pages, town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places.
+2. **Read each article:** `python3 tools/wiki_raw.py "Exact title" …` prints its coordinates and opening text; add `-g 'closed|demol|remain|ruin'` to pull only the sentences about what happened and what is left. Other sources that have worked: state park and land-trust pages (access, trail maps), National Park Service pages, town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places, and `python3 tools/nom.py "name, town, state"` for a ruin, trail feature or building that someone has mapped in OpenStreetMap.
 3. **Write the entries** in a new `data_<area>.py` with its `BATCH`, `PLACES` and `PIN_NOTES`.
 4. **Build the list:** `python3 tools/build_sites.py`. It stops on a duplicate id or a missing pin note.
 5. **Check every pin:** `python3 tools/pincheck.py --batch <key>` writes contact sheets to `research/`: one 300 m aerial square per pin with a 30 m ring. Look at every tile. Fix what you can see, downgrade what you cannot, and record in the pin note what the aerial showed.
@@ -200,9 +200,9 @@ The base is already in place for all nine Northeast states: New York, Massachuse
 | New York | Capital Region outward; none yet in NYC, central, western or northern regions | State services | Some counties | Yes |
 | Massachusetts | Statewide first pass, Worcester County deeper | State services | Statewide | Yes |
 | Rhode Island | First pass | State services | No | Yes |
-| Vermont | A few in the south | State services | No | No |
-| Connecticut | Two in the northwest | Fallback only | No | No |
-| New Hampshire, Maine, New Jersey, Pennsylvania | None | Fallback only | No | No |
+| Vermont | A few in the south, two farther north | State services | No | No |
+| Connecticut | Five | Fallback only | No | No |
+| New Hampshire, Maine, New Jersey, Pennsylvania | A first handful each, all woods ruins on public or preserve land (the "Ruins in the woods" batch) | Fallback only | No | No |
 
 Beyond adding places, these make a state better. Do them when asked, or note in section 10 that they are still open.
 
@@ -231,7 +231,9 @@ A state outside these nine also needs its outline added to `source/build/states.
 ## 10. Known gaps
 
 - Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial, and none was moved.
-- Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have the base only: regions, start cities and fallback imagery. They have no law note in the app, and the last four have no places.
+- Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have regions, start cities, fallback imagery and a first handful of places each, but no law note in the app. Read the state's trespass statute and add the note before sending anyone far off a marked trail there.
+- The "Ruins in the woods" batch (November 2026) has no trailhead coordinates: access notes name the road or lot. Most of its pins sit under tree cover and could not be confirmed on an aerial; `tools/pincheck.py` had no leaf-off imagery outside New York. Its Pennsylvania and Maine entries were written from one Wikipedia article each.
+- Pins taken from OpenStreetMap through Nominatim (`tools/nom.py`) are a named mapped feature, which is usually closer than an article coordinate, but for a tunnel or a long path the point is the middle of the line.
 - Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
 - Leads are missing for greater Boston, the South Shore, Cape Cod and Rhode Island.
