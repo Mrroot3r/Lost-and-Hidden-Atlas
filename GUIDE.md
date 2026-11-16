@@ -28,11 +28,12 @@ The site is static files on GitHub Pages. There is no server and no account. A v
 | `data/leads.json` | Unchecked leads from OpenStreetMap; fetched when the Leads layer is turned on |
 | `topo/<place-id>.webp` | One cropped old USGS map per place; fetched when the place is opened |
 | `source/` | Everything the site is generated from |
+| `source/tools/states.py` | The base for every state: its regions, start cities and what is wired up for it |
 | `LEADS.md` | Places someone read about but did not add, and why |
 
 **Never edit the files in the repository root by hand.** They are build output. Edit `source/` and rebuild.
 
-Map layers come from public services, chosen per state by `regionOf()` in `app.js`:
+Map layers come from public services, chosen per state. `regionOf()` in `app.js` works out the state of any point from simplified Census outlines of the nine Northeast states (`source/build/states.json`), so nobody has to describe a border by hand.
 
 - Streets and satellite: Esri. Current and old topo: USGS and Esri.
 - Leaf-off aerial and LiDAR: New York (NYS ITS, slow export services, heavily cached), Massachusetts (MassGIS tiles), Vermont (VCGI tiles), Rhode Island (RIGIS image services at `maps.edc.uri.edu/rigis`: the March 2026 flight and the 2022 LiDAR elevation service, shaded on request like New York's). Other states fall back to Esri satellite and world hillshade.
@@ -118,7 +119,7 @@ N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
 | Field | Meaning and allowed values |
 |---|---|
 | `id` | Unique lowercase slug with hyphens. Ids are shared across every state, and common names repeat (`queens-fort` exists in New York), so give a new place a town or state suffix when in doubt: `queens-fort-exeter`. **Never rename a published id**: saved notes are keyed to it |
-| `reg` | Region code from `REG` in `app.js`. A new region needs a new entry there |
+| `reg` | Region code from `tools/states.py`. Every Northeast state already has regions; pick the one the place is in. `check.py` fails if the pin is not inside that region's state |
 | `cat` | `amuse` `hotel` `canal` `rail` `industry` `burial` `town` `civic` `fort` `water` `inst` `light` `landmark` |
 | `st` | What is left: `ruins` `traces` (grades, piers, earthworks) `standing` `marker` `gone` `water` (drowned) |
 | `prec` | `exact` (on the structure, about 30 m) · `site` (inside the footprint, about 150 m) · `area` (right vicinity only, about 500 m) |
@@ -145,7 +146,7 @@ These are what keep the Atlas trustworthy. They are not optional.
 3. **When sources disagree, say so.** Give both versions in the text ("the closing year is not confirmed: the articles give both 1995 and November 1994"), set `conf='mixed'`, and do not pick one.
 4. **Be honest about the pin, and look at it.** A coordinate from a Wikipedia infobox, an OpenStreetMap feature, an address lookup or a trail log is fine if the pin note says so. But such coordinates are often off the structure: in the Rhode Island batch 5 of 28 were visibly wrong on the aerial. Run the pin check in section 6 on every new pin. Move a pin only when you can see the right spot; otherwise keep it, use `prec='area'`, and say what the aerial showed. Never invent or nudge a coordinate blind.
 5. **Say what is left, not what was there.** A demolished site is `gone`, however famous. Check for recent demolition, fire or redevelopment.
-6. **Access is part of the entry, and "access" never means a way in.** Name the owner or manager when known. Private or unknown means `ask` or `view`. Active railroads, mines, tunnels and sealed buildings get a plain warning. Sources sometimes describe how people get onto a closed bridge or into a sealed building: leave that out entirely, even when it is the only "access" information the source gives. `check.py` flags suspicious wording, but the rule is yours to keep.
+6. **Access is part of the entry.** Legal access detail is wanted and useful: who owns or manages the land, where to park, which trail or public path reaches it, hours, fees, permits, who to ask. Private or unknown means `ask` or `view`. Active railroads, mines, tunnels and sealed buildings get a plain warning. The one thing that stays out is how to get past a barrier into somewhere closed: a fence, a locked gate, a sealed building, a closed bridge. If that is the only "access" a source describes, write that the place is closed.
 7. **Write plainly.** Short sentences, no hype, no filler. Put the facts in your own words; do not copy source sentences.
 8. **Prefer places with something to find.** Ruins and traces first, then standing landmarks with a story, then vanished sites that matter to a series.
 9. **Record what you did not add.** A place you read about but could not source or locate goes in `LEADS.md` with one line on what is missing.
@@ -178,32 +179,41 @@ in the format below, plus one pin-note line. Rules:
   and set conf='mixed' or conf='lead'.
 - Give the coordinate's origin in the pin note. If it marks a town, road or
   park and not the site itself, say so and use prec='area'.
-- State who owns or manages the land if a source says. Otherwise acc='ask'
-  or 'view'. Never describe how to get into a building or past a fence,
-  even if a source does.
+- Give legal access detail when a source has it: owner or manager, parking,
+  trail, hours, fees. Otherwise acc='ask' or 'view'. Do not describe how to
+  get past a fence, a lock or a sealed entrance.
+- Use a region code from tools/states.py for the state the place is in.
 - Plain short sentences in your own words. No hype.
 - Skip a place rather than guess, and list it with what was missing.
 
 <paste the field table from section 4 and one example entry>
 ```
 
-## 8. Adding a new state
+## 8. Opening a new state or area
 
-Do it in this order. A first pass needs only the required steps; say in section 10 which optional ones were left.
+The base is already in place for all nine Northeast states: New York, Massachusetts, Rhode Island, Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania. For each, `tools/states.py` lists its regions and start cities (the capital and the main cities), the map covers it, state detection works, and satellite imagery and a world hillshade load as a fallback. **To start work in any of them, you only add a batch of places** (section 6) using that state's region codes.
 
-| Step | Required? | What to do |
+| State | Places so far | Leaf-off and LiDAR | Owner lookup | Law note in the app |
+|---|---|---|---|---|
+| New York | Capital Region outward; none yet in NYC, central, western or northern regions | State services | Some counties | Yes |
+| Massachusetts | Statewide first pass, Worcester County deeper | State services | Statewide | Yes |
+| Rhode Island | First pass | State services | No | Yes |
+| Vermont | A few in the south | State services | No | No |
+| Connecticut | Two in the northwest | Fallback only | No | No |
+| New Hampshire, Maine, New Jersey, Pennsylvania | None | Fallback only | No | No |
+
+Beyond adding places, these make a state better. Do them when asked, or note in section 10 that they are still open.
+
+| Step | When | What to do |
 |---|---|---|
-| 1. Regions | Required | Add region codes to `REG` in `app.js` |
-| 2. State detection | Required | Extend `regionOf()` and its border tables. Test known towns on both sides of every border |
-| 3. Map bounds | Required if outside | Widen `maxBounds` in `initMap()`; `check.py` fails on pins outside it |
-| 4. Imagery | Required to try | Add the state's leaf-off and LiDAR services to `leafUrl()` and `lidarUrl()` if it publishes them. Check they send CORS headers, note their deepest zoom, and look at a tile over open water (some services return black there). If the state has none, the Esri fallback already works: say so in the options text |
-| 5. Places | Required | Research and add the batch (section 6), including the pin check |
-| 6. Start city | Required | Add one to `HUBS` in `drive.py` so drive times make sense |
-| 7. Legal note | Required | Add the state's trespass basics to the in-app Guide; the law differs by state. Read the statute, do not paraphrase from memory |
-| 8. Test the state | Required | `node tools/smoke.js <url> <new-place-id>` checks that leaf-off and LiDAR tiles load there |
-| 9. Rail and canal lines | Can wait | Widen the box in `lines.py` and `basegeo.py`, add the state's old lines, rebuild `lines.json` |
-| 10. Leads | Can wait | Overpass download for the state |
-| 11. Owner lookup and lot lines | Can wait | Add to `lookup()` and `drawLots()` if the state publishes parcels with owner names |
+| Law note | With the first batch for a state | Add the state's trespass basics to the in-app Guide and set `legal` to `True` in `states.py`. Read the statute; do not paraphrase from memory |
+| State imagery | When the state publishes it | Add its leaf-off and LiDAR services to `leafUrl()` and `lidarUrl()`. Check they send CORS headers, note their deepest zoom, and look at a tile over open water (some services return black there). Then test with `node tools/smoke.js <url> <place-id>` |
+| Rail and canal lines | Can wait | Widen the box in `lines.py`, add the state's old lines, rebuild `lines.json` |
+| Leads | Can wait | Overpass download for the state |
+| Owner lookup and lot lines | Can wait | Add to `lookup()` and `drawLots()` if the state publishes parcels with owner names |
+| A new region or start city | When a state's regions are too coarse | Add it in `states.py`. Do not rename a region code that published places use |
+
+A state outside these nine also needs its outline added to `source/build/states.json`, an entry in `states.py`, and wider `maxBounds` in `initMap()`.
 
 ## 9. Changing the app
 
@@ -216,6 +226,7 @@ Do it in this order. A first pass needs only the required steps; say in section 
 ## 10. Known gaps
 
 - Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial, and none was moved.
+- Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have the base only: regions, start cities and fallback imagery. They have no law note in the app, and the last four have no places.
 - Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
 - Leads are missing for greater Boston, the South Shore, Cape Cod and Rhode Island.

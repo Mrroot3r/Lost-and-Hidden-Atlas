@@ -17,7 +17,9 @@ const PREC={exact:['Pin: exact','On the structure or marker itself, within about
 const ACC={public:'Public land or street',view:'View from the public way',ask:'Ask permission first',permit:'Permit required',boat:'On the water'};
 const EFF={drive:'Drive-up',walk:'Short walk',hike:'Hike',boat:'Boat or shore view'};
 const MY={'':'Not started',todo:'Want to scout',scouted:'Scouted online',asked:'Asked the owner',ok:'Have permission',visited:'Visited',filmed:'Filmed',skip:'Skip'};
-const REG={alb:'Albany',albco:'Albany County',troy:'Troy & Lansingburgh',renss:'Rensselaer County',conf:'Cohoes · Waterford · Watervliet',sch:'Schenectady',mohawk:'Mohawk Valley',sar:'Saratoga',hud:'Hudson Valley',cat:'Catskills',adk:'Lake George & Adirondacks',wash:'Upper Hudson & Washington Co.',mohw:'Mohawk Valley west',scho:'Schoharie, Otsego & Delaware',midh:'Mid-Hudson',berk:'Berkshires',pv:'Pioneer Valley',cmass:'Quabbin & central Massachusetts',worc:'Worcester & Blackstone Valley',bos:'Greater Boston & MetroWest',nshore:'North Shore & Merrimack Valley',south:'South Shore, South Coast & Cape Cod',vt:'Southern Vermont',ct:'Northwest Connecticut',riprov:'Providence, Blackstone Valley & western Rhode Island',ribay:'Narragansett Bay & Newport',risouth:'South County, Rhode Island'};
+/* states, their regions and start cities come from tools/states.py, so a new area needs no change here */
+const STATES=D.states||[], REG={}, REG_STATE={}, STATE={other:'this area'};
+STATES.forEach(st=>{ STATE[st.k]=st.name; st.regions.forEach(r=>{ REG[r[0]]=r[1]; REG_STATE[r[0]]=st.k; }); });
 const HOLLOW={gone:1,marker:1,water:1};
 const LOCAL=location.protocol==='file:';
 
@@ -132,7 +134,7 @@ function buildFilters(){
   const fb=$('#fbody'); fb.textContent='';
   fb.append(chipGroup("What's left to see",STS,F.st));
   fb.append(chipGroup('Kind of place',CAT,F.cat,true));
-  const reg=el('select',{id:'f-reg',onchange:e=>{F.reg=e.target.value;refresh();}},el('option',{value:'',text:'All regions'}),Object.keys(REG).map(k=>el('option',{value:k,text:REG[k]})));
+  const reg=el('select',{id:'f-reg',onchange:e=>{F.reg=e.target.value;refresh();}},el('option',{value:'',text:'All regions'}),STATES.map(st=>{ const used=st.regions.filter(r=>BASE.some(x=>x.reg===r[0])); return used.length?el('optgroup',{label:st.name},used.map(r=>el('option',{value:r[0],text:r[1]}))):null; }));
   reg.value=F.reg;
   const max=el('select',{id:'f-max',onchange:e=>{F.max=+e.target.value;refresh();}},[[0,'Any drive'],[15,'15 min or less'],[30,'30 min or less'],[45,'45 min or less'],[60,'1 hour or less'],[90,'1½ hours or less'],[120,'2 hours or less']].map(o=>el('option',{value:String(o[0]),text:o[1]})));
   max.value=String(F.max);
@@ -193,18 +195,15 @@ let FnLayer=null;
 const YEARS=['Latest','2025','2024','2023','2022','2021','2020','2018','2017','2016','2015','2014','2013','2012','2011','2010','2009','2008','2007','2006','2005','2004','2003','2002','2001','2000','napp'];
 const LIGHT={nw:['Sun from northwest',315,40,2],ne:['Sun from northeast',45,40,2],low:['Low evening sun',300,18,3],s:['Sun from south',180,35,2]};
 /* which state a map tile is in: New York's eastern border as [latitude, longitude] steps */
-const NYE=[[40.9,-73.66],[41.3,-73.55],[41.5,-73.53],[42.05,-73.487],[42.5,-73.35],[42.745,-73.265],[43.0,-73.27],[43.3,-73.255],[43.5,-73.25],[43.62,-73.3],[43.8,-73.37],[44.0,-73.41],[44.5,-73.33],[45.1,-73.34]];
-/* northern edge of Massachusetts as [longitude, latitude]; eastern edge of Rhode Island as [latitude, longitude] */
-const MAN=[[-73.265,42.745],[-72.46,42.727],[-71.294,42.697],[-71.255,42.736],[-71.186,42.79],[-71.116,42.812],[-71.031,42.859],[-70.93,42.885],[-70.6,42.875]];
-const RIE=[[41.3,-71.12],[41.6,-71.12],[41.68,-71.18],[41.72,-71.26],[41.78,-71.33],[41.9,-71.34],[42.012,-71.381]];
-function lerp(t,x){ if(x<=t[0][0]) return t[0][1]; for(let i=1;i<t.length;i++){ if(x<=t[i][0]){ const a=t[i-1],b=t[i]; return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]); } } return t[t.length-1][1]; }
+/* which state a point is in: point-in-polygon on simplified Census outlines (they include coastal water, so harbor islands count) */
+const OUTL=D.outlines||{}, regMemo=new Map();
+function inRing(r,x,y){ let ins=false; for(let i=0,n=r.length/2,j=n-1;i<n;j=i++){ const xi=r[2*i],yi=r[2*i+1],xj=r[2*j],yj=r[2*j+1]; if((yi>y)!==(yj>y)&&x<(xj-xi)*(y-yi)/(yj-yi)+xi) ins=!ins; } return ins; }
 function regionOf(lat,lon){
-  if(lon<=lerp(NYE,lat)) return 'ny';
-  if(lat>lerp(MAN,lon)) return lon<-72.5+(lat-42.7)*0.25?'vt':'nh';
-  if(lon<-71.8) return lat<42.04?(lat<41.45&&lon>-71.87?'ri':'ct'):'ma';
-  if(lat<42.012&&lon<lerp(RIE,lat)) return 'ri';
-  return 'ma'; }
-const STATE={ny:'New York',ma:'Massachusetts',vt:'Vermont',ct:'Connecticut',ri:'Rhode Island',nh:'New Hampshire'};
+  const key=lat.toFixed(3)+','+lon.toFixed(3); let v=regMemo.get(key); if(v) return v;
+  v='other'; for(const k in OUTL){ if(OUTL[k].some(r=>inRing(r,lon,lat))){ v=k; break; } }
+  if(v==='other'){ /* just off the edge of an outline: take the nearest state within about 3 km */
+    let best=0.0009; for(const k in OUTL) OUTL[k].forEach(r=>{ for(let i=0;i<r.length;i+=2){ const dx=(r[i]-lon)*0.74, dy=r[i+1]-lat, d=dx*dx+dy*dy; if(d<best){ best=d; v=k; } } }); }
+  if(regMemo.size>4000) regMemo.clear(); regMemo.set(key,v); return v; }
 function tileCenter(c){ const n=Math.pow(2,c.z); return [Math.atan(Math.sinh(Math.PI*(1-2*(c.y+0.5)/n)))*180/Math.PI,(c.x+0.5)/n*360-180]; }
 function exportUrl(base,c,extra){ const n=Math.pow(2,c.z),r=2*W/n,x0=-W+c.x*r,y1=W-c.y*r,px=PXQ();
   return base+'?bbox='+[x0,y1-r,x0+r,y1].map(v=>v.toFixed(2)).join(',')+'&bboxSR=3857&imageSR=3857&size='+px+','+px+'&format=jpg&f=image'+(extra||''); }
@@ -333,7 +332,7 @@ function initMap(){
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
-  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:7,zoomSnap:1,worldCopyJump:false,maxBounds:[[40.4,-76.6],[45.3,-69.4]],maxBoundsViscosity:0.6}).setView([42.82,-73.86],9);
+  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:7,zoomSnap:1,worldCopyJump:false,maxBounds:[[38.7,-81.0],[47.7,-66.5]],maxBoundsViscosity:0.6}).setView([42.82,-73.86],9);
   L.control.zoom({position:'bottomright'}).addTo(map);
   L.control.scale({position:'bottomleft',imperial:true,metric:true}).addTo(map);
   map.attributionControl.setPrefix(false);
@@ -919,7 +918,8 @@ function renderDetail(s){
   /* getting there */
   const times=el('div',{class:'times'});
   times.append(el('div',{class:'time home'},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+d.mi+' mi'));
-  if(s.dt) HUBS.forEach(h=>{ if(h.id!==U.home.id) times.append(el('div',{class:'time'},el('b',{text:fmtMin(s.dt[h.id][0])}),h.name)); });
+  /* the three nearest other start cities, not all of them */
+  if(s.dt) HUBS.filter(h=>h.id!==U.home.id&&s.dt[h.id]).sort((a,b)=>s.dt[a.id][0]-s.dt[b.id][0]).slice(0,3).forEach(h=>times.append(el('div',{class:'time'},el('b',{text:fmtMin(s.dt[h.id][0])}),h.name)));
   const gd='https://www.google.com/maps/dir/?api=1&origin='+H.lat+','+H.lon+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
   const cbtn=el('button',{class:'btn sm',type:'button'},'Copy'); cbtn.addEventListener('click',()=>copy(ll(p),cbtn));
   v.append(el('div',{class:'sec pad'},el('h3',{text:'Getting there'}),times,
@@ -1127,6 +1127,7 @@ function renderGuide(){
       'Railroads in use are private property with their own police. Stay off them, and out of tunnels.']),
     el('p',null,el('b',{text:'Massachusetts is different: '}),'the open-land rule above is New York law and does not carry over. Massachusetts treats entering or staying on land or in buildings after being forbidden, in person or by a posted notice, as criminal trespass (M.G.L. c. 266, §120). State parks and forests there are run by DCR, which has its own permit rules for commercial filming and drones. Read the current text before a Massachusetts trip.'),
     el('p',null,el('b',{text:'Rhode Island: '}),'the New York open-land rule does not carry over here either. Rhode Island makes it a crime to trespass willfully, or to stay on land with no legitimate purpose, after the owner or the owner\'s agent has forbidden it (R.I. Gen. Laws §11-44-26: up to a $1,000 fine, up to a year in jail, or both). State parks and management areas are run by DEM. Owner lookup and lot lines are not built for Rhode Island yet; ask the town assessor. Read the current text before a Rhode Island trip.'),
+    el('p',null,el('b',{text:'Other states: '}),'the rules differ again in '+STATES.filter(st=>!st.legal).map(st=>st.name).join(', ')+'. This guide has no note for them yet, so look up that state\'s trespass law before a trip there.'),
     el('p',null,el('b',{text:'Bright-line rules: '}),'No buildings without permission. Never cross a fence or pass a posted sign without permission. Never take anything. Carry nothing that looks like an entry tool. Leave as soon as you are asked.'),
     el('p',null,el('b',{text:'If someone approaches: '}),'stop filming if asked, explain honestly what you are doing, show ID, and leave by the shortest route. Show your permission letter and the owner\'s number if you have them. Do not run, hide, argue or lie.'),
     el('p',null,el('b',{text:'Asking: '}),'every place page has "Whose land is it?" with an owner lookup and a permission letter you can copy. Set the place to "Asked the owner" or "Have permission" under My notes to keep track.')]));
@@ -1197,7 +1198,8 @@ function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(
 /* ---------- wiring ---------- */
 function buildHome(){
   const h=$('#home'); h.textContent='';
-  HUBS.forEach(x=>h.append(el('option',{value:x.id,text:x.name})));
+  STATES.forEach(st=>{ const hs=HUBS.filter(x=>x.st===st.k); if(hs.length) h.append(el('optgroup',{label:st.name},hs.map(x=>el('option',{value:x.id,text:x.name})))); });
+  HUBS.filter(x=>!x.st).forEach(x=>h.append(el('option',{value:x.id,text:x.name})));
   if(U.home.id==='custom') h.append(el('option',{value:'custom',text:'My spot ('+U.home.lat.toFixed(3)+', '+U.home.lon.toFixed(3)+')'}));
   h.append(el('option',{value:'pick',text:'Pick a spot on the map…'}));
   h.value=U.home.id;
