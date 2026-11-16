@@ -15,7 +15,6 @@ Places someone read about while researching but did not add, with what is missin
 | Worcester streetcar substations and carhouses | Worcester County, MA | Wikipedia says several survive | Which ones, and where |
 | Mountain Mills | Whitingham, VT | Said to be a village drowned by Harriman Reservoir | A source |
 | Glass House / Rensselaer Glass Factory | Sand Lake, NY | Early glass works | A source and a coordinate |
-| Flight of Five Locks | Lockport, NY | Wikipedia: a five-step staircase lock that carried the Erie Canal over the Niagara Escarpment, since restored; the article's dates did not come through | Dates, what a visitor may walk, a coordinate |
 | Erie Beach amusement park | Fort Erie, Ontario | Recalled as lakeside ruins of an amusement park across from Buffalo; the Wikipedia article 'Erie Beach, Ontario' gave nothing usable | A source and a coordinate |
 | Niagara Gorge Railroad (Great Gorge Route) | Niagara Falls to Lewiston, NY | Wikipedia: a trolley line at water level in the gorge, 1895 until a rock slide on September 17, 1935; Devil's Hole and Whirlpool state parks have a trail along the gorge bottom | A source that says the trail is on the old trolley bed, and what remains |
 | Great Northern Elevator | Buffalo, NY | Wikipedia: world's largest elevator when finished in 1897; a wall fell in the windstorm of December 11, 2021; demolished September 2022 to May 2023 | Nothing left to find; add only as `gone` if a series wants it |
@@ -31,6 +30,10 @@ Places someone read about while researching but did not add, with what is missin
 | Chenango Canal Summit Level | Bouckville, NY | A National Register listing in Madison County; the Wikipedia title redirects to the general Chenango Canal article (canal ran 1834 to 1878, Utica to Binghamton) | A source for what survives at the summit level and where to walk it |
 | Erie Canal Village | Rome, NY | Recalled as a closed museum village on the old canal | A source and a coordinate |
 | Black River Canal Warehouse | Boonville, NY | A National Register listing; not read | A source; pairs with the Five Lock Combine entry |
+| Pan-American Exposition grounds | Buffalo, NY | Wikipedia: world's fair of May to November 1901; President McKinley was shot at its Temple of Music on September 6, 1901 | A source for what survives of the fair and where the marker for the shooting stands |
+| Lackawanna Steel (Bethlehem Steel) plant | Lackawanna, NY | Wikipedia: an independent company from 1840 to 1922, then part of Bethlehem Steel until 1983; once the world's second-largest steel company | A source for what stands today and what can be seen from public roads |
+| Wollenberg Grain and Seed Elevator | Buffalo, NY | Wikipedia: the last wooden 'country style' elevator, 1912, burned October 2006 | Nothing left to find; add only as `gone` |
+| Date of the Lockport Flight of Five | Lockport, NY | The Lockport entry gives 1859 for the older set of locks from one article; the Flight of Five article's own dates did not come through | A source that dates the five-step staircase and its restoration |
 | Mount Hope Furnace | Fort Ann, NY | Iron furnace | A source and a coordinate |
 | Sam's Point berry-picker shacks | Cragsmoor, NY | Said to stand along the old road | A source |
 | Dungeon Rock | Lynn, MA | In Lynn Woods Reservation; the article read says only that it became a tourist attraction in the 1850s | A source for the tunnel's story and whether it is open; a coordinate |
