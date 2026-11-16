@@ -1,7 +1,7 @@
 import json,csv,html,os
 R=os.environ.get('ATLAS','/home/claude/atlas').rstrip('/')+'/'
 S=json.load(open(R+'build/sites.json'))
-CAT={'amuse':'Amusement & trolley parks','hotel':'Hotels & resorts','canal':'Canal works','rail':'Rail, trolley & bridges','industry':'Mills, iron, brick & ice','burial':'Burial grounds','town':'Ghost & drowned towns','civic':'Downtown losses','fort':'Forts & depots','water':'Water works & buried creeks','inst':'Estates, institutions & parks','light':'Lighthouses','landmark':'Standing landmarks'}
+CAT={'amuse':'Amusement & trolley parks','hotel':'Hotels & resorts','canal':'Canal works','rail':'Rail, trolley & bridges','industry':'Mills, iron, brick & ice','burial':'Burial grounds','town':'Ghost & drowned towns','civic':'Downtown losses','fort':'Forts & depots','water':'Water works & buried creeks','inst':'Estates, institutions & parks','light':'Lighthouses','landmark':'Standing landmarks','lidar':'LiDAR find, unverified'}
 ST={'ruins':'Ruins','traces':'Traces','standing':'Standing','marker':'Marker only','gone':'Nothing visible','water':'Under water'}
 PREC={'exact':'Exact','site':'On site','area':'Approximate'}
 ACC={'public':'Public land or street','view':'View from the public way','ask':'Ask permission first','permit':'Permit required','boat':'On the water'}

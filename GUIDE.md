@@ -122,7 +122,7 @@ N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
 |---|---|
 | `id` | Unique lowercase slug with hyphens. Ids are shared across every state, and common names repeat (`queens-fort` exists in New York), so give a new place a town or state suffix when in doubt: `queens-fort-exeter`. **Never rename a published id**: saved notes are keyed to it |
 | `reg` | Region code from `tools/states.py`. Every Northeast state already has regions; pick the one the place is in. `check.py` fails if the pin is not inside that region's state |
-| `cat` | `amuse` `hotel` `canal` `rail` `industry` `burial` `town` `civic` `fort` `water` `inst` `light` `landmark` |
+| `cat` | `amuse` `hotel` `canal` `rail` `industry` `burial` `town` `civic` `fort` `water` `inst` `light` `landmark`, and `lidar` for a place found on LiDAR that nobody has written up (section 13; always `conf='lead'` until someone has stood on it) |
 | `st` | What is left: `ruins` `traces` (grades, piers, earthworks) `standing` `marker` `gone` `water` (drowned) |
 | `prec` | `exact` (on the structure, about 30 m) · `site` (inside the footprint, about 150 m) · `area` (right vicinity only, about 500 m) |
 | `acc` | `public` · `view` (see it from a public way) · `ask` (private, permission needed) · `permit` · `boat` |
@@ -215,6 +215,22 @@ Beyond adding places, these make a state better. Do them when asked, or note in 
 | Owner lookup and lot lines | Can wait | Add to `lookup()` and `drawLots()` if the state publishes parcels with owner names |
 | A new region or start city | When a state's regions are too coarse | Add it in `states.py`. Do not rename a region code that published places use |
 
+### Starting a new chat from nothing
+
+A new session knows nothing about this project. With the repository attached, this prompt is enough to go from an empty area to documented pins in a pull request:
+
+```
+Read CLAUDE.md and GUIDE.md in the Lost-and-Hidden-Atlas repository, then add a batch of places for
+<city, county or region, and state>. Follow GUIDE.md sections 3 to 6 exactly: build the workspace with
+setup.sh, find candidates from list pages, read a source for every fact, write one data_<area>.py batch,
+look at every pin with pincheck.py and say in each pin note what the aerial showed, cut old maps, run
+all.sh, check.py and the smoke test, add what you could not source to LEADS.md, and open a pull request
+that says what you verified and what you could not. Do not push to main or merge. Aim for <N> places,
+ruins and traces first. If the state has no law note in the app, say so in the pull request.
+```
+
+Name the area and a number; everything else is in the guide. If the area is a city the Atlas has no start city for, the session should add one to `tools/states.py` (the table above).
+
 A state outside these nine also needs its outline added to `source/build/states.json`, an entry in `states.py`, and wider `maxBounds` in `initMap()`.
 
 ## 9. Changing the app
@@ -233,6 +249,7 @@ A state outside these nine also needs its outline added to `source/build/states.
 - Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial, and none was moved.
 - Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have regions, start cities, fallback imagery and a first handful of places each, but no law note in the app. Read the state's trespass statute and add the note before sending anyone far off a marked trail there.
 - The "Ruins in the woods" batch (November 2026) has no trailhead coordinates: access notes name the road or lot. Most of its pins sit under tree cover and could not be confirmed on an aerial; `tools/pincheck.py` had no leaf-off imagery outside New York. Its Pennsylvania and Maine entries were written from one Wikipedia article each.
+- The LiDAR tools (section 13) work in New York only, were tried on one wildlife area, and are tuned for 1:62,500 sheets and cellar-hole-sized pits. Stone walls, mill races and charcoal hearths are not detected. The four `lidar` places have not been visited.
 - Pins taken from OpenStreetMap through Nominatim (`tools/nom.py`) are a named mapped feature, which is usually closer than an article coordinate, but for a tunnel or a long path the point is the middle of the line.
 - Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
@@ -303,3 +320,37 @@ cd android && ./gradlew assembleDebug        # app/build/outputs/apk/debug/app-d
 
 **Keep it small.** No analytics, no accounts, no extra permissions. The app asks for location, notifications (for the recording notice), exemption from battery optimisation, and read access to photos and videos (asked only when the user taps "Find photos and video"), and nothing else.
 
+## 13. Finding places nobody has written up (LiDAR)
+
+Old farm country that the state reforested is full of cellar holes that appear in no article. They can be found from a desk. The method below found the first four `lidar` places in Partridge Run, Berne, in November 2026. It is New York only for now: `tools/lidar_dem.py` reads the state's "Latest_DEM" ground model, and other states need their own elevation service added there.
+
+**What does not work:** scanning LiDAR for pits alone. In the first trial that gave 326 pits in one wildlife area, nearly all tree-throw hollows, stream pockets, or noise under dense conifers, and the best-looking one had no house on any map. **What works:** start from the buildings drawn on an old survey sheet, then look at LiDAR and the aerial at each.
+
+1. **Pick a unit of public land** that was farmland: `python3 tools/lidar_unit.py "Partridge Run"` lists matching units; add the exact name and `save` to write its outline.
+2. **Scan it for pits:** `python3 tools/lidar_scan.py research/lidar/unit_X.json research/lidar/x`. About one request per square kilometre; tiles are cached.
+3. **Get an old sheet:** `python3 tools/lidar_sheet.py maps <lat> <lon>` lists the historic USGS sheets over a point; `get <url>` downloads one. Use the oldest 1:62,500 sheet (often 1890 to 1905) to find buildings, and a 1940s 1:24,000 sheet to see which were gone by then.
+4. **Find the buildings:** `python3 tools/lidar_buildings.py research/lidar/unit_X.json research/lidar/x cache/topo/<old sheet>.tif` lists every building symbol inside the unit and any pit within 90 m.
+5. **Look:** `python3 tools/lidar_sheet.py sheet out.jpg 70 <old.tif>,<1940s.tif> "label,lat,lon" …` draws LiDAR, the leaf-off aerial and both maps side by side for each spot. Open the image and judge each row yourself.
+6. **Check the parcel for every find:** `python3 tools/parcel.py <lat> <lon>`. This is not optional. Public land is a patchwork with private lots inside and beside it, and an outline simplified to speed up a scan will swallow some of them: the best find of the first trial was reported as state land and turned out to be on a private 60-acre lot.
+
+**What counts as a find.** All four of: a sharp-edged pit, platform or wall on LiDAR; a building at that spot on an old map; nothing standing on the leaf-off aerial (one strong LiDAR pattern in the trial was an occupied house); and a parcel record. Then say how sure you are. Old 15-minute sheets can be 50 to 100 m off, and a pit can be a borrow pit, a spring box or a pond dam.
+
+**Writing it up.** `cat='lidar'`, `st='traces'`, `conf='lead'`, in a `data_*.py` batch like any other place (`data_lidar.py` is the model). The story says only what the maps show. `look` says what the LiDAR and the aerial show and that nobody has checked it on the ground. `accn` gives the parcel result: state land by name, or "PRIVATE LAND" with `acc='ask'`. Never write a private owner's name or address into the repository; the app's owner lookup shows it to the person standing there. The pin note says whether the pin is the pit itself or the old map's symbol.
+
+When the owner visits one and reports back, change `conf`, `st` and `look` to what was found, and move it to the category it really belongs in if it turns out to be more than a cellar hole.
+
+## 14. Reviewing a pull request
+
+Cheaper models add common places in bulk; a stronger model or a person reviews before the owner merges. A review answers one question: is every new entry true, honestly pinned and legal to visit as written?
+
+To ask a Claude session to do it, attach the repository and say: *"Review pull request #N in Lost-and-Hidden-Atlas following GUIDE.md section 14. Do not merge."*
+
+1. Check out the pull request's branch and run `python3 source/tools/review.py . origin/main`. It lists every place added or changed, with its sources, and flags the usual trouble spots. A removed or renamed id is a blocker.
+2. Run `python3 source/tools/check.py .`; GitHub's own check must be green too.
+3. **Open the sources.** For every new place if there are up to about 20; otherwise for every flagged entry plus a random third of the rest. Read the linked page (`tools/wiki_raw.py` for Wikipedia) and compare each date, name, number and "what remains" claim with it. Wrong, unsupported, or copied sentences get listed by place id.
+4. **Look at the pins.** Rebuild the workspace from the branch (`setup.sh`) and run `tools/pincheck.py --batch <key>`. Compare each tile with the pin note. An `exact` pin with no visible structure, or a pin in the wrong town, gets listed.
+5. **Check access claims.** `review.py` flags `public` places that the public-land map does not confirm. For New York, `tools/parcel.py` settles it. An entry that tells the reader how to get past a barrier is a blocker.
+6. **Report as a comment on the pull request**, not as commits to someone else's branch: a short verdict (ready, ready with fixes, or not ready), then findings by place id with the source line that contradicts the entry, then what you could not check. If asked to fix as well, push fixes as separate commits and say so.
+7. Do not merge. The owner merges.
+
+GitHub can also start a review without opening a chat: Anthropic's Claude GitHub app answers a `@claude review` comment on a pull request once it is installed for the repository. That gives a code review; for place data it needs to be pointed at this section.
