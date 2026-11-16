@@ -16,7 +16,7 @@ Rows: [lat, lon, type, name, MRDS deposit id, commodity, 'P' past producer | 'S'
 The record for a point is at https://mrdata.usgs.gov/mrds/show-mrds.php?dep_id=<id>."""
 import zipfile,csv,io,json,os,re,sys
 from collections import Counter
-STATES={'New York':'ny','Massachusetts':'ma','Vermont':'vt','Connecticut':'ct','New Hampshire':'nh','New Jersey':'nj','Pennsylvania':'pa','Rhode Island':'ri','Maine':'me'}
+STATES={'New York':'ny','Massachusetts':'ma','Vermont':'vt','Connecticut':'ct','New Hampshire':'nh','New Jersey':'nj','Pennsylvania':'pa','Rhode Island':'ri','Maine':'me','Missouri':'mo','Kansas':'ks'}
 TYPES=['Old iron mine','Old quarry','Old clay pit','Old mine or prospect']
 QUARRY=re.compile(r'stone|limestone|granite|marble|slate|sandstone|dolomite|dimension|trap|quartzite|cement|lime\b|gypsum',re.I)
 SRC='cache/mrds/mrds-csv.zip'
