@@ -75,14 +75,14 @@ const byId=id=>sites().find(s=>s.id===id);
 const pos=s=>{ const m=U.moved[s.id]; return m?{lat:m[0],lon:m[1]}:{lat:s.lat,lon:s.lon}; };
 const dest=s=>s.th?{lat:s.th[0],lon:s.th[1]}:pos(s);
 function homeObj(){ if(U.home.id==='custom') return {id:'custom',name:U.home.name||'My spot',lat:U.home.lat,lon:U.home.lon}; return HUBS.find(h=>h.id===U.home.id)||HUBS[0]; }
-const MAXB=[[35.7,-96.0],[47.7,-66.5]];
+const MAXB=[[17.5,-170.0],[72.0,-50.0]];
 const inMap=(la,lo)=>la>=MAXB[0][0]&&la<=MAXB[1][0]&&lo>=MAXB[0][1]&&lo<=MAXB[1][1];
 /* Until a start place is chosen by hand, it follows the nearest start city to where the reader is (or last was). */
 function nearHome(ll,say){ if(!ll||U.home.by===1||U.home.id==='custom') return false; let b=null,bd=1e9; HUBS.forEach(h=>{ const d=hav(ll[0],ll[1],h.lat,h.lon); if(d<bd){ bd=d; b=h; } });
   if(!b||bd>300||b.id===U.home.id) return false; U.home={id:b.id,by:2}; save();
   if(say){ buildHome(); drawHome(); refresh(); banner('Drive times now count from '+b.name+', the nearest start city. Change it under the gear in Map options.',false,7000); } return true; }
 function startView(){ const v=U.ui.view, H=homeObj();
-  if(pref('start')!=='home'&&v&&inMap(v[0],v[1])) return {c:[v[0],v[1]],z:Math.max(5,Math.min(20,v[2]||9))};
+  if(pref('start')!=='home'&&v&&inMap(v[0],v[1])) return {c:[v[0],v[1]],z:Math.max(3,Math.min(20,v[2]||9))};
   if(H.id==='alb') return {c:[42.82,-73.86],z:9}; return {c:[H.lat,H.lon],z:H.id==='custom'?11:10}; }
 function setSpot(la,lo,name){ U.home={id:'custom',lat:+(+la).toFixed(5),lon:+(+lo).toFixed(5),by:1}; if(name) U.home.name=String(name).slice(0,60); save(); buildHome(); drawHome(); refresh(); banner('Working out drive times from '+(name||'your spot')+'…',false);
   fetchDT().then(ok=>{ banner(ok?'Drive times updated from '+(name||'your spot')+'.':'Could not reach the routing service, so times are rough estimates (marked ~).',!ok,5000); refresh(); }); }
@@ -110,7 +110,7 @@ async function fetchDT(){
       const coords=[H].concat(ch.map(dest)).map(p=>p.lon.toFixed(5)+','+p.lat.toFixed(5)).join(';');
       const r=await fetch('https://router.project-osrm.org/table/v1/driving/'+coords+'?sources=0&annotations=duration,distance');
       const j=await r.json(); if(j.code!=='Ok') throw new Error('route');
-      ch.forEach((s,i)=>{ t[s.id]=[Math.round(j.durations[0][i+1]/60),Math.round(j.distances[0][i+1]/160.934)/10]; });
+      ch.forEach((s,i)=>{ const du=j.durations[0][i+1], di=j.distances[0][i+1]; if(du!=null&&di!=null) t[s.id]=[Math.round(du/60),Math.round(di/160.934)/10]; });   /* no road (an island): leave it to the rough estimate */
     }
     U.dtc={key:key,t:t}; save(); return true;
   }catch(e){ return false; }
@@ -365,7 +365,7 @@ function initMap(){
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
-  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:5,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); map.setView(sv.c,sv.z); }
+  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:3,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); map.setView(sv.c,sv.z); }
   L.control.zoom({position:'bottomright'}).addTo(map);
   drawScale();
   map.attributionControl.setPrefix(false);
@@ -1438,7 +1438,7 @@ function renderGuide(){
       'Railroads in use are private property with their own police. Stay off them, and out of tunnels.']),
     el('p',null,el('b',{text:'Massachusetts is different: '}),'the open-land rule above is New York law and does not carry over. Massachusetts treats entering or staying on land or in buildings after being forbidden, in person or by a posted notice, as criminal trespass (M.G.L. c. 266, §120). State parks and forests there are run by DCR, which has its own permit rules for commercial filming and drones. Read the current text before a Massachusetts trip.'),
     el('p',null,el('b',{text:'Rhode Island: '}),'the New York open-land rule does not carry over here either. Rhode Island makes it a crime to trespass willfully, or to stay on land with no legitimate purpose, after the owner or the owner\'s agent has forbidden it (R.I. Gen. Laws §11-44-26: up to a $1,000 fine, up to a year in jail, or both). State parks and management areas are run by DEM. Owner lookup and lot lines are not built for Rhode Island yet; ask the town assessor. Read the current text before a Rhode Island trip.'),
-    el('p',null,el('b',{text:'Other states: '}),'the rules differ again in '+STATES.filter(st=>!st.legal).map(st=>st.name).join(', ')+'. This guide has no note for them yet, so look up that state\'s trespass law before a trip there.'),
+    el('p',null,el('b',{text:'Everywhere else: '}),'the rules differ again in every other state and in each Canadian province. This guide has notes only for '+STATES.filter(st=>st.legal).map(st=>st.name).join(', ')+', so look up the trespass law of the state or province before a trip there.'),
     el('p',null,el('b',{text:'Bright-line rules: '}),'No buildings without permission. Never cross a fence or pass a posted sign without permission. Never take anything. Carry nothing that looks like an entry tool. Leave as soon as you are asked.'),
     el('p',null,el('b',{text:'If someone approaches: '}),'stop filming if asked, explain honestly what you are doing, show ID, and leave by the shortest route. Show your permission letter and the owner\'s number if you have them. Do not run, hide, argue or lie.'),
     el('p',null,el('b',{text:'Asking: '}),'every place page has "Whose land is it?" with an owner lookup and a permission letter you can copy. Set the place to "Asked the owner" or "Have permission" under My notes to keep track.')]));
@@ -1473,7 +1473,7 @@ function renderGuide(){
     el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>{ openSheet(); showSettings(true); }},'Open settings'))]));
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),
-    P('Drive times from Albany, Schenectady, Troy and Saratoga Springs were calculated by road with no traffic, so add a little. Pick your own start point from "Drive times from."'),
+    P('Drive times from the listed start cities were calculated by road with no traffic, so add a little. A place more than about 450 miles from your start city, or with no road to it, shows a rough estimate marked ~. Pick your own start point from "Drive times from."'),
     P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
     P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));

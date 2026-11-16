@@ -49,4 +49,17 @@ Places someone read about while researching but did not add, with what is missin
 | Camp Lake of the Woods and Camp Hope lodges | Swope Park, Kansas City, MO | KC Parks master plan and Flatland: former segregated summer camps; Hope Lodge stands empty | A source for dates and access; a coordinate |
 | Thomas J. Pendergast headquarters | 1908 Main St, Kansas City, MO | Wikipedia (Tom Pendergast): the political boss ruled from this two-story building; on the Kansas City register | A source on its present use; a pin check |
 | WILLIAM S. MITCHELL dredge | Missouri River, Kansas City, MO | National Register list: destroyed in the 1993 flood | Whether any wreckage remains |
-| Quindaro ruins | Kansas City, Kansas | Limestone ruins of an 1850s Underground Railroad town; trail reported closed except on booked tours | A Kansas region in `states.py` first; a source on current legal access |
+| Independence Mines | Hatcher Pass, Alaska | Wikipedia: second-largest hard-rock gold mine in the state, worked 1934–1943 and 1948–1950, now a state historical park | What stands today, hours and road season, a pin check |
+| Fort DuPont | Delaware City, DE | Wikipedia: river fort of 1900–1942, part of it a state park since 1992 | Which batteries are open to walk; a pin |
+| Kaniakapūpū | Nuʻuanu, Oahu, HI | Wikipedia: ruins of Kamehameha III's summer palace; officially off-limits, trespassers cited | Do not add unless the state opens it |
+| Fort Atkinson State Preserve | Fort Atkinson, IA | Wikipedia: remnants of an 1840 Army post, a state preserve | What remains, hours, a pin check |
+| Fort Macomb | New Orleans, LA | Wikipedia: brick fort of 1822 on Chef Menteur Pass beside Venetian Isles | Whether it can be seen from a public place; it is not open |
+| Garnet | Granite County, MT | Wikipedia: 1890s mining town, preserved buildings open to visitors, Bureau of Land Management | Road season, fees, a pin check |
+| Lost Cove | Yancey County, NC | Wikipedia: ghost town above the Nolichucky, last family left 1957, fires in 2007, reached only on foot | Who owns the land now and which trail is legal; what survived the fires |
+| Old Sheldon Church ruins | Beaufort County, SC | Wikipedia: church of 1745–53, twice ruined; the article notes limits on use since 2015 | Whether visitors may still walk in or only look from the fence |
+| Kay Moor | Fayetteville, WV | Wikipedia: abandoned mine, coal plant and town in the New River Gorge | National Park Service trail and stair details; a pin for each level |
+| Miner's Delight | Fremont County, WY | Wikipedia: gold camp of 1868, a few buildings standing, lived in until 1960 | Who manages it and the road in |
+| Banning quarry | Banning State Park, MN | Wikipedia mentions only "the remains of a historic quarry" | A source for the quarry's history and the trail to it |
+| Badger Army Ammunition Plant | Sauk County, WI | Wikipedia: wartime powder works, in the last stage of demolition by 2013 | What, if anything, is left and open |
+| Claybank Brick Plant | Claybank, Saskatchewan | Wikipedia: brick plant of 1914–1989, a national historic site | Hours and what a visitor may enter; would be Saskatchewan's first place |
+| Sweetwater Creek mill ruins, exact spot | Lithia Springs, GA | Added as `new-manchester-mill` with the pin on the park | The coordinate of the ruins themselves (OpenStreetMap or a trail map) |

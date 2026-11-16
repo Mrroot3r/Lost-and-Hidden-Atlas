@@ -4,7 +4,7 @@ This is the handoff guide. It tells a new contributor, human or AI model, what t
 
 ## 1. What the Atlas is
 
-A phone-first map tool for finding lost buildings, ruins and abandoned sites, made for a YouTube creator who explores them on foot. It began around Albany, New York and now covers upstate New York and Massachusetts, with a first pass at Rhode Island. The plan is to grow across the Northeast. Kansas City, Missouri has a first batch too, the first area outside the Northeast.
+A phone-first map tool for finding lost buildings, ruins and abandoned sites, made for a YouTube creator who explores them on foot. It began around Albany, New York and is deepest in upstate New York, Massachusetts and Rhode Island, with a batch for Kansas City, Missouri. Since November 2026 every US state and seven Canadian provinces hold at least one place, and every state and province has an outline, a region and a start city, so work can begin anywhere without setup.
 
 Live site: https://mrroot3r.github.io/Lost-and-Hidden-Atlas/
 
@@ -161,7 +161,7 @@ These are what keep the Atlas trustworthy. They are not optional.
 2. **Read each article:** `python3 tools/wiki_raw.py "Exact title" …` prints its coordinates and opening text; add `-g 'closed|demol|remain|ruin'` to pull only the sentences about what happened and what is left. Other sources that have worked: state park and land-trust pages (access, trail maps), National Park Service pages, town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places, and `python3 tools/nom.py "name, town, state"` for a ruin, trail feature or building that someone has mapped in OpenStreetMap.
 3. **Write the entries** in a new `data_<area>.py` with its `BATCH`, `PLACES` and `PIN_NOTES`.
 4. **Build the list:** `python3 tools/build_sites.py`. It stops on a duplicate id or a missing pin note.
-5. **Check every pin:** `python3 tools/pincheck.py --batch <key>` writes contact sheets to `research/`: one 300 m aerial square per pin with a 30 m ring. Look at every tile. Fix what you can see, downgrade what you cannot, and record in the pin note what the aerial showed.
+5. **Check every pin:** `python3 tools/pincheck.py --batch <key>` writes contact sheets to `research/`: one 300 m aerial square per pin with a 30 m ring. Look at every tile. Fix what you can see, downgrade what you cannot, and record in the pin note what the aerial showed. When the ring is off the structure, `python3 tools/look.py out.jpg label,lat,lon,300` draws a wider view with a grid so you can read off where the structure is, and `python3 tools/pad.py label,lat,lon` tells you which public-land unit a point is in (US only). A managing agency's page that the fetch tool refuses can usually be read with `python3 tools/page.py <url>`, which prints the sentences about hours, fees, trails and closures.
 6. **Cut old maps** for the new ids with `topo_all.py`, then run `all.sh`.
 7. **Test:** the smoke test with one of the new place ids, then open a few new places in a browser at phone size.
 8. **Publish** as a pull request (section 3). List in it anything you could not verify.
@@ -195,7 +195,7 @@ in the format below, plus one pin-note line. Rules:
 
 ## 8. Opening a new state or area
 
-The base is already in place for all nine Northeast states: New York, Massachusetts, Rhode Island, Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania. For each, `tools/states.py` lists its regions and start cities (the capital and the main cities), the map covers it, state detection works, and satellite imagery and a world hillshade load as a fallback. **To start work in any of them, you only add a batch of places** (section 6) using that state's region codes.
+The base is already in place for every US state, the District of Columbia and the ten Canadian provinces. For each, `tools/states.py` lists its regions and start cities (the capital and the main cities), the map covers it, state detection works, and satellite imagery and a world hillshade load as a fallback. **To start work in any of them, you only add a batch of places** (section 6) using that state's region codes.
 
 | State | Places so far | Leaf-off and LiDAR | Owner lookup | Law note in the app |
 |---|---|---|---|---|
@@ -206,6 +206,9 @@ The base is already in place for all nine Northeast states: New York, Massachuse
 | Connecticut | Five | Fallback only | No | No |
 | New Hampshire, Maine, New Jersey, Pennsylvania | A first handful each, all woods ruins on public or preserve land (the "Ruins in the woods" batch) | Fallback only | No | No |
 | Missouri | Kansas City only (region `kcmo`, start city Kansas City), first batch November 2026 | Fallback only | No | No |
+| The other 40 states | One place each, in `data_states.py` ("A first place in every state"). Each has one statewide region whose code is the state's two letters (`tx`, `ca`) and one or two start cities | Fallback only | No | No |
+| Ontario, Quebec, New Brunswick, Nova Scotia, Manitoba, Alberta, British Columbia | One place each, in the same batch. Region code is the province's two letters (`on`, `qc`) | Fallback only. No USGS old maps and no public-land lookup in Canada | No | No |
+| District of Columbia, Prince Edward Island, Newfoundland and Labrador, Saskatchewan | None yet. Outline, region and start city are ready | Fallback only | No | No |
 
 Beyond adding places, these make a state better. Do them when asked, or note in section 10 that they are still open.
 
@@ -216,7 +219,7 @@ Beyond adding places, these make a state better. Do them when asked, or note in 
 | Rail and canal lines | Can wait | Widen the box in `lines.py`, add the state's old lines, rebuild `lines.json` |
 | Leads | Can wait | Overpass download for the state |
 | Owner lookup and lot lines | Can wait | Add to `lookup()` and `drawLots()` if the state publishes parcels with owner names |
-| A new region or start city | When a state's regions are too coarse | Add it in `states.py`. Do not rename a region code that published places use |
+| A new region or start city | When a state's regions are too coarse, or its one statewide region holds more than a few dozen places | Add it in `states.py`: for example `('txw','West Texas')` beside the statewide `('tx','Texas')`. Leave the statewide code in place for the places already using it; never rename a region code that published places use. Check a new start city's coordinate with a geocoder, not from memory |
 
 ### Starting a new chat from nothing
 
@@ -234,19 +237,23 @@ ruins and traces first.
 
 Name the area and a number; everything else is in the guide. If the area is a city the Atlas has no start city for, the session should add one to `tools/states.py` (the table above).
 
-### A state outside the Northeast
+### A province, territory or country that is not listed yet
 
-Missouri (Kansas City) was added this way in November 2026. A new state needs five things besides its batch of places, all in the same pull request:
+Every US state and Canadian province was set up this way in November 2026, so this is only needed for somewhere new (a Canadian territory, Mexico, Puerto Rico). It needs five things besides its batch of places, all in the same pull request:
 
-1. **Outline.** Add the state to `source/build/states.json` under its two-letter key. The outline is the Census 1:20,000,000 cartographic boundary file (`cb_2023_us_state_20m`, from www2.census.gov), simplified with shapely to 0.01 degrees and stored like the others: one closed ring as a flat list `[lon, lat, lon, lat, …]`. State detection (which imagery and which law note apply) reads this file.
+1. **Outline.** `python3 tools/outlines.py <key>` writes it into `build/states.json` (needs `pip install pyshp shapely`). It reads the Census 1:20,000,000 state file for the US and Natural Earth 1:10,000,000 for Canada, pushes the shape out about 3 km so that pins on a shore or a near island still fall inside, cuts away every neighbour's land, simplifies it, and stores each ring closed as a flat list `[lon, lat, lon, lat, …]`. For another country, add its source to `load()` in that file. State detection (which imagery and which law note apply) and `check.py` read these outlines; nothing draws them, so they are coarse. Outlines already in the file are left alone unless you name their key.
 2. **Entry in `tools/states.py`:** key, name, `imagery` (say "fallback" unless you add state services), `owners`, `legal: False`, its region codes, and at least one start city (`hubs`) with coordinates. The build works out drive times from every start city.
-3. **Map limits.** `MAXB` near the top of `source/src/app.js` is the box the map can be moved inside, as `[[south, west], [north, east]]`. Widen it to hold the new state with a margin. If you skip this the new pins exist but the map springs back before reaching them. `minZoom` is 5, which shows the whole box on a phone.
+3. **Map limits.** `MAXB` near the top of `source/src/app.js` is the box the map can be moved inside, as `[[south, west], [north, east]]`. It now runs from 17.5° N to 72° N and from 170° W to 50° W, which holds Hawaii, Alaska and Newfoundland. Widen it only for somewhere outside that. If a pin is outside the box, `check.py` fails and the map springs back before reaching it. `minZoom` is 3, which shows the whole box on a phone.
 4. **`tools/pincheck.py`** picks an aerial service by a rough box per state. Anything outside those boxes falls back to Esri satellite. If you add state imagery, add its box; check that the New York box (it once swallowed everything west of New York) does not cover the new state.
 5. **Known gaps.** Write in section 10 what the state does not have yet (state imagery, owner lookup, lines, leads).
 
 **The live site and the installed app do not show any of this until the pull request is merged.** The Android app carries its own copy of `app.js`, so a change to the map limits or settings reaches the phone only with the next app build (the pull request's `app` check publishes a test build; the merge publishes the release). New places alone arrive through the app's data refresh without a new build.
 
 **Where the map opens.** Nobody has to pick a start city for a far-away area. The map reopens where it was last left, and until the reader chooses a start place by hand, drive times count from the start city nearest to their location (or last known location). A reader whose device has no location (a desktop with location turned off) can choose a start city, pick a spot on the map, or type a town, address, ZIP code or coordinates under the gear in Map options. Typed names are looked up with OpenStreetMap's Nominatim; typed coordinates are not sent anywhere.
+
+**Drive times.** `tools/drive.py` gives each place a drive time only from the start cities within 450 miles in a straight line. Beyond that, and where no road joins the two (Hawaii's other islands from Honolulu), the app shows its own rough estimate marked `~`. Adding a start city to `states.py` is enough; the next build works out its times.
+
+**Canada.** The app, the pin check, the place lookup (`tools/nom.py`) and drive times work the same there. Three things do not exist for it: USGS old maps (`topo_all.py` prints `no map`, which is expected), the PAD-US public-land lookup (so a Canadian place never shows a land line; say who manages the land in the access note), and any law note.
 
 **Old-map crops.** `tools/topo_all.py` cuts a crop for every new place except those in the `landmark` category, which it skips on purpose (a standing landmark is on the current map). If a `landmark` place is really a trace on the ground, such as trail ruts, and an old map would help, give it a more specific category or pass its id after removing the skip for that run; do not report the missing crop as a failure.
 
@@ -273,6 +280,9 @@ Missouri (Kansas City) was added this way in November 2026. A new state needs fi
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
 - Leads are missing for greater Boston, the South Shore, Cape Cod, Rhode Island and Missouri.
 - The start-place changes of November 2026 (map reopens where it was left, nearest start city chosen from location, typed start place) were tested in a desktop browser at phone size only, not on a phone or in the Android app. The typed lookup depends on OpenStreetMap's public Nominatim service, which is for light use.
+- The "A first place in every state" batch (November 2026, `data_states.py`) is one place for each of 40 states and 7 provinces, meant as a worked example per state, not coverage. Each was written from one Wikipedia article plus, for most, the managing agency's own page; 17 have Wikipedia as their only source, which the links on each place make plain. Agency pages that would not open from the cloud session are named as such in the entry (Florida State Parks). Pins were looked at on Esri satellite only; about a third sit under tree cover and could not be confirmed, and the pin notes say which. `new-manchester-mill` marks the park and not the ruins. `daniels-md`, `spokane-sd` and `piedmont-charcoal-kilns` are `mixed` because access or a count is unsettled. Only two have a trailhead coordinate.
+- Canada has no old-map crops, no public-land status and no law note. Hawaii's only start city is Honolulu, so a place on another island shows a rough drive estimate that means little.
+- State and province outlines added in November 2026 are coarse (simplified to roughly 1 to 5 km) and pushed about 3 km out to sea. A pin within a kilometre or two of a state line can be read as the neighbouring state; `check.py` will say so. If the coordinate is right, remake that outline more finely with `outlines.py` (lower its tolerance) before changing the pin.
 - Missouri (Kansas City) is a first pass: no law note in the app, no state leaf-off or LiDAR, no owner lookup, no rail lines. Pins were checked on Esri satellite only. Old-map crops are cut for every new place except `landmark` ones (section 8).
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
