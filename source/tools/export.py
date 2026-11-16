@@ -12,7 +12,7 @@ with open(R+'dist/lost-hidden-atlas-places.csv','w',newline='',encoding='utf-8-s
     TM=json.load(open(R+'build/topo/meta.json'))
     for s in S:
         th=s.get('th') or ['','']
-        w.writerow([s['name'],s['town'],s.get('years',''),CAT[s['cat']],ST[s['st']],PREC[s['prec']],s['lat'],s['lon'],ACC[s['acc']],EFF[s['eff']],th[0],th[1],s['dt']['alb'][0],s['dt']['sch'][0],s['dt']['troy'][0],s['dt']['sar'][0],{'verified':'Verified','lead':'Lead','mixed':'Partly verified','reference':'Reference'}[s['conf']],'Yes' if s.get('now') else '',(TM.get(s['id']) or {}).get('y',''),s.get('story',''),s.get('look',''),s.get('accn',''),s.get('pn',''),f"https://www.google.com/maps/search/?api=1&query={s['lat']},{s['lon']}",' | '.join(l[1] for l in s.get('links',[]))])
+        w.writerow([s['name'],s['town'],s.get('years',''),CAT[s['cat']],ST[s['st']],PREC[s['prec']],s['lat'],s['lon'],ACC[s['acc']],EFF[s['eff']],th[0],th[1],s['dt'].get('alb',[''])[0],s['dt'].get('sch',[''])[0],s['dt'].get('troy',[''])[0],s['dt'].get('sar',[''])[0],{'verified':'Verified','lead':'Lead','mixed':'Partly verified','reference':'Reference'}[s['conf']],'Yes' if s.get('now') else '',(TM.get(s['id']) or {}).get('y',''),s.get('story',''),s.get('look',''),s.get('accn',''),s.get('pn',''),f"https://www.google.com/maps/search/?api=1&query={s['lat']},{s['lon']}",' | '.join(l[1] for l in s.get('links',[]))])
 e=html.escape
 k=['<?xml version="1.0" encoding="UTF-8"?>','<kml xmlns="http://www.opengis.net/kml/2.2"><Document>','<name>Lost &amp; Hidden Atlas</name>','<description>Lost and hidden places across upstate New York, Massachusetts and Rhode Island. Built '+__import__('datetime').date.today().strftime('%B %-d, %Y')+'.</description>']
 for c,col in COL.items():
@@ -26,7 +26,7 @@ for c,label in CAT.items():
         if s.get('accn'): d.append('<b>Access:</b> '+e(s['accn']))
         if s.get('pn'): d.append('<b>Pin:</b> '+e(s['pn']))
         if s.get('th'): d.append(f"<b>Park at:</b> {e(s.get('thn',''))} ({s['th'][0]}, {s['th'][1]})")
-        d.append(f"Drive: Albany {s['dt']['alb'][0]} min · Schenectady {s['dt']['sch'][0]} · Troy {s['dt']['troy'][0]} · Saratoga {s['dt']['sar'][0]}")
+        if all(h in s['dt'] for h in ('alb','sch','troy','sar')): d.append(f"Drive: Albany {s['dt']['alb'][0]} min · Schenectady {s['dt']['sch'][0]} · Troy {s['dt']['troy'][0]} · Saratoga {s['dt']['sar'][0]}")
         for l in s.get('links',[])[:4]: d.append(f'<a href="{e(l[1])}">{e(l[0])}</a>')
         k.append(f"<Placemark><name>{e(s['name'])}</name><styleUrl>#c-{c}</styleUrl><description><![CDATA[{'<br><br>'.join(x for x in d if x)}]]></description><Point><coordinates>{s['lon']},{s['lat']},0</coordinates></Point></Placemark>")
     k.append('</Folder>')
