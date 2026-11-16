@@ -17,7 +17,7 @@ fi
 rm -rf "$W/src" "$W/tools" "$W/build/topo"
 mkdir -p "$W"/{src,tools,build/topo,cache/osm,dist,research,test}
 cp "$REPO"/source/src/* "$W/src/"
-cp "$REPO"/source/tools/* "$W/tools/"
+find "$REPO"/source/tools -maxdepth 1 -type f -exec cp {} "$W/tools/" \;   # files only: a __pycache__ folder left by running a tool in the clone must not stop the setup
 cp "$REPO"/source/build/base.json "$REPO"/source/build/hubs.json "$REPO"/source/build/padus.json "$REPO"/source/build/states.json "$W/build/"
 cp "$REPO"/source/build/topo-meta.json "$W/build/topo/meta.json"
 cp "$REPO"/source/build/leaflet.min.css "$W/cache/leaflet.min.css"

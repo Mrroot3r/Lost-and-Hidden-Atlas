@@ -581,6 +581,7 @@ const LK={ab:['Abandoned railroad','#ff5a1f','8 6'],tr:['Old trolley line','#e83
 const LGRP={oldrail:['Old rail and trolley lines',['ab','tr','tl','di']],canal:['Canals, old and current',['co','cn']],rail:['Railroads in use',['rr']]};
 let LINES=null, lineLayer={}, lineHi=null, lineCanvas=null;
 function prepLines(a){ a.forEach(f=>{ let x=90,b=-90,c=180,d=-180; f.c.forEach(p=>p.forEach(q=>{ if(q[0]<x)x=q[0]; if(q[0]>b)b=q[0]; if(q[1]<c)c=q[1]; if(q[1]>d)d=q[1]; })); f.bb=[x,c,b,d]; }); return a; }
+function lineChunks(f){ if(f.c.length<2) return [f.c]; const m={}, o=[]; f.c.forEach(p=>{ const k=Math.floor(p[0][0]*2)+','+Math.floor(p[0][1]*2); if(!m[k]){ m[k]=[]; o.push(m[k]); } m[k].push(p); }); return o; }
 let linesWait=null, linesTold=false;
 function linesData(){ if(LINES) return LINES; const n=document.getElementById('d-lines'); if(!n){ loadLines(); return []; }
   try{ LINES=JSON.parse(n.textContent); }catch(e){ LINES=[]; } return prepLines(LINES); }
@@ -632,10 +633,12 @@ function drawLines(){
     if(!on){ if(lineLayer[g]){ map.removeLayer(lineLayer[g]); } return; }
     if(!lineLayer[g]){ const grp=L.layerGroup();
       linesData().forEach(f=>{ if(LGRP[g][1].indexOf(f.k)<0) return; const st=LK[f.k];
-        f.c.forEach(part=>{
-          L.polyline(part,{pane:'lines',renderer:lineCanvas,color:'#ffffff',weight:f.k==='rr'?3.5:5,opacity:0.75,interactive:false}).addTo(grp);
-          const pl=L.polyline(part,{pane:'lines',renderer:lineCanvas,color:st[1],weight:f.k==='rr'?1.5:2.6,opacity:1,dashArray:st[2],bubblingMouseEvents:false}).addTo(grp);
-          pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } linePopup(f,part,e.latlng); });
+        /* one layer for each feature in each half-degree cell, not one for each piece: a whole state has tens of thousands of pieces,
+           and a layer that is off screen costs the canvas almost nothing */
+        lineChunks(f).forEach(ch=>{
+          L.polyline(ch,{pane:'lines',renderer:lineCanvas,color:'#ffffff',weight:f.k==='rr'?3.5:5,opacity:0.75,interactive:false}).addTo(grp);
+          const pl=L.polyline(ch,{pane:'lines',renderer:lineCanvas,color:st[1],weight:f.k==='rr'?1.5:2.6,opacity:1,dashArray:st[2],bubblingMouseEvents:false}).addTo(grp);
+          pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } let part=ch[0], bd=1e12; if(ch.length>1) ch.forEach(q=>{ const d=distToPart(e.latlng.lat,e.latlng.lng,q); if(d<bd){ bd=d; part=q; } }); linePopup(f,part,e.latlng); });
         }); });
       lineLayer[g]=grp; }
     lineLayer[g].addTo(map);
@@ -1476,7 +1479,7 @@ function renderGuide(){
     P('Drive times from the listed start cities were calculated by road with no traffic, so add a little. A place more than about 450 miles from your start city, or with no road to it, shows a rough estimate marked ~. Pick your own start point from "Drive times from."'),
     P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
-    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
+    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }
 function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(visible.map(s=>{const p=pos(s);return [p.lat,p.lon];})); map.fitBounds(b.pad(0.15),{maxZoom:14}); }
 
