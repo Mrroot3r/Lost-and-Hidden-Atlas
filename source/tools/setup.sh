@@ -25,6 +25,11 @@ cp "$REPO"/leaflet.js "$W/cache/leaflet.min.js"
 cp "$REPO"/topo/*.webp "$W/build/topo/"
 cp "$REPO"/data/lines.json "$W/build/lines.json"
 cp "$REPO"/data/leads.json "$W/build/leads.json"
+# historic pockets: the built layer travels with the site, so a workspace without the raw downloads keeps every state
+if [ -f "$REPO/data/pockets.json" ]; then
+  cp "$REPO"/data/pockets.json "$W/build/pockets.json"
+  mkdir -p "$W/build/pock"; [ -d "$REPO/data/pock" ] && cp "$REPO"/data/pock/*.json "$W/build/pock/"
+fi
 # what this machine can and cannot do
 MISS=""
 for m in requests PIL rasterio shapely; do python3 -c "import $m" 2>/dev/null || MISS="$MISS $m"; done

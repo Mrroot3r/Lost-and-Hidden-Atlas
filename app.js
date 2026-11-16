@@ -558,10 +558,14 @@ function buildSheet(){
   }
   lb.append(H('Leads'));
   lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Ruins, mines, kilns, quarries and old farms mapped by OpenStreetMap volunteers. Nobody has checked them for the Atlas',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); }));
-  lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Where historical markers and National Register listings bunch together: old town centres worth a walk. Purple discs; zoom in to see each marker and listing',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); }));
-  if(U.ui.pockets&&POCK){ const near=pockNear(); if(near.length){ lb.append(note('The biggest pockets within 40 miles of your start place. Tap one to go there.'));
-    const ul=el('div',{class:'pocklist'}); near.forEach(o=>ul.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ closeSheet(); map.setView([o.k[0],o.k[1]],15); }},el('b',{text:o.k[7]}),el('small',{text:' '+Math.round(o.mi)+' mi · '+pockCounts(o.k)})))); lb.append(ul); }
-    else lb.append(note('No pockets are mapped within 40 miles of your start place yet. They cover '+Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', ')+' so far.')); }
+  lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Old town centres, and other places where historical markers and National Register listings bunch together. Purple discs; zoom in to see each marker and listing',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); }));
+  if(U.ui.pockets&&POCK){ const all=pockNear(pockList.mode), other=pockList.mode==='other';
+    lb.append(ck('pock-c',U.ui.pockC,'Old town centres only','Hide the other pockets: estates, mill sites, battlefields, campuses',v=>{ U.ui.pockC=v; save(); pockReset(); }));
+    const seg=el('div',{class:'pockseg'}); [['rich','Richest'],['near','Nearest'],['other','Other pockets']].forEach(m=>seg.append(el('button',{class:'btn sm'+(pockList.mode===m[0]?' on':''),type:'button','aria-pressed':String(pockList.mode===m[0]),onclick:()=>{ pockList={mode:m[0],n:8}; buildSheet(); }},m[1])));
+    lb.append(note(other?'Estates, mill sites, battlefields and other pockets within 40 miles of your start place.':'Old town centres within 40 miles of your start place. Tap one to go there.'),seg);
+    if(all.length){ const ul=el('div',{class:'pocklist'}); all.slice(0,pockList.n).forEach(o=>ul.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ closeSheet(); map.setView([o.k[0],o.k[1]],15); }},el('b',{text:o.k[7]}),el('small',{text:' '+pockLine(o)})))); lb.append(ul);
+      if(all.length>pockList.n) lb.append(el('button',{class:'btn sm',type:'button',id:'pock-more',onclick:()=>{ pockList.n+=8; buildSheet(); }},'Show more ('+(all.length-pockList.n)+')')); }
+    else lb.append(note('None are mapped within 40 miles of your start place yet. The layer covers '+Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', ')+' so far.')); }
   lb.scrollTop=keep;
 }
 function goSchematic(){
@@ -699,39 +703,70 @@ function drawLeads(){
     LEADS.p.forEach(p=>{ const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false}).addTo(leadGrp);
       m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } leadPopup(p); }); }); }
   leadGrp.addTo(map); }
-/* ---------- historic pockets: where historical markers and National Register listings bunch together ----------
-   data/pockets.json (tools/pockets.py): k = pockets [lat,lon,radius m,markers,listed places,districts,contributing buildings,name,state],
-   m = markers [lat,lon,HMdb number,title,state], r = listings [lat,lon,NRIS ref,name,kind,contributing buildings,year,state],
-   d = district outlines [ref,[[lat,lon]...],state]. A pocket is drawn as one soft disc; the single markers and listings
-   appear only from zoom 15, and only those in view, so the map never fills with plaques. */
-let POCK=null, pockGrp=null, pockItems=null, pockWait=null, pockIdx=null;
-const PKK={b:'building',d:'historic district',s:'site',t:'structure',o:'object'};
-const pockScore=k=>(k[9]==null?k[3]:k[9])+2*k[4]+Math.min(k[6],400)/8;   /* k[9]: marker spots; a lawn of memorial plaques counts once */
-const pockColor=s=>s>=80?'#3b1a9e':s>=35?'#5b3fd6':s>=15?'#8a74ee':'#b3a4f7';
-function pockPx(k,z){ const real=k[2]/(156543.03392*Math.cos(rad(k[0]))/Math.pow(2,z)); return Math.max(real,4+Math.min(9,Math.sqrt(pockScore(k)))); }
+/* ---------- historic pockets: old town centres, and other places where markers and Register listings bunch together ----------
+   data/pockets.json (tools/pockets.py) holds every state's pockets and is small:
+     k = [lat,lon,radius m,markers,listed places,districts,contributing buildings,name,state,marker spots,type,score,era,settlement kind]
+         type 'c' = old town centre, named after its settlement; 'p' = any other pocket. Rows come sorted: centres first, best score first.
+     s = per state: counts, and h, a stamp of that state's detail file
+   data/pock/<state>.json holds one state's single things and is fetched only when the map is zoomed in there:
+     m = markers [lat,lon,HMdb number,title], r = listings [lat,lon,NRIS ref,name,kind,contributing buildings (-1 unknown),year],
+     d = district outlines [ref,[[lat,lon]...]]
+   A pocket is drawn as one disc; the single markers and listings appear only from zoom 15, and only those in view. */
+let POCK=null, pockGrp=null, pockTier={}, pockItems=null, pockLab=null, pockWait=null, pockIdx={}, pockDet={}, pockList={mode:'rich',n:8};
+const PKK={b:'building',d:'historic district',s:'site',t:'structure',o:'object'}, PKS={C:'city',t:'town',v:'village',h:'hamlet'};
+const pockC=k=>k[10]==='c';
+const pockColor=k=>{ const s=k[11]; return !pockC(k)?'#8d86ad':s>=40?'#3b1a9e':s>=25?'#5b3fd6':s>=14?'#7a62e8':'#9d8bf2'; };
+function pockPx(k,z){ const real=k[2]/(156543.03392*Math.cos(rad(k[0]))/Math.pow(2,z)); return Math.max(real,pockC(k)?5+Math.min(8,k[11]/6):3.5+Math.min(4,k[11]/9)); }
+/* Zoomed out, only the richest show, or a state full of old villages is one purple smear: each disc has a zoom it appears from. */
+const PKT=['p11','p10','p9','c11','c10','c9','c8','c0'];
+const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8?10:11):(s>=25?9:s>=15?10:11); };
 /* close in, a disc would tint the whole screen: fade its fill and leave the ring */
-function pockZoom(){ if(!U.ui.pockets||!pockGrp) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3; POCK.k.forEach(k=>{ k.c.setRadius(pockPx(k,z)); if(k.f!==f){ k.f=f; k.c.setStyle({fillOpacity:f}); } }); }
+function pockZoom(){ if(!U.ui.pockets||!pockGrp) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
+  const want=PKT.filter(t=>pockTier[t]&&z>=+t.slice(1)).join();       /* plain pockets underneath, the richest town centres on top */
+  if(want!==pockGrp._want){ pockGrp._want=want; pockGrp.clearLayers(); want.split(',').forEach(t=>{ if(t) pockGrp.addLayer(pockTier[t]); }); }
+  POCK.k.forEach(k=>{ if(!k.c||z<pockFrom(k)) return; k.c.setRadius(pockPx(k,z)); const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; k.c.setStyle({fillOpacity:ff}); } }); }
 function pockLoad(){ if(POCK||pockWait) return;
   pockWait=(AT?AT.fetch('data/pockets.json'):fetch('data/pockets.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
     .then(j=>{ POCK=j; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); })
     .catch(()=>{ pockWait=null; banner('Historic pockets could not load. Check your signal and turn them on again.',true,6000); }); }
+/* after "old town centres only" is switched: draw the discs afresh */
+function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.c=null; k.f=null; }); drawPockets(); }
 function drawPockets(){
   if(!map) return;
-  if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp); if(pockItems){ map.removeLayer(pockItems); pockItems=null; } return; }
+  if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp); [pockItems,pockLab].forEach(g=>{ if(g) map.removeLayer(g); }); pockItems=pockLab=null; return; }
   if(!POCK){ pockLoad(); return; }
   if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
-  if(!pockGrp){ pockGrp=L.layerGroup(); const z=map.getZoom();
-    POCK.k.forEach(k=>{ const c=pockColor(pockScore(k));
-      k.c=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:pockPx(k,z),color:c,weight:1.5,opacity:0.95,fillColor:c,fillOpacity:0.3,bubblingMouseEvents:false}).addTo(pockGrp);
-      k.c.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,e.latlng); }); });
-    map.on('zoomend',pockZoom);
-    map.on('moveend',pockDetail); }
-  pockGrp.addTo(map); pockZoom(); pockDetail(); }
+  if(!pockGrp){ const first=!map._pockOn; map._pockOn=true; pockGrp=L.layerGroup(); pockTier={}; const z=map.getZoom();
+    for(let i=POCK.k.length-1;i>=0;i--){ const k=POCK.k[i], tc=pockC(k), c=pockColor(k);     /* plain pockets first, so that town centres sit on top */
+      if(U.ui.pockC&&!tc) continue;
+      k.c=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:pockPx(k,z),color:tc?c:'#6d6790',weight:tc?2:1.2,dashArray:tc?null:'3 4',opacity:0.95,fillColor:c,fillOpacity:tc?0.3:0.12,bubblingMouseEvents:false}); const t=(tc?'c':'p')+pockFrom(k); k.c.addTo(pockTier[t]||(pockTier[t]=L.layerGroup()));
+      k.c.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,e.latlng); }); }
+    if(first){ map.on('zoomend',pockZoom); map.on('moveend',pockDetail); } }
+  pockGrp.addTo(map); pockGrp._want=null; pockZoom(); pockDetail(); }
+/* names on the best town centres in view, so a disc can be told without tapping it. Best score first; a name that
+   would sit on top of one already placed is left out. */
+function pockLabels(){
+  if(pockLab){ map.removeLayer(pockLab); pockLab=null; }
+  const z=map.getZoom(); if(!U.ui.pockets||!POCK||z<10) return;
+  const b=map.getBounds(), cap=z>=13?22:14, g=L.layerGroup(), put=[]; let n=0;
+  for(const k of POCK.k){ if(!pockC(k)||n>=cap) break; if(z<pockFrom(k)||!b.contains([k[0],k[1]])) continue;
+    const pt=map.latLngToContainerPoint([k[0],k[1]]), r=Math.round(pockPx(k,z)+2), w=k[7].length*6.6+8, box=[pt.x-w/2,pt.y-r-15,pt.x+w/2,pt.y-r];
+    if(put.some(q=>box[0]<q[2]&&box[2]>q[0]&&box[1]<q[3]&&box[3]>q[1])) continue; put.push(box); n++;
+    L.marker([k[0],k[1]],{interactive:false,keyboard:false,icon:L.divIcon({className:'pocklab',iconSize:[0,0],html:el('span',{style:'transform:translate(-50%,calc(-100% - '+r+'px))',text:k[7]})})}).addTo(g); }
+  pockLab=g.addTo(map); }
+/* one state's markers, listings and district outlines: fetched the first time the map is zoomed in there */
+function pockFetch(key){ const d=pockDet[key]; if(d&&(d==='wait'||d.m||Date.now()-d.t<30000)) return; pockDet[key]='wait';
+  const p='data/pock/'+key+'.json', h=((POCK.s||{})[key]||{}).h;
+  (AT?AT.fetch(p):fetch(p+(h?'?v='+h:VQ))).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(j=>{ pockDet[key]=j; const put=(a,t)=>(a||[]).forEach(x=>{ const g=Math.floor(x[0]*50)+','+Math.floor(x[1]*50); (pockIdx[g]=pockIdx[g]||[]).push([t,x]); });
+      put(j.m,'m'); put(j.r,'r'); put((j.d||[]).map(d=>[d[1][0][0],d[1][0][1],d]),'d'); pockDetail(); })
+    .catch(()=>{ pockDet[key]={t:Date.now()}; banner('The single markers and listings here could not load. Check your signal.',true,5000); }); }
 /* the single markers and listings: only when zoomed in, only what is in view */
 function pockDetail(){
+  pockLabels();
   if(pockItems){ map.removeLayer(pockItems); pockItems=null; }
   if(!U.ui.pockets||!POCK||map.getZoom()<15) return;
-  if(!pockIdx){ pockIdx={}; const put=(a,t)=>a.forEach(x=>{ const key=Math.floor(x[0]*50)+','+Math.floor(x[1]*50); (pockIdx[key]=pockIdx[key]||[]).push([t,x]); }); put(POCK.m,'m'); put(POCK.r,'r'); put(POCK.d.map(d=>[d[1][0][0],d[1][0][1],d]),'d'); }
+  const c=map.getCenter(), need={}; POCK.k.forEach(k=>{ if(!need[k[8]]&&Math.abs(k[0]-c.lat)<0.25&&Math.abs(k[1]-c.lng)<0.35) need[k[8]]=1; }); Object.keys(need).forEach(pockFetch);
   const b=map.getBounds().pad(0.15), g=L.layerGroup(); let n=0;
   for(let i=Math.floor(b.getSouth()*50);i<=Math.floor(b.getNorth()*50);i++) for(let j=Math.floor(b.getWest()*50);j<=Math.floor(b.getEast()*50);j++) (pockIdx[i+','+j]||[]).forEach(q=>{ const x=q[1];
     if(q[0]==='d'){ L.polygon(x[2][1],{pane:'lines',renderer:lineCanvas,color:'#5b3fd6',weight:1.5,dashArray:'5 5',fill:false,interactive:false}).addTo(g); return; }
@@ -742,8 +777,12 @@ function pockDetail(){
   pockItems=g.addTo(map); }
 function pockCounts(k){ const a=[]; if(k[3]) a.push(k[3]+' historical marker'+(k[3]>1?'s':'')+(k[9]&&k[9]*1.5<k[3]?' at '+k[9]+' spot'+(k[9]>1?'s':''):'')); if(k[4]) a.push(k[4]+' listed place'+(k[4]>1?'s':'')); if(k[5]) a.push(k[5]+' historic district'+(k[5]>1?'s':'')+(k[6]?' ('+k[6]+' buildings)':'')); return a.join(' · '); }
 function pockPopup(k,latlng){
-  const box=el('div',{class:'ctx'},el('b',{text:k[7]}),el('span',{style:'color:#5b6660',text:pockCounts(k)}),
-    el('span',{style:'color:#5b6660',text:'A pocket of markers and National Register listings. Many plaques mark something that is gone, so walk it and look.'}),
+  const tc=pockC(k);
+  const box=el('div',{class:'ctx'},el('b',{text:k[7]}),
+    el('span',{style:'color:#5b6660',text:(tc?'Old town centre'+(PKS[k[13]]?' ('+PKS[k[13]]+')':''):'A pocket of markers and listings')+' · score '+Math.round(k[11])}),
+    el('span',{style:'color:#5b6660',text:pockCounts(k)}));
+  if(k[12]) box.append(el('span',{style:'color:#5b6660',text:'Its dated plaques mostly speak of the '+k[12]+'.'}));
+  box.append(el('span',{style:'color:#5b6660',text:tc?'Ranked by how much still stands on the National Register and how old the plaques are. A guide to where to walk, not a promise.':'Many plaques mark something that is gone, so walk it and look.'}),
     el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); map.setView([k[0],k[1]],Math.max(map.getZoom(),16)); }},'Zoom in to see each one'));
   scoutLinks({lat:k[0],lon:k[1]}).slice(0,2).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
   L.popup({maxWidth:270}).setLatLng(latlng||[k[0],k[1]]).setContent(box).openOn(map); }
@@ -755,8 +794,13 @@ function pockItemPopup(t,x){
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); openForm({lat:x[0],lon:x[1],name:name,story:(t==='m'?'From a historical marker listed on HMdb.org (marker '+x[2]+').':'From a National Register listing (reference '+x[2]+').')+' Not checked yet.'}); }},'+ Add to my places'));
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(pt)},'Whose land is it?'));
   L.popup({maxWidth:270}).setLatLng([x[0],x[1]]).setContent(box).openOn(map); }
-/* the biggest pockets within reach of the start place, for the map options sheet */
-function pockNear(){ if(!POCK) return []; const H=homeObj(); return POCK.k.map(k=>({k:k,mi:hav(H.lat,H.lon,k[0],k[1])})).filter(o=>o.mi<=40).sort((a,b)=>pockScore(b.k)-pockScore(a.k)).slice(0,12); }
+/* for the map options sheet: old town centres within reach of the start place, richest or nearest first, or the other pockets.
+   "Nearest" leaves out the thinnest centres when there are plenty, so the list is not all crossroads with one plaque. */
+function pockNear(mode){ if(!POCK) return []; const H=homeObj();
+  let a=POCK.k.filter(k=>(mode==='other')!==pockC(k)).map(k=>({k:k,mi:hav(H.lat,H.lon,k[0],k[1])})).filter(o=>o.mi<=40);
+  if(mode==='near'){ const solid=a.filter(o=>o.k[11]>=10); if(solid.length>=8) a=solid; return a.sort((x,y)=>x.mi-y.mi); }
+  return a.sort((x,y)=>y.k[11]-x.k[11]); }
+function pockLine(o){ const k=o.k, a=[Math.round(o.mi)+' mi'], reg=k[4]+k[6]; if(reg) a.push(reg+' on the Register'); else if(k[5]) a.push('historic district'); if(k[9]) a.push(k[9]+' plaque spot'+(k[9]>1?'s':'')); if(k[12]) a.push(k[12]); return a.join(' · '); }
 function leadPopup(p){
   const pt={lat:p[0],lon:p[1]}, kind=LEADS.t[p[2]];
   const box=el('div',{class:'ctx'},el('b',{text:p[3]||kind}),el('span',{style:'color:#5b6660',text:(p[3]?kind+' · ':'')+'unchecked lead from OpenStreetMap'}));
@@ -1541,7 +1585,7 @@ function renderGuide(){
     P('Drive times from the listed start cities were calculated by road with no traffic, so add a little. A place more than about 450 miles from your start city, or with no road to it, shows a rough estimate marked ~. Pick your own start point from "Drive times from."'),
     P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
-    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), and National Register of Historic Places listings from the National Park Service. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
+    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }
 function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(visible.map(s=>{const p=pos(s);return [p.lat,p.lon];})); map.fitBounds(b.pad(0.15),{maxZoom:14}); }
 

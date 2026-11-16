@@ -4,9 +4,11 @@ county, for the historic-pockets layer (tools/pockets.py).
 
    python3 tools/hmdb_state.py "New York" ny        writes cache/hmdb/ny.json and prints which counties are incomplete
 
-The county names come from cache/nrhp/<key>.json, so run tools/nrhp_state.py first.
+The county names are the ones HMdb.org lists on its page of geographical names (Connecticut is filed by planning
+region, not county); if that page cannot be read, the county names in cache/nrhp/<key>.json are used instead.
 
-What is kept: only what a list page shows, and only the marker's number, title, town, county and coordinate.
+What is kept: only what a list page shows, and only the marker's number, title, town, county and coordinate, the
+earliest year its title or first line names (a number), and whether the site files it as a war memorial.
 No inscription, photo or other text is stored.
 
 The rules this tool keeps to:
@@ -24,7 +26,8 @@ if len(sys.argv)<3: sys.exit(__doc__)
 STATE,KEY=sys.argv[1],sys.argv[2]
 UA={'User-Agent':'lost-hidden-atlas-research/1.0 (personal research tool)'}
 D=f'cache/hmdb/{KEY}'; os.makedirs(D,exist_ok=True)
-ITEM=re.compile(r"<a Name=(\d+)>(.*?)&#8212;\s*<a[^>]*href='\.\./m\.asp\?m=\d+'>(.*?)</a>(.*?)</table>",re.S)
+ITEM=re.compile(r"<a Name=(\d+)>(.*?)&#8212;\s*<a[^>]*href='\.\./m\.asp\?m=\d+'>(.*?)</a>(.*?)</table>\s*<table>(.*?)</table>",re.S)
+YEAR=re.compile(r'(?<!\d)(1[6-9]\d\d|20[0-2]\d)(?!\d)')
 DEST=re.compile(r'destination=(-?[\d.]+),(-?[\d.]+)')
 def clean(s): return re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',s))).strip(' "“”—-')
 def page(county,n):
@@ -40,10 +43,28 @@ def page(county,n):
         except Exception as e:
             print('  retry',county,n,str(e)[:60],flush=True); time.sleep(30*(k+1))
     raise SystemExit(f'{county} page {n} would not load; run the command again later')
-counties=sorted({e['county'] for e in json.load(open(f'cache/nrhp/{KEY}.json')) if e.get('county')})
+def geonames():
+    """The county-level names HMdb.org itself uses for this state, from its page of geographical names. Most are
+    'X County', but Connecticut is listed by planning region, Louisiana by parish, Alaska by borough."""
+    p='cache/hmdb/_geonames.html'
+    if not os.path.exists(p):
+        open(p,'w',encoding='utf-8').write(urllib.request.urlopen(urllib.request.Request('https://www.hmdb.org/GeoNamesList.asp',headers=UA),timeout=90).read().decode('windows-1252','ignore')); time.sleep(4)
+    t=re.sub(r'<script.*?</script>|<style.*?</style>','',open(p,encoding='utf-8').read(),flags=re.S)
+    ls=[l.strip() for l in html.unescape(re.sub(r'<[^>]+>','\n',t)).split('\n') if l.strip()]
+    for i,l in enumerate(ls):
+        if l==STATE and i+1<len(ls) and not re.fullmatch(r'\d+',ls[i+1]):     # a heading is followed by names; the same word used as a county name is followed by the state's count
+            out=[]
+            for x in ls[i+1:]:
+                if re.fullmatch(r'\d+',x): return out
+                out.append(x)
+    return None
+counties=geonames()
+if not counties:
+    print('could not read the names from HMdb.org; using the county names in the Register file')
+    counties=sorted({e['county']+' County' for e in json.load(open(f'cache/nrhp/{KEY}.json')) if e.get('county')})
 out={}; short=[]; none=[]
-for c in counties:
-    names=[c+' County']+([c.replace('St. ','Saint ')+' County'] if 'St. ' in c else [])
+for full in counties:
+    c=re.sub(r' County$','',full); names=[full]+([full.replace('St. ','Saint ')] if 'St. ' in full else [])
     total=0
     for nm in names:
         t=page(nm,1); m=re.search(r'([\d,]+) entr(?:ies|y) match',t or '')
@@ -55,10 +76,15 @@ for c in counties:
         t=page(nm,n) if n>1 else t
         if not t: break
         for mm in ITEM.finditer(t):
-            mid,place,title,rest=mm.groups(); d=DEST.search(rest)
+            mid,place,title,rest,prev=mm.groups(); d=DEST.search(rest)
             if not d: continue
             parts=[x.strip() for x in clean(place).split(',')]
             out[mid]={'id':int(mid),'t':clean(title)[:90],'lat':round(float(d.group(1)),5),'lon':round(float(d.group(2)),5),'county':c,'town':parts[2] if len(parts)>2 else ''}; got+=1
+            # the earliest year named in the title or the first line of the inscription, as a number: it tells an old
+            # town's plaques from a recent memorial's. The words themselves are not kept.
+            ys=[int(y) for y in YEAR.findall(clean(title)+' '+clean(prev.split('(db')[0]))]
+            if ys: out[mid]['y']=min(ys)
+            if re.search(r'</small>\s*WM\b',prev): out[mid]['wm']=1
     if total>500: short.append((c,total))
     print(f'{c}: {got} of {total}',flush=True)
 json.dump(list(out.values()),open(f'cache/hmdb/{KEY}.json','w'),separators=(',',':'),ensure_ascii=False)
