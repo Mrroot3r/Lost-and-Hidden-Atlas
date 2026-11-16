@@ -479,7 +479,7 @@ public class FieldLogPlugin extends Plugin {
         }
     }
 
-    /** share({name, text, mime}): hands a file to Android's share sheet (GPX tracks, note lists). */
+    /** share({name, text or base64, mime}): hands a file to Android's share sheet (GPX tracks, note lists, the route map picture). */
     @PluginMethod
     public void share(PluginCall call) {
         String name = call.getString("name", "atlas.txt").replaceAll("[^A-Za-z0-9._-]", "_");
@@ -489,8 +489,9 @@ public class FieldLogPlugin extends Plugin {
             File dir = new File(getContext().getCacheDir(), "share");
             if (!dir.exists()) dir.mkdirs();
             File f = new File(dir, name);
+            String base64 = call.getString("base64"); // a picture or other binary file comes as base64; text comes as "text"
             try (FileOutputStream out = new FileOutputStream(f)) {
-                out.write(text.getBytes(StandardCharsets.UTF_8));
+                out.write(base64 != null ? Base64.decode(base64, Base64.DEFAULT) : text.getBytes(StandardCharsets.UTF_8));
             }
             Uri uri = FileProvider.getUriForFile(getContext(), getContext().getPackageName() + ".fileprovider", f);
             Intent send = new Intent(Intent.ACTION_SEND);

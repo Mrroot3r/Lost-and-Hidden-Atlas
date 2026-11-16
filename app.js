@@ -1258,6 +1258,120 @@ function editSheet(l){ const tc=x=>{ x=Math.max(0,Math.round(x)); return [Math.f
   const rest=l.notes.filter(n=>!used.has(n)).map(n=>[n.t,'NOTE ',n.x]).concat((l.media||[]).filter(p=>p.k==='i'&&!used.has(p)).map(p=>[p.t,'PHOTO',p.n])).sort((a,b)=>a[0]-b[0]);
   if(rest.length){ out.push('NOT DURING ANY VIDEO   (time into the walk, clock time)'); rest.forEach(r=>out.push('  '+tc(r[0]-l.t0)+'   '+tm(r[0])+'   '+r[1]+'  '+r[2])); out.push(''); }
   return out.join('\n'); }
+/* ---------- episode kit ----------
+   From one finished field log, everything needed to cut and publish a video about it:
+     stops     the Atlas places the walk came to, in the order reached (kitStops)
+     parts     the walk cut into "walking" and "at a stop", with the clips, photos and notes that fall in each (kitParts)
+     chapters  draft YouTube chapters: where each stop starts if the clips are joined end to end, uncut (kitChapters)
+     words     a description with what each place is, how to visit and the sources from its place record (kitDescription)
+     picture   a 1920 x 1080 route map on the public-domain USGS base map (kitMap)
+   Nothing is uploaded. The picture and the distance use the trimmed walk (Settings, "Trim the ends"), so they do not show where the car was. */
+let kitOpen=null;
+const KITSITE='https://mrroot3r.github.io/Lost-and-Hidden-Atlas/';
+function kitStops(l){ const p=l.pts, out=[]; if(p.length<2) return out;
+  let a=90,b=-90,c=180,d=-180; p.forEach(q=>{ if(q[0]<a)a=q[0]; if(q[0]>b)b=q[0]; if(q[1]<c)c=q[1]; if(q[1]>d)d=q[1]; });
+  sites().forEach(s=>{ const q=pos(s); if(q.lat<a-0.006||q.lat>b+0.006||q.lon<c-0.008||q.lon>d+0.008) return;
+    /* a visit starts when the track comes within reach of the pin and ends when it has gone half as far again; the longest visit is the stop */
+    const reach=Math.min(250,Math.max(60,(PREC[s.prec]||PREC.site)[2])); let ins=false, v=null, best=null, near=1e9;
+    p.forEach(k=>{ const m=hav(q.lat,q.lon,k[0],k[1])*1609.344; if(m<near) near=m;
+      if(!ins&&m<=reach){ ins=true; v={t0:k[2],t1:k[2]}; if(!best) best=v; } else if(ins){ if(m>reach*1.5) ins=false; else { v.t1=k[2]; if(v.t1-v.t0>best.t1-best.t0) best=v; } } });
+    if(best) out.push({s:s,t0:best.t0,t1:best.t1,m:Math.round(near),la:q.lat,lo:q.lon}); });
+  return out.sort((x,y)=>x.t0-y.t0); }
+function kitParts(l,stops){ const end=l.t1||(l.pts.length?l.pts[l.pts.length-1][2]:l.t0), parts=[]; let t=l.t0;
+  stops.forEach((st,i)=>{ const nx=stops[i+1], a=Math.max(st.t0,t), b=Math.max(a,nx?Math.min(st.t1,nx.t0):st.t1);
+    if(a>t) parts.push({k:'walk',t0:t,t1:a,name:'On the way to '+st.s.name}); parts.push({k:'stop',t0:a,t1:b,st:st,n:i+1,name:st.s.name}); t=b; });
+  if(end>t||!parts.length) parts.push({k:'walk',t0:t,t1:Math.max(end,t),name:stops.length?'After '+stops[stops.length-1].s.name:'The walk'});
+  const last=parts[parts.length-1], inP=(P,x)=>x>=P.t0&&(x<P.t1||(P===last&&x<=P.t1+120));
+  parts.forEach(P=>{ P.notes=l.notes.filter(n=>inP(P,n.t)); P.photos=(l.media||[]).filter(m=>m.k==='i'&&inP(P,m.t));
+    P.clips=vids(l).map((m,i)=>({n:i+1,v:m,a:Math.max(m.t,P.t0),b:Math.min(m.t+m.d,P.t1)})).filter(c=>c.b>c.a); });
+  return parts; }
+/* seconds into the footage, if every clip is laid end to end in the order it was shot; a moment between clips counts as the start of the next one */
+function kitRun(l,t){ let run=0; const v=vids(l); for(let i=0;i<v.length;i++){ if(t<v[i].t) return run; if(t<=v[i].t+v[i].d) return run+(t-v[i].t); run+=v[i].d; } return null; }
+function kitChapters(l,parts){ const v=vids(l), out=[]; if(!v.length) return out; const total=v.reduce((s,m)=>s+m.d,0);
+  const add=(sec,name)=>{ if(sec==null||sec>total-10) return; const p=out[out.length-1]; if(p&&sec-p[0]<10) return; out.push([Math.round(sec),name]); };
+  out.push([0,parts.length&&parts[0].k==='stop'&&parts[0].clips.length&&kitRun(l,parts[0].clips[0].a)<10?parts[0].name:'Setting out']);
+  const stops=parts.filter(P=>P.k==='stop'&&P.clips.length);
+  stops.forEach(P=>add(kitRun(l,P.clips[0].a),P.name));
+  if(out.length<3){   /* too few stops to make chapters: use the notes as well */
+    const all=out.concat(l.notes.filter(n=>clipAt(l,n.t)).map(n=>[Math.round(kitRun(l,n.t)),n.x])).sort((x,y)=>x[0]-y[0]); out.length=0;
+    all.forEach(x=>{ const p=out[out.length-1]; if(x[0]>total-10&&out.length) return; if(p&&x[0]-p[0]<10) return; out.push(x); }); }
+  return out; }
+const kitChapText=ch=>ch.map(c=>hms(c[0])+' '+c[1]).join('\n');
+function kitDescription(l,stops,ch){ const tl=trimmed(l)||l, out=[], first=x=>{ x=String(x||'').trim(); const m=/^.*?[.!?](?=\s|$)/.exec(x); return m?m[0]:x; };
+  out.push(l.name.replace(/\s*·\s*[A-Z][a-z]{2} \d{1,2}$/,''),'');
+  if(stops.length){ out.push(stops.length===1?'In this video:':'In this video, in the order we reached them:');
+    stops.forEach(o=>{ const s=o.s; out.push('• '+s.name+(s.town?', '+s.town:'')+(s.years?' ('+s.years+')':'')+((s.hook||s.story)?': '+(s.hook||first(s.story)):'')); }); out.push(''); }
+  if(ch.length>=3){ out.push('Chapters',kitChapText(ch),''); }
+  out.push('On foot: '+fmtMi(trackMi(tl.pts),1)+' in '+fmtMin(Math.max(1,Math.round(((tl.t1||tl.t0)-tl.t0)/60)))+'.');
+  const acc=stops.filter(o=>o.s.accn||ACC[o.s.acc]); if(acc.length){ out.push('','Before you go'); acc.forEach(o=>out.push(('• '+o.s.name+': '+(ACC[o.s.acc]||'')+(o.s.accn?(ACC[o.s.acc]?'. ':'')+first(o.s.accn):'')).replace(/[.\s]*$/,'.'))); }
+  const src=stops.filter(o=>Array.isArray(o.s.links)&&o.s.links.length); if(src.length){ out.push('','Sources and further reading'); src.forEach(o=>{ out.push(o.s.name+':'); o.s.links.forEach(k=>out.push('  '+k[0]+' '+k[1])); }); }
+  out.push('','Route recorded with the Lost & Hidden Atlas: '+KITSITE+(stops.length?'#'+stops[0].s.id:''),'Route map: base map from USGS The National Map.');
+  return out.join('\n'); }
+/* the whole kit as one text file: clips, photos and notes grouped by place, then the chapters and the description */
+function kitText(l){ const stops=kitStops(l), parts=kitParts(l,stops), ch=kitChapters(l,parts), tm=t=>new Date(t*1000).toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit'});
+  const out=['EPISODE KIT: '+l.name,new Date(l.t0*1000).toLocaleDateString([],{dateStyle:'long'})+' · '+logSummary(l),'','BY PLACE, IN THE ORDER WALKED','Times are h:mm:ss into the walk unless they say "in the clip".',''];
+  parts.forEach(P=>{ if(P.k==='walk'&&!P.notes.length&&!P.photos.length&&!P.clips.length) return;
+    out.push((P.k==='stop'?P.n+'. '+P.name.toUpperCase()+(P.st.s.town?', '+P.st.s.town:''):P.name.toUpperCase())+'   '+hms(P.t0-l.t0)+' to '+hms(P.t1-l.t0)+' ('+tm(P.t0)+')'+(P.k==='stop'?'   '+Math.max(1,Math.round((P.t1-P.t0)/60))+' min there, pin '+P.st.m+' m from the track':''));
+    P.clips.forEach(c=>out.push('   VIDEO '+c.n+'  '+c.v.n+'   '+(c.a<=c.v.t&&c.b>=c.v.t+c.v.d?'all of it ('+hms(c.v.d)+')':hms(c.a-c.v.t)+' to '+hms(c.b-c.v.t)+' in the clip')));
+    if(P.photos.length) out.push('   PHOTOS  '+P.photos.map(m=>m.n).join(', '));
+    P.notes.forEach(n=>{ const c=clipAt(l,n.t); out.push('   NOTE  '+hms(n.t-l.t0)+'  '+n.x+(c?'   (video '+c.n+' at '+hms(c.at)+')':'')); }); out.push(''); });
+  if(!stops.length) out.push('This walk did not come within reach of any place on the Atlas, so nothing is grouped by place.','');
+  out.push('YOUTUBE CHAPTERS (DRAFT)',ch.length>=3?kitChapText(ch):vids(l).length?'Fewer than three chapters could be made from this walk; YouTube needs at least three.':'No video is matched to this walk yet, so there are no chapter times. Use "Find photos and video" in the app first.',
+    ch.length>=3?'These assume every clip is joined end to end in the order shot, with nothing cut. Shift them to match your edit. YouTube needs the first at 0:00, at least three, each 10 seconds or longer.':'','','DESCRIPTION','',kitDescription(l,stops,ch));
+  return out.join('\n'); }
+/* ---- the route map picture ---- */
+const KITMAP={topo:['Topo','https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}'],air:['Aerial','https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}']};
+async function kitMap(l,style){ const tl=trimmed(l); if(!tl) throw new Error(TOOSHORT); const pts=tl.pts; if(pts.length<2) throw new Error('This walk has no track to draw.');
+  const stops=kitStops(l), Wd=1920, Ht=1080, fl=714, fr=Wd-110, ft=110, fb=Ht-110, ox=(fl+fr)/2, oy=(ft+fb)/2, wx=(lo,z)=>(lo+180)/360*256*Math.pow(2,z), wy=(la,z)=>{ const s=Math.sin(rad(la)); return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*256*Math.pow(2,z); };
+  let a=90,b=-90,c=180,d=-180; const grow=(la,lo)=>{ if(la<a)a=la; if(la>b)b=la; if(lo<c)c=lo; if(lo>d)d=lo; }; pts.forEach(q=>grow(q[0],q[1])); stops.forEach(o=>grow(o.la,o.lo));
+  /* the zoom that fits the walk in the frame, in fractions; tiles come from the whole zoom at or below it (the base map stops at 16) and are stretched */
+  const w0=Math.max(1e-9,wx(d,0)-wx(c,0)), h0=Math.max(1e-9,wy(a,0)-wy(b,0)), zf=Math.min(17.5,Math.log2(Math.min((fr-fl)/w0,(fb-ft)/h0))), zt=Math.max(1,Math.min(16,Math.floor(zf+0.35))), k=Math.pow(2,zf-zt);
+  const cx=(wx(c,zt)+wx(d,zt))/2, cy=(wy(a,zt)+wy(b,zt))/2, X=lo=>(wx(lo,zt)-cx)*k+ox, Y=la=>(wy(la,zt)-cy)*k+oy;
+  const cv=document.createElement('canvas'); cv.width=Wd; cv.height=Ht; const g=cv.getContext('2d'); g.fillStyle='#e9e6dc'; g.fillRect(0,0,Wd,Ht);
+  const x0=Math.floor((cx-ox/k)/256), x1=Math.floor((cx+(Wd-ox)/k)/256), y0=Math.floor((cy-oy/k)/256), y1=Math.floor((cy+(Ht-oy)/k)/256), n=Math.pow(2,zt), jobs=[]; let miss=0;
+  for(let tx=x0;tx<=x1;tx++) for(let ty=y0;ty<=y1;ty++){ if(ty<0||ty>=n) continue; const u=KITMAP[style][1].replace('{z}',zt).replace('{y}',ty).replace('{x}',((tx%n)+n)%n);
+    jobs.push(fetch(u).then(r=>{ if(!r.ok) throw 0; return r.blob(); }).then(bl=>createImageBitmap(bl)).then(im=>{ g.drawImage(im,Math.round((tx*256-cx)*k+ox),Math.round((ty*256-cy)*k+oy),Math.ceil(256*k)+1,Math.ceil(256*k)+1); }).catch(()=>{ miss++; })); }
+  await Promise.all(jobs);
+  if(style==='air'){ g.fillStyle='rgba(0,0,0,.18)'; g.fillRect(0,0,Wd,Ht); } else { g.fillStyle='rgba(255,255,255,.22)'; g.fillRect(0,0,Wd,Ht); }
+  const path=()=>{ g.beginPath(); pts.forEach((q,i)=>{ const x=X(q[1]), y=Y(q[0]); if(i) g.lineTo(x,y); else g.moveTo(x,y); }); };
+  g.lineJoin='round'; g.lineCap='round'; path(); g.strokeStyle='#fff'; g.lineWidth=13; g.stroke(); path(); g.strokeStyle=pref('trk'); g.lineWidth=7; g.stroke();
+  const font=(px,wt)=>{ g.font=(wt||700)+' '+px+'px system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif'; };
+  [pts[0],pts[pts.length-1]].forEach(q=>{ g.beginPath(); g.arc(X(q[1]),Y(q[0]),9,0,7); g.fillStyle='#fff'; g.fill(); g.lineWidth=4; g.strokeStyle='#111'; g.stroke(); });
+  stops.forEach((o,i)=>{ const x=X(o.lo), y=Y(o.la); g.beginPath(); g.arc(x,y,25,0,7); g.fillStyle='#111'; g.fill(); g.lineWidth=5; g.strokeStyle='#fff'; g.stroke(); font(28); g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='middle'; g.fillText(String(i+1),x,y+1); });
+  /* the panel: title, distance and time, numbered stops */
+  g.textAlign='left'; g.textBaseline='alphabetic'; const title=l.name.replace(/\s*·\s*[A-Z][a-z]{2} \d{1,2}$/,''), fit=(t,px,wt,max)=>{ font(px,wt); if(g.measureText(t).width<=max) return t; while(t.length>4&&g.measureText(t+'…').width>max) t=t.slice(0,-1); return t.trim()+'…'; };
+  const rows=stops.slice(0,9), pw=620, ph=118+rows.length*46+(stops.length>9?40:0)+(rows.length?14:0), px0=44, py0=44;
+  g.fillStyle='rgba(255,255,255,.93)'; g.beginPath(); if(g.roundRect) g.roundRect(px0,py0,pw,ph,18); else g.rect(px0,py0,pw,ph); g.fill();
+  g.fillStyle='#111'; g.fillText(fit(title,40,800,pw-56),px0+28,py0+58); font(27,500); g.fillStyle='#333'; g.fillText(fmtMi(trackMi(pts),1)+' on foot · '+fmtMin(Math.max(1,Math.round(((tl.t1||tl.t0)-tl.t0)/60))),px0+28,py0+98);
+  rows.forEach((o,i)=>{ const y=py0+150+i*46; g.beginPath(); g.arc(px0+46,y-10,17,0,7); g.fillStyle='#111'; g.fill(); font(20); g.fillStyle='#fff'; g.textAlign='center'; g.fillText(String(i+1),px0+46,y-3); g.textAlign='left'; g.fillStyle='#111'; g.fillText(fit(o.s.name,28,600,pw-112),px0+76,y); });
+  if(stops.length>9){ font(24,500); g.fillStyle='#333'; g.fillText('and '+(stops.length-9)+' more',px0+76,py0+150+9*46); }
+  /* scale bar, north, credit */
+  const mpp=156543.03392*Math.cos(rad((a+b)/2))/Math.pow(2,zf);   /* metres to one pixel of the picture */
+  const bars=KM()?[[20,'20 m'],[50,'50 m'],[100,'100 m'],[200,'200 m'],[500,'500 m'],[1000,'1 km'],[2000,'2 km'],[5000,'5 km'],[10000,'10 km'],[20000,'20 km']]:[[30.48,'100 ft'],[60.96,'200 ft'],[152.4,'500 ft'],[304.8,'1,000 ft'],[402.336,'¼ mi'],[804.672,'½ mi'],[1609.344,'1 mi'],[3218.688,'2 mi'],[8046.72,'5 mi'],[16093.44,'10 mi']];
+  const bar=bars.filter(o=>o[0]/mpp<=300).pop()||bars[0], len=bar[0]/mpp, lab=bar[1], sx=44, sy=Ht-52;
+  g.fillStyle='rgba(255,255,255,.93)'; g.fillRect(sx-12,sy-44,len+24,66); g.strokeStyle='#111'; g.lineWidth=5; g.beginPath(); g.moveTo(sx,sy-10); g.lineTo(sx,sy+4); g.lineTo(sx+len,sy+4); g.lineTo(sx+len,sy-10); g.stroke(); font(24,600); g.fillStyle='#111'; g.fillText(lab,sx+8,sy-12);
+  g.fillStyle='rgba(255,255,255,.93)'; g.beginPath(); g.arc(Wd-84,92,44,0,7); g.fill(); g.fillStyle='#111'; g.beginPath(); g.moveTo(Wd-84,58); g.lineTo(Wd-68,104); g.lineTo(Wd-84,94); g.lineTo(Wd-100,104); g.closePath(); g.fill(); font(22); g.textAlign='center'; g.fillText('N',Wd-84,128);
+  const cr='Base map: USGS The National Map'; font(21,500); g.textAlign='right'; const cw=g.measureText(cr).width; g.fillStyle='rgba(255,255,255,.88)'; g.fillRect(Wd-cw-36,Ht-44,cw+36,44); g.fillStyle='#222'; g.fillText(cr,Wd-18,Ht-15);
+  return {canvas:cv,miss:miss,tiles:jobs.length,stops:stops.length}; }
+async function sendBlob(name,blob,btn){
+  if(NATIVE){ const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]||''); r.onerror=()=>rej(r.error); r.readAsDataURL(blob); }); await AT.call('share',{name:name,base64:b64,mime:blob.type}); return; }
+  try{ const f=new File([blob],name,{type:blob.type}); if(navigator.canShare&&navigator.canShare({files:[f]})&&/Android|iPhone|iPad/.test(navigator.userAgent)){ await navigator.share({files:[f],title:name}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  const a=el('a',{href:URL.createObjectURL(blob),download:name}); document.body.append(a); a.click(); a.remove(); }
+function kitPanel(l,fn){ const stops=kitStops(l), parts=kitParts(l,stops), ch=kitChapters(l,parts), nv=vids(l).length, box=el('div',{class:'kit'});
+  const plural=(n,w)=>n+' '+w+(n===1?'':'s'), B=(t,f)=>{ const b=el('button',{class:'btn sm',type:'button'},t); b.addEventListener('click',()=>f(b)); return b; };
+  box.append(el('h4',{text:'Episode kit'}),el('p',{class:'snote',text:stops.length?'The walk came to '+plural(stops.length,'place')+' on the Atlas. Clips, photos and notes are grouped under each.':'This walk did not come within reach of any place on the Atlas, so there is nothing to group by place. The route map and the notes still work.'}));
+  if(stops.length){ const ol=el('ol',{class:'kitstops'}); parts.filter(P=>P.k==='stop').forEach(P=>{ const li=el('li',{role:'button',tabindex:'0'},el('b',{text:P.name}),el('small',{text:['reached '+hms(P.t0-l.t0),Math.max(1,Math.round((P.t1-P.t0)/60))+' min',P.clips.length?plural(P.clips.length,'clip'):'',P.photos.length?plural(P.photos.length,'photo'):'',P.notes.length?plural(P.notes.length,'note'):''].filter(Boolean).join(' · ')}));
+      li.addEventListener('click',()=>select(P.st.s,true)); ol.append(li); }); box.append(ol); }
+  const chBox=el('pre',{class:'kitpre',text:ch.length>=3?kitChapText(ch):nv?'Fewer than three chapters could be made; YouTube needs at least three. Add a note at each thing you film and they become chapters.':NATIVE?'No video is matched to this walk yet. Tap "Find photos and video" above, then open the kit again.':'Chapter times come from the videos the Android app matches to a walk. This walk has none.'});
+  box.append(el('h5',{text:'YouTube chapters (draft)'}),chBox,ch.length>=3?el('p',{class:'snote',text:'These assume the clips are joined end to end in the order shot, with nothing cut. Shift them to match your edit.'}):null);
+  const pic=el('div',{class:'kitpic'}), sty=el('select',{'aria-label':'Base map for the picture'},Object.keys(KITMAP).map(k=>el('option',{value:k,text:KITMAP[k][0]})));
+  const draw=async b=>{ const was=b.textContent; b.disabled=true; b.textContent='Drawing…'; pic.textContent='';
+    try{ const r=await kitMap(l,sty.value), blob=await new Promise(res=>r.canvas.toBlob(res,'image/png')); const im=el('img',{alt:'Route map of this walk',src:URL.createObjectURL(blob)}); pic.append(im,el('div',{class:'row',style:'margin-top:6px'},B(NATIVE?'Share the picture':'Save the picture',bb=>sendBlob(fn+'-route-map.png',blob,bb).catch(()=>banner('The picture could not be shared.',true,6000))),el('span',{class:'snote',text:'1920 × 1080'+(r.miss?' · '+r.miss+' of '+r.tiles+' map tiles did not load, so parts are blank. Try again with a signal.':'')})));
+    }catch(e){ pic.append(el('p',{class:'pn',text:(e&&e.message)||'The picture could not be drawn.'})); }
+    b.disabled=false; b.textContent=was; };
+  box.append(el('div',{class:'row',style:'margin-top:8px'},ch.length>=3?B('Copy chapters',b=>copy(kitChapText(ch),b)):null,B('Copy description',b=>copy(kitDescription(l,stops,ch),b)),B(NATIVE?'Share the whole kit':'Save the whole kit',b=>sendFile(fn+'-episode-kit.txt',kitText(l),'text/plain',b))),
+    el('h5',{text:'Route map picture'}),el('div',{class:'row'},sty,B('Draw the route map',draw)),el('p',{class:'snote',text:'A 1920 × 1080 picture for the video, on the public-domain USGS base map. The ends of the walk are trimmed as set in Settings.'}),pic);
+  return box; }
 /* In the app: keep a copy of everything in the phone's Downloads, where it survives the app being removed. */
 let lastBackup=0;
 function backupFile(){ if(!NATIVE) return Promise.reject(new Error('Only in the Android app.')); return AT.call('saveBackup',{name:'atlas-backup.json',text:JSON.stringify(U)}).then(r=>{ lastBackup=Date.now(); return r; }); }
@@ -1295,10 +1409,11 @@ function renderLog(){
     const gx=el('button',{class:'btn sm',type:'button'},NATIVE?'Share route (GPX)':'GPX track'); gx.addEventListener('click',()=>{ const tl=trimmed(l); if(!tl){ banner(TOOSHORT,true,10000); return; } sendFile(fn+'.gpx',gpx(tl),'application/gpx+xml',gx); });
     const sw=el('button',{class:'btn sm',type:'button'},'Share this walk'); sw.addEventListener('click',()=>{ const tl=trimmed(l); if(!tl){ banner(TOOSHORT,true,10000); return; } sw.disabled=true; sw.textContent='Packing…'; walkFile(tl).then(t=>sendFile(fn+'.atlas.json',t,'application/json',sw)).catch(()=>banner('The walk could not be packed.',true,6000)).then(()=>{ sw.disabled=false; sw.textContent='Share this walk'; }); });
     const es=vids(l).length?el('button',{class:'btn sm',type:'button'},'Edit sheet'):null; if(es) es.addEventListener('click',()=>sendFile(fn+'-edit-sheet.txt',editSheet(l),'text/plain',es));
+    const ek=l.pts.length>1?el('button',{class:'btn sm'+(kitOpen===l.id?' on':''),type:'button','aria-expanded':String(kitOpen===l.id),onclick:()=>{ kitOpen=kitOpen===l.id?null:l.id; renderLog(); }},'Episode kit'):null;
     const del=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; del.addEventListener('click',()=>{ if(!armed){ armed=true; del.textContent='Really delete?'; setTimeout(()=>{ armed=false; del.textContent='Delete'; },4000); return; } if(shownLog===l.id) hideLog(); U.logs=U.logs.filter(x=>x!==l); saveNow(); if(NATIVE) AT.call('remove',{logId:l.id}).catch(()=>{}); renderLog(); });
     const site=l.site&&byId(l.site);
     const box=el('div',{class:'sec pad logitem'},title,el('p',{class:'sub2',text:new Date(l.t0*1000).toLocaleString([],{hour12:H12(),dateStyle:'medium',timeStyle:'short'})+' · '+logSummary(l)}),
-      el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,sw,gx,cp,es,ren,del),
+      el('div',{class:'row',style:'margin-top:6px'},map?el('button',{class:'btn sm'+(shown?' on':''),type:'button',onclick:()=>{ if(shown) hideLog(); else showLog(l,true); renderLog(); }},shown?'Hide on map':'Show on map'):null,sw,gx,cp,es,ek,ren,del),
       site?el('p',{style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>select(site,true)},'Open '+site.name)):null);
     if(l.notes.length){ const ul=el('ul',{class:'lognotes'}); l.notes.forEach((n,i)=>{ const k=l.id+':'+i, li=el('li',{role:'button',tabindex:'0','data-k':k,class:(goNote.at===k?'on':'')+(n.la==null?' nopin':'')},el('span',{class:'num',text:String(i+1)}),el('span',{class:'mono',text:hms(n.t-l.t0)}),el('span',{class:'nx',text:n.x})); const cl=clipAt(l,n.t), ph=photosOf(l,n); if(cl) li.append(el('span',{class:'clip',title:'Position in video '+cl.n,text:'\u25B6'+cl.n+' '+hms(cl.at)})); if(ph.length) li.append(mediaStrip(l,ph)); const go=()=>goNote(l,n,li); li.addEventListener('click',go); li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } }); ul.append(li); });
       box.append(el('details',{open:shown},el('summary',{text:l.notes.length+(l.notes.length===1?' note':' notes')}),ul)); }
@@ -1312,6 +1427,7 @@ function renderLog(){
     if(vd.length){ const ul=el('ul',{class:'lognotes'}); vd.forEach((m,i)=>{ const li=el('li',{role:'button',tabindex:'0'},el('span',{class:'num vn',text:'\u25B6'+(i+1)}),el('span',{class:'mono',text:hms(m.t-l.t0)}),el('span',{class:'nx',text:hms(m.d)+' long · '+m.n})); li.addEventListener('click',()=>goMedia(l,m)); ul.append(li); });
       box.append(el('details',{open:shown},el('summary',{text:plural(vd.length,'video')+' (time shown is where each starts in the log)'}),ul)); }
     if(lp.length) box.append(el('details',{open:shown},el('summary',{text:plural(lp.length,'photo')+' not attached to a note'}),mediaStrip(l,lp)));
+    if(kitOpen===l.id&&ek) box.append(kitPanel(l,fn));
     v.append(box); });
 }
 function resumeLog(){
@@ -1693,6 +1809,14 @@ function renderGuide(){
     P('With an alert distance set, the phone buzzes and a notice shows when you come within that distance of a place or lead. It fires once for each spot, and again only after you have walked well away and come back. Old town centres are listed but never set it off.'),
     P(NATIVE?'With the screen off, the buzz works only while a field log is recording, because the recorder is what keeps the GPS running. The notification then names what you are near. The app gives the recorder everything within 25 miles each time it is opened.':'In a browser the alert works only while this page is open, the screen is on and location is switched on. In the Android app it also works with the screen off while a field log is recording.'),
     P('Lead positions are rough. A vanished place or an old mine can be a hundred metres or more from its dot, so treat the buzz as "look around here", and check whose land it is before you leave the trail.')]));
+  v.append(sec('Episode kit: from a walk to a video',false,[
+    P('Every finished field log has an Episode kit button. It works out which Atlas places the walk came to, in the order you reached them, and puts the clips, photos and notes from the walk under each one.'),
+    el('ul',null,
+      el('li',{text:'YouTube chapters: where each place starts, counted as if your clips were joined end to end in the order shot with nothing cut. They are a draft; shift them to match your edit. With fewer than three places, your notes become chapters too.'}),
+      el('li',{text:'A description: what each place is, how far you walked, what to know before going, and the sources from each place page.'}),
+      el('li',{text:'The whole kit as one text file, with the time inside each clip where each place, photo and note falls.'}),
+      el('li',{text:'A route map picture, 1920 by 1080, with the stops numbered. It is drawn on the USGS base map, which is in the public domain, so it is safe to put in a video.'})),
+    P('The picture and the distance respect "Trim the ends of a shared walk" in Settings, so they need not show where you parked. Clips and photos are matched to a walk only in the Android app.')]));
   v.append(sec('Video series ideas',false,[P('Each one filters the map to its stops. Timing assumes leaf-off months, November to April, for anything in the woods.'),ser]));
   const air=el('div',{class:'tk'}); D.aerial.forEach(t=>air.append(el('div',null,ext(t[2],t[0]),el('span',{text:t[1]}))));
   v.append(sec('Old air photos and maps',false,[P('No free service streams 1940s–50s air photos for this region as a map layer, so the Atlas builds in what can be streamed (state flights back to the 1990s, LiDAR, and scanned USGS sheets) and links out for the rest. Every place page has an "Old air photos" button that opens the spot in Historic Aerials.'),air]));
