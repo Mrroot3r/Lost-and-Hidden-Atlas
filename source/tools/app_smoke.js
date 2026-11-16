@@ -75,8 +75,11 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   await page.click('#tab-list'); await page.locator('#list .item').first().click(); await page.waitForTimeout(600); await page.click('#lb-opt'); await page.waitForTimeout(300);
   const seq = []; for (let i = 0; i < 3; i++) { seq.push(await page.evaluate(() => window.atlasBack())); await page.waitForTimeout(150); }
   ok('Back closes the sheet, then the place, then leaves the app', seq.join() === 'true,true,false', seq.join());
-  await page.click('#tab-guide'); await page.waitForTimeout(300);
-  ok('Guide has the data-source section', await page.locator('#at-base').count() === 1);
+  await page.click('#lb-opt'); await page.waitForTimeout(300); await page.click('#sheet-set'); await page.waitForTimeout(400);
+  ok('Settings open from the gear and hold the data-source section', (await page.locator('#sheet-t').textContent()) === 'Settings' && await page.locator('#at-base').count() === 1);
+  await page.selectOption('#set-units', 'km'); await page.waitForTimeout(300);
+  ok('settings reach the recorder', (await phone()).calls.includes('configure'));
+  await page.click('#sheet-x'); await page.click('#tab-log'); await page.waitForTimeout(300);
   ok('no script errors', errs.length === 0, errs.join(' | ').slice(0, 300));
   await browser.close(); console.log(fails.length ? fails.length + ' FAILED' : 'app smoke test passed'); process.exit(fails.length ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

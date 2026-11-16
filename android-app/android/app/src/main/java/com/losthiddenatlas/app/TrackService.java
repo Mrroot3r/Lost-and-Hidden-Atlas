@@ -17,6 +17,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
@@ -44,7 +46,7 @@ public class TrackService extends Service implements LocationListener {
     private static final String CHANNEL = "fieldlog";
     private static final int NOTE_ID = 4101;
     private static final float MAX_ACCURACY_M = 35f; // fixes worse than this are not recorded
-    private static final double MIN_STEP_M = 4.0; // a new point is saved only this far from the last one
+    private double minStep = 4.0; // a new point is saved only this far from the last one (Settings, "Track detail")
 
     private LocationManager locations;
     private PowerManager.WakeLock wake;
@@ -122,7 +124,10 @@ public class TrackService extends Service implements LocationListener {
         }
         locations = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         try {
-            locations.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000L, 0f, this, Looper.getMainLooper());
+            SharedPreferences p = getSharedPreferences(PREFS, MODE_PRIVATE);
+            minStep = Math.max(1f, Math.min(50f, p.getFloat("step", 4f)));
+            long every = Math.max(1000L, Math.min(30000L, p.getLong("every", 2000L)));
+            locations.requestLocationUpdates(LocationManager.GPS_PROVIDER, every, 0f, this, Looper.getMainLooper());
         } catch (SecurityException | IllegalArgumentException e) {
             lastError = "requestLocationUpdates: " + e;
             running = false;
@@ -149,7 +154,7 @@ public class TrackService extends Service implements LocationListener {
         if (p == null || acc > MAX_ACCURACY_M) return;
         if (haveLast) {
             double d = dist(lastLat, lastLon, p[0], p[1]);
-            if (d < MIN_STEP_M) return;
+            if (d < minStep) return;
             meters += d;
         }
         TrackStore.append(this, logId, p[0], p[1], t / 1000L);
@@ -185,12 +190,22 @@ public class TrackService extends Service implements LocationListener {
             nm.notify(NOTE_ID, note(status()));
         } catch (Exception ignored) {}
         try {
+            if (getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean("buzz", true)) {
+                Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                if (v != null) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) v.vibrate(VibrationEffect.createOneShot(70, VibrationEffect.DEFAULT_AMPLITUDE));
+                    else v.vibrate(70);
+                }
+            }
+        } catch (Exception ignored) {}
+        try {
             Toast.makeText(getApplicationContext(), "Marked (" + markCount + ")", Toast.LENGTH_SHORT).show();
         } catch (Exception ignored) {}
     }
 
     private String status() {
-        String s = String.format(Locale.US, "Recording · %.2f mi", meters / 1609.34);
+        boolean km = "km".equals(getSharedPreferences(PREFS, MODE_PRIVATE).getString("units", "mi"));
+        String s = km ? String.format(Locale.US, "Recording · %.2f km", meters / 1000.0) : String.format(Locale.US, "Recording · %.2f mi", meters / 1609.34);
         return markCount > 0 ? s + " · " + markCount + (markCount == 1 ? " mark" : " marks") : s;
     }
 

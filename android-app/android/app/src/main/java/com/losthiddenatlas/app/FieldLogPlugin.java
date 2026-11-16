@@ -187,6 +187,22 @@ public class FieldLogPlugin extends Plugin {
         call.resolve(o);
     }
 
+    /** configure({units, step, every, buzz}): the recorder's settings. Read when a recording starts and when a mark is dropped. */
+    @PluginMethod
+    public void configure(PluginCall call) {
+        SharedPreferences.Editor e = prefs().edit();
+        String units = call.getString("units");
+        if (units != null) e.putString("units", "km".equals(units) ? "km" : "mi");
+        Double step = call.getDouble("step");
+        if (step != null) e.putFloat("step", step.floatValue());
+        Double every = call.getDouble("every");
+        if (every != null) e.putLong("every", every.longValue());
+        Boolean buzz = call.getBoolean("buzz");
+        if (buzz != null) e.putBoolean("buzz", buzz);
+        e.apply();
+        call.resolve();
+    }
+
     /** marks({logId, from}) -> {marks: [[lat or null, lon or null, seconds], ...]}: pins dropped from the notification. */
     @PluginMethod
     public void marks(PluginCall call) {
