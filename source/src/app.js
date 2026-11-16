@@ -17,7 +17,7 @@ const PREC={exact:['Pin: exact','On the structure or marker itself, within about
 const ACC={public:'Public land or street',view:'View from the public way',ask:'Ask permission first',permit:'Permit required',boat:'On the water'};
 const EFF={drive:'Drive-up',walk:'Short walk',hike:'Hike',boat:'Boat or shore view'};
 const MY={'':'Not started',todo:'Want to scout',scouted:'Scouted online',asked:'Asked the owner',ok:'Have permission',visited:'Visited',filmed:'Filmed',skip:'Skip'};
-const REG={alb:'Albany',albco:'Albany County',troy:'Troy & Lansingburgh',renss:'Rensselaer County',conf:'Cohoes · Waterford · Watervliet',sch:'Schenectady',mohawk:'Mohawk Valley',sar:'Saratoga',hud:'Hudson Valley',cat:'Catskills',adk:'Lake George & Adirondacks',wash:'Upper Hudson & Washington Co.',mohw:'Mohawk Valley west',scho:'Schoharie, Otsego & Delaware',midh:'Mid-Hudson',berk:'Berkshires',pv:'Pioneer Valley',cmass:'Quabbin & central Massachusetts',worc:'Worcester & Blackstone Valley',bos:'Greater Boston & MetroWest',nshore:'North Shore & Merrimack Valley',south:'South Shore, South Coast & Cape Cod',vt:'Southern Vermont',ct:'Northwest Connecticut'};
+const REG={alb:'Albany',albco:'Albany County',troy:'Troy & Lansingburgh',renss:'Rensselaer County',conf:'Cohoes · Waterford · Watervliet',sch:'Schenectady',mohawk:'Mohawk Valley',sar:'Saratoga',hud:'Hudson Valley',cat:'Catskills',adk:'Lake George & Adirondacks',wash:'Upper Hudson & Washington Co.',mohw:'Mohawk Valley west',scho:'Schoharie, Otsego & Delaware',midh:'Mid-Hudson',berk:'Berkshires',pv:'Pioneer Valley',cmass:'Quabbin & central Massachusetts',worc:'Worcester & Blackstone Valley',bos:'Greater Boston & MetroWest',nshore:'North Shore & Merrimack Valley',south:'South Shore, South Coast & Cape Cod',vt:'Southern Vermont',ct:'Northwest Connecticut',riprov:'Providence, Blackstone Valley & western Rhode Island',ribay:'Narragansett Bay & Newport',risouth:'South County, Rhode Island'};
 const HOLLOW={gone:1,marker:1,water:1};
 const LOCAL=location.protocol==='file:';
 
@@ -98,7 +98,7 @@ function match(s){
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
-  if(F.fresh&&!(F.fresh===2?s.new>=2:s.new)) return false;
+  if(F.fresh&&!(F.fresh===2?(s.new===2||s.new===3):F.fresh===4?s.new===4:s.new)) return false;
   const my=U.status[s.id]||'';
   if(F.my==='mine'){ if(!s.mine) return false; } else if(F.my!=='any'&&my!==F.my) return false;
   if(F.hideDone&&(my==='filmed'||my==='skip')) return false;
@@ -108,6 +108,7 @@ function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.re
 function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.fresh=false;F.my='any';F.hideDone=false; }
 const PRESETS=[
   ['Worcester County',()=>{ F.reg='worc'; }],
+  ['New: Rhode Island',()=>{ F.fresh=4; }],
   ['New: Massachusetts',()=>{ F.fresh=2; }],
   ['New: around Albany',()=>{ F.fresh=true; F.max=135; }],
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
@@ -209,22 +210,26 @@ function exportUrl(base,c,extra){ const n=Math.pow(2,c.z),r=2*W/n,x0=-W+c.x*r,y1
   return base+'?bbox='+[x0,y1-r,x0+r,y1].map(v=>v.toFixed(2)).join(',')+'&bboxSR=3857&imageSR=3857&size='+px+','+px+'&format=jpg&f=image'+(extra||''); }
 function xyz(tpl,c,maxN){ let z=c.z,x=c.x,y=c.y,dz=0; if(z>maxN){ dz=z-maxN; x=x>>dz; y=y>>dz; z=maxN; }
   const u=tpl.replace('{z}',z).replace('{y}',y).replace('{x}',x); return dz?{url:u,dz:dz,ox:c.x-(x<<dz),oy:c.y-(y<<dz)}:u; }
+const RIG='https://maps.edc.uri.edu/rigis/rest/services/', RILEAF=RIG+'IMG/RI_202603_RGB_3in_web/ImageServer/exportImage', RIDEM=RIG+'TOPO/Elevation_2022_Lidar_web/ImageServer/exportImage';
+const hsRule=g=>'&interpolation=RSP_BilinearInterpolation&renderingRule='+encodeURIComponent(JSON.stringify({rasterFunction:'Hillshade',rasterFunctionArguments:{Azimuth:g[1],Altitude:g[2],ZFactor:g[3]},variableName:'DEM'}));
 const NYHS='https://elevation.its.ny.gov/arcgis/rest/services/NYS_Statewide_Hillshade/MapServer/export', NYDEM='https://elevation.its.ny.gov/arcgis/rest/services/Latest_DEM/ImageServer/exportImage';
 function leafUrl(c){ const p=tileCenter(c), r=regionOf(p[0],p[1]);
   if(r==='ny') return exportUrl('https://orthos.its.ny.gov/arcgis/rest/services/wms/'+U.ui.year+'/MapServer/export',c);
   if(r==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/orthos2023/MapServer/tile/{z}/{y}/{x}',c,20);
   if(r==='vt') return xyz('https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/IMG_VCGI_CLR_WM_CACHE/ImageServer/tile/{z}/{y}/{x}',c,19);
+  if(r==='ri'&&c.z>=12) return exportUrl(RILEAF,c);
   return xyz('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',c,19); }
 function lidarUrl(c){ const p=tileCenter(c), r=regionOf(p[0],p[1]);
   if(r==='ny'){ if(c.z<14) return exportUrl(NYHS,c); const g=LIGHT[U.ui.light]||LIGHT.nw;
-    return exportUrl(NYDEM,c,'&interpolation=RSP_BilinearInterpolation&renderingRule='+encodeURIComponent(JSON.stringify({rasterFunction:'Hillshade',rasterFunctionArguments:{Azimuth:g[1],Altitude:g[2],ZFactor:g[3]},variableName:'DEM'}))); }
+    return exportUrl(NYDEM,c,hsRule(g)); }
+  if(r==='ri'&&c.z>=11) return exportUrl(RIDEM,c,hsRule(LIGHT[U.ui.light]||LIGHT.nw));
   if(r==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/LiDAR_ShadedRelief/MapServer/tile/{z}/{y}/{x}',c,18);
   if(r==='vt') return xyz('https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/IMG_VCGI_LIDARHILLSHD_WM_CACHE_v1/ImageServer/tile/{z}/{y}/{x}',c,19);
   return xyz('https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',c,15); }
 const LD={
   streets:{n:'Streets',d:'Roads and place names',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:19,attribution:'Esri, HERE, Garmin, USGS'})},
-  leaf:{n:'Leaf-off aerial',d:'State spring flights. The ground shows through bare trees',mk:p=>new FnLayer('',{pane:p,maxZoom:20,minZoom:9,fn:leafUrl,attribution:'NYS ITS, MassGIS, VCGI'})},
-  lidar:{n:'LiDAR terrain',d:'Bare ground with the trees stripped off. Sharpens to 1 m as you zoom in',mk:p=>new FnLayer('',{pane:p,maxZoom:20,fn:lidarUrl,attribution:'NYS ITS, MassGIS, VCGI, Esri'})},
+  leaf:{n:'Leaf-off aerial',d:'State spring flights. The ground shows through bare trees',mk:p=>new FnLayer('',{pane:p,maxZoom:20,minZoom:9,fn:leafUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS'})},
+  lidar:{n:'LiDAR terrain',d:'Bare ground with the trees stripped off. Sharpens to 1 m as you zoom in',mk:p=>new FnLayer('',{pane:p,maxZoom:20,fn:lidarUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS, Esri'})},
   sat:{n:'Satellite',d:'World imagery, usually leaves on',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:19,attribution:'Esri, Maxar, Earthstar Geographics'})},
   topo:{n:'USGS topo, current',d:'Contours, streams and trails',mk:p=>new CachedXYZ('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:16,attribution:'USGS The National Map'})},
   oldtopo:{n:'USGS topo, 1940s–80s',d:'Scanned paper quads. Purple marks later photo-revisions',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:15,attribution:'USGS, National Geographic, i-cubed'})}
@@ -450,10 +455,10 @@ function buildSheet(){
   else {
     lb.append(H('Leaf-off aerial'));
     const y=el('select',{id:'leaf-year','aria-label':'Flight year',onchange:e=>{ U.ui.year=e.target.value; save(); if(U.ui.base==='leaf') setBase('leaf'); if(cmp.on&&cmp.key==='leaf') setCmp(); }},YEARS.map(v=>el('option',{value:v,text:v==='napp'?'1990s infrared':v==='Latest'?'Latest flight':v})));
-    y.value=U.ui.year; lb.append(el('div',{class:'lsub'},el('span',{text:'Flight year'}),y),note('The year applies to New York. Blank? That year skipped this county. Massachusetts and Vermont show their own latest state flight (the Vermont one is not always leaf-off); Connecticut, Rhode Island and New Hampshire fall back to satellite for now.'));
+    y.value=U.ui.year; lb.append(el('div',{class:'lsub'},el('span',{text:'Flight year'}),y),note('The year applies to New York. Blank? That year skipped this county. Massachusetts and Vermont show their own latest state flight (the Vermont one is not always leaf-off). Rhode Island shows its March 2026 state flight once you zoom in past town level. Connecticut and New Hampshire fall back to satellite for now.'));
     lb.append(H('LiDAR light'));
     const s=el('select',{id:'lidar-light','aria-label':'Light direction',onchange:e=>{ U.ui.light=e.target.value; save(); if(U.ui.base==='lidar') setBase('lidar'); if(cmp.on&&cmp.key==='lidar') setCmp(); }},Object.keys(LIGHT).map(v=>el('option',{value:v,text:LIGHT[v][0]})));
-    s.value=U.ui.light; lb.append(el('div',{class:'lsub'},s),note('Changing the light makes faint walls and grades pop. It applies in New York once you zoom in past town level. Massachusetts and Vermont use their own fixed-light LiDAR.'));
+    s.value=U.ui.light; lb.append(el('div',{class:'lsub'},s),note('Changing the light makes faint walls and grades pop. It applies in New York and Rhode Island once you zoom in past town level. Massachusetts and Vermont use their own fixed-light LiDAR.'));
     lb.append(H('Compare two layers'));
     lb.append(ck('cmp-on',cmp.on,'Show a second layer over the map','Drag the divider, or fade one over the other',v=>{ cmp.on=v; setCmp(); syncBar(); }));
     if(cmp.on){
@@ -1121,6 +1126,7 @@ function renderGuide(){
       'Posted land stays posted for a year even if someone tears the signs down (ECL §11-2111).',
       'Railroads in use are private property with their own police. Stay off them, and out of tunnels.']),
     el('p',null,el('b',{text:'Massachusetts is different: '}),'the open-land rule above is New York law and does not carry over. Massachusetts treats entering or staying on land or in buildings after being forbidden, in person or by a posted notice, as criminal trespass (M.G.L. c. 266, §120). State parks and forests there are run by DCR, which has its own permit rules for commercial filming and drones. Read the current text before a Massachusetts trip.'),
+    el('p',null,el('b',{text:'Rhode Island: '}),'the New York open-land rule does not carry over here either. Rhode Island makes it a crime to trespass willfully, or to stay on land with no legitimate purpose, after the owner or the owner\'s agent has forbidden it (R.I. Gen. Laws §11-44-26: up to a $1,000 fine, up to a year in jail, or both). State parks and management areas are run by DEM. Owner lookup and lot lines are not built for Rhode Island yet; ask the town assessor. Read the current text before a Rhode Island trip.'),
     el('p',null,el('b',{text:'Bright-line rules: '}),'No buildings without permission. Never cross a fence or pass a posted sign without permission. Never take anything. Carry nothing that looks like an entry tool. Leave as soon as you are asked.'),
     el('p',null,el('b',{text:'If someone approaches: '}),'stop filming if asked, explain honestly what you are doing, show ID, and leave by the shortest route. Show your permission letter and the owner\'s number if you have them. Do not run, hide, argue or lie.'),
     el('p',null,el('b',{text:'Asking: '}),'every place page has "Whose land is it?" with an owner lookup and a permission letter you can copy. Set the place to "Asked the owner" or "Have permission" under My notes to keep track.')]));
@@ -1182,9 +1188,9 @@ function renderGuide(){
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),
     P('Drive times from Albany, Schenectady, Troy and Saratoga Springs were calculated by road with no traffic, so add a little. Pick your own start point from "Drive times from."'),
-    P('The November 2026 expansions added '+BASE.filter(s=>s.new).length+' places: first the two-hour circle around Albany, then Massachusetts with Worcester County first. Their pins come from the source named in each pin note and most were not checked on imagery, so read the pin note before you drive.'),
+    P('The November 2026 expansions added '+BASE.filter(s=>s.new).length+' places: first the two-hour circle around Albany, then Massachusetts with Worcester County first, then a first pass at Rhode Island. Their pins come from the source named in each pin note and most were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
-    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
+    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }
 function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(visible.map(s=>{const p=pos(s);return [p.lat,p.lon];})); map.fitBounds(b.pad(0.15),{maxZoom:14}); }
 

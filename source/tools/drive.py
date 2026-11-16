@@ -1,6 +1,6 @@
 import json,urllib.request,time
 S=json.load(open('build/sites.json'))
-HUBS=[('alb','Albany',42.6526,-73.7562),('sch','Schenectady',42.8142,-73.9396),('troy','Troy',42.7284,-73.6918),('sar','Saratoga Springs',43.0831,-73.7846),('wor','Worcester',42.2626,-71.8023)]
+HUBS=[('alb','Albany',42.6526,-73.7562),('sch','Schenectady',42.8142,-73.9396),('troy','Troy',42.7284,-73.6918),('sar','Saratoga Springs',43.0831,-73.7846),('wor','Worcester',42.2626,-71.8023),('prov','Providence',41.8242,-71.4126)]
 def dest(s): return s.get('th') or [s['lat'],s['lon']]
 out={}
 for k in range(0,len(S),70):

@@ -1,6 +1,6 @@
 # Lost & Hidden Atlas
 
-A map tool for finding abandoned sites and ruins across upstate New York and Massachusetts.
+A map tool for finding abandoned sites and ruins across upstate New York and Massachusetts, with a first pass at Rhode Island.
 
 **Open it:** https://mrroot3r.github.io/Lost-and-Hidden-Atlas/
 
@@ -25,6 +25,6 @@ New places, corrected pins and field reports are welcome. `GUIDE.md` explains th
 
 ## Data credits
 
-Imagery: New York State ITS Geospatial Services, MassGIS, Vermont Center for Geographic Information, USGS, Esri.
+Imagery: New York State ITS Geospatial Services, MassGIS, Vermont Center for Geographic Information, RIGIS and the URI Environmental Data Center, USGS, Esri.
 Lines and leads: OpenStreetMap contributors, OpenHistoricalMap, MassGIS, U.S. DOT.
 Public land: USGS PAD-US. Parcels: NYS tax parcel file, NYS DEC, MassGIS.

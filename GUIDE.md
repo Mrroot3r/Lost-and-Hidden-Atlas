@@ -4,7 +4,7 @@ This is the handoff guide. It tells a new contributor, human or AI model, what t
 
 ## 1. What the Atlas is
 
-A phone-first map tool for finding lost buildings, ruins and abandoned sites, made for a YouTube creator who explores them on foot. It began around Albany, New York and now covers upstate New York and Massachusetts. The plan is to grow across the Northeast.
+A phone-first map tool for finding lost buildings, ruins and abandoned sites, made for a YouTube creator who explores them on foot. It began around Albany, New York and now covers upstate New York and Massachusetts, with a first pass at Rhode Island. The plan is to grow across the Northeast.
 
 Live site: https://mrroot3r.github.io/Lost-and-Hidden-Atlas/
 
@@ -34,7 +34,7 @@ The site is static files on GitHub Pages. There is no server and no account. A v
 Map layers come from public services, chosen per state by `regionOf()` in `app.js`:
 
 - Streets and satellite: Esri. Current and old topo: USGS and Esri.
-- Leaf-off aerial and LiDAR: New York (NYS ITS, slow export services, heavily cached), Massachusetts (MassGIS tiles), Vermont (VCGI tiles). Other states fall back to Esri satellite and world hillshade.
+- Leaf-off aerial and LiDAR: New York (NYS ITS, slow export services, heavily cached), Massachusetts (MassGIS tiles), Vermont (VCGI tiles), Rhode Island (RIGIS image services at `maps.edc.uri.edu/rigis`: the March 2026 3-inch flight, and the 2022 LiDAR elevation service shaded on request the same way as New York's, so the light direction setting works there too). Other states fall back to Esri satellite and world hillshade.
 - Public land: USGS PAD-US. Owner lookup and lot lines: NYS tax parcels (only some counties share owner names), NYS DEC, MassGIS parcels (statewide).
 - Drive times: OSRM, precomputed at build time from the start cities in `tools/drive.py`.
 
@@ -107,7 +107,7 @@ These are what keep the Atlas trustworthy. They are not optional.
 7. **Prefer places with something to find.** Ruins and traces first, then standing landmarks with a story, then vanished sites that matter to a series.
 8. **Stay inside what the user can reach.** Their base is Albany, New York; a second base is Worcester, Massachusetts.
 
-Sources that have worked: Wikipedia and National Register listings (facts and coordinates), state park and land-trust pages (access, trail maps), OpenStreetMap `historic=ruins` and related tags (leads and coordinates), town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places. Wikipedia rate-limits hard: batch titles (`tools/wiki_ma.py`, `tools/wiki_wt.py`), pause between calls, send a real User-Agent, cache to disk.
+Sources that have worked: Wikipedia and National Register listings (facts and coordinates), state park and land-trust pages (access, trail maps), OpenStreetMap `historic=ruins` and related tags (leads and coordinates), town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places. Wikipedia rate-limits hard: batch titles (`tools/wiki_ma.py`, `tools/wiki_wt.py`), pause between calls, send a real User-Agent, cache to disk. From a shared cloud address the API answers 429 for minutes at a time even at that pace; fetching one article at a time as raw wikitext (`index.php?title=…&action=raw`), a few seconds apart, got through when the API did not. Before trusting a pin, pull a 300 m square of the state leaf-off aerial around it: that caught a Wikipedia coordinate that lands on the shoreline beside a fort instead of on it.
 
 ## 6. Handing research to a cheaper model
 
@@ -164,7 +164,9 @@ Then, for the batch: add the file, hook it into `build_sites.py`, run `build_sit
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
 - GPS smoothing and the field log were tested with simulated location only.
 - A web page cannot record location with the screen off. An Android app wrapper with background location is planned.
-- Not built yet: Rhode Island, historical-markers layer, photo notes, GPX import.
+- Rhode Island is a first pass: 28 places in `data_ri.py`, each pin looked at once on the state leaf-off aerial but none walked. Not done there: owner lookup and lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), leads (Overpass could not be reached), and a rebuild of the rail and canal lines.
+- Rhode Island leads read about but not added, for want of a source or a coordinate: Ramtail Factory (Foster), Hunt's Mills (East Providence), Enchanted Forest (Hope Valley, 1971–2005), Whale Rock Light foundation, Warren powerhouse ruins, Windswept ruins (Narragansett), Stillwater mill (Smithfield).
+- Not built yet: historical-markers layer, photo notes, GPX import.
 
 ## 10. Privacy
 
