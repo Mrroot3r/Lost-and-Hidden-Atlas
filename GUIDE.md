@@ -241,7 +241,7 @@ A state outside these nine also needs its outline added to `source/build/states.
 - The Android app's background recorder was compiled and its page logic tested against a stand-in, but nothing here can run it on a real phone. Whether it survives a long walk with the screen off depends on the phone maker's battery rules, and only field use will show it.
 - A web page cannot record location with the screen off; that is what the app is for. The website's own field log still needs the page open.
 - Photo and video matching was tested with made-up files only. How a given camera app stamps its files (above all videos) can differ by phone maker; if matches look shifted, that is the first thing to check.
-- The recorder's settings (track detail, vibrate on mark, units in the notification) compile but have not run on a real phone.
+- Still to confirm on a real walk: the coarse track-detail setting (a point every 10 m, GPS every 5 s) and kilometres in the recording notification. Vibrate on "Mark here" was confirmed by the owner.
 - Marks, walk sharing, the edit sheet and the backup file were tested in a browser against a stand-in; the notification button and the Downloads file have not run on a real phone.
 - A shared walk has to be opened from inside the Atlas (Log tab); tapping the file in another app does not open the Atlas yet. Shared walks carry small previews, not the photos themselves.
 - Not built yet: historical-markers layer, full-size photos in exports, telling the user a newer app build exists.
