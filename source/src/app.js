@@ -380,7 +380,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); try{ window.__atlasMap=map; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); try{ window.__atlasMap=map; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -558,6 +558,9 @@ function buildSheet(){
   }
   lb.append(H('Leads'));
   lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Ruins, mines, kilns, quarries and old farms mapped by OpenStreetMap volunteers. Nobody has checked them for the Atlas',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); }));
+  lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone. Orange dots, from town level in. Nine Northeast states',v=>{ xlSet('vanished',v); buildSheet(); }));
+  if(xlOn('vanished')) lb.append(ck('xl-schools',U.ui.xl&&U.ui.xl.schools,'Old school sites too','Mostly one-room schoolhouses. There are thousands, so they are off unless you ask',v=>xlSet('schools',v)));
+  lb.append(ck('xl-mines',xlOn('mines'),'Old mines and quarries','Iron mines, quarries, clay pits and prospects from the U.S. Geological Survey. Grey dots, from town level in. Positions are rough',v=>xlSet('mines',v)));
   lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Old town centres, and other places where historical markers and National Register listings bunch together. Purple discs; zoom in to see each marker and listing',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); }));
   if(U.ui.pockets&&POCK){ const all=pockNear(pockList.mode), other=pockList.mode==='other';
     lb.append(ck('pock-c',U.ui.pockC,'Old town centres only','Hide the other pockets: estates, mill sites, battlefields, campuses',v=>{ U.ui.pockC=v; save(); pockReset(); }));
@@ -703,6 +706,51 @@ function drawLeads(){
     LEADS.p.forEach(p=>{ const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false}).addTo(leadGrp);
       m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } leadPopup(p); }); }); }
   leadGrp.addTo(map); }
+/* ---------- two more lead layers, drawn only where the map is looking ----------
+   data/vanished.json (tools/vanished.py): places the federal names file of 2021 marks "(historical)".
+       p = [lat,lon,type,name,GNIS id,state]
+   data/mines.json (tools/mines.py): past producers and prospects from the USGS Mineral Resources Data System.
+       p = [lat,lon,type,name,MRDS id,commodity,'P' past producer|'S' prospect,last year worked or 0,state]
+   Both are fetched only when switched on. There are thousands of points, so they are indexed on a grid and only the
+   ones in view are drawn, from zoom XL[k].z. */
+const XL={
+  vanished:{file:'data/vanished.json',z:10,fill:'#ff8a3d',ring:'#5a2600',what:'vanished place',
+    src:'From the U.S. Board on Geographic Names file of 2021, which marks it "historical": it no longer exists or no longer serves that purpose. Something may still stand. The position can be 100 m or more out.',
+    seed:x=>'Lead from the federal place-names file (GNIS '+x[4]+'), which marks it historical. Not checked yet.'},
+  mines:{file:'data/mines.json',z:9,fill:'#aeb7c2',ring:'#1f2a36',what:'old mine or quarry',
+    src:'From the USGS Mineral Resources Data System, last updated in 2011. The position is often only good to a few hundred metres. Old workings can be flooded, fenced or on private land: do not enter shafts or adits.',
+    seed:x=>'Lead from the USGS Mineral Resources Data System (record '+x[4]+'). Not checked yet.'} };
+Object.keys(XL).forEach(k=>{ XL[k].k=k; XL[k].data=null; XL[k].idx=null; XL[k].layer=null; XL[k].wait=null; });
+const xlOn=k=>!!(U.ui.xl&&U.ui.xl[k]);
+const xlShow=(k,x)=>k!=='vanished'||x[2]!==1||!!(U.ui.xl&&U.ui.xl.schools);     /* old school sites are two thirds of the file: off unless asked for */
+function xlLoad(k){ const X=XL[k]; if(X.data||X.wait) return;
+  X.wait=(AT?AT.fetch(X.file):fetch(X.file+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(j=>{ X.data=j; X.idx={}; j.p.forEach(x=>{ const g=Math.floor(x[0]*20)+','+Math.floor(x[1]*20); (X.idx[g]=X.idx[g]||[]).push(x); }); drawXL(k); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); })
+    .catch(()=>{ X.wait=null; banner('That layer could not load. Check your signal and switch it on again.',true,6000); }); }
+function xlInView(k,b){ const X=XL[k], out=[]; if(!X.idx) return out;
+  for(let i=Math.floor(b.getSouth()*20);i<=Math.floor(b.getNorth()*20);i++) for(let j=Math.floor(b.getWest()*20);j<=Math.floor(b.getEast()*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(k,x)&&b.contains([x[0],x[1]])) out.push(x); });
+  return out; }
+function drawXL(k){ const X=XL[k]; if(!map) return;
+  if(X.layer){ map.removeLayer(X.layer); X.layer=null; }
+  if(!xlOn(k)) return;
+  if(!X.data){ xlLoad(k); return; }
+  if(!map._xlOn){ map._xlOn=true; map.on('moveend',()=>Object.keys(XL).forEach(drawXL)); }
+  if(map.getZoom()<X.z) return;
+  if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
+  const g=L.layerGroup(); xlInView(k,map.getBounds().pad(0.1)).slice(0,1500).forEach(x=>{
+    const m=L.circleMarker([x[0],x[1]],{pane:'lines',renderer:lineCanvas,radius:5,color:X.ring,weight:1.3,fillColor:X.fill,fillOpacity:0.95,bubblingMouseEvents:false}).addTo(g);
+    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } xlPopup(k,x); }); });
+  X.layer=g.addTo(map); }
+function xlLine(k,x){ const t=XL[k].data.t[x[2]];
+  return k==='mines'?t+(x[5]?' · '+x[5].toLowerCase():'')+' · '+(x[6]==='S'?'prospect':'past producer')+(x[7]?', last worked '+x[7]:''):t; }
+function xlPopup(k,x){ const X=XL[k], pt={lat:x[0],lon:x[1]}, name=x[3]||X.data.t[x[2]];
+  const box=el('div',{class:'ctx'},el('b',{text:name}),el('span',{style:'color:#5b6660',text:xlLine(k,x)+' · unchecked lead'}),el('span',{style:'color:#5b6660',text:X.src}));
+  if(k==='mines') box.append(ext('https://mrdata.usgs.gov/mrds/show-mrds.php?dep_id='+x[4],'USGS record','btn sm'));
+  box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); openForm({lat:x[0],lon:x[1],name:name,story:X.seed(x)}); }},'+ Add to my places'));
+  box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(pt)},'Whose land is it?'));
+  scoutLinks(pt).slice(0,2).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
+  L.popup({maxWidth:270}).setLatLng([x[0],x[1]]).setContent(box).openOn(map); }
+function xlSet(k,v){ U.ui.xl=U.ui.xl||{}; U.ui.xl[k]=v; save(); if(k==='schools') drawXL('vanished'); else { drawXL(k); if(v&&map.getZoom()<XL[k].z) banner('Zoom in to see them: they show from about town level.',false,5000); } }
 /* ---------- historic pockets: old town centres, and other places where markers and Register listings bunch together ----------
    data/pockets.json (tools/pockets.py) holds every state's pockets and is small:
      k = [lat,lon,radius m,markers,listed places,districts,contributing buildings,name,state,marker spots,type,score,era,settlement kind]
@@ -1585,7 +1633,7 @@ function renderGuide(){
     P('Drive times from the listed start cities were calculated by road with no traffic, so add a little. A place more than about 450 miles from your start city, or with no road to it, shows a rough estimate marked ~. Pick your own start point from "Drive times from."'),
     P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
-    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
+    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vanished places: U.S. Board on Geographic Names, Geographic Names Information System file of August 2021, unchecked. Old mines and quarries: U.S. Geological Survey Mineral Resources Data System, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }
 function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(visible.map(s=>{const p=pos(s);return [p.lat,p.lon];})); map.fitBounds(b.pad(0.15),{maxZoom:14}); }
 
