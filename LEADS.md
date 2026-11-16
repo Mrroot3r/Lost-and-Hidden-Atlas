@@ -27,6 +27,10 @@ Places someone read about while researching but did not add, with what is missin
 | Wolf Hollow | Glenville, NY | Recalled as an old road through a ravine, closed to cars | A source for its history and who may walk it |
 | Rip Van Winkle House | Palenville, NY | Recalled as a ruin on the old mountain road to the Catskill Mountain House | A source and a coordinate |
 | Staalesen Vanderheyden Preserve | Troy, NY | Recalled as a preserve round an old city reservoir | A source and a coordinate |
+| Willard Asylum for the Chronic Insane | Willard, NY | Wikipedia: state asylum opened 1869; a drug treatment center opened on the campus in 1995; 400 patients' suitcases were found in an attic that year | Who holds the campus now, whether any of it can be seen from a public road, the cemetery |
+| Chenango Canal Summit Level | Bouckville, NY | A National Register listing in Madison County; the Wikipedia title redirects to the general Chenango Canal article (canal ran 1834 to 1878, Utica to Binghamton) | A source for what survives at the summit level and where to walk it |
+| Erie Canal Village | Rome, NY | Recalled as a closed museum village on the old canal | A source and a coordinate |
+| Black River Canal Warehouse | Boonville, NY | A National Register listing; not read | A source; pairs with the Five Lock Combine entry |
 | Mount Hope Furnace | Fort Ann, NY | Iron furnace | A source and a coordinate |
 | Sam's Point berry-picker shacks | Cragsmoor, NY | Said to stand along the old road | A source |
 | Dungeon Rock | Lynn, MA | In Lynn Woods Reservation; the article read says only that it became a tourist attraction in the 1850s | A source for the tunnel's story and whether it is open; a coordinate |
