@@ -59,7 +59,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true};
+const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -74,7 +74,26 @@ const sites=()=>BASE.concat(U.custom);
 const byId=id=>sites().find(s=>s.id===id);
 const pos=s=>{ const m=U.moved[s.id]; return m?{lat:m[0],lon:m[1]}:{lat:s.lat,lon:s.lon}; };
 const dest=s=>s.th?{lat:s.th[0],lon:s.th[1]}:pos(s);
-function homeObj(){ if(U.home.id==='custom') return {id:'custom',name:'My spot',lat:U.home.lat,lon:U.home.lon}; return HUBS.find(h=>h.id===U.home.id)||HUBS[0]; }
+function homeObj(){ if(U.home.id==='custom') return {id:'custom',name:U.home.name||'My spot',lat:U.home.lat,lon:U.home.lon}; return HUBS.find(h=>h.id===U.home.id)||HUBS[0]; }
+const MAXB=[[35.7,-96.0],[47.7,-66.5]];
+const inMap=(la,lo)=>la>=MAXB[0][0]&&la<=MAXB[1][0]&&lo>=MAXB[0][1]&&lo<=MAXB[1][1];
+/* Until a start place is chosen by hand, it follows the nearest start city to where the reader is (or last was). */
+function nearHome(ll,say){ if(!ll||U.home.by===1||U.home.id==='custom') return false; let b=null,bd=1e9; HUBS.forEach(h=>{ const d=hav(ll[0],ll[1],h.lat,h.lon); if(d<bd){ bd=d; b=h; } });
+  if(!b||bd>300||b.id===U.home.id) return false; U.home={id:b.id,by:2}; save();
+  if(say){ buildHome(); drawHome(); refresh(); banner('Drive times now count from '+b.name+', the nearest start city. Change it under the gear in Map options.',false,7000); } return true; }
+function startView(){ const v=U.ui.view, H=homeObj();
+  if(pref('start')!=='home'&&v&&inMap(v[0],v[1])) return {c:[v[0],v[1]],z:Math.max(5,Math.min(20,v[2]||9))};
+  if(H.id==='alb') return {c:[42.82,-73.86],z:9}; return {c:[H.lat,H.lon],z:H.id==='custom'?11:10}; }
+function setSpot(la,lo,name){ U.home={id:'custom',lat:+(+la).toFixed(5),lon:+(+lo).toFixed(5),by:1}; if(name) U.home.name=String(name).slice(0,60); save(); buildHome(); drawHome(); refresh(); banner('Working out drive times from '+(name||'your spot')+'…',false);
+  fetchDT().then(ok=>{ banner(ok?'Drive times updated from '+(name||'your spot')+'.':'Could not reach the routing service, so times are rough estimates (marked ~).',!ok,5000); refresh(); }); }
+/* A typed start place: "lat, lon" is read directly, anything else is looked up with OpenStreetMap's Nominatim. */
+async function findSpot(q){ q=String(q||'').trim(); if(!q) return {err:'Type a town, an address, a ZIP code, or coordinates.'};
+  const m=q.match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*[, ]\s*(-?\d{1,3}(?:\.\d+)?)\s*$/); let la,lo,name='';
+  if(m){ la=+m[1]; lo=+m[2]; if(lo>0) lo=-lo; }
+  else { try{ const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us,ca&q='+encodeURIComponent(q)); const j=await r.json(); if(!j.length) return {err:'Nothing found for "'+q+'". Try a town and state, or coordinates like 39.10, -94.58.'}; la=+j[0].lat; lo=+j[0].lon; name=String(j[0].display_name||q).split(',').slice(0,2).join(',').trim(); }
+    catch(e){ return {err:'Could not look that up (no connection?). Type coordinates like 39.10, -94.58, or choose "Pick a spot on the map".'}; } }
+  if(!isFinite(la)||!isFinite(lo)||!inMap(la,lo)) return {err:'That is outside the area the Atlas covers.'};
+  return {lat:la,lon:lo,name:name}; }
 const homeKey=()=>{ const H=homeObj(); return H.lat.toFixed(4)+','+H.lon.toFixed(4); };
 function roughMin(mi){ const road=mi*1.3, mph=road<8?26:road<35?40:50; return {min:Math.max(1,Math.round(road/mph*60)),mi:Math.round(road*10)/10}; }
 function dt(s){
@@ -346,13 +365,13 @@ function initMap(){
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
-  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:7,zoomSnap:1,worldCopyJump:false,maxBounds:[[38.7,-81.0],[47.7,-66.5]],maxBoundsViscosity:0.6}).setView([42.82,-73.86],9);
+  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:5,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); map.setView(sv.c,sv.z); }
   L.control.zoom({position:'bottomright'}).addTo(map);
   drawScale();
   map.attributionControl.setPrefix(false);
   map.createPane('cmp').style.zIndex=250;
   map.createPane('hist').style.zIndex=350;
-  map.on('moveend',()=>{ if(U.ui.land) drawLand(); });
+  map.on('moveend',()=>{ if(U.ui.land) drawLand(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
   if(!LD[U.ui.base]) U.ui.base='streets';
   setBase(U.ui.base,true);
   map.on('zoomend',onZoom); onZoom();
@@ -473,16 +492,21 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     x.addEventListener('change',()=>{ const c=choices.find(c=>String(c[0])===x.value); setPref(key,c?c[0]:x.value); }); return el('label',{class:'field setrow',for:id},el('span',{text:label}),x,sub?el('small',{class:'snote',text:sub}):null); };
   const tog=(key,label,sub)=>{ const id='set-'+key; return el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!pref(key),onchange:e=>setPref(key,e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null)); };
   const sw=el('div',{class:'swatches',role:'radiogroup','aria-label':'Track colour'}); [['#e11d74','Pink'],['#2563eb','Blue'],['#dc2626','Red'],['#7c3aed','Purple'],['#111827','Black']].forEach(c=>{ const b=el('button',{type:'button',role:'radio','aria-checked':String(pref('trk')===c[0]),'aria-label':c[1],title:c[1],style:'--c:'+c[0]}); b.addEventListener('click',()=>{ setPref('trk',c[0]); buildSettings(); }); sw.append(b); });
-  const hs=el('select',{id:'set-home'}); [...$('#home').children].forEach(n=>hs.append(n.cloneNode(true))); hs.value=U.home.id; hs.addEventListener('change',()=>{ const h=$('#home'); h.value=hs.value; if(hs.value==='pick') closeSheet(); h.dispatchEvent(new Event('change')); });
+  const hs=el('select',{id:'set-home'}); [...$('#home').children].forEach(n=>hs.append(n.cloneNode(true))); hs.value=U.home.id; hs.addEventListener('change',()=>{ const h=$('#home'); h.value=hs.value; if(hs.value==='pick') closeSheet(); const ev=new Event('change'); ev.go=true; h.dispatchEvent(ev); });
+  const fq=el('input',{type:'text',id:'set-find',placeholder:'Town, address, ZIP or 39.10, -94.58',autocomplete:'off',enterkeyhint:'search'}), fb=el('button',{type:'button',class:'btn',text:'Set'}), fm=el('small',{class:'snote',text:'Use this when the device cannot find you, such as a desktop with location turned off. Names are looked up with OpenStreetMap; coordinates are not sent anywhere.'});
+  const go=async()=>{ fb.disabled=true; fm.textContent='Looking…'; const r=await findSpot(fq.value); fb.disabled=false; if(r.err){ fm.textContent=r.err; return; } setSpot(r.lat,r.lon,r.name); if(map) map.setView([r.lat,r.lon],11); buildSettings(); };
+  fb.addEventListener('click',go); fq.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } });
   lb.append(H('Look and units'),
     pick('theme','Theme',[['auto','Follow the phone'],['light','Light'],['dark','Dark']]),
     pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
     pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
     el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),
     H('Map'),
-    pick('open','The map opens on',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
+    pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
-    el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Drive times from'}),hs),
+    pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
+    el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here. Until you choose one, the Atlas uses the start city nearest to where you are or last were.'})),
+    el('div',{class:'field setrow'},el('label',{for:'set-find',text:'Or type your start place'}),el('div',{class:'findrow'},fq,fb),fm),
     H('Field log'),
     pick('detail','Track detail',[['fine','Fine: a point every 2 m'],['normal','Normal: every 4 m'],['coarse','Coarse: every 10 m']],NATIVE?'Coarse also checks GPS less often, which saves some battery on long days. Takes effect on the next recording.':'Takes effect on the next recording.'),
     NATIVE?tog('buzz','Vibrate on "Mark here"','A short buzz so you know the pin was dropped without looking.'):null,
@@ -774,7 +798,7 @@ function locate(){
       const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); recPoint(p,c.accuracy||50,t);
       /* follow: if the dot was on screen and has now walked off it, bring the map along */
       if(pref('follow')&&!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
-      if(geo.first){ geo.first=false; banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,Math.max(map.getZoom(),16)); }
+      if(geo.first){ geo.first=false; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,Math.max(map.getZoom(),16)); }
     },e=>{ if(e&&e.code===1){ fail(LOCAL||HOSTED?'Location was refused. Allow it for this page in your browser settings, then tap again.':'This online copy is not allowed to use your location. It works when the Atlas is opened as a file or from your own web address.'); return; }
       if(geo.f) return;   /* a passing timeout after we already had a fix: keep listening */
       fail('Could not get a GPS fix. Step into the open and try again.'); },
@@ -1086,8 +1110,7 @@ function showHist(){
 }
 function onMapClick(e){
   if(asking){ setAsking(false); whoPopup({lat:e.latlng.lat,lon:e.latlng.lng}); return; }
-  if(pickingHome){ pickingHome=false; stage.classList.remove('adding'); $('#addbar').hidden=true; U.home={id:'custom',lat:+e.latlng.lat.toFixed(5),lon:+e.latlng.lng.toFixed(5)}; save(); buildHome(); drawHome(); refresh(); banner('Working out drive times from your spot…',false);
-    fetchDT().then(ok=>{ banner(ok?'Drive times updated from your spot.':'Could not reach the routing service, so times are rough estimates (marked ~).',!ok,5000); refresh(); }); return; }
+  if(pickingHome){ pickingHome=false; stage.classList.remove('adding'); $('#addbar').hidden=true; setSpot(e.latlng.lat,e.latlng.lng); return; }
   if(adding){ adding=false; stage.classList.remove('adding'); $('#addbar').hidden=true; $('#add-here').hidden=true; openForm({lat:+e.latlng.lat.toFixed(6),lon:+e.latlng.lng.toFixed(6)}); }
 }
 function scoutLinks(p,town){
@@ -1462,7 +1485,7 @@ function buildHome(){
   const h=$('#home'); h.textContent='';
   STATES.forEach(st=>{ const hs=HUBS.filter(x=>x.st===st.k); if(hs.length) h.append(el('optgroup',{label:st.name},hs.map(x=>el('option',{value:x.id,text:x.name})))); });
   HUBS.filter(x=>!x.st).forEach(x=>h.append(el('option',{value:x.id,text:x.name})));
-  if(U.home.id==='custom') h.append(el('option',{value:'custom',text:'My spot ('+U.home.lat.toFixed(3)+', '+U.home.lon.toFixed(3)+')'}));
+  if(U.home.id==='custom') h.append(el('option',{value:'custom',text:(U.home.name||'My spot')+' ('+U.home.lat.toFixed(3)+', '+U.home.lon.toFixed(3)+')'}));
   h.append(el('option',{value:'pick',text:'Pick a spot on the map…'}));
   h.value=U.home.id;
 }
@@ -1470,7 +1493,7 @@ $('#home').addEventListener('change',e=>{
   const v=e.target.value;
   if(v==='pick'){ if(!map){ e.target.value=U.home.id; return; } pickingHome=true; stage.classList.add('adding'); $('#addbar').hidden=false; $('#addbar span').textContent='Click the map where you start from.'; e.target.value=U.home.id; return; }
   if(v==='custom') return;
-  U.home={id:v}; save(); buildHome(); drawHome(); refresh(); if(sel) renderDetail(sel);
+  U.home={id:v,by:1}; save(); buildHome(); drawHome(); refresh(); if(sel) renderDetail(sel); { const H=homeObj(); if(map&&e.go) map.setView([H.lat,H.lon],10); }
 });
 $('#q').addEventListener('input',debounce(e=>{ F.q=e.target.value.trim(); renderList(); syncMarkers(); $('#fcount').textContent=activeCount()?activeCount()+' on':''; },150));
 $('#sort').addEventListener('change',e=>{ U.ui.sort=e.target.value; save(); renderList(); });

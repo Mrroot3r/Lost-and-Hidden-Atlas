@@ -31,6 +31,9 @@ STATES=[
  {'k':'pa','name':'Pennsylvania','imagery':'fallback (Esri satellite and world hillshade)','owners':'not built','legal':False,
   'regions':[('pae','Philadelphia & southeast Pennsylvania'),('pane','Northeast Pennsylvania & the Poconos'),('pac','Central Pennsylvania'),('paw','Western Pennsylvania')],
   'hubs':[('harr','Harrisburg',40.2732,-76.8867),('phil','Philadelphia',39.9526,-75.1652),('pitt','Pittsburgh',40.4406,-79.9959)]},
+ {'k':'mo','name':'Missouri','imagery':'fallback (Esri satellite and world hillshade)','owners':'not built','legal':False,
+  'regions':[('kcmo','Kansas City, Missouri')],
+  'hubs':[('kc','Kansas City',39.0997,-94.5786)]},
 ]
 REG={c:l for s in STATES for c,l in s['regions']}
 REG_STATE={c:s['k'] for s in STATES for c,l in s['regions']}

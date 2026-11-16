@@ -25,7 +25,7 @@ def state_of(lat,lon):
     return None
 mk=open(os.path.join(T,'make.py'),encoding='utf-8').read()
 TAGS=set(re.findall(r"^ \['(\w+)',",mk,re.M))|{'now'}
-BOUNDS=[float(x) for x in re.search(r"maxBounds:\[\[([\d.,\-\[\]]+)\]\]",app).group(1).replace('[','').replace(']','').split(',')]
+BOUNDS=[float(x) for x in re.search(r"MAXB=\[\[([\d.,\-\[\]]+)\]\]",app).group(1).replace('[','').replace(']','').split(',')]
 # ---- place lists ----
 ids={}
 def seen(i,where):
