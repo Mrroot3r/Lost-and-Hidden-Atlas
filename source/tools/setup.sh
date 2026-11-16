@@ -31,6 +31,10 @@ if [ -f "$REPO/data/pockets.json" ]; then
   cp "$REPO"/data/pockets.json "$W/build/pockets.json"
   mkdir -p "$W/build/pock"; [ -d "$REPO/data/pock" ] && cp "$REPO"/data/pock/*.json "$W/build/pock/"
 fi
+# the LiDAR ledger (LIDAR.md): the repository's copy is folded into the workspace's, never over it, so verdicts a
+# session has recorded and not yet published survive a second setup
+[ -d "$REPO/source/lidar" ] && (cd "$W" && mkdir -p lidar && for f in "$REPO"/source/lidar/*; do [ -f "$f" ] && cp "$f" lidar/; done; python3 tools/lidar.py pull "$REPO/source/lidar/units" --base)
+git -C "$REPO" rev-parse HEAD > "$W/.setup_commit" 2>/dev/null || true    # publish.sh uses it to notice that main has moved on since
 # what this machine can and cannot do
 MISS=""
 for m in requests PIL rasterio shapely; do python3 -c "import $m" 2>/dev/null || MISS="$MISS $m"; done

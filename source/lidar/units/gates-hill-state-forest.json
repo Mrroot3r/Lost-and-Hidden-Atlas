@@ -1,0 +1,8 @@
+{"name": "Gates Hill State Forest", "code": "ghsf", "state": "done", "swept": "2026-11-16", "buildings": 13, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"],
+"cands":[
+{"id":"ghsf1","lat":42.522477,"lon":-74.368471,"depth":0.82,"size":[5,6],"dist":41,"blat":42.52281,"blon":-74.36869,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","when":"2026-11-16","late":[1944,"NY_Middleburgh_130551_1944_24000_geo.tif"],"seen":"2026-11-16","why":"dup","note":"the same site as lidar-gates-hill-pits"},
+{"id":"ghsf2","lat":42.52232,"lon":-74.368477,"depth":0.69,"size":[12,11],"dist":40,"blat":42.52239,"blon":-74.36896,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"published","place":"lidar-gates-hill-pits","batch":"lidar4","when":"2026-11-16"},
+{"id":"ghsf3","lat":42.525038,"lon":-74.358191,"depth":0.81,"size":[8,8],"dist":55,"blat":42.52551,"blon":-74.35839,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"},
+{"id":"ghsf4","lat":42.522159,"lon":-74.358989,"depth":0.74,"size":[15,9],"dist":83,"blat":42.5218,"blon":-74.35988,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"},
+{"id":"ghsf5","lat":42.52188,"lon":-74.359032,"depth":0.65,"size":[14,11],"dist":70,"blat":42.5218,"blon":-74.35988,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"}
+]}

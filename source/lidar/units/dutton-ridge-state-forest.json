@@ -1,0 +1,5 @@
+{"name": "Dutton Ridge State Forest", "code": "drsf", "state": "done", "swept": "2026-11-16", "buildings": 7, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"],
+"cands":[
+{"id":"drsf1","lat":42.526304,"lon":-74.272597,"depth":1.04,"size":[8,6],"dist":9,"blat":42.52631,"blon":-74.27271,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"published","place":"lidar-dutton-ridge-ringed-pit","batch":"lidar3","when":"2026-11-16"},
+{"id":"drsf2","lat":42.525985,"lon":-74.271792,"depth":0.6,"size":[10,7],"dist":84,"blat":42.52631,"blon":-74.27271,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"}
+]}

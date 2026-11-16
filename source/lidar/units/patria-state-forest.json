@@ -1,0 +1,6 @@
+{"name": "Patria State Forest", "code": "pasf", "state": "done", "swept": "2026-11-16", "buildings": 13, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"],
+"cands":[
+{"id":"pasf1","lat":42.593704,"lon":-74.415937,"depth":0.76,"size":[7,10],"dist":43,"blat":42.59387,"blon":-74.41546,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"coarse","when":"2026-11-16"},
+{"id":"pasf2","lat":42.602925,"lon":-74.406089,"depth":0.61,"size":[5,7],"dist":86,"blat":42.60215,"blon":-74.40612,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"},
+{"id":"pasf3","lat":42.594,"lon":-74.416041,"depth":0.78,"size":[4,8],"dist":50,"blat":42.59387,"blon":-74.41546,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"new"}
+]}

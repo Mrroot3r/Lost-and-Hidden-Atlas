@@ -1,0 +1,7 @@
+{"name": "Bates State Forest", "code": "basf", "state": "done", "swept": "2026-11-16", "buildings": 22, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif"],
+"cands":[
+{"id":"basf1","lat":42.435882,"lon":-74.277632,"depth":1.01,"size":[13,10],"dist":38,"blat":42.43581,"blon":-74.27718,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"water","note":"in a stream ravine","when":"2026-11-16"},
+{"id":"basf2","lat":42.435864,"lon":-74.26505,"depth":0.67,"size":[5,8],"dist":43,"blat":42.43612,"blon":-74.26544,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"basf3","lat":42.435352,"lon":-74.277243,"depth":0.83,"size":[5,6],"dist":51,"blat":42.43581,"blon":-74.27718,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"basf4","lat":42.429297,"lon":-74.281229,"depth":1.2,"size":[14,14],"dist":73,"blat":42.4299,"blon":-74.28159,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"}
+]}
