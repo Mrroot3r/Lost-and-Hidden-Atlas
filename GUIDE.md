@@ -88,7 +88,8 @@ Run only when needed:
 
 - `python3 tools/topo_all.py <id> <id> …` cuts old-map crops for new places. It downloads large USGS scans, so run it only for new ids.
 - `python3 tools/pincheck.py --batch <key>` makes contact sheets of every new pin on an aerial (section 6).
-- `tools/lines.py` rebuilds the rail and canal lines. It needs raw downloads that are not in the repository. Run it only when adding a region.
+- `tools/lines.py` rebuilds the rail, trolley and canal lines, and `tools/leads.py` the leads. The raw downloads they read are not in the repository, and neither needs all of them: each rebuilds only the areas whose raw files are in `cache/osm/` and keeps what is already in `build/lines.json` and `build/leads.json` for everywhere else. Run them only when adding a state (section 8, "Lines and leads for a new state").
+- `tools/osm_layers.py <key>` and `tools/ohm_state.py <key>` download a whole state's old railways, canals and mapped ruins.
 - `tools/osm_leads.py`, `tools/osm_worc.py` download leads from Overpass.
 
 ### What a cloud session usually cannot reach
@@ -98,7 +99,7 @@ Check these once and move on; do not spend time retrying.
 | Service | What happens | Do instead |
 |---|---|---|
 | Wikipedia search and query API | HTTP 429 for minutes at a time, even batched and paced | `tools/wiki_raw.py`, which reads one article at a time as raw text |
-| Overpass (OpenStreetMap queries) | Blocked or timing out on most mirrors | Skip leads for now and record it in section 10; try small boxes on the `maps.mail.ru` mirror |
+| Overpass (OpenStreetMap queries) | Blocked or timing out on every mirror. `maps.mail.ru` sometimes answers, but cuts any request off at about 57 seconds, which is too short for even a quarter-degree box. Geofabrik extracts are blocked too | `tools/osm_layers.py`, which reads the copies of OpenStreetMap that Esri hosts as feature layers (updated daily). OpenHistoricalMap's own Overpass server works: `tools/ohm_state.py` |
 | Everything else used here (ArcGIS geocoder, state image services, OSRM, USGS TNM, PAD-US) | Has worked | |
 
 ## 4. The place record
@@ -216,8 +217,7 @@ Beyond adding places, these make a state better. Do them when asked, or note in 
 |---|---|---|
 | Law note | **Optional. Only when the owner asks** | Add the state's trespass basics to the in-app Guide and set `legal` to `True` in `states.py`. Read the statute; do not paraphrase from memory. A batch is complete without it: the owner's position is that knowing the local law is up to whoever visits. What is never optional is the access line on each place (who owns it, whether it is open, closed or posted) |
 | State imagery | When the state publishes it | Add its leaf-off and LiDAR services to `leafUrl()` and `lidarUrl()`. Check they send CORS headers, note their deepest zoom, and look at a tile over open water (some services return black there). Then test with `node tools/smoke.js <url> <place-id>` |
-| Rail and canal lines | Can wait | Widen the box in `lines.py`, add the state's old lines, rebuild `lines.json` |
-| Leads | Can wait | Overpass download for the state |
+| Rail and canal lines, and leads | When the owner asks for a state | See "Lines and leads for a new state" below. Done for all of New York and Massachusetts |
 | Owner lookup and lot lines | Can wait | Add to `lookup()` and `drawLots()` if the state publishes parcels with owner names |
 | A new region or start city | When a state's regions are too coarse, or its one statewide region holds more than a few dozen places | Add it in `states.py`: for example `('txw','West Texas')` beside the statewide `('tx','Texas')`. Leave the statewide code in place for the places already using it; never rename a region code that published places use. Check a new start city's coordinate with a geocoder, not from memory |
 
@@ -236,6 +236,19 @@ ruins and traces first.
 ```
 
 Name the area and a number; everything else is in the guide. If the area is a city the Atlas has no start city for, the session should add one to `tools/states.py` (the table above).
+
+### Lines and leads for a new state
+
+The old rail, trolley and canal lines and the leads layer exist for all of New York and Massachusetts, with a strip of western Connecticut and Vermont. Every other state has none yet. To add a state (its outline must already be in `build/states.json`):
+
+1. `python3 tools/osm_layers.py <key>` downloads the state's abandoned, disused and razed railways, its canals, and its mapped ruins from the OpenStreetMap layers Esri hosts. It looks each old railway up in the highways layer to tell which are rail trails today. About ten minutes for New York.
+2. `python3 tools/ohm_state.py <key>` downloads OpenHistoricalMap's railways and canals, which carry opening and closing years.
+3. Add the key to `STATE_KEYS` at the top of **both** `tools/lines.py` and `tools/leads.py`.
+4. `python3 tools/lines.py` (several minutes) and `python3 tools/leads.py`, then `all.sh`. Both keep the existing lines and leads for every area whose raw files you do not have, so a fresh workspace only rebuilds the new state. Railroads in use come from the federal rail network and are fetched for the new state by `lines.py` itself.
+5. Look at the result at phone size over the state's cities, and tap a few lines. Trolley and interurban lines are recognised by name (`TROL` in `lines.py`): add the state's interurban company names there if they show as plain abandoned railroad. Canals still in use are listed by name in the same file.
+6. Say in the pull request how many kilometres of each kind were added (`lines.py` prints them).
+
+What the layer route loses compared with a full OpenStreetMap download: a line tagged only as `abandoned:railway=…` with no `railway=abandoned` is missing (about 5% by length in the Capital Region, where both were available to compare), and old names kept in tags such as `old_name` are missing, so more lines are unnamed. Leads from the layers are thinner than from Overpass: only mapped historic points and ruined or abandoned buildings.
 
 ### A province, territory or country that is not listed yet
 
@@ -283,6 +296,7 @@ Every US state and Canadian province was set up this way in November 2026, so th
 - The "A first place in every state" batch (November 2026, `data_states.py`) is one place for each of 40 states and 7 provinces, meant as a worked example per state, not coverage. Each was written from one Wikipedia article plus, for most, the managing agency's own page; 17 have Wikipedia as their only source, which the links on each place make plain. Agency pages that would not open from the cloud session are named as such in the entry (Florida State Parks). Pins were looked at on Esri satellite only; about a third sit under tree cover and could not be confirmed, and the pin notes say which. `new-manchester-mill` marks the park and not the ruins. `daniels-md`, `spokane-sd` and `piedmont-charcoal-kilns` are `mixed` because access or a count is unsettled. Only two have a trailhead coordinate.
 - Canada has no old-map crops, no public-land status and no law note. Hawaii's only start city is Honolulu, so a place on another island shows a rough drive estimate that means little.
 - State and province outlines added in November 2026 are coarse (simplified to roughly 1 to 5 km) and pushed about 3 km out to sea. A pin within a kilometre or two of a state line can be read as the neighbouring state; `check.py` will say so. If the coordinate is right, remake that outline more finely with `outlines.py` (lower its tolerance) before changing the pin.
+- Rail, trolley and canal lines and leads (November 2026) cover all of New York and Massachusetts. Outside the Capital Region and the Hudson Valley, New York's come from the hosted OpenStreetMap layers (see section 8 for what that loses). Buffalo's and New York City's yards show as dense bundles of parallel abandoned tracks, and many street-railway lines in New York City are drawn as plain abandoned railroad because OpenStreetMap does not name them. None of the new lines was checked on the ground or against an old map. No other state has lines yet.
 - Missouri (Kansas City) is a first pass: no law note in the app, no state leaf-off or LiDAR, no owner lookup, no rail lines. Pins were checked on Esri satellite only. Old-map crops are cut for every new place except `landmark` ones (section 8).
 - The Massachusetts rail layer comes from a state file with unlabeled numeric line types; "abandoned" there is a best reading.
 - Drive times to far-eastern places can look long; the Google directions button is the truth.
