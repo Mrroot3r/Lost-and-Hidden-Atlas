@@ -1010,9 +1010,14 @@ function nmGoalDraw(){ if(!map) return; const t=NM.goal, o=t&&nmOrigin();
   if(!NM.ring) NM.ring=L.circleMarker([t.la,t.lo],{radius:13,color:'#e11d74',weight:3,fill:false,interactive:false}).addTo(map); else NM.ring.setLatLng([t.la,t.lo]);
   if(o&&o.how!=='map'){ if(!NM.line) NM.line=L.polyline([o.p,[t.la,t.lo]],{color:'#e11d74',weight:2.5,dashArray:'7 7',interactive:false}).addTo(map); else NM.line.setLatLngs([o.p,[t.la,t.lo]]); }
   else if(NM.line){ map.removeLayer(NM.line); NM.line=null; } }
-const nmArrow=(b,big)=>{ const s=el('span',{class:'nmarrow'+(big?' big':''),'data-b':String(Math.round(b)),'aria-hidden':'true'}); s.innerHTML='<svg viewBox="0 0 24 24" width="'+(big?54:22)+'" height="'+(big?54:22)+'"><path d="M12 2.5 18.5 20 12 16.2 5.5 20z" fill="currentColor"/></svg>'; s.style.transform='rotate('+nmTurn(b)+'deg)'; return s; };
+const nmArrow=(b,big)=>{ const s=el('span',{class:'nmarrow'+(big?' big':''),'data-b':String(Math.round(b)),'aria-hidden':'true'}); s.innerHTML='<svg viewBox="0 0 24 24" width="'+(big?54:22)+'" height="'+(big?54:22)+'"><path d="M12 2.5 18.5 20 12 16.2 5.5 20z" fill="currentColor"/></svg>'; nmRot(s); return s; };
 const nmTurn=b=>Math.round(NM.hd==null?b:(b-NM.hd+360)%360);
-function nmSpin(){ document.querySelectorAll('#v-near .nmarrow').forEach(n=>{ n.style.transform='rotate('+nmTurn(+n.getAttribute('data-b'))+'deg)'; }); }
+/* Turn one arrow to where it should point. The angle is kept running on (361, 362 ... not 1, 2) and each change goes the short way round:
+   a jump from 3 to 359 degrees would otherwise be animated as a spin through nearly a whole turn. */
+function nmRot(n){ const t=nmTurn(+n.getAttribute('data-b')), was=n.hasAttribute('data-r')?+n.getAttribute('data-r'):null; let r=t;
+  if(was!=null&&isFinite(was)){ let d=(t-was)%360; if(d>180) d-=360; if(d<-180) d+=360; r=was+d; }
+  n.setAttribute('data-r',String(r)); n.style.transform='rotate('+r+'deg)'; }
+function nmSpin(){ document.querySelectorAll('#v-near .nmarrow').forEach(nmRot); }
 /* the phone's compass, while the Near tab is showing: arrows then point from the way the phone is held */
 function nmHeading(e){ let h=null;
   if(typeof e.webkitCompassHeading==='number') h=e.webkitCompassHeading;
