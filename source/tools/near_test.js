@@ -49,7 +49,15 @@ const { chromium, devices } = require('playwright');
   r=await rows(); ok('compass: phone pointing west, the north arrow turns to point right',mine()[3]==='rotate(90deg)'&&/Compass on/.test(await p.innerText('#near-note')),mine()[3]);
   // held upright facing east (beta 90, alpha 270): north is to the left
   await p.evaluate(()=>{ for(let i=0;i<12;i++){ const e=new Event('deviceorientationabsolute'); e.absolute=true; e.alpha=270; e.beta=88; e.gamma=0; window.dispatchEvent(e); } }); await p.waitForTimeout(600);
-  r=await rows(); const deg=+(/rotate\((\d+)deg\)/.exec(mine()[3])||[0,-1])[1]; ok('compass: phone upright facing east, the north arrow points left',Math.abs(deg-270)<=4,mine()[3]);
+  r=await rows(); const deg=((+(/rotate\((-?[\d.]+)deg\)/.exec(mine()[3])||[0,NaN])[1])%360+360)%360; ok('compass: phone upright facing east, the north arrow points left',Math.abs(deg-270)<=4,mine()[3]);
+  // turning slowly through north: the arrow must follow, never swing the long way round the dial
+  const steps=await p.evaluate(async()=>{ const out=[], fire=h=>{ const e=new Event('deviceorientationabsolute'); e.absolute=true; e.alpha=(360-h)%360; e.beta=0; e.gamma=0; window.dispatchEvent(e); };
+    const read=()=>{ const n=document.querySelector('#near-list .nmitem[data-id="p:lidar-cole-hill-farmstead"] .nmarrow'); return +(/rotate\((-?[\d.]+)deg\)/.exec(n.style.transform)||[0,NaN])[1]; };
+    const frame=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    for(let i=0;i<14;i++) fire(330); await frame();
+    for(let h=330;h<=390;h+=4){ fire(h%360); fire(h%360); await frame(); out.push(read()); } return out; });
+  const jump=Math.max(...steps.slice(1).map((v,i)=>Math.abs(v-steps[i])));
+  ok('turning slowly through north, the arrow never swings the long way round',jump<45&&steps.every(v=>!isNaN(v)),steps.join(' '));
   // walk towards it: nothing at 250 m, a buzz inside 100 m, and no second buzz while still there
   await at(250); ok('no alert at 250 m',(await p.evaluate(()=>window.__buzz.length))===0);
   await at(80); const ban=await p.innerText('#banner').catch(()=>'');
