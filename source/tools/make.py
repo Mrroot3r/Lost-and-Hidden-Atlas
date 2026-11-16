@@ -85,6 +85,8 @@ if os.path.exists(R+'build/pockets.json'):       # historic pockets (tools/pocke
     open(WEB+'data/pockets.json','w',encoding='utf-8').write(json.dumps(pj,separators=(',',':'),ensure_ascii=False))
     os.makedirs(WEB+'data/pock')
     for k in pj.get('s',{}): shutil.copyfile(R+f'build/pock/{k}.json',WEB+f'data/pock/{k}.json')   # one state's markers and listings, fetched when the map is zoomed in there
+for extra in ('vanished','mines'):       # optional lead layers (tools/vanished.py, tools/mines.py); fetched only when switched on
+    if os.path.exists(R+f'build/{extra}.json'): shutil.copyfile(R+f'build/{extra}.json',WEB+f'data/{extra}.json')
 open(WEB+'app.js','w').write(app)
 open(WEB+'leaflet.js','w').write(open(R+'cache/leaflet.min.js').read())
 web_scripts=('<script src="leaflet.js?v=1.9.4"></script>\n'

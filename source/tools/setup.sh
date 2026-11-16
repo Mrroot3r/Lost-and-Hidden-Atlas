@@ -25,6 +25,7 @@ cp "$REPO"/leaflet.js "$W/cache/leaflet.min.js"
 cp "$REPO"/topo/*.webp "$W/build/topo/"
 cp "$REPO"/data/lines.json "$W/build/lines.json"
 cp "$REPO"/data/leads.json "$W/build/leads.json"
+for f in vanished mines; do [ -f "$REPO/data/$f.json" ] && cp "$REPO/data/$f.json" "$W/build/$f.json"; done   # optional lead layers, kept when their raw downloads are absent
 # historic pockets: the built layer travels with the site, so a workspace without the raw downloads keeps every state
 if [ -f "$REPO/data/pockets.json" ]; then
   cp "$REPO"/data/pockets.json "$W/build/pockets.json"
