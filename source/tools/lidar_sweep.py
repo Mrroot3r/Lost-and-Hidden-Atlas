@@ -44,17 +44,27 @@ if len(sys.argv)>1 and sys.argv[1]=='rank':
     for c in cs: print(f"{rank(c):4} {c['unit'][:28]:28} pit {c['plat']:.6f},{c['plon']:.6f} {c['depth']:.2f} m {c['size'][0]}x{c['size'][1]}  {c['dist']} m from the {c['year']} symbol at {c['lat']},{c['lon']}  {c['sheet']}")
     sys.exit()
 S=load()
-for uf in sys.argv[1:]:
+REDO='--redo' in sys.argv
+for uf in [a for a in sys.argv[1:] if a!='--redo']:
     unit=json.load(open(uf)); name=unit.get('name') or os.path.basename(uf)
+    if name in S['units'] and REDO:   # look for buildings again (new sheet rules): forget what was found for this unit
+        S['units']=[u for u in S['units'] if u!=name] if isinstance(S['units'],list) else {k:v for k,v in S['units'].items() if k!=name}
+        S['cands']=[c for c in S['cands'] if c.get('unit')!=name]
     if name in S['units']: print('skip (done):',name); continue
     P=list(pts(unit['rings'])); xs=[p[0] for p in P]; ys=[p[1] for p in P]
     pre='research/lidar/sw_'+re.sub(r'[^a-z0-9]+','',name.lower())[:18]
     t0=time.time()
-    r=subprocess.run([sys.executable,'tools/lidar_scan.py',uf,pre],capture_output=True,text=True)
-    if not os.path.exists(pre+'_cands.json'): print('SCAN FAILED',name,(r.stdout+r.stderr)[-200:]); continue
-    # the oldest sheet at each corner and the middle, so a unit across a sheet edge is covered
+    if not os.path.exists(pre+'_cands.json'):   # a finished scan is kept: only the look for buildings is repeated
+        r=subprocess.run([sys.executable,'tools/lidar_scan.py',uf,pre],capture_output=True,text=True)
+        if not os.path.exists(pre+'_cands.json'): print('SCAN FAILED',name,(r.stdout+r.stderr)[-200:]); continue
+    # The oldest sheet over every 15-minute square the unit's outline touches (old sheets are 15 minutes on a side).
+    # The first version asked only at the four corners of the unit's box and its middle, which for a big unit made of
+    # scattered pieces (a wild forest) can miss every piece: Taylor Pond Wild Forest came back with no buildings at all.
+    cells={}
+    for x,y in P: cells.setdefault((math.floor(x*4),math.floor(y*4)),[]).append((x,y))
+    asks=[(sum(a for a,b in v)/len(v),sum(b for a,b in v)/len(v)) for k,v in sorted(cells.items(),key=lambda kv:-len(kv[1]))[:14]]
     want={}
-    for lo,la in ((min(xs),min(ys)),(min(xs),max(ys)),(max(xs),min(ys)),(max(xs),max(ys)),(sum(xs)/len(xs),sum(ys)/len(ys))):
+    for lo,la in asks:
         ss=[s for s in sheets(lo,la) if s[0]<=1915]
         if ss:
             quad=ss[0][1].split('_')[1]
