@@ -559,7 +559,7 @@ function buildSheet(){
   }
   lb.append(H('Leads'));
   lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Ruins, mines, kilns, quarries and old farms mapped by OpenStreetMap volunteers. Nobody has checked them for the Atlas',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); }));
-  lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone. Orange dots, from town level in. Nine Northeast states',v=>{ xlSet('vanished',v); buildSheet(); }));
+  lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone. Orange dots, from town level in. Nine Northeast states, Missouri and Kansas',v=>{ xlSet('vanished',v); buildSheet(); }));
   if(xlOn('vanished')) lb.append(ck('xl-schools',U.ui.xl&&U.ui.xl.schools,'Old school sites too','Mostly one-room schoolhouses. There are thousands, so they are off unless you ask',v=>xlSet('schools',v)));
   lb.append(ck('xl-mines',xlOn('mines'),'Old mines and quarries','Iron mines, quarries, clay pits and prospects from the U.S. Geological Survey. Grey dots, from town level in. Positions are rough',v=>xlSet('mines',v)));
   lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Old town centres, and other places where historical markers and National Register listings bunch together. Purple discs; zoom in to see each marker and listing',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); }));

@@ -18,7 +18,7 @@ Rows: [lat, lon, type, name, GNIS id, state]. Like the other layers this rebuild
 present and keeps the rest of an existing build/vanished.json."""
 import csv,io,json,os
 from collections import Counter
-KEYS=['ny','ma','vt','ct','nh','nj','pa','ri','me']
+KEYS=['ny','ma','vt','ct','nh','nj','pa','ri','me','mo','ks']
 TYPES=['Vanished hamlet or locale','Old school site','Old church site','Old military site','Old airfield','Old hospital','Old post office','Old mine','Other vanished building or structure']
 CLASS={'Populated Place':0,'Locale':0,'School':1,'Church':2,'Military':3,'Airport':4,'Hospital':5,'Post Office':6,'Mine':7,
        'Building':8,'Cemetery':8,'Bridge':8,'Dam':8,'Reservoir':8,'Canal':8,'Park':8,'Tower':8,'Tunnel':8,'Crossing':8,'Harbor':8,'Trail':8,'Oilfield':8,'Well':8}
