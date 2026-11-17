@@ -55,7 +55,11 @@ mkdir -p source/src source/tools source/build
 rm -f source/tools/*.py source/tools/*.sh source/tools/*.js source/tools/*.java
 cp "$W"/src/* source/src/
 cp "$W"/tools/*.py "$W"/tools/*.sh "$W"/tools/*.js "$W"/tools/*.java source/tools/
-if [ -d "$W/lidar" ]; then rm -rf source/lidar; mkdir -p source/lidar/units; cp "$W"/lidar/units/*.json source/lidar/units/; for f in "$W"/lidar/*; do [ -f "$f" ] && cp "$f" source/lidar/; done; fi
+if [ -d "$W/lidar" ]; then
+  mkdir -p source/lidar/units source/lidar/walls; rm -f source/lidar/units/*.json
+  cp "$W"/lidar/units/*.json source/lidar/units/; for f in "$W"/lidar/*; do [ -f "$f" ] && cp "$f" source/lidar/; done
+  for f in "$W"/lidar/walls/*.json; do [ -f "$f" ] && cp "$f" source/lidar/walls/; done        # walls are added to, never removed: another session's units stay
+fi
 git add -A
 echo "--- staged on branch $BR ---"; git status --short | awk '{print $1}' | sort | uniq -c
 echo "--- checks ---"; if [ -n "$FULL" ]; then python3 source/tools/check.py "$REPO"; else python3 source/tools/check.py "$REPO" --sources; fi

@@ -75,6 +75,23 @@ const { chromium, devices } = require('playwright');
   await p.evaluate(()=>{ window.__atlasMap.setView([42.75,-73.9],7,{animate:false}); }); await p.waitForTimeout(500);
   await p.click('#lb-opt'); await p.click('#sheet-set'); await p.waitForTimeout(250); await p.evaluate(()=>document.querySelector('#set-cluster').click()); await p.waitForTimeout(500); await p.click('#sheet-x');
   pc=await pins(); ok('with grouping switched off in Settings every pin shows',pc[1]===0&&pc[0]>400,pc[0]+' pins, '+pc[1]+' groups');
+  // ---- stone walls found on LiDAR: shaded squares zoomed out, the walls themselves zoomed in
+  const wl=()=>p.evaluate(()=>{ let boxes=0, cells=0, parts=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.wallBox) boxes++; if(l.options&&l.options.wallCell){ cells++; parts+=l.getLatLngs().length; } }); return [boxes,cells,parts]; });
+  const idx=await p.evaluate(()=>fetch('data/walls.json').then(r=>r.ok?r.json():null).catch(()=>null));
+  if(!idx||!idx.n){ ok('stone walls: the build has a walls layer to test',false,'data/walls.json is missing or empty'); }
+  else {
+    const at=await p.evaluate(()=>fetch('data/walls.json').then(r=>r.json()).then(j=>{ const b=j.d.slice().sort((x,y)=>y[2]-x[2])[0]; return [b[0]*0.005+0.0025,b[1]*0.005+0.0025]; }));
+    await p.evaluate(at=>{ window.__atlasMap.setView(at,12,{animate:false}); },at); await p.waitForTimeout(400);
+    let w=await wl(); ok('stone walls: nothing is drawn until the layer is switched on',w[0]===0&&w[1]===0,w.join(','));
+    await p.click('#lb-opt'); await p.waitForTimeout(250); await p.evaluate(()=>document.querySelector('#walls-on').click()); await p.waitForTimeout(900); await p.click('#sheet-x');
+    w=await wl(); ok('stone walls, zoomed out: squares are shaded where the walls are',w[0]>5&&w[1]===0,w[0]+' squares');
+    await p.evaluate(at=>{ window.__atlasMap.setView(at,15,{animate:false}); },at); await p.waitForTimeout(1500);
+    w=await wl(); ok('stone walls, zoomed in: the walls themselves are drawn',w[0]===0&&w[1]>=1&&w[2]>20,w[1]+' cells, '+w[2]+' pieces');
+    await p.screenshot({path:'/tmp/set_3_walls.png'});
+    await p.evaluate(()=>{ window.__atlasMap.setView([40.0,-80.0],15,{animate:false}); }); await p.waitForTimeout(500);
+    w=await wl(); ok('stone walls: cells out of view are taken off the map',w[1]===0,w.join(','));
+    ok('stone walls: the switch is remembered',(await U()).ui.walls===true);
+  }
   ok('no script errors',errs.length===0,errs.slice(0,2).join(' | '));
   await b.close(); console.log(fails.length?fails.length+' FAILED':'settings test passed'); process.exit(fails.length?1:0);
 })();
