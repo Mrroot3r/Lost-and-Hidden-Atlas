@@ -81,7 +81,10 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
         ss=[s for s in sheets(lo,la) if s[0]<=1915]
         if ss:
             quad=ss[0][1].split('_')[1]
-            if quad not in want: want[quad]=ss[0]; ALT[quad]=[s for s in ss[1:] if s[1].split('_')[1]==quad][:2]     # later printings of the same sheet, in case the oldest is a pale scan
+            if quad not in want:
+                want[quad]=ss[0]; ALT[quad]=[]; seen={ss[0][0]}
+                for s in ss[1:]:                                    # later printings of the same sheet, one a year, in case the oldest is a poor scan
+                    if s[1].split('_')[1]==quad and s[0] not in seen and len(ALT[quad])<4: ALT[quad].append(s); seen.add(s[0])
     nb=0; found=[]; MISSED=[]
     def have(fn,url):
         tif='cache/topo/'+urllib.parse.quote(fn) if os.path.exists('cache/topo/'+urllib.parse.quote(fn)) else 'cache/topo/'+fn
@@ -93,15 +96,20 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
         year,fn,url,bb=want[quad]
         tif=have(fn,url)
         if not tif: print('  sheet download failed',fn); MISSED.append(fn); continue
-        # A pale scan (its black ink is grey) gives far fewer buildings than a dark scan of the same plate. When the oldest
-        # sheet is pale and a later printing from before 1916 exists, take the darkest of them.
+        # A pale scan (its black ink is grey) gives far fewer buildings than a dark scan, and what it does give is mostly
+        # road junctions. The first Massachusetts printings (1886) are like that: Hawley 1886 has ink near 330 and Greylock
+        # 1886 near 150 to 200, where a good scan is near 100; the 1890s printings of the same sheets are sharp and add
+        # the place names. So when the oldest sheet is paler than 140 and later printings from before 1916 exist, the
+        # darkest of up to four is used, if it is clearly darker.
         k=ink(tif)
-        if k>150 and not os.path.exists(pre+'_b_'+re.sub(r'[^A-Za-z0-9]+','',fn)[:60]+'.txt'):
+        if k>140 and not os.path.exists(pre+'_b_'+re.sub(r'[^A-Za-z0-9]+','',fn)[:60]+'.txt'):
+            best=None
             for alt in ALT.get(quad,[]):
                 t2=have(alt[1],alt[2])
-                if t2 and ink(t2)<k-60:
-                    print(f"  the {year} {quad} sheet is a pale scan; using the {alt[0]} printing instead",flush=True)
-                    k=ink(t2); year,fn,url,bb=alt; tif=t2; want[quad]=alt
+                if t2 and ink(t2)<k-30 and (best is None or ink(t2)<ink(best[1])): best=(alt,t2)
+            if best:
+                print(f"  the {year} {quad} sheet is a pale scan; using the {best[0][0]} printing instead",flush=True)
+                year,fn,url,bb=best[0]; tif=best[1]; want[quad]=best[0]
         bcf=lambda f: pre+'_b_'+re.sub(r'[^A-Za-z0-9]+','',f)[:60]+'.txt'
         bc=bcf(fn)                           # this sheet's buildings, kept so a run that is cut off need not repeat it
         if os.path.exists(bc): bout=open(bc).read()
