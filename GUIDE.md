@@ -86,6 +86,8 @@ node $ATLAS/tools/smoke.js http://localhost:8766/web/ [place-id]   # phone-size 
 node $ATLAS/tools/near_test.js http://localhost:8766/web/index.html # the Near tab: list, big arrow, compass, alert (after changing "near me")
 node $ATLAS/tools/kit_test.js http://localhost:8766/web/index.html  # the episode kit: stops, chapters, kit file, route map picture
 bash $ATLAS/tools/publish.sh repo my-branch-name  # copies the sources onto a new branch, stages, runs check.py --sources
+# AFTER publish.sh, and not before: edit GUIDE.md, LEADS.md or CLAUDE.md in the clone (repo/), on the new branch, then git add -A.
+# They are not copied from the workspace, and publish.sh stops if the clone has uncommitted changes when it starts.
 git -C repo commit && git -C repo push -u origin my-branch-name
 # open the pull request (REST works where the gh pr commands do not):
 gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls -f title="..." -f head=my-branch-name -f base=main -f body="..."
@@ -122,7 +124,9 @@ Places are Python calls to `N(...)` in `source/tools/data_*.py`. Each file is on
 A batch file must define three names, and then `build_sites.py` picks it up by itself. No other code changes are needed:
 
 ```python
-BATCH={'key':'ct','label':'Connecticut','added':'2026-12-01'}   # key: short and unique; added: sorts batches, newest last
+BATCH={'key':'ct','label':'Connecticut','added':'2026-12-01 14:30'}   # key: short and unique; added: sorts batches, newest last.
+# added is 'YYYY-MM-DD HH:MM' in UTC (run: date -u '+%Y-%m-%d %H:%M') and must be later than every other batch's, or the
+# "Newest" button in the app shows somebody else's batch. Older files that give only a date are left as they are.
 PLACES=[ N(...), N(...) ]
 PIN_NOTES={'place-id':'One sentence on where the coordinate came from.'}
 ```
@@ -133,6 +137,8 @@ The app shows the newest batch as a quick filter and lists every batch under Fil
 N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
   story, look='', hook='', accn='', links=None, conf=None, th=None, thn=None)
 ```
+
+Everything up to `links` goes in that order. **Always write `conf=`, `th=` and `thn=` by name.** The real function in `data_b.py` has one more field, `p`, between `links` and `conf`, so a bare `'mixed'` after the links lands in the wrong field and nothing warns you.
 
 | Field | Meaning and allowed values |
 |---|---|
@@ -153,7 +159,7 @@ N(id, name, town, reg, cat, st, lat, lon, prec, acc, eff, tags, years,
 | `conf` | Empty when sourced. `'mixed'` when the outline is sourced but a detail is unconfirmed or sources disagree. `'lead'` when the entry is unverified |
 | `th`, `thn` | Parking or trailhead `[lat, lon]` and its name, when the pin is not where you park |
 
-`python3 source/tools/check.py` validates all of this without a network. `publish.sh` runs it, and so does GitHub on every pull request.
+`python3 source/tools/check.py <repo> --sources`, run from the repository clone, validates all of this without a network. It does not work from the workspace's own `tools/` folder: it reads the clone. `publish.sh` runs it, and so does GitHub on every pull request.
 
 ## 5. Research rules
 
@@ -173,10 +179,12 @@ These are what keep the Atlas trustworthy. They are not optional.
 
 1. **Collect exact titles.** Guessed article titles fail (the Ladd School is "The Ladd School"). Open a list page first and copy names from it: "National Register of Historic Places listings in *county*", "List of amusement parks in *state*", a state's "Category:" pages, state park and land-trust site indexes.
 2. **Read each article:** `python3 tools/wiki_raw.py "Exact title" …` prints its coordinates and opening text; add `-g 'closed|demol|remain|ruin'` to pull only the sentences about what happened and what is left. Other sources that have worked: state park and land-trust pages (access, trail maps), National Park Service pages, town historical societies, the ArcGIS geocoder (`findAddressCandidates`) for addresses and named places, and `python3 tools/nom.py "name, town, state"` for a ruin, trail feature or building that someone has mapped in OpenStreetMap.
-3. **Write the entries** in a new `data_<area>.py` with its `BATCH`, `PLACES` and `PIN_NOTES`.
+   **Sources that have proved better than Wikipedia for what is on the ground:** National Register nomination forms. The text of one downloads from `https://npgallery.nps.gov/NRHP/GetAsset/NRHP/<reference number>_text` (the number is in the Wikipedia infobox). For Sharon Valley, Connecticut, Wikipedia summed the form up as "a foundation and some blocks" where the form describes a 20-foot lime kiln still standing. To read a whole page and not only matching sentences: `python3 tools/page.py --all <url>`. To find a thing by where it is when it has no name to search for (a tunnel, an old rail bed, a ruin): `python3 tools/osmnear.py <lat> <lon> 500 -g 'tunnel|ruins|abandoned'`.
+3. **Write the entries** in a new `data_<area>.py` with its `BATCH`, `PLACES` and `PIN_NOTES`. Before you write one, search every `tools/data_*.py` for the place's name and town: ids and places are shared across all batches, and a second Queen's Fort was nearly added to Rhode Island that way.
 4. **Build the list:** `python3 tools/build_sites.py`. It stops on a duplicate id or a missing pin note.
 5. **Check every pin:** `python3 tools/pincheck.py --batch <key>` writes contact sheets to `research/`: one 300 m aerial square per pin with a 30 m ring. Look at every tile. Fix what you can see, downgrade what you cannot, and record in the pin note what the aerial showed. When the ring is off the structure, `python3 tools/look.py out.jpg label,lat,lon,300` draws a wider view with a grid so you can read off where the structure is, and `python3 tools/pad.py label,lat,lon` tells you which public-land unit a point is in (US only). A managing agency's page that the fetch tool refuses can usually be read with `python3 tools/page.py <url>`, which prints the sentences about hours, fees, trails and closures.
-6. **Cut old maps** for the new ids with `topo_all.py`, then run `all.sh`.
+   The pin check also prints a `land:` line for every pin, from the federal public-land map, and `CHECK ACCESS` for any place marked `public` that is not on mapped public land. Settle the access type then, not after the build: either the access note says who owns the ground and how you know, or the place becomes `view` or `ask`.
+6. **Build:** run `all.sh`. Do not cut old-map crops yourself: GitHub cuts the missing ones when it builds the site (section 3). In the workspace a new place simply has no old map until then.
 7. **Test:** the smoke test with one of the new place ids, then open a few new places in a browser at phone size.
 8. **Publish** as a pull request (section 3). List in it anything you could not verify.
 
@@ -219,7 +227,7 @@ The base is already in place for every US state, the District of Columbia and th
 | Massachusetts | Statewide first pass, Worcester County deeper | State services | Statewide | Yes |
 | Rhode Island | Two passes, 45 places | State services | No | Yes |
 | Vermont | A few in the south, two farther north | State services | No | No |
-| Connecticut | Five | Fallback only | No | No |
+| Connecticut | 20: five first examples and 15 in Litchfield County | Fallback only | No | No |
 | New Hampshire, Maine, New Jersey, Pennsylvania | A first handful each, all woods ruins on public or preserve land (the "Ruins in the woods" batch) | Fallback only | No | No |
 | Missouri | Kansas City only (region `kcmo`, start city Kansas City), first batch November 2026 | Fallback only | No | No |
 | The other 40 states | One place each, in `data_states.py` ("A first place in every state"). Each has one statewide region whose code is the state's two letters (`tx`, `ca`) and one or two start cities | Fallback only | No | No |
@@ -365,6 +373,7 @@ Every US state and Canadian province was set up this way in November 2026, so th
 ## 10. Known gaps
 
 - Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial; in the first pass none was moved, and in the second two were moved (Butts Hill Fort, Miantonomi tower) and one was downgraded (Nine Men's Misery, whose article coordinate falls on a marsh).
+- Northwest Connecticut (Litchfield County) had its first real pass on November 17, 2026 (`data_ctnw.py`, 15 places, by an Opus session working from PROMPTS.md). Its pins were looked at on the Esri satellite, where leaves may be on, except Sharon, which fell inside the box the pin check uses for New York's leaf-off aerial: that worked by luck. Connecticut publishes its own aerials; nobody has checked whether they are leaf-off or added them. Many Connecticut park pages have moved to ctparks.com and some old addresses return "not found" (Camp Columbia, Humaston Brook); DEEP's "Other State Parks and Forests" page covers the undeveloped parks. Wikipedia's coordinate for Burr Pond State Park is in the middle of the pond. That session did not update this guide; the table row and this paragraph were added afterwards.
 - Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have regions, start cities, fallback imagery and a first handful of places each, and no law note in the app (optional, see section 8).
 - The "Ruins in the woods" batch (November 2026) has no trailhead coordinates: access notes name the road or lot. Most of its pins sit under tree cover and could not be confirmed on an aerial; `tools/pincheck.py` had no leaf-off imagery outside New York. Its Pennsylvania and Maine entries were written from one Wikipedia article each.
 - The Adirondacks have 20 places. The six added in `data_adk2.py` are ruins reached on foot, and each woodland pin was looked at on LiDAR and the leaf-off aerial as well as on the pin sheet. Wikipedia covers few trail-side ruins; the state's land pages (`https://dec.ny.gov/places/<unit>`, slugs are in the site map) give trails, parking and fees but almost no history, so each further place needs a third source. `LEADS.md` lists nine more that were started.
@@ -493,7 +502,7 @@ Cheaper models add common places in bulk; a stronger model or a person reviews b
 
 To ask a Claude session to do it, attach the repository and say: *"Review pull request #N in Lost-and-Hidden-Atlas following GUIDE.md section 14. Do not merge."*
 
-1. Check out the pull request's branch and run `python3 source/tools/review.py . origin/main`. It lists every place added or changed, with its sources, and flags the usual trouble spots. A removed or renamed id is a blocker.
+1. Check out the pull request's branch and build it: `bash source/tools/setup.sh`, then `bash $ATLAS/tools/all.sh` in the workspace. A pull request carries sources only, so without a build there is no place list to compare. Then run `python3 source/tools/review.py . origin/main`: it finds the workspace build by itself (or name one with `--built <workspace>/dist/web`) and lists every place added or changed, with its sources, and flags the usual trouble spots. If it stops and says the branch carries sources only, the build is missing. A removed or renamed id is a blocker.
 2. Run `python3 source/tools/check.py .`; GitHub's own check must be green too.
 3. **Open the sources.** For every new place if there are up to about 20; otherwise for every flagged entry plus a random third of the rest. Read the linked page (`tools/wiki_raw.py` for Wikipedia) and compare each date, name, number and "what remains" claim with it. Wrong, unsupported, or copied sentences get listed by place id.
 4. **Look at the pins.** Rebuild the workspace from the branch (`setup.sh`) and run `tools/pincheck.py --batch <key>`. Compare each tile with the pin note. An `exact` pin with no visible structure, or a pin in the wrong town, gets listed.

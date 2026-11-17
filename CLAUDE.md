@@ -1,6 +1,6 @@
 # Lost & Hidden Atlas: instructions for AI models
 
-Read `GUIDE.md` before doing anything. The short version:
+Read `GUIDE.md` before doing anything. The short version (`PROMPTS.md` holds the prompt the owner pastes to start a research session; keep it in step when a procedure changes):
 
 - **Never push to `main`, and never merge your own pull request.** Merging publishes the site. Put your change on a new branch with `tools/publish.sh`, open a pull request, say what you verified and what you could not, and stop. The owner merges. (GUIDE.md section 3.)
 - The files in the repository root (`index.html`, `app.js`, `sw.js`, `data/`, `topo/`) are **build output**. Edit `source/`, rebuild and test in the workspace. A pull request carries sources only (`publish.sh` sees to it); GitHub builds the site on the pull request to test it and again after the merge to publish it (GUIDE.md section 3). Never commit built files by hand.
@@ -19,7 +19,7 @@ Read `GUIDE.md` before doing anything. The short version:
 - If `git push` is refused, attach the repository to the session with push access, then push again (GUIDE.md section 3). Do not retry or look for another login.
 - A state's trespass-law note is optional and done only when the owner asks. The access line on each place is not optional.
 - The owner uses the Atlas on an Android phone in the field. Test at phone size first.
-- Places you read about but could not add go in `LEADS.md`.
+- Places you read about but could not add go in `LEADS.md`. Edit `LEADS.md` and `GUIDE.md` in the clone after `publish.sh` has made the branch, not before. A research pull request also updates GUIDE.md: the state's row in section 8 and a line in section 10.
 - The owner's visit reports (what he found on the ground, and where) come in with "Copy my additions for Claude". Run `tools/visits.py` on them and make the corrections it lists (GUIDE.md section 6). After changing the report form run `tools/visit_test.js`.
 - **Asked to scan, sweep or search LiDAR? Read `LIDAR.md` and follow it step by step.** One command, `tools/lidar.py`, does the work in short runs and keeps the ledger of what has been swept and judged (`source/lidar/units/`; never edit it by hand). It covers New York and Massachusetts; another state is added only when the owner asks (LIDAR.md, "Another state"). Places found that way go in the `lidar` category as unverified leads, with an ownership check for every one (GUIDE.md section 13 is the background). Never write a private landowner's name or address into the repository. After changing `tools/lidar.py` run `tools/lidar_test.py`; after changing the stone-wall finder (`tools/lidar_walls.py`) or which pieces go on the map (`tools/walls_structure.py`) run `tools/walls_test.py` and look at `tools/lidar_walls.py test`.
 - If `publish.sh` stops because `main` moved while you worked, run `tools/resync.sh` as it says, rebuild, and publish again. Do not copy files across by hand.

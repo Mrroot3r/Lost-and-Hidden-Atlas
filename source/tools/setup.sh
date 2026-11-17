@@ -41,6 +41,6 @@ git -C "$REPO" rev-parse HEAD > "$W/.setup_commit" 2>/dev/null || true    # publ
 # what this machine can and cannot do
 MISS=""
 for m in requests PIL rasterio shapely; do python3 -c "import $m" 2>/dev/null || MISS="$MISS $m"; done
-[ -n "$MISS" ] && echo "MISSING Python modules:$MISS  (requests: everything; PIL + rasterio: old-map crops and pin checks; shapely: rebuilding lines). Install: pip install requests Pillow rasterio shapely"
+[ -n "$MISS" ] && echo "MISSING Python modules:$MISS  (requests: everything; PIL + rasterio: old-map crops and pin checks; shapely: rebuilding lines). Install: pip install --break-system-packages requests Pillow rasterio shapely"
 node -e "require('playwright')" 2>/dev/null || echo "MISSING Playwright for Node: the smoke test cannot run. Install: npm i playwright && npx playwright install chromium"
 echo "Workspace ready at $W. Build with: ATLAS=$W bash $W/tools/all.sh"
