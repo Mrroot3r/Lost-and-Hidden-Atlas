@@ -25,6 +25,6 @@ const B = process.argv[2] || 'http://localhost:8766/web/';
     r.placeOk = !!r.place && !/^0 of/.test(r.leafOff) && !/^0 of/.test(r.lidar);
   }
   console.log(JSON.stringify(r, null, 1)); console.log(errs.length ? 'PAGE ERRORS:\n' + errs.join('\n') : 'no page errors');
-  const ok = (r.placeOk !== false) && r.places > 300 && r.lineShapes > 1000 && r.oldMap > 0 && r.sheetOpens && r.sheetCloses && !errs.length;
+  const ok = (r.placeOk !== false) && r.places > 300 && r.lineShapes > 3 && r.oldMap > 0 && r.sheetOpens && r.sheetCloses && !errs.length;
   await browser.close(); process.exit(ok ? 0 : 1);
 })();

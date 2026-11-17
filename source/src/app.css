@@ -389,3 +389,6 @@ details>.phs{margin:8px 0 0}
 .kitpre{margin:0;padding:8px 10px;background:var(--chip);border-radius:8px;font-family:var(--fm);font-size:12.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
 .kitpic img{display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--line);margin-top:8px}
 .kit select{flex:0 1 auto}
+
+/* a numbered disc standing for pins that crowd together (Settings > Map) */
+.clus{display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(34,40,46,.88);color:#fff;font:600 13px/1 var(--fm,ui-monospace,monospace);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer}
