@@ -22,11 +22,13 @@ A.setBase=function(u){ var n=norm(u); if(!n) return false; A.base=n; A.pending='
 A.call=function(method,options){ return native?cap.nativePromise('FieldLog',method,options||{}):Promise.reject(new Error('This only works in the Android app.')); };
 
 /* data/lines.json, data/leads.json, data/pockets.json, data/vanished.json and data/mines.json: a downloaded copy if there is one, otherwise the copy built into the app.
-   One state's pocket detail (data/pock/<state>.json) that is in neither place is fetched from the Atlas address and kept. */
-A.fetch=function(path){ var p=path.split('?')[0], pock=/^data\/pock\//.test(p);
+   One state's pocket detail (data/pock/<state>.json) that is in neither place is fetched from the Atlas address and kept.
+   The stone-walls layer (data/walls.json and data/walls/<cell>.json) is always asked for at the Atlas address first. */
+A.fetch=function(path){ var p=path.split('?')[0], pock=/^data\/pock\//.test(p), walls=/^data\/walls/.test(p);
   function local(){ return fetch(p).then(function(r){ if(pock&&!r.ok) throw new Error('not built in'); return r; }); }
   function kept(){ return store(DATA).then(function(c){ return c.match(p); }).then(function(r){ if(!r) throw new Error('not kept'); return r; }); }
   function remote(){ return get(A.base+p).then(function(r){ return store(DATA).then(function(c){ return c.put(p,r.clone()); }).then(function(){ return r; },function(){ return r; }); }); }
+  if(walls) return remote().catch(kept);        /* stone walls are not built into the app: the newest from the Atlas address, or the copy kept from last time when there is no signal */
   if(!pock) return A.fromCache?kept().catch(local):local();
   return (A.fromCache?kept().catch(local):local().catch(kept)).catch(remote); };
 
