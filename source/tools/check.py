@@ -38,7 +38,7 @@ from data_a import A
 for r in A: seen(r[1],'data_a')
 from data_b import B
 for b in B: seen(b['id'],'data_b')
-keys=set()
+keys=set(); stamps=[]
 for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
     name=os.path.basename(f)[:-3]
     if name in('data_a','data_b'): continue
@@ -49,6 +49,15 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
     k=getattr(m,'BATCH',{}).get('key')
     if 'TODO' in str(getattr(m,'BATCH',{}).get('label','')): err.append(f'{name}: the batch label still says TODO')
     if k in keys: err.append(f'{name}: batch key {k} is already used')
+    _ad=str(getattr(m,'BATCH',{}).get('added',''))
+    if _ad:
+        import datetime as _dt
+        _now=_dt.datetime.now(_dt.timezone.utc).replace(tzinfo=None)
+        try:
+            _t=_dt.datetime.strptime(_ad,'%Y-%m-%d %H:%M' if len(_ad)>10 else '%Y-%m-%d')
+            if _t>_now+_dt.timedelta(minutes=10): err.append(f"{name}: BATCH 'added' is {_ad}, which is in the future (it is {_now:%Y-%m-%d %H:%M} UTC now). Use the time printed by: date -u '+%Y-%m-%d %H:%M'")
+            stamps.append((_ad if len(_ad)>10 else _ad+' 00:00',name))
+        except ValueError: err.append(f"{name}: BATCH 'added' must look like '2026-11-17 06:27' (UTC), not '{_ad}'")
     keys.add(k)
     for p in m.PLACES:
         i=p['id']; w=f'{name}:{i}'; seen(i,name)
@@ -130,5 +139,8 @@ for dp,dn,fn in os.walk(REPO):
             if not any(o in a for o in OKMAIL) and not re.search(r'\.(png|jpg|webp|js|css)$',a): err.append(f'{os.path.relpath(p,REPO)}: contains what looks like an email address ({a})')
 for w in warn: print('warning:',w)
 for e in err: print('ERROR:',e)
+if stamps:
+    stamps.sort(); print(f'newest batch: {stamps[-1][1]} ({stamps[-1][0]} UTC). A new batch must be the newest, or the app will not mark its places as new.')
 print(f'{len(ids)} place ids, {len(keys)} batches, {len(warn)} warnings, {len(err)} errors'+(' (sources only: the built site was not checked)' if SRC_ONLY else ''))
+print('(The built site shows about 39 more places than this count: the Albany and Troy landmark pins, ids starting lm-, are made by build_sites.py from the landmark list and are not in a place list. That is expected.)')
 sys.exit(1 if err else 0)

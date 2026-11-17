@@ -40,7 +40,12 @@ fi
 git -C "$REPO" rev-parse HEAD > "$W/.setup_commit" 2>/dev/null || true    # publish.sh uses it to notice that main has moved on since
 # what this machine can and cannot do
 MISS=""
-for m in requests PIL rasterio shapely; do python3 -c "import $m" 2>/dev/null || MISS="$MISS $m"; done
+PKG() { case $1 in PIL) echo Pillow;; *) echo $1;; esac; }
+for m in requests PIL rasterio shapely numpy scipy pypdf; do
+  python3 -c "import $m" 2>/dev/null && continue
+  echo "installing the Python module $m ..."; pip install -q --break-system-packages "$(PKG $m)" >/dev/null 2>&1 || pip install -q "$(PKG $m)" >/dev/null 2>&1 || true
+  python3 -c "import $m" 2>/dev/null || MISS="$MISS $m"
+done
 [ -n "$MISS" ] && echo "MISSING Python modules:$MISS  (requests: everything; PIL + rasterio: old-map crops and pin checks; shapely: rebuilding lines). Install: pip install --break-system-packages requests Pillow rasterio shapely"
 node -e "require('playwright')" 2>/dev/null || echo "MISSING Playwright for Node: the smoke test cannot run. Install: npm i playwright && npx playwright install chromium"
 echo "Workspace ready at $W. Build with: ATLAS=$W bash $W/tools/all.sh"
