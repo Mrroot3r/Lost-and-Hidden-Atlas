@@ -37,7 +37,7 @@ The four types of work:
 
 4. pins — Check places already in the Atlas for PLACE against the aerial and current sources: is the pin on the right spot, does the thing still stand, has access changed? Fix what you can prove and say what you changed.
 
-If PLACE is "you choose", pick it like this: read the table of states in GUIDE.md section 8 and the known gaps in section 10, and count how many places each region has. Prefer a region that is thin compared with its neighbours, or one whose entry says "first pass". Say in one sentence why you chose it before you start.
+If PLACE is "you choose", pick it like this: read the table of states in GUIDE.md section 8 and the known gaps in section 10, and count how many places each region has. Prefer a region that is thin compared with its neighbours, or one whose entry says "first pass". Skip any area an open pull request already covers (list them with  gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls --jq '.[]|[.number,.head.ref,.title]|@tsv' ; start.py cannot see them). Say in one sentence why you chose it before you start.
 
 If TYPE is "you choose": use lidar when PLACE is a state forest, wildlife area or other public woodland in New York or Massachusetts; use places for a town, county or region; use leads if LEADS.md already has several rows there.
 

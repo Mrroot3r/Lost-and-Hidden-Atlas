@@ -56,7 +56,7 @@ N('moses-kill-aqueduct','Moses Kill aqueduct of the old Champlain Canal','Fort E
   'Who owns the ground was not checked: look from the road only. No parking is mapped nearby, and Route 4 is a fast highway. Lock 14, to the south, is on private land.',
   [ACS],conf='mixed'),
 # ---- Hudson Falls ----
-N('hudson-falls-railroad-piers','Unfinished railroad piers in the Hudson, Hudson Falls','Hudson Falls','wash','rail','ruins',43.30208,-73.58814,'area','view','walk','','1837–',
+N('hudson-falls-railroad-piers','Unfinished railroad piers in the Hudson, Hudson Falls','Hudson Falls','wash','rail','ruins',43.30271,-73.58994,'site','view','walk','','1837–',
   'Large stone piers set in the Hudson in 1837 to carry the Saratoga and Whitehall Railroad across the river. The panic of 1838 stopped the work and the bridge was never finished. The Town of Kingsbury\'s 1999 marker says the only use the piers ever had was for the Hudson Falls fire department to string lines for its alarm boxes, until the mid-1970s.',
   'The stone piers in the river below the marker. How many still stand was not checked.',
   '',
@@ -110,7 +110,7 @@ PIN_NOTES={
  'old-fort-house-fort-edward':'Wikipedia coordinate for the Old Fort House. On the leaf-off aerial it falls among trees on the west side of Broadway, north of a large building and its parking lot; the house itself could not be picked out, so the pin is site, not exact.',
  'old-champlain-lock-13-fort-miller':'American Canal Society coordinate for Lock 13 (43°09\'51.84"N 73°34\'46.21"W); OpenStreetMap maps "Old Champlain Lock 13" about 20 m away. The tile came from Esri satellite with leaves on and shows brush between the canal and an industrial yard; the LiDAR shows a narrow channel along the east bank at the pin but no lock chamber that could be picked out.',
  'moses-kill-aqueduct':'American Canal Society coordinate for the Moses Kill aqueduct (43°12\'11.23"N 73°34\'44.47"W). The leaf-off aerial shows woods over the creek; the LiDAR shows the old canal bank crossing the creek at the pin with a block-shaped mass where the abutment should be.',
- 'hudson-falls-railroad-piers':'HMdb position of the marker on Route 254; the piers are in the river below it. The pin is the marker on the riverside road; the piers themselves were not picked out on the aerial, hence area.',
+ 'hudson-falls-railroad-piers':'Moved on November 17, 2026 (washco2 pass) from the HMdb marker position on Route 254 about 150 m west onto the middle one of a row of rectangular stone piers that crosses the Hudson on a slant, read off the aerial with look.py (Esri satellite; the state leaf-off tile was cut by its edge).',
  'fort-ann-locks-16-18':'OpenStreetMap feature "Old Champlain Canal Locks 16-17" (the leads layer); Lock 18 is mapped about 130 m north. The aerial and the LiDAR both show the long lock chamber along the trail inside the ring.',
  'old-stone-house-library-fort-ann':'Coordinate from the Wikipedia list of Register listings in Washington County. The ring is on a building among trees on the village street.',
  'whitehall-original-canal-walls':'HMdb position of the Traveling Along the Canal marker at Main and Division Streets; the walls are along the towpath from there. The pin is on the street by the canal; the LiDAR shows walls along the canal edge north and south of it, but which are the original canal\'s was not worked out, hence area.',
