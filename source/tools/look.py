@@ -6,7 +6,8 @@ from PIL import Image,ImageDraw
 ESRI='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export'
 PX=560
 def merc(la,lo): return lo*20037508.34/180, math.log(math.tan((90+la)*math.pi/360))*20037508.34/math.pi
-tiles=[]
+tiles=[]; FAILED=[]
+import time
 for a in sys.argv[2:]:
     lab,la,lo,h=a.split(','); la=float(la); lo=float(lo); h=float(h)
     x,y=merc(la,lo); hh=h/math.cos(math.radians(la))
@@ -15,8 +16,10 @@ for a in sys.argv[2:]:
         try:
             r=requests.get(ESRI,params={'bbox':f'{x-hh},{y-hh},{x+hh},{y+hh}','bboxSR':3857,'imageSR':3857,'size':f'{PX},{PX}','format':'jpg','f':'image'},timeout=60)
             im=Image.open(io.BytesIO(r.content)).convert('RGB'); break
-        except Exception: im=None
-    if im is None: im=Image.new('RGB',(PX,PX),'#444')
+        except Exception: im=None; time.sleep(3+4*k)
+    if im is None:
+        im=Image.new('RGB',(PX,PX),'#7a1010'); FAILED.append(lab)
+        ImageDraw.Draw(im).text((20,PX//2),'DOWNLOAD FAILED: this is not a picture of the ground. Run again.',fill='#fff')
     d=ImageDraw.Draw(im); c=PX//2; step=PX/6
     for k in range(1,6):
         col='#ff2d95' if k==3 else '#ffffff'
@@ -26,3 +29,5 @@ for a in sys.argv[2:]:
 cols=min(3,len(tiles)); rows=math.ceil(len(tiles)/cols); sh=Image.new('RGB',(cols*PX,rows*PX),'#222')
 for k,im in enumerate(tiles): sh.paste(im,((k%cols)*PX,(k//cols)*PX))
 sh.save(sys.argv[1],quality=85); print('wrote',sys.argv[1])
+for f in FAILED: print('WARNING: no aerial came back for',f,'(red tile). That is a failed download, NOT empty ground: run the command again.')
+print('To turn a spot you can see into a coordinate: python3 tools/pix.py look <lat> <lon> <half_m> <x> <y>   (x,y = the pixel in this picture)')

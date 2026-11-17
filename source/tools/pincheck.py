@@ -4,7 +4,8 @@
    python3 tools/pincheck.py id1 id2 ...           named places
    add --lidar to either for a second sheet of the same squares as bare-ground LiDAR shading (research/pincheck_*_lidar_*.jpg).
    Use it for anything in woods: a cellar, a race or a wall shows there when the aerial shows only trees.
-Each tile is a 300 m square centred on the pin, with a 30 m ring. Sheets go to research/pincheck_*.jpg.
+Each tile is a 300 m square centred on the pin, with a 30 m ring. A place with a parking or trailhead point (th=) gets a second
+tile for that point, titled TRAILHEAD in blue: check it is a lot or a road shoulder and not somebody's house or yard. Sheets go to research/pincheck_*.jpg.
 LOOK at every tile: is the ring on the structure, the ruin or the documented footprint? If not, move the pin
 only when you can see the right spot; otherwise keep it, set prec='area', and say what you saw in the pin note."""
 import sys,json,io,math,os,requests
@@ -58,9 +59,15 @@ def lidar_tile(s,i):
     d.ellipse([c-r,c-r,c+r,c+r],outline='#ff2d95',width=2); d.line([c-8,c,c+8,c],fill='#ff2d95',width=2); d.line([c,c-8,c,c+8],fill='#ff2d95',width=2)
     d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]",fill='#ffffff'); d.text((5,18),note,fill='#ffb347' if note.startswith('NO') else '#bbbbbb')
     return im,note
+todo=[]
 for i in ids:
     s=S.get(i)
     if not s: print('unknown id',i); continue
+    todo.append((i,s))
+    if s.get('th'):                                        # the parking or trailhead point gets its own tile: it can land on a house too
+        t=dict(s); t['lat'],t['lon']=s['th'][0],s['th'][1]; t['_th']=s.get('thn') or 'trailhead'; todo.append((i+' TRAILHEAD',t))
+FAILED=[]
+for i,s in todo:
     src='Esri satellite (leaves may be on)'; im=None
     if MA_TEST(s['lat'],s['lon']):                         # Massachusetts: the state's leaf-off imagery comes as tiles (tools/ortho.py)
         try:
@@ -74,12 +81,18 @@ for i in ids:
             break
     if im is None:
         try: im=grab(ESRI,s['lat'],s['lon'])
-        except Exception as e: im=Image.new('RGB',(PX,PX),'#444'); src='no image: '+str(e)[:30]
+        except Exception:
+            import time; time.sleep(5)
+            try: im=grab(ESRI,s['lat'],s['lon'])
+            except Exception as e:
+                im=Image.new('RGB',(PX,PX),'#7a1010'); src='DOWNLOAD FAILED: not a picture of the ground'; FAILED.append(i)
     ld=land(s)
-    if s.get('acc')=='public' and (not ld or ld.endswith('(XA)')): WARN.append('%s is marked public, but the pin is %s'%(i,('on land the public-land map calls closed: '+ld) if ld else 'not on mapped public land: say in the access note who owns it and how you know, or change the access type'))
+    if s.get('_th'):
+        if not ld or ld.endswith('(XA)'): WARN.append('%s (%s) is not on mapped public land: look at its tile and make sure it is a lot or a road shoulder, not a house or a yard'%(i,s['_th']))
+    elif s.get('acc')=='public' and (not ld or ld.endswith('(XA)')): WARN.append('%s is marked public, but the pin is %s'%(i,('on land the public-land map calls closed: '+ld) if ld else 'not on mapped public land: say in the access note who owns it and how you know, or change the access type'))
     d=ImageDraw.Draw(im); c=PX//2; r=30/(2*HALF)*PX
     d.ellipse([c-r,c-r,c+r,c+r],outline='#ff2d95',width=3); d.line([c-8,c,c+8,c],fill='#ff2d95',width=2); d.line([c,c-8,c,c+8],fill='#ff2d95',width=2)
-    d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]",fill='#ffffff'); d.text((5,18),f"{s['lat']},{s['lon']}  {src}",fill='#bbbbbb')
+    d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]" if not s.get('_th') else f"{i}: {s['_th']}"[:66],fill='#ffffff' if not s.get('_th') else '#8fd3ff'); d.text((5,18),f"{s['lat']},{s['lon']}  {src}",fill='#bbbbbb')
     d.rectangle([0,PX-16,PX,PX],fill='#000000'); d.text((5,PX-14),('land: '+ld) if ld else 'land: not on mapped public land',fill='#7CFC98' if ld and not ld.endswith('(XA)') else '#ffb347')
     tiles.append(im); print(i,'|',src,'| land:',ld or 'not on mapped public land')
     if LIDAR:
@@ -91,3 +104,5 @@ for T,suf in ((tiles,''),(ltiles,'_lidar')):
         for k,im in enumerate(part): sh.paste(im,((k%cols)*PX,(k//cols)*PX))
         p=f'research/pincheck_{tag}{suf}_{n//PER+1}.jpg'; sh.save(p,quality=82); print('wrote',p)
 for w in WARN: print('CHECK ACCESS:',w)
+for f in FAILED: print('WARNING: no aerial came back for',f,'(red tile). That is a failed download, NOT empty ground: run the pin check again for it.')
+print('To move a pin onto something you can see: python3 tools/pix.py pin <lat> <lon> <x> <y>   (lat,lon = the pin over the tile; x,y = the pixel in the sheet)')
