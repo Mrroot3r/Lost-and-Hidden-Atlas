@@ -217,7 +217,7 @@ The base is already in place for every US state, the District of Columbia and th
 |---|---|---|---|---|
 | New York | Capital Region outward; none yet in NYC, central, western or northern regions | State services | Some counties | Yes |
 | Massachusetts | Statewide first pass, Worcester County deeper | State services | Statewide | Yes |
-| Rhode Island | First pass | State services | No | Yes |
+| Rhode Island | Two passes, 45 places | State services | No | Yes |
 | Vermont | A few in the south, two farther north | State services | No | No |
 | Connecticut | Five | Fallback only | No | No |
 | New Hampshire, Maine, New Jersey, Pennsylvania | A first handful each, all woods ruins on public or preserve land (the "Ruins in the woods" batch) | Fallback only | No | No |
@@ -364,7 +364,7 @@ Every US state and Canadian province was set up this way in November 2026, so th
 
 ## 10. Known gaps
 
-- Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial, and none was moved.
+- Most pins added in November 2026 for New York and Massachusetts were not checked against imagery; their pin notes say so. Rhode Island pins were each looked at once on the state aerial; in the first pass none was moved, and in the second two were moved (Butts Hill Fort, Miantonomi tower) and one was downgraded (Nine Men's Misery, whose article coordinate falls on a marsh).
 - Vermont, Connecticut, New Hampshire, Maine, New Jersey and Pennsylvania have regions, start cities, fallback imagery and a first handful of places each, and no law note in the app (optional, see section 8).
 - The "Ruins in the woods" batch (November 2026) has no trailhead coordinates: access notes name the road or lot. Most of its pins sit under tree cover and could not be confirmed on an aerial; `tools/pincheck.py` had no leaf-off imagery outside New York. Its Pennsylvania and Maine entries were written from one Wikipedia article each.
 - The Adirondacks have 20 places. The six added in `data_adk2.py` are ruins reached on foot, and each woodland pin was looked at on LiDAR and the leaf-off aerial as well as on the pin sheet. Wikipedia covers few trail-side ruins; the state's land pages (`https://dec.ny.gov/places/<unit>`, slugs are in the site map) give trails, parking and fees but almost no history, so each further place needs a third source. `LEADS.md` lists nine more that were started.
@@ -374,7 +374,7 @@ Every US state and Canadian province was set up this way in November 2026, so th
 - An article coordinate can be a mile off even for a famous place: Wikipedia put Canalside in Buffalo among downtown office blocks and the Kane Mountain fire tower beside a road at the foot of the mountain. Both were caught on the aerial and replaced with the mapped feature. The same happened round Buffalo with the Lockport locks (250 m off), the Buffalo Smelting Works (on the expressway) and Scoby Dam (330 m off, in woods): look at every pin.
 - The vanished-places and mines layers (section 8) are raw government lists, not research: nothing in them was checked against a map, an aerial or the ground. The names file's positions for schools and churches are often the nearest road corner. Coverage differs by layer (these two cover nine states, the historic pockets seven, the old lines and OpenStreetMap leads two): section 8 says what each covers.
 - Pins taken from OpenStreetMap through Nominatim (`tools/nom.py`) are a named mapped feature, which is usually closer than an article coordinate, but for a tunnel or a long path the point is the middle of the line.
-- Rhode Island is a first pass: no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
+- Rhode Island has had two passes (45 places). The second pass (`data_ri2.py`, 17 places) took Wikipedia articles through a page reader that answers set questions, not by reading the raw text, and took four places partly from the excerpts a web search returned; its header says which. Queen's Fort was nearly added twice: check `data_ri.py` for an existing id before writing a Rhode Island entry. Still no owner lookup or lot lines (the state has a tax-parcel map service at `risegis.ri.gov`; whether it carries owner names was not checked), no leads, no rebuilt rail and canal lines.
 - The Rhode Island LiDAR service returns black or blank tiles over open water.
 - Leads are missing for greater Boston, the South Shore, Cape Cod, Rhode Island and Missouri.
 - The start-place changes of November 2026 (map reopens where it was left, nearest start city chosen from location, typed start place) were tested in a desktop browser at phone size only, not on a phone or in the Android app. The typed lookup depends on OpenStreetMap's public Nominatim service, which is for light use.
