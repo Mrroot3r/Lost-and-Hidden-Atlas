@@ -1,4 +1,4 @@
-{"name": "Taconic Ridge State Forest", "code": "trsf", "state": "done", "swept": "2026-11-16", "buildings": 121, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif", "NY_Hoosick_129756_1897_62500_geo.tif"],
+{"name": "Taconic Ridge State Forest", "code": "trsf", "state": "done", "swept": "2026-11-16", "buildings": 121, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif", "NY_Hoosick_129756_1897_62500_geo.tif"], "walls": 1359, "wall_m": 45685,
 "cands":[
 {"id":"trsf1","lat":42.79556,"lon":-73.316688,"depth":0.84,"size":[9,7],"dist":25,"blat":42.79578,"blon":-73.31676,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"published","place":"lidar-spencer-hollow-walled-yard","batch":"lidar3","when":"2026-11-16"},
 {"id":"trsf2","lat":42.724899,"lon":-73.28791,"depth":0.78,"size":[10,11],"dist":23,"blat":42.72472,"blon":-73.28806,"sheet":"NY_Berlin_123252_1888_62500_geo.tif","year":1888,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},

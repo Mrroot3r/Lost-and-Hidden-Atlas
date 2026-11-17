@@ -1,4 +1,4 @@
-{"name": "Leonard Hill State Forest", "code": "lhsf", "state": "done", "swept": "2026-11-16", "buildings": 52, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif"],
+{"name": "Leonard Hill State Forest", "code": "lhsf", "state": "done", "swept": "2026-11-16", "buildings": 52, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif"], "walls": 601, "wall_m": 21902,
 "cands":[
 {"id":"lhsf1","lat":42.464534,"lon":-74.335509,"depth":1.34,"size":[5,11],"dist":39,"blat":42.46458,"blon":-74.33504,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"water","note":"a pond shore","when":"2026-11-16"},
 {"id":"lhsf2","lat":42.464129,"lon":-74.335808,"depth":1.47,"size":[12,11],"dist":59,"blat":42.46453,"blon":-74.33627,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
