@@ -105,11 +105,12 @@ function dt(s){
 /* What "nearest" is measured from in the Places list: where the reader is, while their position is being followed (the
    location button), otherwise their start place. The position used is a snapshot, renewed only after a quarter of a mile,
    so the list does not reshuffle under a thumb. From a live position the time is a rough estimate, marked ~. */
-let nearAt=null;
+let nearAt=null, listFrom=null;
 function nearFrom(){ const g=(typeof geo==='object'&&geo)?geo.ll:null; if(g){ if(!nearAt||hav(nearAt[0],nearAt[1],g[0],g[1])>0.25) nearAt=[g[0],g[1]]; } else nearAt=null; return nearAt; }
 function dtl(s){ if(!nearAt) return dt(s); const d=dest(s), r=roughMin(hav(nearAt[0],nearAt[1],d.lat,d.lon)); return {min:r.min,mi:r.mi,est:true,live:true}; }
 /* called when the position moves or is switched off: redo the list if its origin has changed */
-function nearMoved(){ const was=nearAt, now=nearFrom(); if(was===now) return; if(F.max) refresh(); else if(view==='list') renderList(); if(sel&&view==='detail') renderDetail(sel); }
+/* A place page that is open is left alone (it may hold a half-written visit report); it shows the new origin when next opened. */
+function nearMoved(){ const was=nearAt, now=nearFrom(); if(was===now) return; if(F.max&&view!=='detail') refresh(); else if(view==='list') renderList(); }
 async function fetchDT(){
   const H=homeObj(),key=homeKey(),all=sites(),t={};
   try{
@@ -219,7 +220,7 @@ function sortSites(a){
 }
 function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' sq':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
 function renderList(){
-  nearFrom();
+  listFrom=nearFrom();
   { const o=$('#sort').options[0], n=homeObj().name||'your start'; o.textContent=nearAt?'Nearest to you':'Nearest to '+(n.length>20?n.slice(0,19)+'…':n); }
   visible=sortSites(sites().filter(match));
   const ul=$('#list'); ul.textContent='';
@@ -1766,7 +1767,8 @@ function onContext(e){
 
 /* ---------- views ---------- */
 let view='list';
-function showView(v){ view=v; ['list','detail','trip','log','guide','near'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
+function showView(v){ view=v; if(v==='list'&&listFrom!==nearFrom()){ if(F.max) refresh(); else renderList(); }      /* the position changed while another tab was open */
+  ['list','detail','trip','log','guide','near'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
   $('#tab-list').setAttribute('aria-selected',String(v==='list'||v==='detail')); $('#tab-trip').setAttribute('aria-selected',String(v==='trip')); $('#tab-guide').setAttribute('aria-selected',String(v==='guide')); $('#tab-log').setAttribute('aria-selected',String(v==='log')); $('#tab-near').setAttribute('aria-selected',String(v==='near'));
   nmCompass(v==='near'); if(v==='near'){ nmEnsure(true); renderNear(); if(NM.org==='me'&&geo.id===null&&U.last&&map) locate(); }
   if(v==='trip') renderTrip(); if(v==='guide') renderGuide(); if(v==='log') renderLog(); }
