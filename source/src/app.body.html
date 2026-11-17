@@ -19,18 +19,15 @@
 
     <section class="view" id="v-list" aria-labelledby="tab-list">
       <div class="tools pad">
-        <div class="row">
-          <label class="field"><span>Find a place</span>
-            <input type="search" id="q" placeholder="Name, town, or words like iron furnace" autocomplete="off"></label>
+        <div class="findbar">
+          <label class="field"><span class="vh">Find a place</span>
+            <input type="search" id="q" placeholder="Find a place, town or word" autocomplete="off"></label>
+          <button class="btn" type="button" id="filt-btn" aria-expanded="false" aria-controls="filters">Filters<span id="fcount" class="mono"></span></button>
+          <button class="btn" type="button" id="add-place" title="Add a place of your own: tap the map to drop a pin" aria-label="Add a place of your own">+ Add</button>
         </div>
-        <div class="row">
-          <label class="field"><span>Drive times from</span>
-            <select id="home"></select></label>
-          <button class="btn" id="add-place" title="Click the map to drop a new pin">+ Add a place</button>
-        </div>
-        <div class="presets" id="presets"></div>
+        <select id="home" hidden aria-hidden="true" tabindex="-1"></select>   <!-- the start place is chosen under the gear (Settings); this holds the list -->
         <details class="filters" id="filters">
-          <summary><span>Filters</span><span id="fcount" class="mono"></span></summary>
+          <summary hidden>Filters</summary>
           <div class="fbody" id="fbody"></div>
         </details>
       </div>

@@ -71,7 +71,11 @@ textarea{resize:vertical;min-height:64px}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
 .chip{background:var(--chip);border:1px solid transparent;border-radius:14px;padding:3px 9px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;line-height:1.25}
 button.chip:hover{border-color:var(--mute)}
-.chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+/* a chip that is switched on is filled with the accent colour and ticked: the old pale tint could not be told from "off" on a dark screen */
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chip[aria-pressed="true"]::before{content:"\2713";font-size:11px;line-height:1}
+.chip[aria-pressed="true"] .dot{box-shadow:0 0 0 1.5px var(--accent-ink)}
+button.chip[aria-pressed="true"]:hover{border-color:var(--ink)}
 .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--c,#888);box-shadow:0 0 0 1.5px var(--panel),0 0 0 2.5px rgba(0,0,0,.35)}
 .dot.hollow{background:var(--panel);box-shadow:inset 0 0 0 2.5px var(--c,#888),0 0 0 1px rgba(0,0,0,.3)}
 .dot.sq{border-radius:2px}
@@ -84,8 +88,16 @@ button.chip:hover{border-color:var(--mute)}
 
 /* list view */
 .tools{padding-block:10px 8px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
-.presets{display:flex;gap:5px;flex-wrap:wrap}
+.findbar{display:flex;gap:6px;align-items:stretch}
+.findbar .field{flex:1 1 auto}
+.findbar .btn{flex:none;white-space:nowrap}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#filt-btn .mono{background:var(--accent-ink);color:var(--accent);border-radius:9px;padding:0 6px;font-size:11.5px;font-weight:700}
+#filt-btn .mono:empty{display:none}
+#filt-btn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+#filt-btn[aria-expanded="true"]{border-color:var(--accent)}
 details.filters{border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+details.filters:not([open]){display:none}
 details.filters>summary{cursor:pointer;padding:7px 10px;font-family:var(--fc);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:12.5px;display:flex;justify-content:space-between;gap:8px;list-style:none}
 details.filters>summary::-webkit-details-marker{display:none}
 details.filters>summary::after{content:"+";font-family:var(--fm)}
@@ -118,7 +130,7 @@ details.filters[open]>summary::after{content:"\2212"}
 .kv dt{color:var(--mute);font-size:12.5px}.kv dd{margin:0}
 .scout{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:6px}
 .scout .btn{justify-content:flex-start}
-.times{display:flex;flex-wrap:wrap;gap:6px}
+.times{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .time{border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px;color:var(--mute)}
 .time b{font-family:var(--fm);font-size:14px;color:var(--ink);display:block}
 .time.home{border-color:var(--accent)}

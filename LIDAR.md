@@ -44,7 +44,7 @@ It prints how many candidates nobody has looked at, anything half finished, and 
 
 ## 2. Sweep new ground
 
-Unless the owner named a place, pick units near where he explores (he is based near Albany) that are old farm country:
+Unless the owner named a place, pick units that are old farm country:
 
 ```bash
 python3 tools/lidar.py near 42.55 -74.45 12        # units within 12 miles of a point, not yet swept
