@@ -1,3 +1,4 @@
 # Rows of the Google Form's answer sheet that have been dealt with, one a line: the ref tools/inbox.py prints
 # (form-xxxxxxxxxx), then a few words on what was done. tools/inbox.py leaves these rows out. GitHub issues are not
 # listed here: they are closed by "Closes #N" in the pull request that dealt with them.
+form-f8fc798ad8  a test answer sent by the session that wired the form in, November 17, 2026; nothing to do

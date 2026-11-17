@@ -15,7 +15,7 @@ except Exception as e: sys.exit('Could not open the form: '+str(e)[:100])
 m=re.search(r'FB_PUBLIC_LOAD_DATA_\s*=\s*(\[.*?\]);\s*</script>',h,re.S)
 if not m: sys.exit('This does not look like a public Google Form page (is it open to anyone with the link?).')
 d=json.loads(m.group(1)); qs=[(q[1],q[4][0][0]) for q in d[1][1] if q and len(q)>4 and q[4]]
-want=(('kind',('what are you sending',)),('place',('place',)),('where',('where',)),('text',('what do you know','what you know')),('source',('source','how do you know')),('access',('public','access')))
+want=(('kind',('what are you sending','what are you submitting')),('place',('place',)),('where',('where',)),('text',('what do you know','what you know')),('source',('source','how do you know')),('access',('public','access')))
 ent={}; used=set()
 for k,ws in want:
     for t,i in qs:

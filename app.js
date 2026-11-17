@@ -1356,7 +1356,8 @@ function noteMark(n,l){ const num=l.notes.indexOf(n)+1; const m=L.marker([n.la,n
       i.addEventListener('keydown',e=>{ if(e.key==='Enter') ok(); }); i.addEventListener('blur',ok); c.querySelector('b').replaceWith(i); i.focus(); i.select(); });
     const dl=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false; dl.addEventListener('click',()=>{ if(!armed){ armed=true; dl.textContent='Really delete?'; return; } l.notes=l.notes.filter(x=>x!==n); (l.media||[]).forEach(x=>{ if(x.nt===n.t&&!l.notes.some(y=>y.t===n.t)) delete x.nt; }); redo(); });
     const pl=n.pl&&byId(n.pl), ap=el('button',{class:'btn sm',type:'button'},pl?'Open its place':'Add to the Atlas'); ap.addEventListener('click',()=>{ map.closePopup(); if(pl){ select(pl,true); return; } openForm({lat:n.la,lon:n.lo,name:n.x,story:'Found on a field log on '+new Date(n.t*1000).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})+'.',from:{log:l.id,t:n.t}}); });
-    c.append(el('div',{class:'nacts'},rn,dl,rec===l?null:ap)); m.getPopup().update(); }); return m; }
+    const sp=spotLink(n.x,n.la,n.lo,'Noted on a walk on '+new Date(n.t*1000).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'})+'.','Send to the Atlas');
+    c.append(el('div',{class:'nacts'},rn,dl,rec===l?null:ap,rec===l?null:sp)); m.getPopup().update(); }); return m; }
 function clearRec(){ if(recLine){ map.removeLayer(recLine); recLine=null; } recMarks.forEach(m=>map.removeLayer(m)); recMarks=[]; }
 function drawRec(){ if(!map||!rec) return; clearRec();
   recLine=L.polyline(rec.pts.map(p=>[p[0],p[1]]),{color:pref('trk'),weight:4,opacity:0.9,interactive:false}).addTo(map);
@@ -1761,6 +1762,7 @@ function onContext(e){
   scoutLinks(p).slice(0,5).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
   if(!schematic) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(p)},'Whose land is it?'));
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); openForm({lat:+p.lat.toFixed(6),lon:+p.lon.toFixed(6)}); }},'+ Add a place here'));
+  box.append(spotLink('',p.lat,p.lon,'')); box.lastChild.title='Opens a short form with these coordinates filled in. You say what is there; it is researched later.';
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); pickingHome=true; onMapClick(e); }},'Measure drive times from here'));
   L.popup({maxWidth:260}).setLatLng(e.latlng).setContent(box).openOn(map);
 }
@@ -1936,8 +1938,9 @@ function openForm(seed){
    Nothing is sent until the reader presses Submit on the page that opens. What arrives is read by tools/inbox.py and is
    treated as a tip to be checked, never as fact. */
 const SHARE={gh:'https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new',
-  form:'',     /* the form's "viewform" address; tools/form_ids.py prints this line and the next from the form's link */
-  ent:{}};     /* its question ids: {kind:'entry.1',place:'entry.2',where:'entry.3',text:'entry.4',source:'entry.5',access:'entry.6'} */
+  /* the owner's Google Form and its question ids; tools/form_ids.py prints these two lines from the form's link */
+  form:'https://docs.google.com/forms/d/e/1FAIpQLScsxGx4EgDT2vQqAkU_JkCOlY7arNAGa9da0-55y6K6v1r_Dw/viewform',
+  ent:{kind:'entry.1512318193',place:'entry.1603685238',where:'entry.1784127289',text:'entry.245411565',source:'entry.1131631114',access:'entry.2120312031'}};
 const cut=(t,n)=>{ t=String(t||''); return t.length>n?t.slice(0,n-1)+'…':t; };
 /* f: {place, where, text, source, access} for a lead; for a visit also {id, when, found, spot} */
 function shareText(kind,f){ return (kind==='visit'?['Visit report for the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Visited: '+(f.when||''),'Found: '+(f.found||''),'What is there: '+(f.text||''),'Access as found: '+(f.access||''),'True spot: '+(f.spot||'the pin is right, or not known')]
@@ -1953,6 +1956,8 @@ function shareLinks(kind,f){ const q=o=>Object.keys(o).filter(k=>o[k]).map(k=>en
     put('text',kind==='visit'?[f.found,f.text].filter(Boolean).join('. '):f.text); put('source',f.source); put('access',f.access);
     form=SHARE.form+(SHARE.form.indexOf('?')<0?'?':'&')+'usp=pp_url&'+q(o); }
   return {gh:gh,form:form}; }
+/* one link that sends a spot, coordinates already filled in: from a field-log note or a long press on the map */
+function spotLink(name,la,lo,text,label){ const L=shareLinks('lead',{place:name||'',where:(+la).toFixed(5)+', '+(+lo).toFixed(5),text:text||'',source:'I was there',access:''}); return ext(L.form||L.gh,label||'Send this spot to the Atlas','btn sm spot-send'); }
 function shareBox(kind,f){ const L=shareLinks(kind,f), cp=el('button',{class:'btn sm',type:'button'},'Copy as text'); cp.addEventListener('click',()=>copy(shareText(kind,f),cp));
   return el('div',{class:'sharebox'},
     el('p',{class:'snote',style:'display:block',text:(kind==='visit'?'Send this report':'Send this place')+' so the map can be corrected for everyone. A page opens with it filled in; nothing is sent until you press Submit there. What you send is public, so leave out anything private. Reports are checked before the map changes.'}),
