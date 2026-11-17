@@ -9,7 +9,8 @@ Where the ground model comes from:
          shows through), which makes the wall finder draw more false walls. Only for when 3dep will not answer.
 The source is LIDAR_SRC when that is set (tools/lidar.py sets it from the unit's state so a whole unit comes from one
 source). Otherwise it goes by the point: inside New York's outline 'ny', anywhere else '3dep'. A New York answer that
-is empty (the outline is coarse near the border) is asked for again from 3dep."""
+is empty, or that cannot be read (what the service sends for a tile that hangs over the state line), is asked for
+again from 3dep, so a unit on the border has no holes."""
 import io,os,json,math,requests,numpy as np
 from PIL import Image
 SRC={'ny':('https://elevation.its.ny.gov/arcgis/rest/services/Latest_DEM/ImageServer/exportImage',{}),
@@ -53,8 +54,13 @@ def dem(la,lo,half_m,px):
     import time
     for k in range(5):
         try:
-            a=_get(src,x,y,h,px)
-            if src=='ny' and not os.environ.get('LIDAR_SRC') and empty(a): src='3dep'; a=_get(src,x,y,h,px)     # just over the state line
+            try: a=_get(src,x,y,h,px)
+            except OSError as e:
+                # New York's service answers a tile that hangs over the state line with a picture that cannot be read
+                # ("image file is truncated"), every time. Asking again never helps; the national model has the tile.
+                if src=='ny' and 'truncated' in str(e): src='3dep'; a=_get(src,x,y,h,px)
+                else: raise
+            if src=='ny' and empty(a): src='3dep'; a=_get(src,x,y,h,px)     # wholly over the state line
             break
         except Exception as e:
             if k==4: raise

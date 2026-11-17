@@ -78,15 +78,23 @@ for la,lo in TILES:
         if WALLS: wallsall+=json.load(open(fw))
         n+=1; continue
     if BUDGET is not None and time.time()-T0>BUDGET:
-        json.dump({'done':n,'total':len(TILES)},open(pre+'_partial.json','w'))
-        print(pre,'PARTIAL: time is up after',n,'of',len(TILES),'tiles. Run the same command again to carry on.'); sys.exit(3)
+        json.dump({'done':n,'total':len(TILES),'failed':failed},open(pre+'_partial.json','w'))
+        # Tiles that would not load use up the time (each is tried for a minute or two). Say so with code 4, not 3, so the
+        # caller counts the attempt: otherwise a unit with a handful of bad tiles is "not finished" for ever.
+        print(pre,'PARTIAL: time is up after',n,'of',len(TILES),'tiles'+(f' ({failed} would not load)' if failed else '')+'. Run the same command again to carry on.'); sys.exit(4 if failed else 3)
     a=None
     if os.path.exists(f): a=np.load(f)
     else:
         for k in range(3):
             try: a,_=dem(la,lo,T/2+PAD,T+2*PAD); break
             except Exception as e: time.sleep(3); a=None
-        if a is None: print('failed tile',la,lo); failed+=1; continue     # not marked done: the next run tries it again
+        if a is None:
+            print('failed tile',la,lo); failed+=1
+            if os.environ.get('LIDAR_ALLOW_GAPS'):                         # tried in earlier runs too: leave it out for good, so the scan can end
+                if needp: json.dump([],open(fc,'w'))
+                if needw: json.dump([],open(fw,'w'))
+                n+=1
+            continue                                                       # otherwise not marked done: the next run tries it again
         if KEEP: np.save(f,a)
     if coarse(a) and f'{la:.5f},{lo:.5f}' not in CO: CO.add(f'{la:.5f},{lo:.5f}'); json.dump(sorted(CO),open(pre+'_coarse.json','w'))
     if needw:                                               # walls first: the pits file is what marks a tile done for a pits-only run

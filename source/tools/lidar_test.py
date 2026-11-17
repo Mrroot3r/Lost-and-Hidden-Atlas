@@ -99,6 +99,17 @@ else:
     t('a 10 m model blown up to 1 m is called coarse',lidar_dem.coarse(ndi.zoom(fine[::10,::10],10,order=1)))
     t('still water is not called coarse',not lidar_dem.coarse(np.zeros((200,200),'float32')+7))
     t('an empty answer is known as empty',lidar_dem.empty(np.full((50,50),-9999.0)) and lidar_dem.empty(np.full((50,50),np.nan)) and not lidar_dem.empty(fine))
+    calls=[]
+    def fake(src,x,y,h,px):
+        calls.append(src)
+        if src=='ny': raise OSError('image file is truncated (282 bytes not processed)')
+        return fine
+    _g=lidar_dem._get; lidar_dem._get=fake; os.environ['LIDAR_SRC']='ny'
+    a,sc=lidar_dem.dem(42.62,-73.30,150,300)
+    t('a New York tile that cannot be read comes from the national model, at once',calls==['ny','3dep'] and a is fine)
+    calls.clear(); lidar_dem._get=lambda src,x,y,h,px:(calls.append(src),np.full((9,9),-9999.0) if src=='ny' else fine)[1]
+    t('so does an empty one',lidar_dem.dem(42.62,-73.30,150,300)[0] is fine and calls==['ny','3dep'])
+    lidar_dem._get=_g; os.environ.pop('LIDAR_SRC')
     K=parcel.ma_kind
     t('Massachusetts: the Commonwealth by name is state land',K('COMMONWEALTH OF MASS','9150')=='STATE LAND' and K('MASS COMMONWEALTH OF DCR','')=='STATE LAND')
     t('Massachusetts: a house lot is private',K('SOMEBODY JANE','101')=='PRIVATE')
