@@ -238,6 +238,10 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #sheet-b .lsub{margin-left:0}
 #sheet-b .lopt+.lsub,#sheet-b .lopt+.lkeys{margin-left:24px}
 .snote{display:block;color:var(--mute);font-size:12px;line-height:1.35}
+#sheet-b:not(.tips):not(.guide) .lopt small,#sheet-b:not(.tips):not(.guide) .snote{display:none}
+#sheet-tips{align-self:flex-start;margin-top:8px}
+#sheet-b textarea{width:100%;min-height:56px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
+.nmrow #near-set{flex:none;padding:6px 9px}
 .lkeys{display:flex;flex-wrap:wrap;gap:3px 12px;font-size:12px;color:var(--mute)}
 .lkey{display:inline-flex;align-items:center;gap:5px}
 .who{margin-top:8px}

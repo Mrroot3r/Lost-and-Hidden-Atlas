@@ -59,7 +59,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true};
+const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:''};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -487,6 +487,7 @@ function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme();
   if(k==='units'||k==='clock'){ renderList(); if(sel&&view==='detail') renderDetail(sel); if(view==='log') renderLog(); if(view==='trip') renderTrip(); syncRec(); } }
 function showSettings(on){ sheetMode=on?'set':'map'; $('#sheet-t').textContent=on?'Settings':'Map options'; const g=$('#sheet-set'); g.setAttribute('aria-label',on?'Back to map options':'Settings'); g.classList.toggle('back',!!on);
   if(on) buildSettings(); else buildSheet(); $('#sheet-b').scrollTop=0; }
+function openSettings(head){ openSheet(); showSettings(true); if(head){ const h=[...$('#sheet-b').querySelectorAll('h3')].find(n=>n.textContent===head); if(h) h.scrollIntoView({block:'start'}); } }
 function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classList.add('guide');
   const H=t=>el('h3',{text:t});
   const pick=(key,label,choices,sub)=>{ const id='set-'+key, x=el('select',{id:id},choices.map(c=>el('option',{value:String(c[0]),text:c[1]}))); x.value=String(pref(key));
@@ -497,7 +498,11 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
   const fq=el('input',{type:'text',id:'set-find',placeholder:'Town, address, ZIP or 39.10, -94.58',autocomplete:'off',enterkeyhint:'search'}), fb=el('button',{type:'button',class:'btn',text:'Set'}), fm=el('small',{class:'snote',text:'Use this when the device cannot find you, such as a desktop with location turned off. Names are looked up with OpenStreetMap; coordinates are not sent anywhere.'});
   const go=async()=>{ fb.disabled=true; fm.textContent='Looking…'; const r=await findSpot(fq.value); fb.disabled=false; if(r.err){ fm.textContent=r.err; return; } setSpot(r.lat,r.lon,r.name); if(map) map.setView([r.lat,r.lon],11); buildSettings(); };
   fb.addEventListener('click',go); fq.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } });
-  lb.append(H('Look and units'),
+  const nmPick=(k,label,list,sub)=>{ const id='set-nm-'+k, x=el('select',{id:id},list.map(c=>el('option',{value:String(c[0]),text:c[0]?(KM()?c[2]:c[1]):'Off'}))); x.value=String(nmSet()[k]);
+    x.addEventListener('change',()=>{ const o={}; o[k]=+x.value; nmSave(o); const n=$('#near-'+k); if(n) n.value=x.value; }); return el('label',{class:'field setrow',for:id},el('span',{text:label}),x,sub?el('small',{class:'snote',text:sub}):null); };
+  const ks=el('textarea',{id:'set-kitSign',rows:'2',placeholder:'More walks: youtube.com/@yourchannel'}); ks.value=pref('kitSign'); ['change','blur'].forEach(ev=>ks.addEventListener(ev,()=>{ if(ks.value.trim()!==pref('kitSign')) setPref('kitSign',ks.value.trim()); }));
+  const add=(...a)=>a.forEach(x=>{ if(x) lb.append(x); });      /* Element.append(null) would print the word "null" */
+  add(H('Look and units'),
     pick('theme','Theme',[['auto','Follow the phone'],['light','Light'],['dark','Dark']]),
     pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
     pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
@@ -508,11 +513,18 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
     el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here. Until you choose one, the Atlas uses the start city nearest to where you are or last were.'})),
     el('div',{class:'field setrow'},el('label',{for:'set-find',text:'Or type your start place'}),el('div',{class:'findrow'},fq,fb),fm),
+    H('Near me'),
+    nmPick('r','List what is within',NMR),
+    nmPick('al','Buzz when I walk within',NMA,NATIVE?'While a field log is recording the phone buzzes with the screen off too. Old town centres are listed but never buzz.':'Works while the Atlas is open and showing where you are. Old town centres are listed but never buzz.'),
+    el('small',{class:'snote',text:'Which kinds count (places, leads, vanished places, mines, town centres) is chosen with the chips at the top of the Near tab.'}),
     H('Field log'),
     pick('detail','Track detail',[['fine','Fine: a point every 2 m'],['normal','Normal: every 4 m'],['coarse','Coarse: every 10 m']],NATIVE?'Coarse also checks GPS less often, which saves some battery on long days. Takes effect on the next recording.':'Takes effect on the next recording.'),
     NATIVE?tog('buzz','Vibrate on "Mark here"','A short buzz so you know the pin was dropped without looking.'):null,
     NATIVE?tog('autoPhotos','Find photos and video when a log ends'):null,
     NATIVE?pick('near','A photo joins a note within',[[10,'10 m'],[25,'25 m'],[50,'50 m']],'After changing this, use "Look again for photos" on a log. Photos you placed by hand stay put.'):null,
+    H('Episode kit'),
+    pick('kitBase','Draw the route map picture on',Object.keys(KITMAP).map(k=>[k,KITMAP[k][0]])),
+    el('label',{class:'field setrow',for:'set-kitSign'},el('span',{text:'Lines to end every description'}),ks,el('small',{class:'snote',text:'Your channel link, credits or a standing thank-you. The kit adds them to each description it writes, above the Atlas credit.'})),
     H('Sharing and privacy'),
     pick('trim','Trim the ends of a shared walk',[[0,'Do not trim'],[100,'First and last 100 m'],[200,'First and last 200 m'],[500,'First and last 500 m']],'Applies to "Share this walk" and the GPX file, so a shared walk does not show where you parked or live. Your own copy is not changed.'),
     tog('previews','Include photo previews in a shared walk'),
@@ -523,7 +535,9 @@ function openSheet(){ sheetMode='map'; $('#sheet-t').textContent='Map options'; 
 function closeSheet(){ $('#sheet').hidden=true; $('#scrim').hidden=true; }
 function buildSheet(){
   if(sheetMode==='set') return;
-  const lb=$('#sheet-b'), keep=lb.scrollTop; lb.textContent=''; lb.classList.remove('guide');
+  const lb=$('#sheet-b'), keep=lb.scrollTop; lb.textContent=''; lb.classList.remove('guide'); lb.classList.toggle('tips',!!U.ui.tips);
+  /* the sheet lists every switch and nothing else; the small print under each shows only when asked for */
+  lb.append(el('button',{class:'btn sm',id:'sheet-tips',type:'button','aria-pressed':String(!!U.ui.tips),onclick:()=>{ U.ui.tips=!U.ui.tips; save(); buildSheet(); }},U.ui.tips?'Hide the explanations':'What do these do?'));
   const H=t=>el('h3',{text:t}), note=t=>el('small',{class:'snote',text:t});
   const ck=(id,on,label,sub,fn)=>el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!on,onchange:e=>fn(e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null));
   if(schematic){ lb.append(el('p',{style:'margin:8px 0 0',text:LOCAL?'Live imagery could not load, so the map is showing a built-in outline. Old-map overlays and every scouting link still work. Reload when you are back online.':'This online copy cannot load live imagery, so the map is a built-in outline. Old-map overlays and every scouting link still work. Open the Atlas file, or host it, for satellite, leaf-off, LiDAR, public land and owner lookups.'})); }
@@ -547,13 +561,13 @@ function buildSheet(){
   lb.append(ck('hist-on',U.ui.hist,'Lay it over the selected place','1890s–1930s USGS sheets, where one exists',v=>{ U.ui.hist=v; save(); showHist(); syncBar(); if(sel&&view==='detail') renderDetail(sel); }));
   lb.append(el('div',{class:'lsub'},el('span',{text:'Strength'}),el('input',{type:'range',id:'hist-op',min:'0.1',max:'1',step:'0.05',value:String(U.ui.histOp),'aria-label':'Old map strength',oninput:e=>{U.ui.histOp=+e.target.value;save();if(histLayer)histLayer.setOpacity(U.ui.histOp);}})));
   lb.append(H('Lines'));
-  Object.keys(LGRP).forEach(g=>lb.append(ck('ln-'+g,U.ui.lines[g],LGRP[g][0],null,v=>{ U.ui.lines[g]=v; save(); drawLines(); syncBar(); }),
-    el('div',{class:'lkeys'},LGRP[g][1].map(k=>el('span',{class:'lkey'},el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))));
+  Object.keys(LGRP).forEach(g=>{ lb.append(ck('ln-'+g,U.ui.lines[g],LGRP[g][0],null,v=>{ U.ui.lines[g]=v; save(); drawLines(); syncBar(); }));
+    if(U.ui.lines[g]||U.ui.tips) lb.append(el('div',{class:'lkeys'},LGRP[g][1].map(k=>el('span',{class:'lkey'},el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))); });
   lb.append(note('Tap any line for its name and the Atlas places along it.'));
   if(!schematic){
     lb.append(H('Land and owners'));
     lb.append(ck('land-on',U.ui.land,'Public and protected land','From the national protected-areas database. Zoom in to town level',v=>{ U.ui.land=v; save(); drawLand(); syncBar(); }));
-    lb.append(el('div',{class:'lkeys'},Object.keys(PADC).map(k=>el('span',{class:'lkey'},el('span',{class:'sw',style:'--c:'+PADC[k][1]}),PADC[k][0]))));
+    if(U.ui.land||U.ui.tips) lb.append(el('div',{class:'lkeys'},Object.keys(PADC).map(k=>el('span',{class:'lkey'},el('span',{class:'sw',style:'--c:'+PADC[k][1]}),PADC[k][0]))));
     lb.append(ck('lots-on',U.ui.lots,'Lot lines','New York and Massachusetts property lines. Zoom in close',v=>{ U.ui.lots=v; save(); drawLots(); syncBar(); }));
     lb.append(note('Tap Owner? on the bar, then tap the map, to see the public-land unit and the parcel owner at that spot. Long-press the map for the same thing. Massachusetts is covered statewide; in New York not every county shares owner names.'));
   }
@@ -1035,7 +1049,7 @@ function renderNear(){ const v=$('#v-near'); if(!v) return;
   if(!v.firstChild){   /* the controls are built once; nmDraw() fills in what changes */
     const S=nmSet(), rs=el('select',{id:'near-r','aria-label':'How far to look'},NMR.map(c=>el('option',{value:String(c[0]),text:'Within '+(KM()?c[2]:c[1])}))), as=el('select',{id:'near-al','aria-label':'Alert me when this close'},NMA.map(c=>el('option',{value:String(c[0]),text:c[0]?'Alert within '+(KM()?c[2]:c[1]):'No alert'})));
     rs.value=String(S.r); as.value=String(S.al); rs.addEventListener('change',()=>nmSave({r:+rs.value})); as.addEventListener('change',()=>nmSave({al:+as.value}));
-    v.append(el('div',{class:'pad nmtop'},el('div',{id:'near-st'}),el('div',{class:'nmrow'},rs,as),el('div',{class:'presets',id:'near-k'}),el('p',{class:'nmnote',id:'near-note'})),el('div',{id:'near-goal',hidden:''}),el('ul',{id:'near-list'}));
+    v.append(el('div',{class:'pad nmtop'},el('div',{id:'near-st'}),el('div',{class:'nmrow'},rs,as,el('button',{class:'btn sm',id:'near-set',type:'button','aria-label':'Near me settings',title:'Near me settings',onclick:()=>openSettings('Near me')},$('#sheet-set svg')?$('#sheet-set svg').cloneNode(true):'Settings')),el('div',{class:'presets',id:'near-k'}),el('p',{class:'nmnote',id:'near-note'})),el('div',{id:'near-goal',hidden:''}),el('ul',{id:'near-list'}));
     ['pointerdown','touchstart'].forEach(k=>v.addEventListener(k,()=>{ NM.touch=Date.now(); },{passive:true})); }
   nmDraw(true); }
 function nmDraw(now){ if(view!=='near') return; const v=$('#v-near'); if(!v||!v.firstChild) return; const t=Date.now();
@@ -1310,6 +1324,7 @@ function kitDescription(l,stops,ch){ const tl=trimmed(l)||l, out=[], first=x=>{ 
   out.push('On foot: '+fmtMi(trackMi(tl.pts),1)+' in '+fmtMin(Math.max(1,Math.round(((tl.t1||tl.t0)-tl.t0)/60)))+'.');
   const acc=stops.filter(o=>o.s.accn||ACC[o.s.acc]); if(acc.length){ out.push('','Before you go'); acc.forEach(o=>out.push(('• '+o.s.name+': '+(ACC[o.s.acc]||'')+(o.s.accn?(ACC[o.s.acc]?'. ':'')+first(o.s.accn):'')).replace(/[.\s]*$/,'.'))); }
   const src=stops.filter(o=>Array.isArray(o.s.links)&&o.s.links.length); if(src.length){ out.push('','Sources and further reading'); src.forEach(o=>{ out.push(o.s.name+':'); o.s.links.forEach(k=>out.push('  '+k[0]+' '+k[1])); }); }
+  if(String(pref('kitSign')||'').trim()) out.push('',String(pref('kitSign')).trim());
   out.push('','Route recorded with the Lost & Hidden Atlas: '+KITSITE+(stops.length?'#'+stops[0].s.id:''),'Route map: base map from USGS The National Map.');
   return out.join('\n'); }
 /* the whole kit as one text file: clips, photos and notes grouped by place, then the chapters and the description */
@@ -1370,6 +1385,7 @@ function kitPanel(l,fn){ const stops=kitStops(l), parts=kitParts(l,stops), ch=ki
   const chBox=el('pre',{class:'kitpre',text:ch.length>=3?kitChapText(ch):nv?'Fewer than three chapters could be made; YouTube needs at least three. Add a note at each thing you film and they become chapters.':NATIVE?'No video is matched to this walk yet. Tap "Find photos and video" above, then open the kit again.':'Chapter times come from the videos the Android app matches to a walk. This walk has none.'});
   box.append(el('h5',{text:'YouTube chapters (draft)'}),chBox,ch.length>=3?el('p',{class:'snote',text:'These assume the clips are joined end to end in the order shot, with nothing cut. Shift them to match your edit.'}):null);
   const pic=el('div',{class:'kitpic'}), sty=el('select',{'aria-label':'Base map for the picture'},Object.keys(KITMAP).map(k=>el('option',{value:k,text:KITMAP[k][0]})));
+  if(KITMAP[pref('kitBase')]) sty.value=pref('kitBase'); sty.addEventListener('change',()=>setPref('kitBase',sty.value));
   const draw=async b=>{ const was=b.textContent; b.disabled=true; b.textContent='Drawing…'; pic.textContent='';
     try{ const r=await kitMap(l,sty.value), blob=await new Promise(res=>r.canvas.toBlob(res,'image/png')); const im=el('img',{alt:'Route map of this walk',src:URL.createObjectURL(blob)}); pic.append(im,el('div',{class:'row',style:'margin-top:6px'},B(NATIVE?'Share the picture':'Save the picture',bb=>sendBlob(fn+'-route-map.png',blob,bb).catch(()=>banner('The picture could not be shared.',true,6000))),el('span',{class:'snote',text:'1920 × 1080'+(r.miss?' · '+r.miss+' of '+r.tiles+' map tiles did not load, so parts are blank. Try again with a signal.':'')})));
     }catch(e){ pic.append(el('p',{class:'pn',text:(e&&e.message)||'The picture could not be drawn.'})); }
@@ -1702,7 +1718,7 @@ function gmapsLinks(){
   return out;
 }
 function renderTrip(){
-  const v=$('#v-trip'); v.textContent=''; const st=tripStops(), H=homeObj();
+  const v=$('#v-trip'); v.textContent=''; trip.round=U.ui.round!==false; const st=tripStops(), H=homeObj();
   const box=el('div',{class:'pad',style:'padding-block:12px'}); v.append(box);
   box.append(el('h2',{style:'font-size:22px',text:'Trip builder'}),el('p',{style:'color:var(--mute);margin:4px 0 10px',text:'Add places from their pages, put them in order, then hand the route to Google Maps for live traffic and turn-by-turn.'}));
   if(!st.length){ box.append(el('p',{class:'empty',text:'No stops yet. Open a place and choose "Add to trip".'})); return; }
@@ -1716,7 +1732,7 @@ function renderTrip(){
   if(trip.real) sum.append(el('b',{class:'mono',text:fmtMin(trip.real.min)}),' driving, '+miTxt(trip.real.mi)+' by road, before stops and traffic.');
   else sum.append(el('b',{class:'mono',text:'~'+fmtMin(r.min)}),' driving, about '+miTxt(Math.round(r.mi))+'. Rough estimate from straight-line distance.');
   box.append(sum);
-  const rt=el('input',{type:'checkbox',id:'trip-round',checked:trip.round,onchange:e=>{trip.round=e.target.checked;trip.real=null;renderTrip();}});
+  const rt=el('input',{type:'checkbox',id:'trip-round',checked:trip.round,onchange:e=>{U.ui.round=trip.round=e.target.checked;save();trip.real=null;renderTrip();}});
   box.append(el('label',{class:'lopt',for:'trip-round'},rt,el('span',null,'Round trip from '+H.name)));
   const real=el('button',{class:'btn',type:'button',onclick:async()=>{ real.disabled=true; real.textContent='Checking…';
     try{ const c=pts.map(p=>p.lon.toFixed(5)+','+p.lat.toFixed(5)).join(';'); const j=await (await fetch('https://router.project-osrm.org/route/v1/driving/'+c+'?overview=false')).json(); if(j.code!=='Ok') throw 0;
@@ -1872,6 +1888,7 @@ function renderGuide(){
     fo,
     el('p',null,el('b',{text:'Sharing locations: '}),'name public-land sites openly, since that sends viewers somewhere legal. For fragile private sites, name the region and not the route, or hold the video until the owner is on side.')]));
   v.append(sec('Settings, backups and storage',false,[P('Backups, restoring, offline map storage and the app\'s own settings are under the gear: tap More under the map, then the gear next to Done.'),
+    el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>openSettings()},'Open Settings')),P('Settings holds: theme, units and clock; how the map opens and your start place; Near me (how far to list, when to buzz); the field log; the episode kit; trimming a shared walk; backups; where the app gets its places; offline storage.'),
     el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>{ openSheet(); showSettings(true); }},'Open settings'))]));
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),

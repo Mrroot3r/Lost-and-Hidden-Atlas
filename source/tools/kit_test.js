@@ -28,7 +28,7 @@ const { chromium, devices } = require('playwright'); const fs = require('fs');
   if(!made){ await b.close(); process.exit(1); }
   // the page saves its own data as it closes, so new data goes in just before the next load, once
   const inject=(key,part)=>c.addInitScript(([key,part])=>{ if(location.protocol==='about:'||sessionStorage.getItem('inj'+key)) return; sessionStorage.setItem('inj'+key,'1'); const U=JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'); Object.assign(U,part); localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify(U)); },[key,part]);
-  await inject(1,{logs:[made.log]});
+  await inject(1,{logs:[made.log],set:{kitSign:'More walks: example.org/channel',kitBase:'air'}});
   await p.goto('about:blank'); await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800);
   await p.click('#tab-log'); await p.waitForTimeout(400);
   await p.getByRole('button',{name:'Episode kit'}).click(); await p.waitForTimeout(500);
@@ -40,6 +40,8 @@ const { chromium, devices } = require('playwright'); const fs = require('fs');
   await p.screenshot({path:'/tmp/kit_1.png',fullPage:false});
   const [dl]=await Promise.all([p.waitForEvent('download'),p.getByRole('button',{name:'Save the whole kit'}).click()]); const kit=fs.readFileSync(await dl.path(),'utf8');
   ok('the kit file groups clips, photos and notes by place',kit.includes('1. '+made.A.toUpperCase())&&kit.includes('2. '+made.B.toUpperCase())&&/VIDEO 1 {2}VID_0001\.mp4/.test(kit)&&/PHOTOS {2}IMG_0002\.jpg/.test(kit)&&/NOTE {2}[\d:]+ {2}cellar hole {3}\(video 1 at /.test(kit));
+  ok('the closing lines from Settings end the description, before the credit',/More walks: example\.org\/channel\n\nRoute recorded with/.test(kit),(kit.match(/.{0,60}Route recorded with/s)||[''])[0].replace(/\n/g,' / '));
+  ok('the route picture starts on the base map chosen in Settings',(await p.evaluate(()=>{ const n=document.querySelector('.kit select'); return n&&n.value; }))==='air');
   ok('it carries the chapters and a description with the sources',kit.includes('YOUTUBE CHAPTERS (DRAFT)\n0:00 Setting out')&&kit.includes('Sources and further reading')&&kit.includes(made.link)&&kit.includes('Before you go')&&kit.includes('#'+made.aid)&&/On foot: [\d.]+ mi in \d+ min\./.test(kit));
   fs.writeFileSync('/tmp/kit_text.txt',kit);
   await p.getByRole('button',{name:'Draw the route map'}).click(); await p.waitForSelector('.kitpic img',{timeout:60000}); await p.waitForTimeout(500);
