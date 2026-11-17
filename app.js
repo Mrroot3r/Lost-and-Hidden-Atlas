@@ -55,7 +55,7 @@ const debounce=(f,ms)=>{ let t; return function(){ const a=arguments; clearTimeo
 
 /* ---------- your saved data (this browser only) ---------- */
 const LS='lost-hidden-atlas-v1';
-const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:true,canal:true,rail:false}}});
+const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:true,canal:true,rail:false}}});
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
@@ -1728,6 +1728,7 @@ function renderDetail(s){
   if(s.look) st.append(el('p',null,el('b',{text:'Look for: '}),s.look));
   if(s.hook) st.append(el('p',{class:'hook',text:s.hook}));
   if(s.story||s.look||s.hook||s.fr) v.append(st);
+  v.append(visitSection(s));
   /* mine */
   const sv=el('span',{class:'note-saved',text:''});
   const stSel=el('select',{id:'my-status',onchange:e=>{ if(e.target.value) U.status[s.id]=e.target.value; else delete U.status[s.id]; save(); syncMarkers(); sv.textContent='Saved'; }},Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})));
@@ -1795,6 +1796,60 @@ function openForm(seed){
   v.append(form); name.focus();
 }
 
+/* ---------- visit reports ----------
+   What was really there when the owner went: U.visits[id] = [{t:'2026-11-16', v:'found'|'else'|'nothing'|'blocked', x: what is there,
+   a: access as found, at:[lat,lon] the true spot or null}], newest first. They travel in "Copy my additions for Claude"
+   (Settings, Your data) and tools/visits.py turns that into a list of corrections to pins, texts and the LiDAR ledger. */
+const VISIT={found:'Found it',else:'Something else is there',nothing:'Nothing there',blocked:'Could not get to it'};
+let visitOpen=null;      /* {id, i} while a report is being written or edited; i is its place in the list, -1 for a new one */
+function visitSection(s){ if(!U.visits) U.visits={}; const list=U.visits[s.id]||[], pin=pos(s), sec=el('div',{class:'sec pad',id:'visits'},el('h3',{text:'Visit reports'}));
+  const dist=at=>hav(pin.lat,pin.lon,at[0],at[1])*1609.344, far=m=>KM()?Math.round(m)+' m':Math.round(m*3.28084)+' ft';
+  list.forEach((r,i)=>{ if(visitOpen&&visitOpen.id===s.id&&visitOpen.i===i) return;
+    sec.append(el('div',{class:'visit-item'},el('b',{text:new Date(r.t+'T12:00:00').toLocaleDateString([],{dateStyle:'medium'})+' · '+(VISIT[r.v]||r.v)}),r.at?el('small',{text:' · true spot '+far(dist(r.at))+' from the Atlas pin'}):null,
+      r.x?el('p',{text:r.x}):null,r.a?el('p',{class:'snote',style:'display:block',text:'Access: '+r.a}):null,
+      el('div',{class:'row'},el('button',{class:'btn sm visit-edit',type:'button',onclick:()=>{ visitOpen={id:s.id,i:i}; renderDetail(s); const n=$('#visit-form'); if(n) n.scrollIntoView({block:'nearest'}); }},'Edit'),
+        el('button',{class:'btn sm visit-del',type:'button',onclick:()=>{ if(!confirm('Delete this visit report?')) return; list.splice(i,1); if(!list.length) delete U.visits[s.id]; save(); renderDetail(s); }},'Delete')))); });
+  if(!(visitOpen&&visitOpen.id===s.id)){ sec.append(el('div',{class:'row'},el('button',{class:'btn sm',type:'button',id:'visit-add',onclick:()=>{ visitOpen={id:s.id,i:-1}; renderDetail(s); const n=$('#visit-form'); if(n) n.scrollIntoView({block:'nearest'}); }},list.length?'+ Another visit':'+ I was here')),
+      list.length?null:el('p',{class:'snote',style:'display:block;margin-top:6px',text:'Been there? Say what you found and where it really is. Your reports go to Claude with "Copy my additions for Claude" in Settings, so the pin and the text get corrected for everyone.'}));
+    return sec; }
+  const old=visitOpen.i>=0?list[visitOpen.i]:null, d0=new Date(), today=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
+  let verdict=old?old.v:'';
+  const chips=el('div',{class:'chips'},Object.keys(VISIT).map(k=>el('button',{class:'chip visit-v',type:'button','data-v':k,'aria-pressed':String(verdict===k),onclick:e=>{ verdict=k; chips.querySelectorAll('.chip').forEach(n=>n.setAttribute('aria-pressed',String(n.getAttribute('data-v')===k))); }},VISIT[k])));
+  const tx=el('textarea',{id:'visit-x',placeholder:'A laid-stone cellar about 5 m square, a well 10 m east of it, apple trees…'}); tx.value=old?old.x||'':'';
+  const ta=el('input',{type:'text',id:'visit-a',placeholder:'Parked at the gate on the forest road; posted on the east side',autocomplete:'off'}); ta.value=old?old.a||'':'';
+  const td=el('input',{type:'date',id:'visit-t',max:today}); td.value=old?old.t:today;
+  const farN=el('small',{class:'snote',id:'visit-far',style:'display:block'}), msg=el('span',{class:'note-saved',id:'visit-msg'});
+  const R=(id,val,label,dis)=>{ const n=el('input',{type:'radio',name:'visit-at',id:id,value:val,disabled:!!dis}); n.addEventListener('change',upd); return el('label',{class:'lopt',for:id},n,el('span',null,label)); };
+  const spot=()=>{ const k=(sec.querySelector('input[name="visit-at"]:checked')||{}).value; if(k==='me'&&geo.ll) return [+geo.ll[0].toFixed(6),+geo.ll[1].toFixed(6)]; if(k==='map'&&map){ const c=map.getCenter(); return [+c.lat.toFixed(6),+c.lng.toFixed(6)]; } if(k==='keep'&&old&&old.at) return old.at; return null; };
+  function upd(){ const at=spot(); farN.textContent=at?'That is '+far(dist(at))+' from the Atlas pin. The pin on your map moves there when you save.':''; }
+  const box=el('div',{id:'visit-form'},
+    el('label',{class:'field'},el('span',{text:'What did you find?'}),chips),
+    el('label',{class:'field',for:'visit-x',style:'margin-top:8px'},el('span',{text:'What is really there'}),tx),
+    el('label',{class:'field',for:'visit-a',style:'margin-top:8px'},el('span',{text:'Access as you found it'}),ta),
+    el('div',{class:'field',style:'margin-top:8px'},el('span',{text:'The true spot'}),
+      R('visit-at-pin','pin','The pin is right, or I cannot say'),
+      old&&old.at?R('visit-at-keep','keep','Keep the spot from this report'):null,
+      R('visit-at-me','me','Where I am standing now',!geo.ll),
+      map?R('visit-at-map','map','The middle of the map (move the map until the spot is dead centre)'):null,
+      geo.ll?null:el('small',{class:'snote',style:'display:block',text:'For "where I am standing", tap Me under the map first.'}),farN),
+    el('label',{class:'field',for:'visit-t',style:'margin-top:8px'},el('span',{text:'Date of the visit'}),td),
+    el('div',{class:'row',style:'margin-top:10px'},
+      el('button',{class:'btn pri',type:'button',id:'visit-save',onclick:()=>{ if(!verdict){ msg.textContent=' Choose what you found first.'; return; }
+        const at=spot(), r={t:td.value||today,v:verdict,x:tx.value.trim(),a:ta.value.trim(),at:at};
+        if(!U.visits[s.id]) U.visits[s.id]=[]; if(old) U.visits[s.id][visitOpen.i]=r; else U.visits[s.id].unshift(r);
+        U.visits[s.id].sort((x,y)=>x.t<y.t?1:x.t>y.t?-1:0);
+        if(['','todo','scouted','asked','ok',undefined].indexOf(U.status[s.id])>=0&&verdict!=='blocked') U.status[s.id]='visited';
+        if(at&&dist(at)>4) U.moved[s.id]=at;
+        visitOpen=null; saveNow(); refresh(); select(byId(s.id)||s,true); banner('Visit report saved. Send it with "Copy my additions for Claude" in Settings.',false,5000); }},'Save the report'),
+      el('button',{class:'btn',type:'button',onclick:()=>{ visitOpen=null; renderDetail(s); }},'Cancel'),msg));
+  sec.append(box); sec.querySelector(old&&old.at?'#visit-at-keep':'#visit-at-pin').checked=true;
+  /* the choice "where I am standing" opens up as soon as the phone knows where it is */
+  if(!geo.ll){ const t=setInterval(()=>{ const n=document.getElementById('visit-at-me'); if(!n){ clearInterval(t); return; } if(geo.ll){ n.disabled=false; clearInterval(t); } },700); }
+  return sec; }
+/* the reports as they go to Claude: each with the place's name and the Atlas's own pin, so the list reads on its own */
+function visitExport(){ const out=[]; Object.keys(U.visits||{}).forEach(id=>{ const s=byId(id), b=BASE.find(x=>x.id===id)||s; if(!s||!U.visits[id].length) return;
+    out.push({id:id,name:s.name,town:s.town||'',cat:s.cat,pin:[b.lat,b.lon],mine:!!s.mine,reports:U.visits[id]}); }); return out; }
+
 /* ---------- trip ---------- */
 let trip={round:true,real:null};
 function tripStops(){ return U.trip.map(byId).filter(Boolean); }
@@ -1859,7 +1914,7 @@ function dataSections(v){
   const dump=()=>JSON.stringify(U);
   const b1=el('button',{class:'btn sm',type:'button'},'Copy backup'); b1.addEventListener('click',()=>{ out.value=dump(); copy(out.value,b1); });
   const b2=el('button',{class:'btn sm',type:'button',onclick:()=>{ out.value=dump(); try{ const a=el('a',{href:URL.createObjectURL(new Blob([out.value],{type:'application/json'})),download:'lost-hidden-atlas-backup.json'}); document.body.append(a); a.click(); a.remove(); }catch(e){} }},'Save backup file');
-  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status},null,1); out.value=t; copy(t,b3); });
+  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status,visits:visitExport()},null,1); out.value=t; copy(t,b3); });
   const inp=el('textarea',{id:'bk-in',placeholder:'Paste a backup here',style:'min-height:60px;font-family:var(--fm);font-size:11.5px'});
   const msg=el('span',{class:'note-saved'});
   const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; save(); applyTheme(); drawScale(); pushPrefs(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
@@ -1871,7 +1926,7 @@ function dataSections(v){
     el('div',{class:'row'},b1,LOCAL?b2:null,b3),out,
     el('label',{class:'field',for:'bk-in',style:'margin-top:10px'},el('span',{text:'Restore'}),inp),
     el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>load(inp.value)},'Restore from pasted text'),file,msg),
-    P('To grow the master list, use "Copy my additions for Claude" and paste it into a chat. Claude can fold them into the Atlas with drive times and old-map overlays.')]));
+    P('To grow the master list, use "Copy my additions for Claude" and paste it into a chat. Claude can fold them into the Atlas with drive times and old-map overlays. It carries your visit reports too: what you found at each place and where it really is.')]));
   if(AT){ const info=el('p'), res=el('span',{class:'note-saved'}), addr=el('input',{type:'url',id:'at-base','aria-label':'Atlas address',autocomplete:'off'}); addr.value=AT.base;
     const show=()=>{ info.textContent='Place data: build '+AT.dataV+(AT.fromCache?', downloaded from the address below.':', as built into the app.')+(AT.pending?' Build '+AT.pending+' is downloaded and loads the next time the app starts.':''); };
     const run=()=>{ res.textContent=' Checking…'; return AT.check().then(r=>{ show(); res.textContent=r.state==='same'?' You have the latest.':' New data downloaded'+(r.places?' ('+r.places+' places)':'')+'.'; if(r.state!=='same') res.append(' ',el('button',{class:'btn sm',type:'button',onclick:()=>location.reload()},'Load it now')); },
@@ -1920,7 +1975,8 @@ function renderGuide(){
       el('li',{text:'Tap Compare to swipe aerial against LiDAR. Turn on Public land and tap Owner? to see whose ground it is before you go.'}),
       el('li',{text:'Follow the lines. Old railroads, trolley lines and canals are drawn on the map; stations, mills, hotels and locks sat right beside them. Click a line to list the Atlas places along it in order, then walk the rest of it on LiDAR looking for platforms and foundations.'}),
       el('li',{text:'On site, open the Log tab and start a field log. It draws where you walk and lets you drop timed notes, then exports the track (GPX) and a note list with times to match against your footage.'}),
-      el('li',{text:'Found the real spot? Open My notes, choose "Move the pin," and drag it. Right-click (or long-press) anywhere on the map for coordinates and links.'})),
+      el('li',{text:'Found the real spot? Open My notes, choose "Move the pin," and drag it. Right-click (or long-press) anywhere on the map for coordinates and links.'}),
+      el('li',{text:'Been to a place? Open it and tap "I was here": say what you found, how you got in, and mark the true spot from where you stand. Send the reports with "Copy my additions for Claude" in Settings and the Atlas gets corrected.'})),
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
   const ser=el('div',{class:'series'}); D.series.forEach(s=>{ const n=BASE.filter(x=>(x.tags||[]).indexOf(s.tag)>=0).length;
     ser.append(el('button',{type:'button',onclick:()=>{ clearF(); $('#q').value=''; F.tag=s.tag; showView('list'); refresh(); fitVisible(); }},el('b',{text:s.title+' · '+n+' stops'}),el('small',{text:s.note}))); });
