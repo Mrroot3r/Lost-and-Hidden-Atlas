@@ -180,6 +180,8 @@ These are what keep the Atlas trustworthy. They are not optional.
 7. **Test:** the smoke test with one of the new place ids, then open a few new places in a browser at phone size.
 8. **Publish** as a pull request (section 3). List in it anything you could not verify.
 
+**Visit reports.** On a place page the owner can tap "I was here" and say what he found (found it, something else is there, nothing there, could not get to it), what is really there, the access as he found it, and the true spot, taken from where he stands or from the middle of the map (`visitSection()`, stored in `U.visits`). Saving one marks the place Visited and moves his own pin. The reports travel in "Copy my additions for Claude" (Settings, Your data), each with the place's name and the Atlas's own pin. Paste that into a file and run `python3 tools/visits.py additions.json`: it prints, for each report, what to change, and with `--ledger` it notes a visit to a LiDAR lead on its candidate. A visit report is the best source the Atlas has. "Found it" lets a LiDAR lead become `conf='verified'`; write the `look` text from his words, drop "Not checked on the ground", move the pin to his true spot with `prec='exact'`, and say in the pin note that the owner confirmed it and on what date. "Nothing there" is as useful: say so, set `st='gone'`, or take a LiDAR lead out. After changing the report form or the export run `tools/visit_test.js`.
+
 ## 7. Handing research to a cheaper model
 
 Give it sections 4, 5 and 6 and a prompt like the one below. Have a stronger model, or a person, spot-check a sample before the pull request is merged; "what remains today" and coordinates are where cheaper models slip.
