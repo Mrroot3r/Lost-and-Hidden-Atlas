@@ -1,4 +1,4 @@
-{"name": "Gates Hill State Forest", "code": "ghsf", "state": "done", "swept": "2026-11-16", "buildings": 13, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"],
+{"name": "Gates Hill State Forest", "code": "ghsf", "state": "done", "swept": "2026-11-16", "buildings": 13, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"], "walls": 422, "wall_m": 14626,
 "cands":[
 {"id":"ghsf1","lat":42.522477,"lon":-74.368471,"depth":0.82,"size":[5,6],"dist":41,"blat":42.52281,"blon":-74.36869,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","when":"2026-11-16","late":[1944,"NY_Middleburgh_130551_1944_24000_geo.tif"],"seen":"2026-11-16","why":"dup","note":"the same site as lidar-gates-hill-pits"},
 {"id":"ghsf2","lat":42.52232,"lon":-74.368477,"depth":0.69,"size":[12,11],"dist":40,"blat":42.52239,"blon":-74.36896,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"published","place":"lidar-gates-hill-pits","batch":"lidar4","when":"2026-11-16"},

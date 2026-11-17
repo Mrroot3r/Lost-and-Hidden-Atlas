@@ -400,3 +400,11 @@ details>.phs{margin:8px 0 0}
 #visit-form textarea{min-height:70px}
 #visit-form input[type=text],#visit-form input[type=date]{width:100%;min-height:40px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
 #visit-form .lopt{padding:3px 0}
+
+/* the Trip tab's clock, and saving a map view */
+.stops .stop-at{display:block;color:var(--mute)}
+.stops .stop-at.late{color:#b42318;font-weight:600}
+#trip-clock{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+#trip-clock input,#trip-clock select{min-height:40px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;width:100%}
+#view-off{align-self:flex-start}
+#view-box .row{margin-top:6px}

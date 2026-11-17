@@ -1,4 +1,4 @@
-{"name": "Grafton Lakes State Park", "code": "glsp", "state": "done", "swept": "2026-11-16", "buildings": 98, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif", "NY_Hoosick_129756_1897_62500_geo.tif"],
+{"name": "Grafton Lakes State Park", "code": "glsp", "state": "done", "swept": "2026-11-16", "buildings": 98, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif", "NY_Hoosick_129756_1897_62500_geo.tif"], "walls": 1329, "wall_m": 45913,
 "cands":[
 {"id":"glsp1","lat":42.770194,"lon":-73.459546,"depth":1.06,"size":[12,8],"dist":31,"blat":42.77005,"blon":-73.45987,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"no","why":"private","note":"the pit is on a private house lot","when":"2026-11-16"},
 {"id":"glsp2","lat":42.782474,"lon":-73.441292,"depth":1.0,"size":[5,6],"dist":42,"blat":42.78278,"blon":-73.44099,"sheet":"NY_Hoosick_129756_1897_62500_geo.tif","year":1897,"status":"published","place":"lidar-second-pond-road-pit","batch":"lidar3","when":"2026-11-16"},

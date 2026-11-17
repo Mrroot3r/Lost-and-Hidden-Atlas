@@ -1,4 +1,4 @@
-{"name": "Scott Patent State Forest", "code": "spsf", "state": "done", "swept": "2026-11-16", "buildings": 19, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif", "NY_Durham_140606_1893_62500_geo.tif"],
+{"name": "Scott Patent State Forest", "code": "spsf", "state": "done", "swept": "2026-11-16", "buildings": 19, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif", "NY_Durham_140606_1893_62500_geo.tif"], "walls": 639, "wall_m": 21925,
 "cands":[
 {"id":"spsf1","lat":42.470748,"lon":-74.289672,"depth":0.72,"size":[13,8],"dist":31,"blat":42.47056,"blon":-74.28995,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
 {"id":"spsf2","lat":42.464608,"lon":-74.266437,"depth":0.74,"size":[9,11],"dist":70,"blat":42.4641,"blon":-74.26594,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},

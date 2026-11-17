@@ -1,4 +1,4 @@
-{"name": "South Mountain State Forest", "code": "smsf", "state": "done", "swept": "2026-11-16", "buildings": 34, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif"],
+{"name": "South Mountain State Forest", "code": "smsf", "state": "done", "swept": "2026-11-16", "buildings": 34, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif"], "walls": 327, "wall_m": 10439,
 "cands":[
 {"id":"smsf1","lat":42.391782,"lon":-74.273988,"depth":1.11,"size":[12,6],"dist":14,"blat":42.39168,"blon":-74.27389,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"road","note":"about 20 m from a gravel road and may be a road pit; it is in LEADS.md","when":"2026-11-16"},
 {"id":"smsf2","lat":42.387385,"lon":-74.271557,"depth":1.06,"size":[8,7],"dist":31,"blat":42.38766,"blon":-74.27156,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
