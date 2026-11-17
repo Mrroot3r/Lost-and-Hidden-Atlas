@@ -23,7 +23,7 @@ What I care about most:
 - Work frugally. Read a page with the tools' -g filters before reading it whole, do not open the same file or page twice (the tools keep copies), and look at pins in sheets of twelve, not one at a time.
 
 Before you open the pull request, do all of this (GUIDE.md section 3 has the commands):
-- Get the data file right in the working folder before publish.sh: take the batch time from the command  date -u '+%Y-%m-%d %H:%M'  (never write it from memory), build, run the pin check and the tests. Then run publish.sh ONCE. Only after that edit GUIDE.md and LEADS.md, in the repository clone, on the branch it made.
+- Get the data file right in the working folder before publish.sh: take the batch time from the command  date -u '+%Y-%m-%d %H:%M'  (never write it from memory), build, run the pin check and the tests. List the open pull requests again just before publish.sh: if one now covers your ground, keep only the places it lacks, under a new file name and batch key. Then run publish.sh ONCE. Only after that edit GUIDE.md and LEADS.md, in the repository clone, on the branch it made.
 - Update GUIDE.md for what you did: the row for the state in the table of states (section 8) and a line in the known gaps (section 10) saying what this batch is, how its sources were read and what was not checked.
 - Do not cut old-map crops and do not commit built files: GitHub builds the site and cuts the maps after the merge.
 - If something in the guide was wrong, missing or slowed you down, fix the guide in the same pull request and say so in your report.
