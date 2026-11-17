@@ -252,30 +252,38 @@ function regionOf(lat,lon){
     let best=0.0009; for(const k in OUTL) OUTL[k].forEach(r=>{ for(let i=0;i<r.length;i+=2){ const dx=(r[i]-lon)*0.74, dy=r[i+1]-lat, d=dx*dx+dy*dy; if(d<best){ best=d; v=k; } } }); }
   if(regMemo.size>4000) regMemo.clear(); regMemo.set(key,v); return v; }
 function tileCenter(c){ const n=Math.pow(2,c.z); return [Math.atan(Math.sinh(Math.PI*(1-2*(c.y+0.5)/n)))*180/Math.PI,(c.x+0.5)/n*360-180]; }
-function exportUrl(base,c,extra){ const n=Math.pow(2,c.z),r=2*W/n,x0=-W+c.x*r,y1=W-c.y*r,px=PXQ();
+let PXM=1;   /* 2 while a big tile's address is being built (FnLayer, below) */
+function exportUrl(base,c,extra){ const n=Math.pow(2,c.z),r=2*W/n,x0=-W+c.x*r,y1=W-c.y*r,px=PXQ()*PXM;
   return base+'?bbox='+[x0,y1-r,x0+r,y1].map(v=>v.toFixed(2)).join(',')+'&bboxSR=3857&imageSR=3857&size='+px+','+px+'&format=jpg&f=image'+(extra||''); }
 function xyz(tpl,c,maxN){ let z=c.z,x=c.x,y=c.y,dz=0; if(z>maxN){ dz=z-maxN; x=x>>dz; y=y>>dz; z=maxN; }
   const u=tpl.replace('{z}',z).replace('{y}',y).replace('{x}',x); return dz?{url:u,dz:dz,ox:c.x-(x<<dz),oy:c.y-(y<<dz)}:u; }
 const RIG='https://maps.edc.uri.edu/rigis/rest/services/', RILEAF=RIG+'IMG/RI_202603_RGB_3in_web/ImageServer/exportImage', RIDEM=RIG+'TOPO/Elevation_2022_Lidar_web/ImageServer/exportImage';
 const hsRule=g=>'&interpolation=RSP_BilinearInterpolation&renderingRule='+encodeURIComponent(JSON.stringify({rasterFunction:'Hillshade',rasterFunctionArguments:{Azimuth:g[1],Altitude:g[2],ZFactor:g[3]},variableName:'DEM'}));
 const NYHS='https://elevation.its.ny.gov/arcgis/rest/services/NYS_Statewide_Hillshade/MapServer/export', NYDEM='https://elevation.its.ny.gov/arcgis/rest/services/Latest_DEM/ImageServer/exportImage';
-function leafUrl(c){ const p=tileCenter(c), r=regionOf(p[0],p[1]);
+const WORLDIMG='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+function leafUrl(c){
+  /* zoomed far out, a state flight and the world imagery look the same; the world imagery is ready-cut tiles that arrive at
+     once and has no white blocks beyond a state's edge. An older flight, picked by year, is kept from zoom 9. */
+  if(c.z<(U.ui.year==='Latest'?11:9)) return xyz(WORLDIMG,c,19);
+  const p=tileCenter(c), r=regionOf(p[0],p[1]);
   if(r==='ny') return exportUrl('https://orthos.its.ny.gov/arcgis/rest/services/wms/'+U.ui.year+'/MapServer/export',c);
   if(r==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/orthos2023/MapServer/tile/{z}/{y}/{x}',c,20);
   if(r==='vt') return xyz('https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/IMG_VCGI_CLR_WM_CACHE/ImageServer/tile/{z}/{y}/{x}',c,19);
   if(r==='ri'&&c.z>=12) return exportUrl(RILEAF,c);
-  return xyz('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',c,19); }
-function lidarUrl(c){ const p=tileCenter(c), r=regionOf(p[0],p[1]);
+  return xyz(WORLDIMG,c,19); }
+const WORLDHS='https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}';
+function lidarUrl(c){ if(c.z<9) return xyz(WORLDHS,c,15);
+  const p=tileCenter(c), r=regionOf(p[0],p[1]);
   if(r==='ny'){ if(c.z<14) return exportUrl(NYHS,c); const g=LIGHT[U.ui.light]||LIGHT.nw;
     return exportUrl(NYDEM,c,hsRule(g)); }
   if(r==='ri'&&c.z>=11) return exportUrl(RIDEM,c,hsRule(LIGHT[U.ui.light]||LIGHT.nw));
   if(r==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/LiDAR_ShadedRelief/MapServer/tile/{z}/{y}/{x}',c,18);
   if(r==='vt') return xyz('https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/IMG_VCGI_LIDARHILLSHD_WM_CACHE_v1/ImageServer/tile/{z}/{y}/{x}',c,19);
-  return xyz('https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}',c,15); }
+  return xyz(WORLDHS,c,15); }
 const LD={
   streets:{n:'Streets',d:'Roads and place names',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:19,attribution:'Esri, HERE, Garmin, USGS'})},
-  leaf:{n:'Leaf-off aerial',d:'State spring flights. The ground shows through bare trees',mk:p=>new FnLayer('',{pane:p,maxZoom:20,minZoom:9,fn:leafUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS'})},
-  lidar:{n:'LiDAR terrain',d:'Bare ground with the trees stripped off. Sharpens to 1 m as you zoom in',mk:p=>new FnLayer('',{pane:p,maxZoom:20,fn:lidarUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS, Esri'})},
+  leaf:{n:'Leaf-off aerial',d:'State spring flights. The ground shows through bare trees',mk:p=>new FnLayer('',bigOpt({pane:p,maxZoom:20,ghost:true,fn:leafUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS, Esri'}))},
+  lidar:{n:'LiDAR terrain',d:'Bare ground with the trees stripped off. Sharpens to 1 m as you zoom in',mk:p=>new FnLayer('',bigOpt({pane:p,maxZoom:20,ghost:true,fn:lidarUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS, Esri'}))},
   sat:{n:'Satellite',d:'World imagery, usually leaves on',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:19,attribution:'Esri, Maxar, Earthstar Geographics'})},
   topo:{n:'USGS topo, current',d:'Contours, streams and trails',mk:p=>new CachedXYZ('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:16,attribution:'USGS The National Map'})},
   oldtopo:{n:'USGS topo, 1940s–80s',d:'Scanned paper quads. Purple marks later photo-revisions',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:15,attribution:'USGS, National Geographic, i-cubed'})}
@@ -312,21 +320,54 @@ async function tcScan(){ const db=await tcOpen(); if(!db) return; TC.size=0; TC.
     cur.onsuccess=()=>{ const c=cur.result; if(!c){ res(); return; } const v=c.value; if(v.p){ TC.pinSize+=v.s; TC.pinN++; } else TC.size+=v.s; c.continue(); };
     cur.onerror=()=>res(); }catch(e){ res(); } }); }
 async function tcClear(){ TC.mem.clear(); const db=await tcOpen(); if(!db) return; await new Promise(res=>{ try{ const tx=db.transaction('t','readwrite'); tx.objectStore('t').clear(); tx.oncomplete=tx.onerror=()=>res(); }catch(e){ res(); } }); TC.size=TC.pinSize=TC.pinN=0; }
-async function tileBlob(url,pin){
+/* Fetching tiles. The state servers are slow, and about one request in thirty simply hangs for 15 seconds. So:
+   - a request that has not answered in a few seconds is dropped and asked again (three tries, each allowed longer);
+   - only a few run at a time for each server, the newest first, so what the map shows NOW is fetched before what it showed
+     a moment ago;
+   - a tile the map no longer wants (you zoomed on) is never asked for at all. */
+const TQ={q:[],run:new Map(),max:8,avg:900,retried:0,dropped:0};
+const tqHost=u=>{ const m=/^https?:\/\/([^/]+)/.exec(u); return m?m[1]:''; };
+async function fetchTile(url){ let err=null;
+  for(let k=0;k<3;k++){ const ac=typeof AbortController==='function'?new AbortController():null, lim=Math.min(20000,Math.max(5000,TQ.avg*5))*(k+1), t0=Date.now(), tm=ac?setTimeout(()=>ac.abort(),lim):0;
+    if(k) TQ.retried++;
+    try{ const r=await fetch(url,{mode:'cors',credentials:'omit',signal:ac?ac.signal:undefined});
+      if(!r.ok){ err=new Error('http '+r.status); if(r.status<500&&r.status!==429) break; continue; }
+      const ct=r.headers.get('content-type')||''; if(ct.indexOf('image')<0&&ct.indexOf('octet-stream')<0){ err=new Error('not an image'); break; }
+      const b=await r.blob(); TQ.avg=TQ.avg*0.9+(Date.now()-t0)*0.1; return b; }
+    catch(e){ err=e; if(navigator.onLine===false) break;
+      if(e.name==='AbortError') TQ.avg=Math.max(TQ.avg,lim/3);                        /* on a slow connection, wait longer next time and do not ask twice */
+      else if(k>=1) break; }                                                          /* a hang is tried three times; any other failure twice */
+    finally{ clearTimeout(tm); } }
+  throw err||new Error('tile failed'); }
+function tqPump(){
+  for(let i=TQ.q.length-1;i>=0;i--){ const j=TQ.q[i];
+    if(!j.keep&&j.wants.length&&!j.wants.some(w=>w())){ TQ.q.splice(i,1); TQ.dropped++; j.rej(new Error('dropped')); continue; }
+    const h=tqHost(j.url), n=TQ.run.get(h)||0; if(n>=TQ.max) continue;
+    TQ.q.splice(i,1); TQ.run.set(h,n+1);
+    fetchTile(j.url).then(j.res,j.rej).then(()=>{ TQ.run.set(h,Math.max(0,(TQ.run.get(h)||1)-1)); tqPump(); }); } }
+/* want: a function that says whether the map still shows this tile. Leave it out for a tile that must be fetched whatever
+   happens (saving an area for offline). */
+async function tileBlob(url,pin,want){
   const hit=await tcGet(url,pin); if(hit) return hit;
-  if(TC.pending.has(url)){ const b=await TC.pending.get(url); if(b&&pin) tcPut(url,b,true,b.size); return b; }
-  const pr=(async()=>{ const r=await fetch(url,{mode:'cors',credentials:'omit'}); if(!r.ok) throw new Error('http '+r.status);
-    const ct=r.headers.get('content-type')||''; if(ct.indexOf('image')<0&&ct.indexOf('octet-stream')<0) throw new Error('not an image');
-    const b=await r.blob(); TC.fetchOk++; tcPut(url,b,!!pin); return b; })();
-  TC.pending.set(url,pr);
-  try{ return await pr; }catch(e){ TC.fetchFail++; throw e; } finally{ TC.pending.delete(url); } }
+  let j=TC.pending.get(url);
+  if(j){ if(want) j.wants.push(want); else j.keep=true; const b=await j.pr; if(b&&pin) tcPut(url,b,true,b.size); return b; }
+  j={url:url,wants:want?[want]:[],keep:!want}; j.pr=new Promise((res,rej)=>{ j.res=res; j.rej=rej; }); TC.pending.set(url,j); TQ.q.push(j); tqPump();
+  try{ const b=await j.pr; TC.fetchOk++; tcPut(url,b,!!pin); return b; }
+  catch(e){ if(e.message!=='dropped') TC.fetchFail++; throw e; }
+  finally{ TC.pending.delete(url); } }
 const CacheMixin={ createTile:function(c,done){
   const img=document.createElement('img'); img.alt=''; img.setAttribute('role','presentation'); const url=this.getTileUrl(c);
   const direct=()=>{ img.onload=()=>{ TC.directOk++; if(TC.fetchOk===0&&TC.fetchFail>=4&&TC.directOk>=4) TC.off=true; done(null,img); }; img.onerror=e=>done(e,img); img.src=url; };
   if(TC.off){ direct(); return img; }
-  tileBlob(url).then(b=>{ const u=URL.createObjectURL(b); img.onload=()=>{ URL.revokeObjectURL(u); done(null,img); }; img.onerror=()=>{ URL.revokeObjectURL(u); done(new Error('bad tile'),img); }; img.src=u; },
-    ()=>{ if(navigator.onLine===false){ done(new Error('offline'),img); } else direct(); });
+  tileBlob(url,false,()=>img.isConnected!==false).then(b=>{ const u=URL.createObjectURL(b); img.onload=()=>{ URL.revokeObjectURL(u); done(null,img); }; img.onerror=()=>{ URL.revokeObjectURL(u); done(new Error('bad tile'),img); }; img.src=u; },
+    e=>{ if(e&&e.message==='dropped') return;                                       /* the map moved on before its turn came */
+      if(navigator.onLine===false){ done(new Error('offline'),img); } else direct(); });
   return img; } };
+/* A wide screen at ordinary sharpness needs sixty or more 256-pixel tiles for one view. There the slow layers are asked for
+   in 512-pixel tiles, a quarter as many requests for the same picture. Decided once from the screen, not the window, so
+   an area saved for offline matches what is shown later. */
+const BIGT=(()=>{ try{ return (window.devicePixelRatio||1)<=1.4&&Math.max(screen.width||0,screen.height||0)>=1200; }catch(e){ return false; } })();
+const bigOpt=o=>BIGT?Object.assign(o,{big:true,tileSize:512,zoomOffset:-1}):o;
 let CachedXYZ=null, cspBlocked=false;
 document.addEventListener('securitypolicyviolation',e=>{ const d=(e.effectiveDirective||e.violatedDirective||''); if(/img-src|default-src/.test(d)) cspBlocked=true; });
 const PXQ=()=>(window.devicePixelRatio||1)>1.4?512:256;
@@ -338,7 +379,7 @@ function tilesAround(p,z,rm){ const n=Math.pow(2,z), dy=rm/111320, dx=rm/(111320
   const tx=lon=>Math.floor((lon+180)/360*n), ty=la=>{ const r=rad(la); return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); };
   const out=[]; for(let x=tx(p.lon-dx);x<=tx(p.lon+dx);x++) for(let y=ty(p.lat+dy);y<=ty(p.lat-dy);y++) out.push([x,y]); return out; }
 function offlineUrls(pts){ const set=new Set();
-  OFF.forEach(o=>{ const lyr=LD[o[0]].mk('tilePane'); for(let z=o[1];z<=o[2];z++){ lyr._tileZoom=z; pts.forEach(p=>tilesAround(p,z,OFFR).forEach(t=>set.add(lyr.getTileUrl({x:t[0],y:t[1],z:z})))); } });
+  OFF.forEach(o=>{ const lyr=LD[o[0]].mk('tilePane'); for(let z=o[1];z<=o[2];z++){ lyr._tileZoom=z; pts.forEach(p=>tilesAround(p,z,OFFR).forEach(t=>set.add(lyr.saveUrl?lyr.saveUrl(t[0],t[1],z):lyr.getTileUrl({x:t[0],y:t[1],z:z})))); } });
   return Array.from(set); }
 async function saveArea(id,urls){
   const tok={id:id,cancel:false,done:0,n:urls.length,bytes:0,fail:0,render:null}; saving=tok; let i=0;
@@ -352,7 +393,7 @@ const VIEWMAX=4500; let viewOpen=false, viewCap=17;
 function viewUrls(b,cap){ const set=new Set(), rr=x=>rad(x);
   OFF.forEach(o=>{ const lyr=LD[o[0]].mk('tilePane'); for(let z=o[1];z<=Math.min(o[2],cap);z++){ lyr._tileZoom=z; const n=Math.pow(2,z), tx=lon=>Math.floor((lon+180)/360*n), ty=la=>{ const r=rr(la); return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); };
       if((tx(b.getEast())-tx(b.getWest())+1)*(ty(b.getSouth())-ty(b.getNorth())+1)>VIEWMAX*2){ set.add('too-many-'+o[0]+z); for(let i=0;i<VIEWMAX*2;i++) set.add('x'+o[0]+z+'_'+i); return; }
-      for(let x=tx(b.getWest());x<=tx(b.getEast());x++) for(let y=ty(b.getNorth());y<=ty(b.getSouth());y++) set.add(lyr.getTileUrl({x:x,y:y,z:z})); } });
+      for(let x=tx(b.getWest());x<=tx(b.getEast());x++) for(let y=ty(b.getNorth());y<=ty(b.getSouth());y++) set.add(lyr.saveUrl?lyr.saveUrl(x,y,z):lyr.getTileUrl({x:x,y:y,z:z})); } });
   return Array.from(set); }
 function viewBox(){ const box=el('div',{id:'view-box'}); if(!map||schematic) return box;
   const b=map.getBounds(), urls=viewUrls(b,viewCap), est=urls.length*(PXQ()>256?62000:21000), msg=el('p',{class:'offmsg'}), bar=el('div',{class:'bar',hidden:true},el('span'));
@@ -393,12 +434,56 @@ function offlineBox(id,pts,label){
 function banner(msg,warn,ms){ const b=$('#banner'); if(!msg){ b.hidden=true; return; } b.textContent=msg; b.className='float'+(warn?' warn':''); b.hidden=false; b.title='Click to dismiss'; b.onclick=()=>{b.hidden=true;}; clearTimeout(banner.t); if(ms) banner.t=setTimeout(()=>b.hidden=true,ms); }
 
 function initMap(){
+  /* A tile layer whose addresses come from a function (which state's service, which zoom).
+     c  = the tile as Leaflet numbers it; rc = the same square in ordinary 256-pixel tile numbering (they differ for big tiles).
+     An "export" address (bbox=...) is cut to order by a slow state server; anything else is a ready-cut tile. */
+  const isExp=t=>typeof t==='string'&&t.indexOf('bbox=')>0;
+  const abs=(n,x,y,w,h)=>{ n.style.cssText='position:absolute;max-width:none;left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px'; return n; };
   FnLayer=L.TileLayer.extend({ options:{updateWhenZooming:false,keepBuffer:4},
-    getTileUrl:function(c){ const t=this.options.fn(c); return typeof t==='string'?t:t.url; },
-    createTile:function(c,done){ const t=this.options.fn(c); if(typeof t==='string') return CacheMixin.createTile.call(this,c,done);
-      const box=document.createElement('div'); box.style.overflow='hidden'; const sz=this.getTileSize().x, k=1<<t.dz;
-      const img=CacheMixin.createTile.call({getTileUrl:()=>t.url},c,e=>done(e,box));
-      img.style.cssText='position:absolute;max-width:none;width:'+sz*k+'px;height:'+sz*k+'px;left:'+(-t.ox*sz)+'px;top:'+(-t.oy*sz)+'px'; box.appendChild(img); return box; } });
+    _rc:function(c){ return this.options.big?{x:c.x,y:c.y,z:c.z-1}:c; },
+    _req:function(rc,small){ PXM=this.options.big&&!small?2:1; try{ return this.options.fn(rc); } finally{ PXM=1; } },
+    getTileUrl:function(c){ const t=this._req(this._rc(c)); return typeof t==='string'?t:t.url; },
+    /* the address that will be fetched for the ground under ordinary tile x,y,z: what "save for offline" must keep */
+    saveUrl:function(x,y,z){ const t=this._req({x:x,y:y,z:z},true);
+      if(this.options.big&&isExp(t)&&z>0){ const b=this._req({x:x>>1,y:y>>1,z:z-1}); if(isExp(b)) return b; }
+      return typeof t==='string'?t:t.url; },
+    /* one ordinary tile drawn into a square of the given size; cb(error) when it has loaded or failed */
+    _piece:function(rc,size,cb){ const t=this._req(rc,true);
+      /* an image with no picture yet is kept hidden: Chrome draws a grey outline round one */
+      if(typeof t==='string'){ const im=CacheMixin.createTile.call({getTileUrl:()=>t},rc,e=>{ if(!e) im.style.visibility=''; cb(e); }); abs(im,0,0,size,size); im.style.visibility='hidden'; return im; }
+      const bx=document.createElement('div'); bx.style.overflow='hidden'; const k=1<<t.dz, im=CacheMixin.createTile.call({getTileUrl:()=>t.url},rc,e=>{ if(!e) im.style.visibility=''; cb(e); });
+      abs(im,-t.ox*size,-t.oy*size,size*k,size*k); im.style.visibility='hidden'; bx.appendChild(im); return abs(bx,0,0,size,size); },
+    /* four ordinary tiles making up one big one */
+    _quad:function(rc,sz,cb){ const g=document.createElement('div'); let left=4, good=0;
+      for(let i=0;i<4;i++){ const dx=i&1, dy=i>>1, pc=this._piece({x:rc.x*2+dx,y:rc.y*2+dy,z:rc.z+1},sz/2,e=>{ if(!e) good++; if(--left===0) cb(good?null:new Error('no tile')); });
+        pc.style.left=dx*sz/2+'px'; pc.style.top=dy*sz/2+'px'; g.appendChild(pc); }
+      return abs(g,0,0,sz,sz); },
+    /* While a slow tile is on its way, show the same ground from a tile this browser already holds: a wider one stretched,
+       or the four finer ones shrunk. It is blurry or patchy for a second instead of blank. */
+    _ghost:async function(rc,sz){
+      const have=async(u,deep)=>TC.mem.get(u)||(deep?await tcGet(u):null), pic=b=>{ const im=document.createElement('img'), u=URL.createObjectURL(b); im.alt=''; im.onload=im.onerror=()=>URL.revokeObjectURL(u); im.src=u; return im; };
+      for(let d=1;d<=5&&rc.z-d>=3;d++){ const a={x:rc.x>>d,y:rc.y>>d,z:rc.z-d}, u=this._req(a); if(typeof u!=='string') continue;
+        const b=await have(u,d<=3); if(b){ const k=1<<d; return abs(pic(b),-(rc.x-(a.x<<d))*sz,-(rc.y-(a.y<<d))*sz,sz*k,sz*k); } }
+      const g=document.createElement('div'); let n=0;
+      for(let i=0;i<4;i++){ const u=this._req({x:rc.x*2+(i&1),y:rc.y*2+(i>>1),z:rc.z+1}); if(typeof u!=='string') continue;
+        const b=await have(u,true); if(b){ n++; g.appendChild(abs(pic(b),(i&1)*sz/2,(i>>1)*sz/2,sz/2,sz/2)); } }
+      return n?abs(g,0,0,sz,sz):null; },
+    createTile:function(c,done){ const rc=this._rc(c), t=this._req(rc), sz=this.getTileSize().x, big=this.options.big;
+      const box=document.createElement('div'); box.style.overflow='hidden';
+      if(!isExp(t)){                                                   /* ready-cut tiles: quick, and never stretched */
+        if(big) box.appendChild(this._quad(rc,sz,e=>{ box._real=!e; done(e,box); })); else if(typeof t==='string') return CacheMixin.createTile.call(this,c,done); else box.appendChild(this._piece(rc,sz,e=>{ box._real=!e; done(e,box); }));
+        return box; }
+      let told=false, fin=false, ghost=null; const tell=e=>{ if(!told){ told=true; done(e,box); } };
+      const img=CacheMixin.createTile.call({getTileUrl:()=>t},c,e=>{ fin=true;
+        if(!e){ box._real=true; img.style.visibility=''; if(ghost){ ghost.remove(); ghost=null; } tell(null); return; }
+        if(ghost){ tell(null); return; }                               /* the real tile failed: the stand-in stays */
+        if(big&&navigator.onLine===false){ img.remove(); box.appendChild(this._quad(rc,sz,e2=>tell(e2))); return; }   /* no signal: ordinary tiles kept from before may cover it */
+        tell(e); });
+      box.appendChild(abs(img,0,0,sz+1,sz+1)); img.style.visibility='hidden'; Promise.resolve().then(()=>{ box.style.width=box.style.height=(sz+1)+'px'; });    /* one pixel over its neighbours: no hairline between tiles while a level is stretched */
+      /* only when the real tile is not here within a moment: a tile this browser holds arrives sooner than a stand-in could be made */
+      if(this.options.ghost&&!TC.mem.has(t)) setTimeout(()=>{ if(fin||box.isConnected===false) return;
+        this._ghost(rc,sz).then(g=>{ if(g&&!fin&&box.isConnected!==false){ ghost=g; box._ghost=true; box.insertBefore(g,img); tell(null); } },()=>{}); },70);
+      return box; } });
   CachedXYZ=L.TileLayer.extend(Object.assign({options:{keepBuffer:4}},CacheMixin));
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
@@ -418,7 +503,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -895,13 +980,13 @@ const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8
 function pockZoom(){ if(!U.ui.pockets||!pockGrp) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
   const want=PKT.filter(t=>pockTier[t]&&z>=+t.slice(1)).join();       /* plain pockets underneath, the richest town centres on top */
   if(want!==pockGrp._want){ pockGrp._want=want; pockGrp.clearLayers(); want.split(',').forEach(t=>{ if(t) pockGrp.addLayer(pockTier[t]); }); }
-  POCK.k.forEach(k=>{ if(!k.c||z<pockFrom(k)) return; k.c.setRadius(pockPx(k,z)); const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; k.c.setStyle({fillOpacity:ff}); } }); }
+  POCK.k.forEach(k=>{ if(!k.c||z<pockFrom(k)) return; const px=Math.round(pockPx(k,z)*2)/2; if(k.px!==px){ k.px=px; k.c.setRadius(px); } const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; k.c.setStyle({fillOpacity:ff}); } }); }
 function pockLoad(quiet){ if(POCK||pockWait) return;
   pockWait=(AT?AT.fetch('data/pockets.json'):fetch('data/pockets.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
     .then(j=>{ POCK=j; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
     .catch(()=>{ pockWait=null; if(!quiet||U.ui.pockets) banner('Historic pockets could not load. Check your signal and turn them on again.',true,6000); }); }
 /* after "old town centres only" is switched: draw the discs afresh */
-function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.c=null; k.f=null; }); drawPockets(); }
+function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.c=null; k.f=null; k.px=null; }); drawPockets(); }
 function drawPockets(){
   if(!map) return;
   if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp); [pockItems,pockLab].forEach(g=>{ if(g) map.removeLayer(g); }); pockItems=pockLab=null; return; }
