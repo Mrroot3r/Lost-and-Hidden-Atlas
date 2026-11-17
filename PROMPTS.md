@@ -4,7 +4,7 @@ Paste everything in the box into a new chat. Fill in the two lines at the top, o
 kept in step with the tools: when a procedure in GUIDE.md or LIDAR.md changes, change the prompt here too.
 
 ```
-PLACE: [a town, county, state forest or region — or "you choose"]
+PLACE: [a town, county, state forest or region — or "you choose". For a second or third pass over a state already worked, name something small: one county or one management area]
 TYPE: [places / lidar / leads / pins — or "you choose"]
 
 You are working on the Lost & Hidden Atlas, a phone-first map of lost buildings, ruins and abandoned sites, in the GitHub repository mrroot3r/Lost-and-Hidden-Atlas. I explore these places on foot, mostly within a day's drive of Albany, New York. I am not a programmer and I will not be watching while you work, so decide things yourself, do not stop to ask me questions, and tell me at the end what you did and what you could not check.
@@ -13,8 +13,9 @@ Start by attaching the repository to this session with push access and cloning i
 
 What I care about most:
 - Every fact in a place entry comes from a source you opened in this session. Your memory of a place is a lead to check, never a fact to publish. If sources disagree, give both versions. If you could not confirm something, write "not checked" in the entry.
-- Every entry says who owns the land and how to get there legally (parking, trail, hours). Private or unknown land is marked ask-first or view-only. Never describe how to get past a fence, gate or sealed building.
-- Look at every new pin on the aerial with the pin-check tool, read the "land:" line it prints for each pin, and fix or downgrade what is wrong before you build.
+- Every entry says who owns the land and how to get there legally (parking, trail, hours). Take hours and rules from the page of whoever manages the place, not from a hiking write-up. Private or unknown land is marked ask-first or view-only. Never describe how to get past a fence, gate or sealed building.
+- Look at every new pin with the pin-check tool, run with --lidar so you get the bare-ground LiDAR sheet as well as the aerial (in woods the LiDAR shows foundations, races and walls the aerial hides). Read the "land:" line it prints for each pin, and fix or downgrade what is wrong before you build.
+- If you cannot find the ruin itself, pin the parking lot or trailhead and say so in the pin note. Never leave a pin on a house or yard. If you can find neither the ruin nor a public way in, put the place in LEADS.md.
 - Places you read about but could not finish go in LEADS.md with one line on what is missing.
 - Finish with ONE pull request and stop. Do not merge it and do not push to main. I merge.
 
@@ -26,7 +27,7 @@ Before you open the pull request, do all of this (GUIDE.md section 3 has the com
 
 The four types of work:
 
-1. places — Research and add places in an area. Read GUIDE.md sections 4, 5 and 6 and follow the workflow there. First check what the Atlas already has in that area (search every tools/data_*.py for the town and the name, and read LEADS.md) so you add nothing twice. Aim for 10 to 20 well-sourced places and prefer ruins and traces you can walk to over standing landmarks or vanished sites.
+1. places — Research and add places in an area. Read GUIDE.md sections 4, 5 and 6 and follow the workflow there. First check what the Atlas already has in that area (search every tools/data_*.py for the town and the name, and read LEADS.md) so you add nothing twice. If LEADS.md already has rows in or near PLACE, try to finish those first: they count toward the total. Aim for 10 to 20 well-sourced places and prefer ruins and traces you can walk to over standing landmarks or vanished sites.
 
 2. lidar — Find cellar holes and farm sites nobody has written up, using the LiDAR tool. Read LIDAR.md and follow it step by step; it assumes you know nothing. It works in New York and Massachusetts only. If PLACE is "you choose", run its status command and take what it says is waiting.
 
@@ -38,7 +39,7 @@ If PLACE is "you choose", pick it like this: read the table of states in GUIDE.m
 
 If TYPE is "you choose": use lidar when PLACE is a state forest, wildlife area or other public woodland in New York or Massachusetts; use places for a town, county or region; use leads if LEADS.md already has several rows there.
 
-When you finish, write me a short plain-English report: what you added, anything I should know before visiting (ask-first land, look-only sites, vague pins), what you could not verify, what you changed in the guide, and the link to the pull request.
+When you finish, write me a short plain-English report: what you added, anything I should know before visiting (ask-first land, look-only sites), a list of every pin that marks only a trailhead or a general area and not the thing itself, what you could not verify, what you changed in the guide, and the link to the pull request.
 ```
 
 ## Reviewing a session's pull request

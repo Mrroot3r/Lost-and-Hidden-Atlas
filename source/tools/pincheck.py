@@ -2,6 +2,8 @@
 """Contact sheets for checking pins against an aerial photo. Run after build_sites.py.
    python3 tools/pincheck.py --batch ri            every place in a batch
    python3 tools/pincheck.py id1 id2 ...           named places
+   add --lidar to either for a second sheet of the same squares as bare-ground LiDAR shading (research/pincheck_*_lidar_*.jpg).
+   Use it for anything in woods: a cellar, a race or a wall shows there when the aerial shows only trees.
 Each tile is a 300 m square centred on the pin, with a 30 m ring. Sheets go to research/pincheck_*.jpg.
 LOOK at every tile: is the ring on the structure, the ruin or the documented footprint? If not, move the pin
 only when you can see the right spot; otherwise keep it, set prec='area', and say what you saw in the pin note."""
@@ -9,6 +11,7 @@ import sys,json,io,math,os,requests
 from PIL import Image,ImageDraw
 S={s['id']:s for s in json.load(open('build/sites.json'))}
 a=sys.argv[1:]
+LIDAR='--lidar' in a; a=[x for x in a if x!='--lidar']
 if a[:1]==['--batch']: ids=[i for i,s in S.items() if s.get('new')==a[1]]; tag=a[1]
 else: ids=a; tag='picked'
 if not ids: sys.exit('no places matched')
@@ -38,7 +41,23 @@ def land(s):
         return '%s (%s)'%(fs[0]['attributes']['Unit_Nm'],fs[0]['attributes']['Pub_Access']) if fs else None
     except Exception: return 'land lookup failed'
 WARN=[]
-tiles=[]
+tiles=[]; ltiles=[]
+def lidar_tile(s,i):
+    """The same 300 m square as shaded bare ground, from the elevation service lidar_dem picks for the spot."""
+    from lidar_dem import dem,shade,coarse,empty
+    import numpy as np
+    note='LiDAR bare ground'
+    try:
+        g,sc=dem(s['lat'],s['lon'],HALF,PX)
+        if empty(g): raise ValueError('no elevation here')
+        if coarse(g,sc): note='NO 1 m LiDAR HERE: coarse model, shows nothing small'
+        g=np.where(np.isfinite(g)&(g>-1000),g,np.nan); g=np.nan_to_num(g,nan=float(np.nanmin(g)))
+        im=Image.fromarray(shade(g,sc)).convert('RGB')
+    except Exception as e: im=Image.new('RGB',(PX,PX),'#444'); note='no LiDAR picture: '+str(e)[:40]
+    d=ImageDraw.Draw(im); c=PX//2; r=30/(2*HALF)*PX
+    d.ellipse([c-r,c-r,c+r,c+r],outline='#ff2d95',width=2); d.line([c-8,c,c+8,c],fill='#ff2d95',width=2); d.line([c,c-8,c,c+8],fill='#ff2d95',width=2)
+    d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]",fill='#ffffff'); d.text((5,18),note,fill='#ffb347' if note.startswith('NO') else '#bbbbbb')
+    return im,note
 for i in ids:
     s=S.get(i)
     if not s: print('unknown id',i); continue
@@ -63,9 +82,12 @@ for i in ids:
     d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]",fill='#ffffff'); d.text((5,18),f"{s['lat']},{s['lon']}  {src}",fill='#bbbbbb')
     d.rectangle([0,PX-16,PX,PX],fill='#000000'); d.text((5,PX-14),('land: '+ld) if ld else 'land: not on mapped public land',fill='#7CFC98' if ld and not ld.endswith('(XA)') else '#ffb347')
     tiles.append(im); print(i,'|',src,'| land:',ld or 'not on mapped public land')
+    if LIDAR:
+        lim,note=lidar_tile(s,i); ltiles.append(lim); print(' ',note)
 os.makedirs('research',exist_ok=True); PER=12
-for n in range(0,len(tiles),PER):
-    part=tiles[n:n+PER]; cols=4; rows=math.ceil(len(part)/cols); sh=Image.new('RGB',(cols*PX,rows*PX),'#222')
-    for k,im in enumerate(part): sh.paste(im,((k%cols)*PX,(k//cols)*PX))
-    p=f'research/pincheck_{tag}_{n//PER+1}.jpg'; sh.save(p,quality=82); print('wrote',p)
+for T,suf in ((tiles,''),(ltiles,'_lidar')):
+    for n in range(0,len(T),PER):
+        part=T[n:n+PER]; cols=4; rows=math.ceil(len(part)/cols); sh=Image.new('RGB',(cols*PX,rows*PX),'#222')
+        for k,im in enumerate(part): sh.paste(im,((k%cols)*PX,(k//cols)*PX))
+        p=f'research/pincheck_{tag}{suf}_{n//PER+1}.jpg'; sh.save(p,quality=82); print('wrote',p)
 for w in WARN: print('CHECK ACCESS:',w)
