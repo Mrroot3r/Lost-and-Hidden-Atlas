@@ -6,14 +6,16 @@ Prints 1. places already in the Atlas there (do not add them again);
           federal names file, old mines and quarries. A named lead is a ready-made starting point: it has a coordinate,
           so all it needs is a source and an owner. (Leads exist only for the states that have those layers.)
        3. a reminder to read LEADS.md for the same towns.
-Needs a built workspace (build/sites.json and the lead files copied in by setup.sh)."""
-import sys,json,math,os
+Run it from the workspace. It builds the place list itself if setup has not."""
+import sys,json,math,os,re
 try: la,lo=float(sys.argv[1]),float(sys.argv[2]); km=float(sys.argv[3]) if len(sys.argv)>3 else 8.0
 except (IndexError,ValueError): sys.exit(__doc__)
 def d(a,b): return math.hypot((a-la)*111.32,(b-lo)*111.32*math.cos(math.radians(la)))
 def comp(a,b):
     e=(b-lo)*math.cos(math.radians(la)); n=a-la
     return 'N NE E SE S SW W NW'.split()[int((math.degrees(math.atan2(e,n))+382.5)%360//45)]
+if not os.path.exists('build/sites.json'):                # a fresh workspace: make the place list first (a second, no network)
+    import subprocess; subprocess.run([sys.executable,os.path.join(os.path.dirname(os.path.abspath(__file__)),'build_sites.py')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 S=[s for s in json.load(open('build/sites.json')) if d(s['lat'],s['lon'])<=km]
 print(f'== Already in the Atlas within {km:g} km: {len(S)}')
 for s in sorted(S,key=lambda s:d(s['lat'],s['lon'])): print(f"  {d(s['lat'],s['lon']):4.1f} km {comp(s['lat'],s['lon']):2}  {s['id']}  |  {s['name']}, {s['town']}  [{s['st']}/{s['acc']}]")
@@ -22,9 +24,12 @@ for f,title in (('leads','OpenStreetMap leads (mapped ruins and old sites)'),('v
     if not os.path.exists(p): continue
     L=json.load(open(p)); P=[x for x in L['p'] if d(x[0],x[1])<=km]
     named=[x for x in P if str(x[3]).strip()]
+    # numbered district schools are many and seldom lead anywhere: count them, do not list them
+    dull=[x for x in named if re.match(r'(School|District)( School)? (Number|No\.?) ?\d+|District (Number )?\d+ School',str(x[3]))]; named=[x for x in named if x not in dull]
     print(f'== {title}: {len(P)} within {km:g} km, {len(named)} with a name')
     for x in sorted(named,key=lambda x:d(x[0],x[1]))[:60]: print(f"  {d(x[0],x[1]):4.1f} km {comp(x[0],x[1]):2}  {x[3]}  |  {L['t'][x[2]]}  |  {x[0]}, {x[1]}")
     if len(named)>60: print(f'  ... {len(named)-60} more: use a smaller distance')
+    if dull: print(f'  and {len(dull)} numbered district schools, not listed')
     un={}
     for x in P:
         if not str(x[3]).strip(): un[L['t'][x[2]]]=un.get(L['t'][x[2]],0)+1
