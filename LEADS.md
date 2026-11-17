@@ -54,9 +54,17 @@ Places someone read about while researching but did not add, with what is missin
 | Knickerbocker Ice Company foundation | Rockland Lake, NY | Wikipedia: closed 1924, 1926 fire, foundation remains with a plaque | A coordinate for the foundation |
 | Thornton Gore | Thornton, NH | Recalled as hill-farm cellar holes in the White Mountain National Forest | A source and a coordinate |
 | Mount Monadnock Halfway House site | Jaffrey, NH | Recalled as a hotel site on the mountain | A source and a coordinate |
-| Cunningham Tower | Cornwall, CT | Recalled as a stone tower in Mohawk State Forest | A source and a coordinate |
 | Gillette's railroad | East Haddam, CT | Recalled as remains of a private miniature railroad in Gillette Castle State Park | A source for what remains |
 | Dudleytown | Cornwall, CT | Well-known abandoned settlement; recalled as private land closed to visitors | Do not add unless a source shows legal public access |
+| Leatherman shelters off Park Road and near Route 6 | Watertown, CT | CTMQ reports a shelter off an unmarked path from an S-bend on Park Road that some call the true Leatherman's Cave (posted private land beside it), and later says the true one is on a feeder trail near Route 6. The Crane's Lookout shelter was added as `leatherman-cave-watertown` | A source better than a hiker's site, a coordinate, and whose land each is on |
+| Hurd estate "yellow cat tea house" | Lovers Leap State Park, New Milford, CT | Wikipedia names it among the park's remains; folded into `lovers-leap-ruins` | What it was, its date, and a coordinate |
+| Bridgeport Wood Finishing Company | Lovers Leap State Park, New Milford, CT | Added as `lovers-leap-ruins` with the pin on the park | When it ran, what it made, and the coordinate of the ruins |
+| Sharon Valley iron furnace | Sharon, CT | 1979 National Register nomination: furnace of 1825/1863 across Webatuck Creek from the lime kiln, with rubble, tie-rods, firebrick arches, a wheelpit, slag and a dam 1,500 feet upstream; on private land then | Who owns it now and whether any of it shows from Sharon Station Road |
+| Amesville iron works | Salisbury, CT (across the Housatonic from Falls Village) | Lakeville Journal (2025): a blast furnace and mills stood on the Amesville side. Another Lakeville Journal walk report, seen only as a search excerpt, went to see what remains of the Horatio Ames iron works | A source for what remains, and whose land it is |
+| Housatonic Railroad shops and turntable | Falls Village, CT | FirstLight's Amesville Interpretive Trail is said to explain the 19th-century railroad turntable and workshop | Whether anything is left to see, and a coordinate |
+| Silicon Mills, Roxbury Falls | Roxbury, CT | Wikipedia (Shepaug railroad): a quartzite powder works at Roxbury Falls station, burned in 1908 | A source for what remains and a coordinate |
+| Camp Toumey (CCC) | Mohawk State Forest, Cornwall, CT | CT DEEP: a 1930s CCC camp near today's forest headquarters; a hiker's site, seen only as a search excerpt, mentions building remnants | A source for what remains |
+| Mount Tom and Haystack Mountain towers | Washington and Norfolk, CT | Standing stone lookout towers of 1921 and 1929 in state parks, both on the National Register | Not added: standing and still in use; add only if a series wants towers |
 | Cliffdale Manor | Alpine, NJ | Recalled as estate ruins in Palisades Interstate Park | A source and a coordinate |
 | Brooksbrae brick factory | Manchester, NJ | Recalled as Pine Barrens factory ruins | A source, ownership and a coordinate |
 | Estellville glassworks and Bethlehem Loading Company | Estell Manor, NJ | Recalled as ruins in a county park | A source and coordinates |
