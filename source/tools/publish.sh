@@ -1,7 +1,13 @@
 #!/bin/bash
-# Put a finished build on a NEW BRANCH of the repository clone, ready to become a pull request.
+# Put a change on a NEW BRANCH of the repository clone, ready to become a pull request.
 # It never touches main. See GUIDE.md section 3.
 #   ATLAS=<workspace> bash tools/publish.sh <path-to-repo-clone> <branch-name>
+# The branch carries SOURCES ONLY (source/tools, source/src, the LiDAR ledger). GitHub builds the site after the merge
+# (tools/ci_build.sh), so two pull requests can never disagree over the built files. Build and test in the workspace
+# first all the same: that is how you know the change works.
+#   LAYERS=1 ...   also carry the layer files (lines, leads, vanished places, mines, historic pockets). Use it after
+#                  rebuilding one of those layers; GitHub cannot rebuild them, their raw downloads are not in the repository.
+#   FULL=1 ...     the old way: carry the whole built site too. Only if the build on GitHub is broken.
 # To build on work that is in an open pull request and not yet merged, name its branch as the base:
 #   BASE=origin/<that-branch> ATLAS=<workspace> bash tools/publish.sh <path-to-repo-clone> <branch-name>
 # (and set the workspace up from that branch first: git checkout it, then source/tools/setup.sh).
@@ -39,22 +45,24 @@ if [ -n "$SC" ] && git cat-file -e "$SC^{commit}" 2>/dev/null && git rev-parse -
 fi
 # the LiDAR ledger: fold the repository's copy into the workspace's first, so another session's verdicts are kept
 [ -d source/lidar/units ] && (cd "$W" && python3 tools/lidar.py pull "$REPO/source/lidar/units")
-rm -rf data topo
-cp -a "$W/dist/web/." ./
+if [ -n "$FULL" ]; then bash "$W/tools/into_repo.sh" "$W" "$REPO"; fi
+if [ -n "$LAYERS" ] && [ -z "$FULL" ]; then
+  mkdir -p data/pock
+  for f in lines leads vanished mines pockets; do [ -f "$W/dist/web/data/$f.json" ] && cp "$W/dist/web/data/$f.json" "data/$f.json"; done
+  [ -d "$W/dist/web/data/pock" ] && cp "$W"/dist/web/data/pock/*.json data/pock/
+fi
 mkdir -p source/src source/tools source/build
 rm -f source/tools/*.py source/tools/*.sh source/tools/*.js source/tools/*.java
 cp "$W"/src/* source/src/
 cp "$W"/tools/*.py "$W"/tools/*.sh "$W"/tools/*.js "$W"/tools/*.java source/tools/
 if [ -d "$W/lidar" ]; then rm -rf source/lidar; mkdir -p source/lidar/units; cp "$W"/lidar/units/*.json source/lidar/units/; for f in "$W"/lidar/*; do [ -f "$f" ] && cp "$f" source/lidar/; done; fi
-cp "$W/build/base.json" "$W/build/hubs.json" "$W/build/padus.json" "$W/build/states.json" source/build/
-cp "$W/build/topo/meta.json" source/build/topo-meta.json
-cp "$W/cache/leaflet.min.css" source/build/leaflet.min.css
 git add -A
 echo "--- staged on branch $BR ---"; git status --short | awk '{print $1}' | sort | uniq -c
-echo "--- checks ---"; python3 source/tools/check.py "$REPO"
+echo "--- checks ---"; if [ -n "$FULL" ]; then python3 source/tools/check.py "$REPO"; else python3 source/tools/check.py "$REPO" --sources; fi
 cat <<MSG
 --- next ---
 1. git -C $REPO commit            (say what changed, what you verified and what you could not)
 2. git -C $REPO push -u origin $BR
 3. Open a pull request into main and stop. The owner merges it. Do not merge it yourself.
+   GitHub builds the site on the pull request to test it, and again after the merge to publish it.
 MSG

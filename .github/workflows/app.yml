@@ -1,12 +1,11 @@
 name: app
 # Builds the Android app (android-app/) and publishes the installable file as a release.
 # It runs when the app's own code changes, not when places are added: the app fetches new places itself.
+# On a pull request it builds a test copy. After a merge it is started by site.yml, once the built site is on main
+# (a merge no longer carries the built app.js, so a push to main cannot start it directly).
 on:
   pull_request:
-    paths: ['android-app/**', 'app.js', 'boot.js', 'leaflet.js', '.github/workflows/app.yml']
-  push:
-    branches: [main]
-    paths: ['android-app/**', 'app.js', 'boot.js', 'leaflet.js', '.github/workflows/app.yml']
+    paths: ['android-app/**', 'source/src/**', 'app.js', 'boot.js', 'leaflet.js', '.github/workflows/app.yml']
   workflow_dispatch:
 permissions:
   contents: write
@@ -25,6 +24,15 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: actions/setup-python@v5
+        if: github.event_name == 'pull_request'
+        with:
+          python-version: '3.12'
+      - name: Build the site from this pull request's sources
+        if: github.event_name == 'pull_request'
+        run: |
+          pip install --quiet requests Pillow numpy rasterio
+          bash source/tools/ci_build.sh
       - name: Put the built Atlas inside the app
         working-directory: android-app
         run: |

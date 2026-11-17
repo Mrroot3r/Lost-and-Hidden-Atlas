@@ -45,10 +45,10 @@ aerial=[
  ['Andy Arthur: 1952 Albany and Schenectady','Ready-made 1952-versus-today overlays for downtown Albany, the Stockade, the West Albany yards, the Pine Bush and more.','https://andyarthur.org/'],
  ['USGS topoView','Every edition of every USGS sheet, free, with a timeline. The Atlas old-map overlays are cut from these.','https://ngmdb.usgs.gov/topoview/viewer/'],
 ]
-V=datetime.datetime.now().strftime('%y%m%d%H%M')
+V=os.environ.get('ATLAS_V') or datetime.datetime.now().strftime('%y%m%d%H%M')     # ATLAS_V: build under a given version, to see whether anything but the stamp changed
 import sys; sys.path.insert(0,R+'tools')
 from states import STATES
-data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':datetime.date.today().strftime('%B %-d, %Y'),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules}
+data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':(os.environ.get('ATLAS_BUILT') or datetime.date.today().strftime('%B %-d, %Y')),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules}
 def js(o): return json.dumps(o,separators=(',',':'),ensure_ascii=False).replace('</','<\\/')
 css=open(R+'src/app.css').read()
 lcss=open(R+'cache/leaflet.min.css').read()

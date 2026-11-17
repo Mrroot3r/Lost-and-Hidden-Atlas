@@ -52,19 +52,26 @@ Map layers come from public services, chosen per state. `regionOf()` in `app.js`
 
 1. Start from a fresh clone of `main` and build a workspace (commands below).
 2. Make the change in the workspace, rebuild, run the checks and tests.
-3. `publish.sh` puts the result on a **new branch**. Commit once, push the branch, open a pull request into `main`.
+3. `publish.sh` puts the **sources** on a **new branch** (`source/tools`, `source/src`, the LiDAR ledger). It does not carry the built site. Commit once, push the branch, open a pull request into `main`.
 4. **Stop there.** Do not merge your own pull request, even if you can. Say in the pull request what changed, what you verified, and what you could not.
-5. GitHub runs `check` on the pull request (place-list validation, source and build in step, a phone-size test that the site opens). The owner merges when it is green, using **Squash and merge** so each change is one commit.
+5. GitHub builds the site from the pull request's sources (`tools/ci_build.sh`) and runs `check` on what it built: place-list validation, source and build in step, the LiDAR ledger test, a phone-size test that the site opens. The owner merges when it is green, using **Squash and merge** so each change is one commit.
+6. After the merge the `site` workflow builds again and commits the built files to `main` itself, as a commit named "Site build ..." by `atlas-build`. The site updates a minute or two after that. If the app's code changed it then starts the `app` workflow, which publishes a new Android build.
+
+**Why the build is on GitHub.** Until November 2026 every pull request carried the whole built site, and `index.html` is one long line, so any two open pull requests that added places conflicted and the second could not be merged. Now a pull request carries sources only and two of them clash only if they change the same source file. The build asks three services about new places (drive times, land status, old-map crops); each step keeps what it knew and carries on if its service is down, and the next build asks again. What they answered is kept in `source/build/` (`drive.json`, `padus.json`, `topo-meta.json`, `topo-none.json`) and the crops in `topo/`; the build commits those, a session does not.
+
+**If the `site` run fails** the site stays as it was and nothing is lost. Open the run on GitHub (Actions tab), read the red step, and press "Re-run all jobs"; a service that was down is the usual cause. If the build itself is broken, a session can still publish the old way, carrying the built site in the pull request: `FULL=1 tools/publish.sh <repo> <branch>`.
+
+**Layers are the exception.** GitHub cannot rebuild the rail lines, leads, vanished places, mines or historic pockets, because their raw downloads are not in the repository. After rebuilding one of them, publish with `LAYERS=1 tools/publish.sh <repo> <branch>` so the layer files in `data/` travel with the pull request.
 
 **If the push is refused.** A cloud session's built-in GitHub login is often read-only or expired, and `git push` fails with a 401 or 403 or "invalid credentials". Do not retry and do not look for another login. Attach the repository to the session with write access first (in Claude: the `add_repo` tool with `access: "push"`, then `register_repo_root`), then push again. If attaching is declined, stop and tell the owner; never paste a token into a file or a command.
 
-**Undoing a change.** Each merged pull request is one commit that holds both the source and the built site, so undoing it restores the previous site exactly.
+**Undoing a change.** Each merged pull request is one commit of sources; reverting it and letting the `site` workflow build again restores the previous site.
 
 - Owner: open the merged pull request on GitHub, press **Revert**, and merge the pull request it creates.
 - Model: `git revert <commit>` on a new branch, then a pull request as usual. Never force-push or reset `main`.
 - Visitors' saved notes are untouched by a revert. Notes on a place that disappears stay stored and return if the place does.
 
-**If `main` moved while you worked.** Build output always conflicts. Take `main`'s version of everything outside `source/`, merge `source/` by hand, then run setup, build and publish again. Keep one data pull request open at a time to avoid this. `publish.sh` checks for it: if a source file changed on `main` after the workspace was set up and the workspace's copy differs, it stops and names `tools/resync.sh`, which sets the workspace up again from today's `main` and puts back the session's own new and changed files, the old-map crops it cut, and its LiDAR verdicts. A file that both sides changed is left for a person to merge, and said so.
+**If `main` moved while you worked.** The built files no longer travel in a pull request, so they cannot conflict. What can still go wrong is a workspace set up before somebody else's change was merged: publishing copies the whole of `tools/` and `src/` over the repository's and would undo that change. `publish.sh` checks for it (it compares every source file that changed on `main` since the workspace was set up) and stops, naming `tools/resync.sh`, which sets the workspace up again from today's `main` and puts back the session's own new and changed files, the old-map crops it cut, and its LiDAR verdicts. A file that both sides changed is left for a person to merge, and said so.
 
 ### Commands
 
@@ -78,7 +85,7 @@ bash $ATLAS/tools/all.sh                          # rebuilds everything into $AT
 node $ATLAS/tools/smoke.js http://localhost:8766/web/ [place-id]   # phone-size test; give a new place's id to test its tiles
 node $ATLAS/tools/near_test.js http://localhost:8766/web/index.html # the Near tab: list, big arrow, compass, alert (after changing "near me")
 node $ATLAS/tools/kit_test.js http://localhost:8766/web/index.html  # the episode kit: stops, chapters, kit file, route map picture
-bash $ATLAS/tools/publish.sh repo my-branch-name  # copies build and sources onto a new branch, stages, runs check.py
+bash $ATLAS/tools/publish.sh repo my-branch-name  # copies the sources onto a new branch, stages, runs check.py --sources
 git -C repo commit && git -C repo push -u origin my-branch-name
 # open the pull request (REST works where the gh pr commands do not):
 gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls -f title="..." -f head=my-branch-name -f base=main -f body="..."
@@ -92,7 +99,7 @@ What `all.sh` runs, in order: `build_sites.py` (merge place lists) → `drive.py
 
 Run only when needed:
 
-- `python3 tools/topo_all.py <id> <id> …` cuts old-map crops for new places. It downloads large USGS scans, so run it only for new ids.
+- `python3 tools/topo_all.py <id> <id> …` cuts old-map crops for new places. The build on GitHub does this for every place that has none (`topo_all.py --missing`), so run it yourself only to see a crop before publishing. It downloads large USGS scans.
 - `python3 tools/pincheck.py --batch <key>` makes contact sheets of every new pin on an aerial (section 6).
 - `tools/lines.py` rebuilds the rail, trolley and canal lines, and `tools/leads.py` the leads. The raw downloads they read are not in the repository, and neither needs all of them: each rebuilds only the areas whose raw files are in `cache/osm/` and keeps what is already in `build/lines.json` and `build/leads.json` for everywhere else. Run them only when adding a state (section 8, "Lines and leads for a new state").
 - `tools/osm_layers.py <key>` and `tools/ohm_state.py <key>` download a whole state's old railways, canals and mapped ruins.

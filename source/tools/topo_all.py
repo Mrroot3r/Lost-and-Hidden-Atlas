@@ -43,7 +43,16 @@ def fetch(url):
             except Exception as e: time.sleep(3)
     return p if os.path.exists(p) else None
 meta={}
-only=set(sys.argv[1:])
+# "--missing": every place that has no crop yet and is not known to have no old map (build/topo/none.json). The site
+# build on GitHub runs it this way, so a session need not cut or commit crops for the places it adds.
+NF='build/topo/none.json'; NONE=json.load(open(NF)) if os.path.exists(NF) else {}
+if sys.argv[1:2]==['--missing']:
+    _old=json.load(open('build/topo/meta.json')) if os.path.exists('build/topo/meta.json') else {}
+    only={s['id'] for s in S if s['cat']!='landmark' and s['id'] not in _old and NONE.get(s['id'])!='%.5f,%.5f'%(s['lat'],s['lon'])}
+    print(len(only),'places need an old-map crop')
+    if not only: sys.exit(0)
+else: only=set(sys.argv[1:])
+def none(s,why): NONE[s['id']]='%.5f,%.5f'%(s['lat'],s['lon']); print(why,s['id'])
 old=json.load(open('build/topo/meta.json')) if os.path.exists('build/topo/meta.json') else {}
 for s in S:
     if s['cat']=='landmark': continue
@@ -51,7 +60,10 @@ for s in S:
         if s['id'] in old: meta[s['id']]=old[s['id']]
         continue
     it=pick(tnm(s['lat'],s['lon']),s)
-    if not it: print('no map',s['id']); continue
+    if not it:
+        if os.path.exists(f"cache/tnm/{s['lat']:.3f}_{s['lon']:.3f}.json"): none(s,'no map')      # the map list answered and had nothing; a failed request is not remembered
+        else: print('map list did not answer',s['id'])
+        continue
     tif=fetch(it['url'])
     if not tif: print('dl fail',s['id']); continue
     hw=1200 if s['prec']=='area' else 800
@@ -61,10 +73,11 @@ for s in S:
         print('crop fail',s['id'],e); continue
     import numpy as np
     a=np.asarray(im)
-    if (a.max(axis=2)<8).mean()>0.5: print('mostly empty',s['id']); continue
+    if (a.max(axis=2)<8).mean()>0.5: none(s,'mostly empty'); continue
     im.save(f"build/topo/{s['id']}.webp",quality=52,method=6)
     quad=re.sub(r'^USGS 1:\d+-scale Quadrangle for ','',it['title'])
     meta[s['id']]={'b':[round(v,6) for v in bb],'y':it['year'],'q':quad,'sc':it['scale']}
     print(s['id'],it['year'],quad,os.path.getsize(f"build/topo/{s['id']}.webp"))
 json.dump(meta,open('build/topo/meta.json','w'))
+json.dump(dict(sorted(NONE.items())),open(NF,'w'))
 print('done',len(meta))

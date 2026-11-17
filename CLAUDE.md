@@ -3,7 +3,7 @@
 Read `GUIDE.md` before doing anything. The short version:
 
 - **Never push to `main`, and never merge your own pull request.** Merging publishes the site. Put your change on a new branch with `tools/publish.sh`, open a pull request, say what you verified and what you could not, and stop. The owner merges. (GUIDE.md section 3.)
-- The files in the repository root (`index.html`, `app.js`, `sw.js`, `data/`, `topo/`) are **build output**. Edit `source/` and rebuild.
+- The files in the repository root (`index.html`, `app.js`, `sw.js`, `data/`, `topo/`) are **build output**. Edit `source/`, rebuild and test in the workspace. A pull request carries sources only (`publish.sh` sees to it); GitHub builds the site on the pull request to test it and again after the merge to publish it (GUIDE.md section 3). Never commit built files by hand.
 - When adding places, follow the research rules in GUIDE.md section 5: every fact from a source you opened, no filling gaps from memory, both versions when sources disagree, and legal access detail stated (owner, parking, trail, hours). The one thing left out is how to get past a barrier into somewhere closed.
 - Look at every new pin on the aerial with `tools/pincheck.py` before proposing it.
 - Every US state, the District of Columbia and the ten Canadian provinces already have an outline, a region, a start city and map coverage (`tools/states.py`, `tools/outlines.py`), and 40 states and 7 provinces have one worked example each in `tools/data_states.py`. To work in any of them you only add a batch of places: one `data_<area>.py` file with `BATCH`, `PLACES` and `PIN_NOTES`. Never rename a published place `id`.
@@ -15,7 +15,7 @@ Read `GUIDE.md` before doing anything. The short version:
 - A choice made once goes under the gear (Settings); a switch flipped while looking at the map goes in Map options, which stays short (GUIDE.md section 9). After changing either sheet run `tools/settings_test.js`.
 - The episode kit (chapters, description, route map picture from a field log) is in GUIDE.md section 9. After changing it run `tools/kit_test.js`. Its route picture must stay on a public-domain base map.
 - Never commit personal information; the repository is public.
-- Run `check.py` and the smoke test before opening the pull request.
+- Run the smoke test on the workspace build (`dist/web`) before opening the pull request; `publish.sh` runs `check.py` on the sources.
 - If `git push` is refused, attach the repository to the session with push access, then push again (GUIDE.md section 3). Do not retry or look for another login.
 - A state's trespass-law note is optional and done only when the owner asks. The access line on each place is not optional.
 - The owner uses the Atlas on an Android phone in the field. Test at phone size first.
