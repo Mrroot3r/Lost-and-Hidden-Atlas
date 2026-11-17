@@ -4,13 +4,17 @@ Places someone read about while researching but did not add, with what is missin
 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Ramtail Factory | Foster, RI | Mill ruin named in Rhode Island sources | A source read in full and a coordinate |
-| Hunt's Mills | East Providence, RI | Mill and amusement site | A source and a coordinate |
+| Ramtail Factory | Foster, RI | Ruin of the Foster Woolen Manufactory off Rams Tail Road; write-ups say it burned in 1873 and that the 1885 state census lists it as haunted. A geocache page puts it on Foster Land Trust land, with parking at the gate behind Hopkins Mills Cemetery. The Town of Foster's page for the 24-acre Hopkins Property (same parking, a half-mile trail to the old McLaughlin Bridge where Dolly Cole Brook meets the Ponagansett) does not mention the factory and warns that a missed turn puts you on Providence Water Supply Board land | A coordinate for the ruin, and whose land it stands on. Not added in the second pass for want of both |
 | Enchanted Forest | Hope Valley, RI | Children's park, 1971–2005 | A source for what remains; a coordinate |
-| Whale Rock Light foundation | Narragansett Bay, RI | Lighthouse lost in the 1938 hurricane; base said to remain | A source read in full; boat access details |
 | Warren powerhouse ruins | Warren, RI | Named in passing | A source and a coordinate |
 | Windswept ruins | Narragansett, RI | Named in passing | A source and a coordinate |
-| Stillwater mill | Smithfield, RI | Named in passing | A source and a coordinate |
+| Stillwater mill | Smithfield, RI (41.89444, -71.575 in Wikipedia) | A woolen mill of 1872 on the Woonasquatucket; a fire in 1984 took part of what was left; 26 acres with the remaining buildings went to the Breakwater Preservation Conservancy in 2009 | What stands now, and whether the public may walk there |
+| Camp Endicott and the Seabee Museum | Davisville, North Kingstown, RI (41.6025, -71.43778) | Navy Seabee camp of 1942, where the Quonset hut began; a few huts were moved to the Seabee Museum and Memorial Park on the old camp | The museum's own page: hours, what is on show, how many huts |
+| Old Jamestown Bridge abutment | North Kingstown, RI | The 1940 bridge closed in 1992 and was blown up in 2006; Wikipedia says the western abutment and the dead-end roadbed remain, and a planned fishing pier was never built | Where exactly, who owns it, whether one may walk out |
+| Gould Island | Narragansett Bay, RI (41.53357, -71.34444) | Navy torpedo-plane base from 1919; the state owns the south end as a bird sanctuary and the Navy the rest | What still stands, and the landing rules. Wikipedia gives neither |
+| Conant Thread / Coats & Clark mills | Pawtucket and Central Falls, RI (41.88117, -71.39695) | A 50-acre thread-mill district; a fire on March 14, 2020 destroyed at least eight buildings | What stands now and who owns it |
+| Diamond Hill ski areas | Cumberland, RI (41.99978, -71.41367) | Two ski areas on a town park (Ski Valley, 1939 to 1981, and Diamond Hill Reservation, mid-1960s to mid-1980s); lifts sold off in the 1980s | Whether any lift footings or buildings remain |
+| Narragansett Pier Railroad survivors | South Kingstown and Narragansett, RI | Line of 1876, closed 1981; Wikipedia says Kingston and Peace Dale stations survive, the Pier station did as of 2017, and most of the roadbed is the William C. O'Neill Bike Path | Coordinates and present state of each, and of the Peace Dale engine house (standing as of 2007) |
 | Kingston Point Park | Kingston, NY | In the Atlas as an unverified lead | A source for its history and for what remains |
 | Worcester streetcar substations and carhouses | Worcester County, MA | Wikipedia says several survive | Which ones, and where |
 | Mountain Mills | Whitingham, VT | Said to be a village drowned by Harriman Reservoir | A source |
