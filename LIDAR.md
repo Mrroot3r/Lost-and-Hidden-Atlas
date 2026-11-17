@@ -163,11 +163,10 @@ N('lidar-rossman-hill-road-house-site','House site south of Rossman Hill Road','
   "No tax-parcel record could be checked: Schoharie County is not in the state's public parcel file. ..."+HUNT,SRC,conf='lead'),
 ```
 
-Plain words, short sentences, no "nestled", no "hidden gem", no guesses about who lived there. Then cut the old-map crops the app shows and check the pins:
+Plain words, short sentences, no "nestled", no "hidden gem", no guesses about who lived there. Then check the pins (the old-map crop each place shows in the app is cut by GitHub when it builds the site):
 
 ```bash
 python3 tools/build_sites.py | tail -1                   # takes the new file into the place list; an error here names the line to fix
-python3 tools/topo_all.py lidar-rossman-hill-road-house-site lidar-monkey-run-house-site
 python3 tools/pincheck.py --batch lidar_1116_brhsf       # the batch key is in the file; open the picture it writes
 ```
 
@@ -181,7 +180,7 @@ cd $ATLAS && bash tools/all.sh
 node tools/smoke.js http://localhost:8766/index.html lidar-rossman-hill-road-house-site    # one of your new ids
 python3 tools/lidar_test.py
 python3 tools/lidar.py report > /tmp/report.txt && cat /tmp/report.txt
-bash tools/publish.sh $REPO lidar-burnt-rossman-hills        # a NEW branch name of your own; it also runs check.py
+bash tools/publish.sh $REPO lidar-burnt-rossman-hills        # a NEW branch name of your own; it carries sources only and runs check.py on them
 ```
 
 If `publish.sh` says **STOP: these files changed in the repository**, somebody else's work was merged while you worked. Run the `resync.sh` line it prints, then `all.sh` and `publish.sh` again. Your new files and verdicts are kept.
@@ -196,6 +195,7 @@ gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls -f title="LiDAR: Burnt-Rossman
 - The pull request title starts with **"LiDAR"**. Its text is the report, plus one paragraph in your own words on anything you could not verify.
 - If `git push` is refused, attach the repository to the session with push access and push again (CLAUDE.md). Do not look for another login.
 - **A session that found nothing still publishes**: the ledger changed, and the next session needs it. Skip step 6 and `topo_all`; build, publish and open the pull request the same way.
+- GitHub builds the site on the pull request to test it, and again after the owner merges to publish it. You do not commit built files.
 - **Then stop.** Tell the owner: what was swept, how many were looked at, what was added, and that nothing has been seen on the ground.
 
 **If the owner says a pull request "has conflicts"** (he merged another one first): in a session with a clone, `git checkout` that branch, set the workspace up from it (`bash source/tools/setup.sh`), then `bash tools/resync.sh $REPO $(git -C $REPO merge-base HEAD origin/main)`, build, publish to a new branch name, open a new pull request and ask him to close the old one.

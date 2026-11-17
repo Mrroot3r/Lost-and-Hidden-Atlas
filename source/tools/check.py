@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Checks a repository clone before a change is proposed. No network, standard library only.
-   python3 source/tools/check.py [path-to-repo]
+   python3 source/tools/check.py [path-to-repo] [--sources]
+--sources: check the place lists, the ledger and the privacy rule only, and skip "the built site matches the sources".
+That is for a branch that carries sources alone; GitHub builds the site and runs the full check (tools/ci_build.sh).
 Exit code 1 on any error. Warnings are for a person to read."""
 import sys,os,re,json,glob,importlib
-REPO=os.path.abspath(sys.argv[1] if len(sys.argv)>1 else os.path.join(os.path.dirname(__file__),'..','..'))
+SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
+REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
 err=[]; warn=[]
 CAT='amuse hotel canal rail industry burial town civic fort water inst light landmark lidar'.split()
@@ -66,36 +69,37 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if not m.PIN_NOTES.get(i): err.append(f'{w}: no pin note saying where the coordinate came from')
         if not p.get('links') and (p.get('conf') or '')!='lead': err.append(f"{w}: no source link (allowed only when conf='lead')")
         if p['acc'] in('ask','view','permit','boat') and not p.get('accn'): warn.append(f'{w}: access is {p["acc"]} but there is no access note')
-# ---- built site matches the sources ----
-def rd(*p): return open(os.path.join(REPO,*p),encoding='utf-8').read()
-idx=rd('index.html'); mm=re.search(r'<script type="application/json" id="d-sites">(.*?)</script>',idx,re.S)
-if not mm: err.append('index.html has no d-sites block')
-else:
-    D=json.loads(mm.group(1).replace('<\\/','</')); built={s['id'] for s in D['sites']}
-    miss=sorted(set(ids)-built); extra=sorted(i for i in built-set(ids) if not i.startswith('lm-'))
-    if miss: err.append('in the place lists but not in the built site (rebuild needed): '+', '.join(miss[:12]))
-    if extra: err.append('in the built site but not in the place lists: '+', '.join(extra[:12]))
-    for s in D['sites']:
-        if s.get('tm') and not os.path.exists(os.path.join(REPO,'topo',s['id']+'.webp')): err.append(f"topo/{s['id']}.webp is missing")
-    v=D.get('v','')
-    if f"const V='{v}'" not in rd('sw.js'): err.append('sw.js version does not match index.html (rebuild needed)')
-    if f'app.js?v={v}' not in idx: err.append('index.html does not reference this build of app.js')
-if rd('app.js')!=rd('source','src','app.js'): err.append('app.js in the root differs from source/src/app.js: edit the source and rebuild, never the root file')
-# the Android app reads boot.js and version.json from the built site
-if os.path.exists(os.path.join(REPO,'source','src','boot.js')):
-    if not os.path.exists(os.path.join(REPO,'boot.js')) or rd('boot.js')!=rd('source','src','boot.js'): err.append('boot.js in the root differs from source/src/boot.js (rebuild needed)')
+if not SRC_ONLY:
+    # ---- built site matches the sources ----
+    def rd(*p): return open(os.path.join(REPO,*p),encoding='utf-8').read()
+    idx=rd('index.html'); mm=re.search(r'<script type="application/json" id="d-sites">(.*?)</script>',idx,re.S)
+    if not mm: err.append('index.html has no d-sites block')
+    else:
+        D=json.loads(mm.group(1).replace('<\\/','</')); built={s['id'] for s in D['sites']}
+        miss=sorted(set(ids)-built); extra=sorted(i for i in built-set(ids) if not i.startswith('lm-'))
+        if miss: err.append('in the place lists but not in the built site (rebuild needed): '+', '.join(miss[:12]))
+        if extra: err.append('in the built site but not in the place lists: '+', '.join(extra[:12]))
+        for s in D['sites']:
+            if s.get('tm') and not os.path.exists(os.path.join(REPO,'topo',s['id']+'.webp')): err.append(f"topo/{s['id']}.webp is missing")
+        v=D.get('v','')
+        if f"const V='{v}'" not in rd('sw.js'): err.append('sw.js version does not match index.html (rebuild needed)')
+        if f'app.js?v={v}' not in idx: err.append('index.html does not reference this build of app.js')
+    if rd('app.js')!=rd('source','src','app.js'): err.append('app.js in the root differs from source/src/app.js: edit the source and rebuild, never the root file')
+    # the Android app reads boot.js and version.json from the built site
+    if os.path.exists(os.path.join(REPO,'source','src','boot.js')):
+        if not os.path.exists(os.path.join(REPO,'boot.js')) or rd('boot.js')!=rd('source','src','boot.js'): err.append('boot.js in the root differs from source/src/boot.js (rebuild needed)')
+        try:
+            if mm and json.loads(rd('version.json')).get('v')!=D.get('v'): err.append('version.json does not match index.html (rebuild needed); the Android app would never see the new places')
+        except Exception: err.append('version.json is missing or unreadable (rebuild needed)')
+    for need in('data/lines.json','data/leads.json','data/pockets.json','leaflet.js','GUIDE.md','CLAUDE.md','source/build/states.json'):
+        if not os.path.exists(os.path.join(REPO,need)): err.append('missing '+need)
+    # the historic-pockets layer: every state it lists needs its detail file, or zooming in there shows nothing
     try:
-        if mm and json.loads(rd('version.json')).get('v')!=D.get('v'): err.append('version.json does not match index.html (rebuild needed); the Android app would never see the new places')
-    except Exception: err.append('version.json is missing or unreadable (rebuild needed)')
-for need in('data/lines.json','data/leads.json','data/pockets.json','leaflet.js','GUIDE.md','CLAUDE.md','source/build/states.json'):
-    if not os.path.exists(os.path.join(REPO,need)): err.append('missing '+need)
-# the historic-pockets layer: every state it lists needs its detail file, or zooming in there shows nothing
-try:
-    pj=json.loads(rd('data','pockets.json'))
-    for k in pj.get('s',{}):
-        if not os.path.exists(os.path.join(REPO,'data','pock',k+'.json')): err.append(f'data/pockets.json lists {k} but data/pock/{k}.json is missing (the workspace lost build/pock: run setup.sh again, or tools/pockets.py)')
-    if not pj.get('k'): err.append('data/pockets.json holds no pockets')
-except Exception: pass
+        pj=json.loads(rd('data','pockets.json'))
+        for k in pj.get('s',{}):
+            if not os.path.exists(os.path.join(REPO,'data','pock',k+'.json')): err.append(f'data/pockets.json lists {k} but data/pock/{k}.json is missing (the workspace lost build/pock: run setup.sh again, or tools/pockets.py)')
+        if not pj.get('k'): err.append('data/pockets.json holds no pockets')
+    except Exception: pass
 # ---- the LiDAR ledger (source/lidar/units, kept by tools/lidar.py; LIDAR.md) ----
 LSEEN={}
 for f in sorted(glob.glob(os.path.join(REPO,'source','lidar','units','*.json'))):
@@ -126,5 +130,5 @@ for dp,dn,fn in os.walk(REPO):
             if not any(o in a for o in OKMAIL) and not re.search(r'\.(png|jpg|webp|js|css)$',a): err.append(f'{os.path.relpath(p,REPO)}: contains what looks like an email address ({a})')
 for w in warn: print('warning:',w)
 for e in err: print('ERROR:',e)
-print(f'{len(ids)} place ids, {len(keys)} batches, {len(warn)} warnings, {len(err)} errors')
+print(f'{len(ids)} place ids, {len(keys)} batches, {len(warn)} warnings, {len(err)} errors'+(' (sources only: the built site was not checked)' if SRC_ONLY else ''))
 sys.exit(1 if err else 0)

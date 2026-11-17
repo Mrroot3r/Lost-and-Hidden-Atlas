@@ -1,8 +1,8 @@
 name: check
+# Runs on every pull request. A pull request carries sources only, so the site is built here first, from those sources,
+# and the checks then look at what was built. Nothing is published from here; that is site.yml, after the merge.
 on:
   pull_request:
-  push:
-    branches: [main]
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -11,6 +11,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Build the site from this pull request's sources
+        run: |
+          pip install --quiet requests Pillow numpy rasterio
+          bash source/tools/ci_build.sh
       - name: Place lists are valid and the built site matches the sources
         run: python3 source/tools/check.py .
       - name: The LiDAR ledger tool keeps its rules

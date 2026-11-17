@@ -20,6 +20,8 @@ cp "$REPO"/source/src/* "$W/src/"
 find "$REPO"/source/tools -maxdepth 1 -type f -exec cp {} "$W/tools/" \;   # files only: a __pycache__ folder left by running a tool in the clone must not stop the setup
 cp "$REPO"/source/build/base.json "$REPO"/source/build/hubs.json "$REPO"/source/build/padus.json "$REPO"/source/build/states.json "$W/build/"
 cp "$REPO"/source/build/topo-meta.json "$W/build/topo/meta.json"
+[ -f "$REPO/source/build/topo-none.json" ] && cp "$REPO/source/build/topo-none.json" "$W/build/topo/none.json"   # places known to have no old map
+[ -f "$REPO/source/build/drive.json" ] && cp "$REPO/source/build/drive.json" "$W/build/drive.json"               # drive times already worked out
 cp "$REPO"/source/build/leaflet.min.css "$W/cache/leaflet.min.css"
 cp "$REPO"/leaflet.js "$W/cache/leaflet.min.js"
 cp "$REPO"/topo/*.webp "$W/build/topo/"
