@@ -59,7 +59,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true};
+const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -347,6 +347,30 @@ async function saveArea(id,urls){
   const worker=async()=>{ while(i<urls.length&&!tok.cancel){ const u=urls[i++]; try{ const b=await tileBlob(u,true); tok.bytes+=b.size; }catch(e){ tok.fail++; } tok.done++; upd(); } };
   await Promise.all([worker(),worker(),worker(),worker()]); saving=null; tok.finished=true; upd(); return tok; }
 const mb=b=>(b/1048576).toFixed(b<10485760?1:0)+' MB';
+/* "Save this map view": every leaf-off, LiDAR and USGS topo tile inside what the map shows, down to a chosen zoom */
+const VIEWMAX=4500; let viewOpen=false, viewCap=17;
+function viewUrls(b,cap){ const set=new Set(), rr=x=>rad(x);
+  OFF.forEach(o=>{ const lyr=LD[o[0]].mk('tilePane'); for(let z=o[1];z<=Math.min(o[2],cap);z++){ lyr._tileZoom=z; const n=Math.pow(2,z), tx=lon=>Math.floor((lon+180)/360*n), ty=la=>{ const r=rr(la); return Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); };
+      if((tx(b.getEast())-tx(b.getWest())+1)*(ty(b.getSouth())-ty(b.getNorth())+1)>VIEWMAX*2){ set.add('too-many-'+o[0]+z); for(let i=0;i<VIEWMAX*2;i++) set.add('x'+o[0]+z+'_'+i); return; }
+      for(let x=tx(b.getWest());x<=tx(b.getEast());x++) for(let y=ty(b.getNorth());y<=ty(b.getSouth());y++) set.add(lyr.getTileUrl({x:x,y:y,z:z})); } });
+  return Array.from(set); }
+function viewBox(){ const box=el('div',{id:'view-box'}); if(!map||schematic) return box;
+  const b=map.getBounds(), urls=viewUrls(b,viewCap), est=urls.length*(PXQ()>256?62000:21000), msg=el('p',{class:'offmsg'}), bar=el('div',{class:'bar',hidden:true},el('span'));
+  const sel2=el('select',{id:'view-detail','aria-label':'How much detail to save',onchange:e=>{ viewCap=+e.target.value; buildSheet(); }},[[16,'Fields and tracks (zoom 16)'],[17,'Walls and cellars (zoom 17)'],[18,'Everything (zoom 18)']].map(o=>el('option',{value:String(o[0]),text:o[1]}))); sel2.value=String(viewCap);
+  box.append(el('div',{class:'lsub'},sel2));
+  if(urls.length>VIEWMAX){ box.append(el('p',{class:'offmsg',text:'This view is too wide to save in one go'+(viewCap>16?' at that detail':'')+'. Zoom in until the map shows only the ground you will walk'+(viewCap>16?', or choose less detail':'')+'.'})); return box; }
+  const id='view:'+b.getCenter().lat.toFixed(4)+','+b.getCenter().lng.toFixed(4)+':'+viewCap, btn=el('button',{class:'btn sm',type:'button',id:'view-save'});
+  const show=()=>{ const t=saving&&saving.id===id?saving:null;
+    if(t){ btn.textContent='Stop'; bar.hidden=false; bar.firstChild.style.width=Math.round(t.done/t.n*100)+'%'; msg.textContent='Saving '+t.done+' of '+t.n+' tiles · '+mb(t.bytes)+(t.fail?' · '+t.fail+' failed':'')+'. Keep the Atlas open.'; return; }
+    bar.hidden=true; const s2=U.saved[id]; btn.textContent=s2?'Save again':'Save '+urls.length+' tiles, about '+mb(est);
+    msg.textContent=s2?('Saved '+new Date(s2.at).toLocaleDateString()+': '+s2.mb+(s2.miss?', '+s2.miss+' tiles missing':'')+'. Works with no signal on this device.'):'Leaf-off aerial, LiDAR and the USGS topo map are saved. The street map and satellite are not: their owners do not allow copies to be kept.'; };
+  btn.addEventListener('click',async()=>{
+    if(saving){ if(saving.id===id) saving.cancel=true; else banner('Another area is still saving. Wait for it or stop it first.',true,5000); return; }
+    const c=b.getCenter(), near=sites().map(s=>[hav(c.lat,c.lng,pos(s).lat,pos(s).lon),s]).sort((x,y)=>x[0]-y[0])[0], label='Map view '+(near&&near[0]<3?'near '+near[1].name:'at '+c.lat.toFixed(3)+', '+c.lng.toFixed(3));
+    const t=saveArea(id,urls); saving.render=show; show(); const r=await t;
+    if(!r.cancel||r.done>0){ U.saved[id]={at:Date.now(),label:label,mb:mb(r.bytes),n:r.done-r.fail,miss:r.fail+(r.n-r.done),y:U.ui.year,pts:[[+c.lat.toFixed(5),+c.lng.toFixed(5)]]}; saveNow(); }
+    show(); if(r.cancel) msg.textContent='Stopped. '+(r.done-r.fail)+' tiles kept.'; else if(r.fail) msg.textContent+=' Some tiles failed; try Save again on better wifi.'; });
+  box.append(el('div',{class:'row'},btn),bar,msg); show(); return box; }
 function offlineBox(id,pts,label){
   const info=U.saved[id], urls=offlineUrls(pts), est=urls.length*(PXQ()>256?62000:21000);
   const msg=el('p',{class:'offmsg'}), btn=el('button',{class:'btn sm',type:'button'});
@@ -529,6 +553,8 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
     el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here. Until you choose one, the Atlas uses the start city nearest to where you are or last were.'})),
     el('div',{class:'field setrow'},el('label',{for:'set-find',text:'Or type your start place'}),el('div',{class:'findrow'},fq,fb),fm),
+    H('Trip'),
+    pick('tripStop','Time at each stop',[20,30,45,60,90,120].map(m=>[m,fmtMin(m)]),'Used for the arrival times and the sunset warning in the Trip tab.'),
     H('Near me'),
     nmPick('r','List what is within',NMR),
     nmPick('al','Buzz when I walk within',NMA,NATIVE?'While a field log is recording the phone buzzes with the screen off too. Old town centres are listed but never buzz.':'Works while the Atlas is open and showing where you are. Old town centres are listed but never buzz.'),
@@ -604,6 +630,9 @@ function buildSheet(){
     if(all.length){ const ul=el('div',{class:'pocklist'}); all.slice(0,pockList.n).forEach(o=>ul.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ closeSheet(); map.setView([o.k[0],o.k[1]],15); }},el('b',{text:o.k[7]}),el('small',{text:' '+pockLine(o)})))); lb.append(ul);
       if(all.length>pockList.n) lb.append(el('button',{class:'btn sm',type:'button',id:'pock-more',onclick:()=>{ pockList.n+=8; buildSheet(); }},'Show more ('+(all.length-pockList.n)+')')); }
     else lb.append(note('None are mapped within 40 miles of your start place yet. The layer covers '+Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', ')+' so far.')); }
+  if(map&&!schematic){ lb.append(H('Offline'));
+    lb.append(el('button',{class:'btn sm',type:'button',id:'view-off','aria-expanded':String(viewOpen),onclick:()=>{ viewOpen=!viewOpen; buildSheet(); }},viewOpen?'Close':'Save this map view for offline…'));
+    if(viewOpen) lb.append(viewBox()); }
   lb.scrollTop=keep;
 }
 function goSchematic(){
@@ -1851,7 +1880,20 @@ function visitExport(){ const out=[]; Object.keys(U.visits||{}).forEach(id=>{ co
     out.push({id:id,name:s.name,town:s.town||'',cat:s.cat,pin:[b.lat,b.lon],mine:!!s.mine,reports:U.visits[id]}); }); return out; }
 
 /* ---------- trip ---------- */
-let trip={round:true,real:null};
+let trip={round:true,real:null,t0:'',day:''};
+/* sunrise and sunset for a calendar day at a place (the NOAA sunrise equation; good to a couple of minutes) */
+function sunTimes(day,lat,lon){ const d=new Date(day+'T12:00:00'), J=Math.floor(d.getTime()/86400000)+2440587.5, n=Math.ceil(J-2451545.0+0.0008), js=n-lon/360, M=rad((357.5291+0.98560028*js)%360);
+  const C=1.9148*Math.sin(M)+0.02*Math.sin(2*M)+0.0003*Math.sin(3*M), lam=rad((M*180/Math.PI+C+180+102.9372)%360), jt=2451545.0+js+0.0053*Math.sin(M)-0.0069*Math.sin(2*lam);
+  const dec=Math.asin(Math.sin(lam)*Math.sin(rad(23.44))), cw=(Math.sin(rad(-0.833))-Math.sin(rad(lat))*Math.sin(dec))/(Math.cos(rad(lat))*Math.cos(dec)); if(cw>1||cw<-1) return null;
+  const w=Math.acos(cw)*180/Math.PI/360, T=j=>new Date((j-2440587.5)*86400000); return {rise:T(jt-w),set:T(jt+w)}; }
+/* the day by the clock: when you reach each stop, when you are done, and whether that is before sunset */
+function tripClock(pts,st){ const d0=new Date(), pad=n=>String(n).padStart(2,'0'), today=d0.getFullYear()+'-'+pad(d0.getMonth()+1)+'-'+pad(d0.getDate());
+  if(!trip.day) trip.day=today; if(!trip.t0){ const q=new Date(Math.ceil((d0.getTime()+5*60000)/900000)*900000); trip.t0=pad(q.getHours())+':'+pad(q.getMinutes()); }
+  const stay=+pref('tripStop')||45, start=new Date(trip.day+'T'+trip.t0+':00'), legs=[]; for(let i=1;i<pts.length;i++) legs.push(trip.real&&trip.real.legs&&trip.real.legs.length===pts.length-1?trip.real.legs[i-1]:roughMin(hav(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon)).min);
+  const at=[]; let t=start.getTime(); st.forEach((s,i)=>{ t+=legs[i]*60000; at.push(new Date(t)); t+=stay*60000; }); if(trip.round) t+=legs[legs.length-1]*60000;
+  const last=st[st.length-1], lp=pos(last), sun=sunTimes(trip.day,lp.lat,lp.lon); let late=-1; if(sun) at.forEach((a,i)=>{ if(late<0&&a.getTime()+stay*60000>sun.set.getTime()) late=i; });
+  return {at:at,end:new Date(t),sun:sun,late:late,stay:stay,real:!!(trip.real&&trip.real.legs)}; }
+const hm=d=>d.toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit'});
 function tripStops(){ return U.trip.map(byId).filter(Boolean); }
 function legMiles(pts){ let m=0; for(let i=1;i<pts.length;i++) m+=hav(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon); return m; }
 function bestOrder(){
@@ -1877,9 +1919,9 @@ function renderTrip(){
   const box=el('div',{class:'pad',style:'padding-block:12px'}); v.append(box);
   box.append(el('h2',{style:'font-size:22px',text:'Trip builder'}),el('p',{style:'color:var(--mute);margin:4px 0 10px',text:'Add places from their pages, put them in order, then hand the route to Google Maps for live traffic and turn-by-turn.'}));
   if(!st.length){ box.append(el('p',{class:'empty',text:'No stops yet. Open a place and choose "Add to trip".'})); return; }
-  const ul=el('ol',{class:'stops'});
+  const ul=el('ol',{class:'stops'}), pts0=[H].concat(st.map(dest)).concat(trip.round?[H]:[]), ck=tripClock(pts0,st);
   st.forEach((s,i)=>{ const mv=d=>()=>{ const j=i+d; if(j<0||j>=U.trip.length) return; const a=U.trip; const t=a[i]; a[i]=a[j]; a[j]=t; trip.real=null; save(); renderTrip(); };
-    ul.append(el('li',null,el('span',null,el('button',{type:'button',style:'background:none;border:0;padding:0;font-weight:600;text-align:left;color:var(--ink)',onclick:()=>select(s,true)},s.name),el('small',{text:[s.town,EFF[s.eff],ACC[s.acc]].filter(Boolean).join(' · ')})),
+    ul.append(el('li',null,el('span',null,el('button',{type:'button',style:'background:none;border:0;padding:0;font-weight:600;text-align:left;color:var(--ink)',onclick:()=>select(s,true)},s.name),el('small',{text:[s.town,EFF[s.eff],ACC[s.acc]].filter(Boolean).join(' · ')}),el('small',{class:'stop-at'+(ck.late>=0&&i>=ck.late?' late':''),text:'there about '+hm(ck.at[i])})),
       el('span',{class:'mv'},el('button',{class:'btn sm',type:'button','aria-label':'Move up',disabled:i===0,onclick:mv(-1)},'↑'),el('button',{class:'btn sm',type:'button','aria-label':'Move down',disabled:i===st.length-1,onclick:mv(1)},'↓'),el('button',{class:'btn sm',type:'button','aria-label':'Remove',onclick:()=>{U.trip.splice(i,1);trip.real=null;save();refresh();}},'✕')))); });
   box.append(ul);
   const pts=[H].concat(st.map(dest)).concat(trip.round?[H]:[]), r=roughMin(legMiles(pts));
@@ -1887,11 +1929,19 @@ function renderTrip(){
   if(trip.real) sum.append(el('b',{class:'mono',text:fmtMin(trip.real.min)}),' driving, '+miTxt(trip.real.mi)+' by road, before stops and traffic.');
   else sum.append(el('b',{class:'mono',text:'~'+fmtMin(r.min)}),' driving, about '+miTxt(Math.round(r.mi))+'. Rough estimate from straight-line distance.');
   box.append(sum);
+  /* the clock */
+  const dayI=el('input',{type:'date',id:'trip-day','aria-label':'Day of the trip',onchange:e=>{ if(e.target.value){ trip.day=e.target.value; renderTrip(); } }}), t0I=el('input',{type:'time',id:'trip-t0','aria-label':'Leaving at',onchange:e=>{ if(e.target.value){ trip.t0=e.target.value; renderTrip(); } }});
+  dayI.value=trip.day; t0I.value=trip.t0;
+  const stS=el('select',{id:'trip-stop','aria-label':'Time at each stop',onchange:e=>{ setPref('tripStop',+e.target.value); renderTrip(); }},[20,30,45,60,90,120].map(m=>el('option',{value:String(m),text:fmtMin(m)+' at each stop'}))); stS.value=String(ck.stay);
+  const clk=el('div',{id:'trip-clock'},el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Day'}),dayI),el('label',{class:'field'},el('span',{text:'Leave at'}),t0I)),el('div',{class:'row',style:'margin-top:6px'},stS),
+    el('p',{style:'margin:8px 0 0'},(trip.round?'Back at '+H.name+' about ':'Done about '),el('b',{class:'mono',text:hm(ck.end)}),ck.sun?'. Sunset at the last stop is '+hm(ck.sun.set)+'.':'.',ck.real?'':' Times use rough drive estimates until you tap "Get real drive time".'));
+  if(ck.late>=0) clk.append(el('p',{class:'pn trip-warn',text:(ck.at[ck.late].getTime()>ck.sun.set.getTime()?'You would reach '+st[ck.late].name+' after sunset.':'Sunset comes while you are at '+st[ck.late].name+'.')+' Leave earlier, shorten the stops or drop a stop.'}));
+  box.append(clk);
   const rt=el('input',{type:'checkbox',id:'trip-round',checked:trip.round,onchange:e=>{U.ui.round=trip.round=e.target.checked;save();trip.real=null;renderTrip();}});
   box.append(el('label',{class:'lopt',for:'trip-round'},rt,el('span',null,'Round trip from '+H.name)));
   const real=el('button',{class:'btn',type:'button',onclick:async()=>{ real.disabled=true; real.textContent='Checking…';
     try{ const c=pts.map(p=>p.lon.toFixed(5)+','+p.lat.toFixed(5)).join(';'); const j=await (await fetch('https://router.project-osrm.org/route/v1/driving/'+c+'?overview=false')).json(); if(j.code!=='Ok') throw 0;
-      trip.real={min:Math.round(j.routes[0].duration/60),mi:Math.round(j.routes[0].distance/1609.34)}; renderTrip(); }
+      trip.real={min:Math.round(j.routes[0].duration/60),mi:Math.round(j.routes[0].distance/1609.34),legs:(j.routes[0].legs||[]).map(l=>l.duration/60)}; renderTrip(); }
     catch(e){ real.disabled=false; real.textContent='Routing service unreachable. Use Google Maps'; } }},'Get real drive time');
   box.append(el('div',{class:'row',style:'margin-top:10px'},el('button',{class:'btn',type:'button',disabled:st.length<3,onclick:()=>{bestOrder();renderTrip();}},'Shortest order'),real));
   const links=gmapsLinks(); const lr=el('div',{class:'row',style:'margin-top:10px'});
