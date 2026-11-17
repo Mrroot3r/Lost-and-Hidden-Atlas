@@ -40,7 +40,19 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   if(j){ const f='/tmp/visit_export.json'; fs.writeFileSync(f,out); const tool=path.join(__dirname,'visits.py');
     const res=cp.spawnSync('python3',[tool,f],{encoding:'utf8'}); const t=res.stdout||'';
     ok('tools/visits.py turns the export into a worklist',res.status===0&&/lidar-high-knob-walled-yard/.test(t)&&/move the pin/i.test(t)&&/3\d m/.test(t)&&/joliet-iron-works/.test(t)&&/nothing there/i.test(t),(t||res.stderr||'').split('\n').slice(0,3).join(' / ').slice(0,200)); }
+  // ---- sending a report or a place to the Atlas
   await p.click('#sheet-x'); await p.goto(url+'#joliet-iron-works'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800);
+  await p.click('.visit-item .visit-send'); await p.waitForTimeout(200);
+  const sh=await p.evaluate(()=>{ const b=document.querySelector('.visit-item .sharebox'); if(!b) return null; const g=b.querySelector('a.share-gh'); return {gh:g?g.href:'',form:!!b.querySelector('a.share-form'),copy:[...b.querySelectorAll('button')].some(n=>/Copy as text/.test(n.textContent)),note:b.textContent}; });
+  ok('"Send to the Atlas" on a report opens a box with a GitHub link and a copy button',!!sh&&/issues\/new\?/.test(sh.gh)&&sh.copy,sh&&sh.gh.slice(0,90));
+  const q=sh?new URL(sh.gh).searchParams:new URLSearchParams();
+  ok('the link opens the visit form already filled in: place and id, date, what was found',q.get('template')==='visit.yml'&&/Joliet Iron Works/.test(q.get('place')||'')&&/\(joliet-iron-works\)/.test(q.get('place')||'')&&/^\d{4}-\d\d-\d\d$/.test(q.get('when')||'')&&q.get('found')==='Nothing there',[q.get('place'),q.get('when'),q.get('found')].join(' | '));
+  ok('the box says nothing is sent until Submit, and that it is public',!!sh&&/nothing is sent until you press Submit/i.test(sh.note)&&/public/.test(sh.note));
+  ok('with no form set up, the no-account button is not offered',!!sh&&!sh.form);
+  ok('with a form set up, the no-account link carries the report',await p.evaluate(()=>{ const L=window.__atlasShare({form:'https://docs.google.com/forms/d/e/TEST/viewform',ent:{kind:'entry.1',place:'entry.2',where:'entry.3',text:'entry.4'}},'visit',{place:'Old mill',id:'old-mill',when:'2026-11-15',found:'Found it',text:'Two walls',spot:'42.1, -73.9'}); const u=new URL(L.form); return u.searchParams.get('usp')==='pp_url'&&u.searchParams.get('entry.1')==='A visit report'&&/Old mill \(old-mill\)/.test(u.searchParams.get('entry.2'))&&/2026-11-15/.test(u.searchParams.get('entry.3'))&&/Found it\. Two walls/.test(u.searchParams.get('entry.4')); }));
+  await p.click('#tab-guide'); await p.waitForTimeout(300);
+  ok('the Guide offers a way to send a place without a pin',await p.evaluate(()=>{ const a=document.querySelector('#share-blank a.share-gh'); return !!a&&/template=lead\.yml/.test(a.href); }));
+  await p.goto(url+'#joliet-iron-works'); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800);
   p.once('dialog',d=>d.accept()); await p.click('.visit-item .visit-del'); await p.waitForTimeout(1300);
   u=await U(); ok('a report can be deleted',!(u.visits||{})['joliet-iron-works']||u.visits['joliet-iron-works'].length===0);
   ok('no script errors',errs.length===0,errs.slice(0,2).join(' | '));

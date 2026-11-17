@@ -25,7 +25,7 @@ Notes, progress, field logs and added places are saved in the visitor's own brow
 
 ## Helping out
 
-New places, corrected pins and field reports are welcome. `GUIDE.md` explains the place format and the research rules that keep the map trustworthy. Changes come in as pull requests; nothing is pushed straight to `main`, because merging publishes the site.
+New places, corrected pins and field reports are welcome. **You do not need to know GitHub:** in the Atlas, "I was here" on a place page and "+ Add" each end in a "Send to the Atlas" button, and the [Suggest a place](https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new?template=lead.yml) and [Report a visit](https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new?template=visit.yml) forms do the same from here. A name and a spot are enough; what you send is checked before the map changes, and it is public. `GUIDE.md` explains the place format and the research rules that keep the map trustworthy. Changes come in as pull requests; nothing is pushed straight to `main`, because merging publishes the site.
 
 ## Data credits
 

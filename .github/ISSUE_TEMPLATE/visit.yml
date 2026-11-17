@@ -1,0 +1,53 @@
+name: Report a visit
+description: You went to a place on the Atlas. Say what you found, so the pin and the text can be corrected.
+title: "Visit: "
+labels: ["visit"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. In the Atlas itself, "I was here" on a place page fills this form in for you.
+        **What you write here is public.** Leave out private details, and do not describe how to get past a fence, a gate or a locked door.
+  - type: input
+    id: place
+    attributes:
+      label: Place
+      description: Its name on the Atlas, and the town.
+    validations:
+      required: true
+  - type: input
+    id: when
+    attributes:
+      label: When did you visit?
+      description: A date, or a month and year.
+  - type: dropdown
+    id: found
+    attributes:
+      label: What did you find?
+      options:
+        - Found it
+        - Something else is there
+        - Nothing there
+        - Could not get to it
+    validations:
+      required: true
+  - type: textarea
+    id: there
+    attributes:
+      label: What is really there?
+      description: What you saw, with rough sizes if you can (a laid-stone cellar about 5 m square, a well just east of it).
+  - type: textarea
+    id: access
+    attributes:
+      label: Access as you found it
+      description: Where you parked, which path you took, any signs or gates.
+  - type: input
+    id: spot
+    attributes:
+      label: The true spot
+      description: Coordinates if the pin is in the wrong place, like 42.6512, -73.7545. Leave blank if the pin is right.
+  - type: input
+    id: credit
+    attributes:
+      label: Name to credit (optional)
+      description: Leave blank to stay anonymous. Anything written here is public.
