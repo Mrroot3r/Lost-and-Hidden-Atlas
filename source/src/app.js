@@ -515,7 +515,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -1872,7 +1872,9 @@ function renderDetail(s){
       map?el('button',{class:'btn sm',type:'button',onclick:()=>{ const m=markers.get(s.id); if(m){ m.dragging.enable(); banner('Drag the pin to the right spot, then let go.',false,6000); } }},'Move the pin'):null,
       U.moved[s.id]?el('button',{class:'btn sm',type:'button',onclick:()=>{ delete U.moved[s.id]; save(); refresh(); select(s,true); }},'Put pin back'):null,
       s.mine?el('button',{class:'btn sm',type:'button',onclick:()=>openForm(s)},'Edit'):null,
-      s.mine?delBtn(s):null,sv),
+      s.mine?delBtn(s):null,
+      s.mine?el('button',{class:'btn sm',type:'button',id:'lead-send','aria-expanded':'false',onclick:e=>{ const row=e.target.closest('.row'), old=row.parentNode.querySelector('.sharebox'); if(old){ old.remove(); e.target.setAttribute('aria-expanded','false'); return; }
+        row.after(shareBox('lead',{place:s.name,where:[s.town,s.lat.toFixed(5)+', '+s.lon.toFixed(5)].filter(Boolean).join(' · '),text:[s.story,s.years?'Years: '+s.years:'',(STS[s.st]||'')+', '+((CAT[s.cat]||[''])[0])].filter(Boolean).join('. '),source:(s.links&&s.links[0]&&s.links[0][1])||'',access:(ACC[s.acc]||'')})); e.target.setAttribute('aria-expanded','true'); }},'Suggest it to the Atlas'):null,sv),
     (()=>{ const fl=s.from&&logById(s.from.log), fn=fl&&fl.notes.find(x=>x.t===s.from.t); if(!fn) return null; const ph=photosOf(fl,fn);   /* a place made from a field-log note keeps its photos and its walk */
       return el('div',{style:'margin-top:10px'},el('p',{class:'snote',text:'From your field log "'+fl.name+'", note "'+fn.x+'".'}),ph.length?mediaStrip(fl,ph):null,
         el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>{ showLog(fl,true); banner('Showing the walk that found it.',false,4000); }},'Show the walk on the map'))); })(),
@@ -1925,6 +1927,38 @@ function openForm(seed){
   v.append(form); name.focus();
 }
 
+/* ---------- sending a visit report or a lead to the Atlas ----------
+   The site has no server, so a report leaves the reader's browser by one of three doors, each opened already filled in:
+     - a Google Form the owner keeps (no account needed to send; GUIDE.md section 15 says how it is made). Until SHARE.form
+       holds its address the button is not shown;
+     - a GitHub issue form (.github/ISSUE_TEMPLATE/lead.yml and visit.yml; the sender needs a free GitHub account);
+     - the clipboard, as plain text.
+   Nothing is sent until the reader presses Submit on the page that opens. What arrives is read by tools/inbox.py and is
+   treated as a tip to be checked, never as fact. */
+const SHARE={gh:'https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new',
+  form:'',     /* the form's "viewform" address; tools/form_ids.py prints this line and the next from the form's link */
+  ent:{}};     /* its question ids: {kind:'entry.1',place:'entry.2',where:'entry.3',text:'entry.4',source:'entry.5',access:'entry.6'} */
+const cut=(t,n)=>{ t=String(t||''); return t.length>n?t.slice(0,n-1)+'…':t; };
+/* f: {place, where, text, source, access} for a lead; for a visit also {id, when, found, spot} */
+function shareText(kind,f){ return (kind==='visit'?['Visit report for the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Visited: '+(f.when||''),'Found: '+(f.found||''),'What is there: '+(f.text||''),'Access as found: '+(f.access||''),'True spot: '+(f.spot||'the pin is right, or not known')]
+    :['A place for the Lost & Hidden Atlas','Place: '+(f.place||''),'Where: '+(f.where||''),'What I know: '+(f.text||''),'Source or how I know: '+(f.source||''),'Can the public go there: '+(f.access||'')]).join('\n'); }
+function shareLinks(kind,f){ const q=o=>Object.keys(o).filter(k=>o[k]).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(cut(o[k],1500))).join('&');
+  const gh=SHARE.gh+'?'+(kind==='visit'
+    ?q({template:'visit.yml',title:'Visit: '+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),when:f.when,found:f.found,there:f.text,access:f.access,spot:f.spot})
+    :q({template:'lead.yml',title:'Lead: '+cut(f.place||'a place',80),place:f.place,where:f.where,know:f.text,source:f.source}));
+  let form='';
+  if(SHARE.form&&SHARE.ent.place){ const e=SHARE.ent, o={}; const put=(k,v)=>{ if(e[k]&&v) o[e[k]]=v; };
+    put('kind',kind==='visit'?'A visit report':'A place I know about'); put('place',f.place+(kind==='visit'&&f.id?' ('+f.id+')':''));
+    put('where',kind==='visit'?[f.when?'Visited '+f.when:'',f.spot?'true spot '+f.spot:''].filter(Boolean).join('; '):f.where);
+    put('text',kind==='visit'?[f.found,f.text].filter(Boolean).join('. '):f.text); put('source',f.source); put('access',f.access);
+    form=SHARE.form+(SHARE.form.indexOf('?')<0?'?':'&')+'usp=pp_url&'+q(o); }
+  return {gh:gh,form:form}; }
+function shareBox(kind,f){ const L=shareLinks(kind,f), cp=el('button',{class:'btn sm',type:'button'},'Copy as text'); cp.addEventListener('click',()=>copy(shareText(kind,f),cp));
+  return el('div',{class:'sharebox'},
+    el('p',{class:'snote',style:'display:block',text:(kind==='visit'?'Send this report':'Send this place')+' so the map can be corrected for everyone. A page opens with it filled in; nothing is sent until you press Submit there. What you send is public, so leave out anything private. Reports are checked before the map changes.'}),
+    el('div',{class:'row'},
+      L.form?ext(L.form,'Send it (no account needed)','btn pri share-form'):null,
+      ext(L.gh,L.form?'Post it on GitHub':'Post it on GitHub (free account)','btn sm share-gh'),cp)); }
 /* ---------- visit reports ----------
    What was really there when the owner went: U.visits[id] = [{t:'2026-11-16', v:'found'|'else'|'nothing'|'blocked', x: what is there,
    a: access as found, at:[lat,lon] the true spot or null}], newest first. They travel in "Copy my additions for Claude"
@@ -1936,10 +1970,12 @@ function visitSection(s){ if(!U.visits) U.visits={}; const list=U.visits[s.id]||
   list.forEach((r,i)=>{ if(visitOpen&&visitOpen.id===s.id&&visitOpen.i===i) return;
     sec.append(el('div',{class:'visit-item'},el('b',{text:new Date(r.t+'T12:00:00').toLocaleDateString([],{dateStyle:'medium'})+' · '+(VISIT[r.v]||r.v)}),r.at?el('small',{text:' · true spot '+far(dist(r.at))+' from the Atlas pin'}):null,
       r.x?el('p',{text:r.x}):null,r.a?el('p',{class:'snote',style:'display:block',text:'Access: '+r.a}):null,
-      el('div',{class:'row'},el('button',{class:'btn sm visit-edit',type:'button',onclick:()=>{ visitOpen={id:s.id,i:i}; renderDetail(s); const n=$('#visit-form'); if(n) n.scrollIntoView({block:'nearest'}); }},'Edit'),
+      el('div',{class:'row'},el('button',{class:'btn sm visit-send',type:'button','aria-expanded':'false',onclick:e=>{ const it=e.target.closest('.visit-item'), old=it.querySelector('.sharebox'); if(old){ old.remove(); e.target.setAttribute('aria-expanded','false'); return; }
+          const b0=BASE.find(x=>x.id===s.id)||s; it.append(shareBox('visit',{place:s.name+(s.town?', '+s.town:''),id:s.mine?'':s.id,when:r.t,found:VISIT[r.v]||r.v,text:r.x,access:r.a,spot:r.at?r.at[0]+', '+r.at[1]:(s.mine?b0.lat+', '+b0.lon:'')})); e.target.setAttribute('aria-expanded','true'); }},'Send to the Atlas'),
+        el('button',{class:'btn sm visit-edit',type:'button',onclick:()=>{ visitOpen={id:s.id,i:i}; renderDetail(s); const n=$('#visit-form'); if(n) n.scrollIntoView({block:'nearest'}); }},'Edit'),
         el('button',{class:'btn sm visit-del',type:'button',onclick:()=>{ if(!confirm('Delete this visit report?')) return; list.splice(i,1); if(!list.length) delete U.visits[s.id]; save(); renderDetail(s); }},'Delete')))); });
   if(!(visitOpen&&visitOpen.id===s.id)){ sec.append(el('div',{class:'row'},el('button',{class:'btn sm',type:'button',id:'visit-add',onclick:()=>{ visitOpen={id:s.id,i:-1}; renderDetail(s); const n=$('#visit-form'); if(n) n.scrollIntoView({block:'nearest'}); }},list.length?'+ Another visit':'+ I was here')),
-      list.length?null:el('p',{class:'snote',style:'display:block;margin-top:6px',text:'Been there? Say what you found and where it really is. Your reports go to Claude with "Copy my additions for Claude" in Settings, so the pin and the text get corrected for everyone.'}));
+      list.length?null:el('p',{class:'snote',style:'display:block;margin-top:6px',text:'Been there? Say what you found and where it really is, then tap "Send to the Atlas" on the report so the pin and the text get corrected for everyone.'}));
     return sec; }
   const old=visitOpen.i>=0?list[visitOpen.i]:null, d0=new Date(), today=d0.getFullYear()+'-'+String(d0.getMonth()+1).padStart(2,'0')+'-'+String(d0.getDate()).padStart(2,'0');
   let verdict=old?old.v:'';
@@ -1969,7 +2005,7 @@ function visitSection(s){ if(!U.visits) U.visits={}; const list=U.visits[s.id]||
         U.visits[s.id].sort((x,y)=>x.t<y.t?1:x.t>y.t?-1:0);
         if(['','todo','scouted','asked','ok',undefined].indexOf(U.status[s.id])>=0&&verdict!=='blocked') U.status[s.id]='visited';
         if(at&&dist(at)>4) U.moved[s.id]=at;
-        visitOpen=null; saveNow(); refresh(); select(byId(s.id)||s,true); banner('Visit report saved. Send it with "Copy my additions for Claude" in Settings.',false,5000); }},'Save the report'),
+        visitOpen=null; saveNow(); refresh(); select(byId(s.id)||s,true); banner('Visit report saved. Tap "Send to the Atlas" on it to share it.',false,6000); }},'Save the report'),
       el('button',{class:'btn',type:'button',onclick:()=>{ visitOpen=null; renderDetail(s); }},'Cancel'),msg));
   sec.append(box); sec.querySelector(old&&old.at?'#visit-at-keep':'#visit-at-pin').checked=true;
   /* the choice "where I am standing" opens up as soon as the phone knows where it is */
@@ -2126,7 +2162,9 @@ function renderGuide(){
       el('li',{text:'Follow the lines. Old railroads, trolley lines and canals are drawn on the map; stations, mills, hotels and locks sat right beside them. Click a line to list the Atlas places along it in order, then walk the rest of it on LiDAR looking for platforms and foundations.'}),
       el('li',{text:'On site, open the Log tab and start a field log. It draws where you walk and lets you drop timed notes, then exports the track (GPX) and a note list with times to match against your footage.'}),
       el('li',{text:'Found the real spot? Open My notes, choose "Move the pin," and drag it. Right-click (or long-press) anywhere on the map for coordinates and links.'}),
-      el('li',{text:'Been to a place? Open it and tap "I was here": say what you found, how you got in, and mark the true spot from where you stand. Send the reports with "Copy my additions for Claude" in Settings and the Atlas gets corrected.'})),
+      el('li',{text:'Been to a place? Open it and tap "I was here": say what you found, how you got in, and mark the true spot from where you stand. Then tap "Send to the Atlas" on the report and the map gets corrected for everyone.'}),
+      el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it to the Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later.'})),
+    el('div',{id:'share-blank'},el('p',{class:'snote',style:'display:block;margin-top:8px',text:'Or send a place without a pin:'}),shareBox('lead',{place:'',where:'',text:'',source:'',access:''})),
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
   const ser=el('div',{class:'series'}); D.series.forEach(s=>{ const n=BASE.filter(x=>(x.tags||[]).indexOf(s.tag)>=0).length;
     ser.append(el('button',{type:'button',onclick:()=>{ clearF(); $('#q').value=''; F.tag=s.tag; showView('list'); refresh(); fitVisible(); }},el('b',{text:s.title+' · '+n+' stops'}),el('small',{text:s.note}))); });

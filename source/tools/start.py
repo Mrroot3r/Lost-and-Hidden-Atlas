@@ -93,6 +93,12 @@ if sec:
     for n,b in area[:5]: print('  '+(b if len(b)<800 else b[:800]+' …'))
     if state: print(f'   and {len(state)} more that mention {sname} in general; their openings:')
     for b in state[:5]: print('     '+b[:150]+' …')
+# ---- work other sessions have open: two sessions given the same job at the same hour have picked the same county
+try:
+    pr=json.load(urllib.request.urlopen(urllib.request.Request('https://api.github.com/repos/Mrroot3r/Lost-and-Hidden-Atlas/pulls?state=open&per_page=30',headers={'User-Agent':'lost-hidden-atlas-research/1.0','Accept':'application/vnd.github+json'}),timeout=30))
+    print(f'== Open pull requests: {len(pr)}'+(' (work another session has not had merged yet. If one covers this ground, pick other ground or other places, and do not reuse its file name, batch key or ids)' if pr else ''))
+    for x in pr[:12]: print('  #%d  %s  [branch %s, opened %s]'%(x['number'],x['title'][:110],x['head']['ref'],x['created_at'][:16].replace('T',' ')))
+except Exception as e: print('== Open pull requests could not be listed ('+str(e)[:50]+'): look at the repository\'s pull requests page before choosing ground.')
 print('''== The order of work (GUIDE.md sections 4 to 6 have the detail)
   1. Find places: tools/wiki_raw.py --rows "National Register of Historic Places listings in <County>, <State>" -g 'mill|lock|ruin|site|kiln|fort'
      then tools/wiki_raw.py "Exact title", tools/page.py <url> (reads PDFs; falls back to an archived copy), tools/nom.py "name, town, state".

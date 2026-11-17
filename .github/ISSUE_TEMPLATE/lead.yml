@@ -1,0 +1,48 @@
+name: Suggest a place
+description: Tell the Atlas about a lost building, a ruin or an abandoned site. A name and a spot are enough; it is researched later.
+title: "Lead: "
+labels: ["lead"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. You do not need to research anything: say what it is and where, and it will be looked into.
+        **What you write here is public.** Leave out private details, and do not describe how to get past a fence, a gate or a locked door.
+  - type: input
+    id: place
+    attributes:
+      label: Place
+      description: What it is called, or what it is (old mill, cellar hole, closed school, trolley bridge piers).
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where is it?
+      description: Town and state, a road or trail, or coordinates like 42.6512, -73.7545.
+    validations:
+      required: true
+  - type: textarea
+    id: know
+    attributes:
+      label: What do you know about it?
+      description: What stood there, what is left to see, when you saw it.
+  - type: input
+    id: source
+    attributes:
+      label: Source, or how do you know?
+      description: A link, a book, a sign on the spot, or "I have been there".
+  - type: dropdown
+    id: access
+    attributes:
+      label: Can the public go there?
+      options:
+        - I don't know
+        - Yes, it is public land or on a public path
+        - Only to look at from the road or trail
+        - No, it is private; someone would have to ask first
+  - type: input
+    id: credit
+    attributes:
+      label: Name to credit (optional)
+      description: Leave blank to stay anonymous. Anything written here is public.

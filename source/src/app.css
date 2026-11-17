@@ -408,6 +408,8 @@ details>.phs{margin:8px 0 0}
 /* visit reports on a place page */
 .visit-item{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px}
 .visit-item p{margin:4px 0}
+.sharebox{border:1px dashed var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;background:var(--bg)}
+.sharebox .row{margin-top:6px}
 .visit-item .row{margin-top:6px}
 #visit-form textarea{min-height:70px}
 #visit-form input[type=text],#visit-form input[type=date]{width:100%;min-height:40px;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
