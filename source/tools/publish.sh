@@ -61,12 +61,14 @@ if [ -d "$W/lidar" ]; then
   for f in "$W"/lidar/walls/*.json; do [ -f "$f" ] && cp "$f" source/lidar/walls/; done        # walls are added to, never removed: another session's units stay
 fi
 git add -A
+python3 "$W/tools/note.py" --new "$REPO" && git add -A      # an empty note file for a new batch (notes/<batch key>.md)
 echo "--- staged on branch $BR ---"; git status --short | awk '{print $1}' | sort | uniq -c
 echo "--- checks ---"; if [ -n "$FULL" ]; then python3 source/tools/check.py "$REPO"; else python3 source/tools/check.py "$REPO" --sources; fi
 cat <<MSG
 --- next ---
-0. NOW is the time to edit GUIDE.md, LEADS.md or CLAUDE.md, in the clone ($REPO), on this branch. They are not copied
-   from the workspace, and editing them before this command makes it stop ("uncommitted changes"). Then: git -C $REPO add -A
+0. A research batch: fill in its note file now, $REPO/notes/<batch key>.md (what the batch is, leads, tips). Do NOT
+   edit GUIDE.md, LEADS.md or PROMPTS.md: sessions run side by side and those edits collide. Any other change: this
+   is the time to edit GUIDE.md or CLAUDE.md in the clone, on this branch. Then: git -C $REPO add -A
 1. git -C $REPO commit            (say what changed, what you verified and what you could not)
 2. git -C $REPO push -u origin $BR
 3. Open a pull request into main and stop. The owner merges it. Do not merge it yourself.

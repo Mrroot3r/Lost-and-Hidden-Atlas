@@ -137,6 +137,16 @@ for dp,dn,fn in os.walk(REPO):
         if os.path.getsize(p)>3_000_000: continue
         for a in set(MAIL.findall(open(p,encoding='utf-8',errors='ignore').read())):
             if not any(o in a for o in OKMAIL) and not re.search(r'\.(png|jpg|webp|js|css)$',a): err.append(f'{os.path.relpath(p,REPO)}: contains what looks like an email address ({a})')
+# ---- session notes (notes/<batch key>.md): every batch from November 19, 2026 on has one, and it is filled in
+_nl=warn if SRC_ONLY else err      # publish.sh makes the empty note and checks sources: a warning there, an error on GitHub
+for st_,nm in stamps:
+    if st_<'2026-11-19': continue
+    m_=importlib.import_module(nm); k_=m_.BATCH['key']; np_=os.path.join(REPO,'notes',k_+'.md')
+    if not os.path.exists(np_): _nl.append(f"{nm}: no note file notes/{k_}.md. Run  python3 tools/note.py {k_} <clone>  after publish.sh and fill it in (it replaces the lines sessions used to add to GUIDE.md and LEADS.md)"); continue
+    t_=open(np_,encoding='utf-8').read()
+    if 'Delete this bracketed text' in t_ or '| Example mill |' in t_: _nl.append(f'notes/{k_}.md still holds the template text: fill in "What this batch is", the leads and the tips, and delete the bracketed lines and the example row')
+    for h_ in('## What this batch is','## Leads','## Tips'):
+        if h_ not in t_: _nl.append(f'notes/{k_}.md: the heading "{h_}" is missing')
 for w in warn: print('warning:',w)
 for e in err: print('ERROR:',e)
 if stamps:
