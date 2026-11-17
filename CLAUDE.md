@@ -20,6 +20,7 @@ Read `GUIDE.md` before doing anything. The short version:
 - A state's trespass-law note is optional and done only when the owner asks. The access line on each place is not optional.
 - The owner uses the Atlas on an Android phone in the field. Test at phone size first.
 - Places you read about but could not add go in `LEADS.md`.
+- The owner's visit reports (what he found on the ground, and where) come in with "Copy my additions for Claude". Run `tools/visits.py` on them and make the corrections it lists (GUIDE.md section 6). After changing the report form run `tools/visit_test.js`.
 - **Asked to scan, sweep or search LiDAR? Read `LIDAR.md` and follow it step by step.** One command, `tools/lidar.py`, does the work in short runs and keeps the ledger of what has been swept and judged (`source/lidar/units/`; never edit it by hand). Places found that way go in the `lidar` category as unverified leads, with an ownership check for every one (GUIDE.md section 13 is the background). Never write a private landowner's name or address into the repository. After changing `tools/lidar.py` run `tools/lidar_test.py`; after changing the stone-wall finder (`tools/lidar_walls.py`) run `tools/walls_test.py` and look at `tools/lidar_walls.py test`.
 - If `publish.sh` stops because `main` moved while you worked, run `tools/resync.sh` as it says, rebuild, and publish again. Do not copy files across by hand.
 - Asked to review a pull request? Follow GUIDE.md section 14: `tools/review.py`, open the sources, look at the pins, report as a comment, do not merge.
