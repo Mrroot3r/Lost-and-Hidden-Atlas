@@ -4,7 +4,7 @@ This file is everything a model needs to find cellar holes and farm sites that n
 
 **What you are doing.** New York State bought thousands of worn-out hill farms and let them go back to woods. The houses are gone but the cellars are still holes in the ground, and the state's LiDAR ground model shows them through the trees. The tools scan a unit of public land for cellar-sized pits, keep the pits that lie beside a building drawn on a USGS map from about 1900, and show them to you. **You look at the pictures and decide.** A few in every hundred become a place on the map, marked as an unverified lead for the owner to walk to.
 
-**One command does everything:** `python3 tools/lidar.py`. It keeps a ledger of every unit swept and every candidate with its verdict, in the repository, so each session starts where the last one stopped. New York State only.
+**One command does everything:** `python3 tools/lidar.py`. It keeps a ledger of every unit swept and every candidate with its verdict, in the repository, so each session starts where the last one stopped. It covers New York and Massachusetts; the section "Massachusetts" below says what is different there.
 
 ## Rules that do not bend
 
@@ -58,6 +58,7 @@ python3 tools/lidar.py sweep "Burnt-Rossman Hills State Forest"
 - **Poor ground:** city and town parks (their own earthworks), anything under 300 acres, flat valley floors, and the high Adirondacks, where the ground model is coarse and only 5 of the first 94 held up.
 - Leave alone names that belong to many places at once ("Memorial Park", "Conservation Area", "New York State Lands", "Unknown Park", "Erie Canal"). `sweep` refuses a name whose pieces lie more than 90 km apart.
 - Sweep only units whose access column says OA or RA.
+- `find` and `near` list units in New York and Massachusetts alike; `find "name" --state ma` searches one state. `sweep` works out which state a unit is in and says so. A unit in any other state is refused.
 
 ## 3. Look at the candidates, 36 at a time
 
@@ -105,7 +106,7 @@ python3 tools/lidar.py sheet brhsf1 brhsf2 brhsf4 brhsf5
 It draws pictures of up to three rows and tells you which candidate is on which row. Like `sweep`, it stops when its time is up and prints the command for the rest; so does `check`. **Open each picture.** A row is four panels with pink ticks at the same spot in each:
 
 1. LiDAR, 200 m across.
-2. The state's leaf-off aerial photograph, same frame.
+2. The state's leaf-off aerial photograph, same frame. Its label says which: New York's own, or MassGIS spring 2023 in Massachusetts. A label that says "Esri satellite (leaves may be on)" means the state's aerial did not load: run `sheet` again before you judge "nothing standing".
 3. The oldest USGS map (about 1900, 1:62,500), 1,800 m across. A building is a small solid black square or dot, nearly always beside a road (a solid or dashed double line).
 4. A USGS map from 1925 to 1965 where one exists. Green is woods, white is open land.
 
@@ -133,7 +134,10 @@ For each one it reads the state tax-parcel file, the federal public-land databas
 
 - **MAY PUBLISH** — the tax parcel is state or other public land.
 - **MAY PUBLISH WITH A CAVEAT** — the county publishes no parcel owners (Schoharie, Clinton, Essex, Franklin and Fulton among them), but the public-land database names the unit. The draft writes the caveat.
+- **MAY PUBLISH WITH A CAVEAT** (Massachusetts) — the parcel is tax-exempt land that is not government-owned (a land trust, a charity, a school), and the public-land database names it as open. The draft leaves a `TODO` for the owner's own visiting rules: find them on the owner's own page, or leave the place out.
 - **DO NOT PUBLISH** — private, or no public record. It prints the `mark` command to run. A sharp, convincing pit that fails only for lack of a record earns one row in `LEADS.md` in the repository clone (what it is, coordinates, why it was not added), with no owner named.
+
+`check` also reads the lots 75 m away in eight directions and prints **`PRIVATE LAND within about 75 m, to the south, south-east`** when one of them is private (where the state file gives owners: all of Massachusetts, some New York counties). A pit on state land can be 40 m from somebody's house lot, and the 200 m sheet does not show a house 130 m off. When you see that line, look at the pin check in step 6 (it shows 300 m), and say in the access text which side of the road or wall is public and that a house stands on the other.
 
 ## 6. Write the places
 
@@ -209,6 +213,28 @@ gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls -f title="LiDAR: Burnt-Rossman
 - Nobody looks at the walls one by one. They are what a program found: low straight ridges at least 18 m long that stand above the ground on both sides. It was checked by eye on three known walled yards and on made-up ground (`tools/walls_test.py`), and it traces yards, field walls and walled lanes. It also draws some ditch banks, old road edges and stream banks, and it misses walls that are low, tumbled or standing on a terrace edge. The layer says so.
 - Do not publish a place because the layer shows walls. Walls say "a farm was here"; the pit beside a map building is still what makes a lead.
 
+## Massachusetts
+
+The method is the same. What differs:
+
+- **Ground model:** the USGS 3DEP service (1 m LiDAR over the whole state), about as fast as New York's. It was compared with MassGIS's own copy on two chips: the same survey, but the state copy is rougher and gave the wall finder false pieces, so 3DEP is used. In the north-west hills the ground model is softer than New York's (blobby under conifers): expect more "faint" verdicts.
+- **Old maps:** Massachusetts was surveyed in the 1880s, so the oldest sheets are dated 1886 to 1894. They draw fewer buildings than New York's 1900 sheets and can be 100 m out. A farm given up before the 1880s is on no sheet: a sharp square pit in a walled lot with no map building near it is still worth a "maybe" and a full sheet.
+- **Aerial:** MassGIS 2023, leaf-off (flown 21 February to 28 April 2023).
+- **Ownership:** every town is in the state parcel file, so `check` nearly always has a parcel to read, and it tells state land (the Commonwealth) from town land from tax-exempt private land.
+- **Region:** Franklin, Hampshire, Worcester and Middlesex counties are each split between two Atlas regions, so the draft leaves `TODO: region` naming the two; choose by the town (Hawley and the Connecticut valley towns are `pv`; the Quabbin towns are `cmass`).
+- **Sources:** add the managing body's own page for the forest to the batch's source list (the first batch, `tools/data_lidar_1116_kdmsf.py`, shows how) and take hours, parking and rules from it. Massachusetts DCR's rules say to stay on designated trails and roads: say how far off the road each pit is.
+- **What the first two units gave (November 2026):** Kenneth Dubuque Memorial State Forest, Hawley: 131 map buildings, 26 pits beside one, 4 published, all in or near the abandoned village of South Hawley, which DCR itself lists; 33 km of stone wall. Catamount State Forest, Colrain: 24 map buildings, 3 pits, none published (one "maybe").
+
+## Another state
+
+Not a job for a research session: the owner asks for it. A new state needs, in this order:
+
+1. **An entry in `STATES` in `tools/lidar.py`**: its name, a generous box, and where the ground model comes from. `3dep` works anywhere the USGS has 1 m LiDAR; run `python3 tools/lidar_dem.py <lat> <lon>` on a wooded hill there and read whether it says `fine (1 m LiDAR)` or `coarse`, then look at `research/lidar/test.png`.
+2. **Its tax parcels in `tools/parcel.py`**: the state's own parcel service, and a rule that turns an owner and a use code into `STATE LAND`, `public ...`, a tax-exempt kind that is not government, or `PRIVATE`. Read the state's own code table; do not guess what a code means. Never print an owner's name.
+3. **Its leaf-off aerial in `tools/ortho.py`**, if the state publishes one. Without it the sheets fall back to a satellite picture with the leaves on, which hides ruins and cannot show "nothing standing" under trees.
+4. **Its counties in `REGION` in `tools/lidar.py`**, each to an Atlas region key from `tools/states.py`.
+5. Checks in `tools/lidar_test.py` for the parcel rule, then sweep one small unit with known cellar holes and look at every picture before trusting it. In Massachusetts that test caught a pale map scan on which the building finder saw nothing at all.
+
 ## How much fits in a session
 
 | step | time | what it costs you |
@@ -227,7 +253,11 @@ A good session: sweep 10,000 to 20,000 acres, look at two or three pictures of 3
 |---|---|
 | `NOT FINISHED` | Run the command it prints (for `sweep`, the same command again). Nothing is lost. |
 | `NO SUCH UNIT` | Copy the name exactly from `find` or `near`, capitals included. |
-| `NO GROUND MODEL` | The unit is outside New York, or the state's elevation service is down. Try another unit; try this one later. |
+| `NO GROUND MODEL` | The elevation service for that state is down (New York's own in New York, the USGS national one in Massachusetts). Try another unit; try this one later. |
+| `SKIPPED ... it lies in VT` | The unit is in a state the tools are not set up for. Pick another unit. "Another state" below says what a new state needs; that is a job for the owner to ask for, not for a research session. |
+| `SKIPPED ... pieces with this name lie 300 km apart` | Two places share the name. If one is in the other state, name the state: `sweep "Name" --state ma`. |
+| `WARNING ... tiles have no 1 m LiDAR` | The national ground model is coarse over part of the unit, and nothing can be found there. Say so in your report: for that part, "nothing found" is not a finding. |
+| `the 1886 ... sheet is a pale scan; using the 1890 printing instead` | Nothing to do. Some old scans print black as grey and the building finder sees nothing on them, so a darker printing of the same sheet is used. |
 | A chip is solid dark red | The ground model did not load for it. Leave it unmarked; it comes round again. |
 | `sheet` says a map could not be fetched | Run it again. The USGS download service has bad minutes. |
 | The later map panel is blank or shows a margin | No large-scale sheet from 1925 to 1965 covers the spot. Judge on three panels and write "No later map was looked at." |
@@ -238,15 +268,15 @@ A good session: sweep 10,000 to 20,000 acres, look at two or three pictures of 3
 
 ## For the owner: what to paste
 
-> Read `LIDAR.md` in the repository `mrroot3r/Lost-and-Hidden-Atlas` and do one LiDAR session exactly as it says. Area for this session: **[name a state forest, or "within 15 miles of Middleburgh", or "whatever status says is next"]**. Open one pull request and stop; do not merge it.
+> Read `LIDAR.md` in the repository `mrroot3r/Lost-and-Hidden-Atlas` and do one LiDAR session exactly as it says. Area for this session: **[name a state forest in New York or Massachusetts, or "within 15 miles of Middleburgh", or "whatever status says is next"]**. Open one pull request and stop; do not merge it.
 
 Run one session at a time and merge its pull request before starting the next. If two overlap, the second pull request will say it has conflicts; the paragraph above the table tells a session how to fix that.
 
 ## How it works, for whoever changes the tools
 
-- `tools/lidar_unit.py` fetches a unit's outline from PAD-US. `tools/lidar_scan.py` reads the state's 1 m ground model in 1 km tiles and keeps closed hollows 4 to 16 m across and 0.6 to 3.5 m deep on gentle ground away from streams; what each tile gave is kept, so a scan can stop and resume. `tools/lidar_buildings.py` finds building symbols on the oldest 15-minute USGS sheet. `tools/lidar_sweep.py` pairs pits with buildings within 90 m. `tools/lidar_triage.py` and `tools/lidar_sheet.py` draw the pictures. `tools/parcel.py` and `tools/pad.py` are the ownership checks.
+- `tools/lidar_unit.py` fetches a unit's outline from PAD-US. `tools/lidar_dem.py` is the ground model: New York's own service in New York, the USGS 3DEP service everywhere else, with a test (`coarse()`) for ground that is not real 1 m LiDAR. `tools/lidar_scan.py` reads that 1 m ground model in 1 km tiles and keeps closed hollows 4 to 16 m across and 0.6 to 3.5 m deep on gentle ground away from streams; what each tile gave is kept, so a scan can stop and resume. `tools/lidar_buildings.py` finds building symbols on the oldest 15-minute USGS sheet. `tools/lidar_sweep.py` pairs pits with buildings within 90 m. `tools/lidar_triage.py` and `tools/lidar_sheet.py` draw the pictures. `tools/parcel.py` (each state's own tax-parcel file) and `tools/pad.py` are the ownership checks. `tools/ortho.py` is the leaf-off aerial for the state a point is in.
 - `tools/lidar_walls.py` is the stone-wall finder (its header gives the method and what was tried and dropped), run on each tile by `lidar_scan.py` when `LIDAR_WALLS` is set. `tools/walls.py` builds the map layer from `lidar/walls/`: an index (`data/walls.json`) with the wall length in every 0.005-degree box, and one file of walls for each 0.05-degree cell. After changing any number in the finder run `python3 tools/walls_test.py` and look at `python3 tools/lidar_walls.py test` on real chips.
 - `tools/lidar.py` is the front door and owns the ledger: one file per unit in `lidar/units/` (in the repository as `source/lidar/units/`), one candidate per line, so two sessions' changes merge. Candidate ids are the unit's initials and a number in rank order (`brhsf3`) and never change once a unit is swept. `setup.sh` and `publish.sh` fold the repository's ledger and the workspace's together; neither overwrites the other.
 - Rank is depth (capped at 1.5 m) × 1 for a house-sized pit, 0.5 otherwise × 1 within 50 m of the map building, 0.7 beyond.
 - After changing `tools/lidar.py` run `python3 tools/lidar_test.py`. `tools/lidar_examples.py` redraws `lidar/examples.jpg`; add a chip when a new kind of false alarm turns up.
-- Not built: mill races and charcoal hearths as their own detectors, and any state but New York (each needs its own elevation service in `tools/lidar_dem.py` and its own parcel source).
+- Not built: mill races and charcoal hearths as their own detectors, and any state but New York and Massachusetts ("Another state" below).

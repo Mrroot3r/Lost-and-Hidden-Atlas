@@ -1,4 +1,4 @@
-{"name": "Featherstonhaugh State Forest", "code": "fsf", "state": "done", "swept": "2026-11-16", "buildings": 8, "sheets": ["NY_Amsterdam_139161_1895_62500_geo.tif"],
+{"name": "Featherstonhaugh State Forest", "code": "fsf", "state": "done", "swept": "2026-11-16", "buildings": 8, "sheets": ["NY_Amsterdam_139161_1895_62500_geo.tif"], "walls": 294, "wall_m": 7898,
 "cands":[
 {"id":"fsf1","lat":42.809127,"lon":-74.119758,"depth":0.8,"size":[12,12],"dist":58,"blat":42.80912,"blon":-74.11905,"sheet":"NY_Amsterdam_139161_1895_62500_geo.tif","year":1895,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
 {"id":"fsf2","lat":42.812761,"lon":-74.121553,"depth":0.77,"size":[11,7],"dist":51,"blat":42.81248,"blon":-74.12106,"sheet":"NY_Amsterdam_139161_1895_62500_geo.tif","year":1895,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},

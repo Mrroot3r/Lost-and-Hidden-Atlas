@@ -4,7 +4,7 @@
    python3 tools/lidar_sheet.py get <downloadURL>
         downloads one sheet into cache/topo/ and prints its path
    python3 tools/lidar_sheet.py sheet out.jpg <half_m> <map.tif>[,<map.tif>] "label,lat,lon" ...
-        one row per spot: LiDAR | leaf-off aerial (same frame) | each old map. Pink ticks mark the same point in every panel.
+        one row per spot: LiDAR | leaf-off aerial (same frame; its label says which) | each old map. Pink ticks mark the same point in every panel.
 LOOK at the sheet. A find needs all of: a sharp pit or wall on LiDAR, a building on an old map at the spot, nothing
 standing on the aerial, and a parcel check (tools/parcel.py)."""
 import sys,os,io,re,math,json,requests,urllib.request,urllib.parse,numpy as np
@@ -30,14 +30,7 @@ if sys.argv[1]=='get':
 from lidar_dem import dem,shade,merc
 from topocrop import crop
 out=sys.argv[2]; HALF=int(sys.argv[3]); maps=[m for m in sys.argv[4].split(',') if m]; items=[a.split(',') for a in sys.argv[5:]]; P=500
-def ortho(la,lo,half,px):
-    x,y=merc(la,lo); h=half/math.cos(math.radians(la))
-    for k in range(4):
-        try:
-            r=requests.get('https://orthos.its.ny.gov/arcgis/rest/services/wms/Latest/MapServer/export',params={'bbox':f'{x-h},{y-h},{x+h},{y+h}','bboxSR':3857,'imageSR':3857,'size':f'{px},{px}','format':'jpg','f':'image'},timeout=90)
-            return Image.open(io.BytesIO(r.content)).convert('RGB')
-        except Exception: pass
-    return Image.new('RGB',(px,px),'#444')
+from ortho import ortho            # the leaf-off aerial for the state the point is in (tools/ortho.py)
 def mark(im,txt):
     d=ImageDraw.Draw(im); c=P//2
     for dx,dy in((1,0),(-1,0),(0,1),(0,-1)): d.line([c+dx*22,c+dy*22,c+dx*38,c+dy*38],fill='#ff2d95',width=2)
@@ -46,7 +39,7 @@ sheet=Image.new('RGB',((2+len(maps))*P,len(items)*P),'#222')
 for r,(lab,la,lo) in enumerate(items):
     la=float(la); lo=float(lo); a,sc=dem(la,lo,HALF,P)
     hs=shade(a,sc,315,40,3.0).astype('float32')*0.6+shade(a,sc,45,40,3.0).astype('float32')*0.4
-    cells=[mark(Image.fromarray(hs.astype('uint8')).convert('RGB'),f'{lab} LiDAR {2*HALF} m across  {la},{lo}'),mark(ortho(la,lo,HALF,P),'leaf-off aerial, same frame')]
+    cells=[mark(Image.fromarray(hs.astype('uint8')).convert('RGB'),f'{lab} LiDAR {2*HALF} m across  {la},{lo}'),mark(*(lambda t:(t[0],t[1]+', same frame'))(ortho(la,lo,HALF,P)))]
     for m in maps:
         y=(re.search(r'_(\d{4})_(\d+)_geo',m) or [0,'?','24000']); hw=900 if int(y[2])>30000 else 350
         try: im=crop(m,la,lo,hw,P)[0].convert('RGB')

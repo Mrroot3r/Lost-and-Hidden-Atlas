@@ -1,4 +1,4 @@
-{"name": "Dutch Settlement State Forest", "code": "dssf", "state": "done", "swept": "2026-11-16", "buildings": 37, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif", "NY_Berne_123269_1900_62500_geo.tif"],
+{"name": "Dutch Settlement State Forest", "code": "dssf", "state": "done", "swept": "2026-11-16", "buildings": 37, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif", "NY_Berne_123269_1900_62500_geo.tif"], "walls": 198, "wall_m": 7232,
 "cands":[
 {"id":"dssf1","lat":42.627434,"lon":-74.264657,"depth":1.02,"size":[13,8],"dist":50,"blat":42.62788,"blon":-74.26472,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"faint","when":"2026-11-16"},
 {"id":"dssf2","lat":42.620081,"lon":-74.262868,"depth":0.73,"size":[6,5],"dist":44,"blat":42.62036,"blon":-74.26324,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"other","note":"set aside in round 4, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},

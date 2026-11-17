@@ -22,7 +22,12 @@ out=[]
 def detect(clat,clon,HW,PX,keep=None):
     """Building symbols in one square of the old map, HW metres either side of clat,clon. keep(lo,la) limits them to a block."""
     im,b=crop(TIF,clat,clon,HW,PX); a=np.asarray(im.convert('RGB')).astype(np.int16)
-    dark=(a.sum(2)<230)&(a.max(2)-a.min(2)<60)                      # black ink, not brown contours or blue water
+    # Black ink, not brown contours or blue water. Most scans print black as black (red+green+blue under 230). Some old scans
+    # are pale: their "black" is a dark grey-brown near 260-300, and the fixed rule finds nothing at all on them (the 1886
+    # Hawley, Massachusetts sheet: 0 buildings where a darker scan of the same plate gives 300). So the level is taken
+    # from the sheet itself when its ink is paler than the rule: a quarter of the way from its darkest ink to its paper.
+    ssum=a.sum(2); K=float(np.percentile(ssum,0.2)); P=float(np.median(ssum)); T=max(230.0,K+0.25*(P-K))
+    dark=(ssum<T)&(a.max(2)-a.min(2)<(60 if T<=230 else 90))
     core=ndi.binary_opening(dark,structure=np.ones((6,6)))           # removes road lines and most lettering
     lab,n=ndi.label(core)
     x0,y0=merc(clat,clon); k=1/math.cos(math.radians(clat))
