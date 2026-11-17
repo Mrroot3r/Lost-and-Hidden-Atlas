@@ -42,5 +42,20 @@ const { chromium } = require('playwright');
     await p.selectOption('#set-home','bost'); await p.waitForTimeout(400);
     ok(name+': choosing a start city there changes the drive time',await p.evaluate(()=>/from Boston/.test(document.querySelector('.times .time').textContent)));
     ok(name+': no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- "Nearest first" counts from where the reader is while location is on, otherwise from the start place
+  { const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true,geolocation:{latitude:42.8864,longitude:-78.8784,accuracy:12},permissions:['geolocation']}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'bost',by:1}})); }catch(e){} });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(700);
+    const top=()=>p.evaluate(()=>{ const li=document.querySelector('#list li'); return {label:document.querySelector('#sort').options[0].textContent,town:li.querySelector('small').textContent,mins:li.querySelector('.mins').textContent}; });
+    let t=await top(); ok('location off: the list counts from the start place and says so',t.label==='Nearest to Boston'&&/Boston|Cambridge|Charlestown|Roxbury/.test(t.town),t.label+' | '+t.town);
+    await p.click('#lb-loc'); await p.waitForFunction(()=>document.querySelector('#sort').options[0].textContent==='Nearest to you',null,{timeout:8000}).catch(()=>{});
+    t=await top(); ok('location on (in Buffalo): the list counts from where you are',t.label==='Nearest to you'&&/Buffalo/.test(t.town)&&/^~/.test(t.mins),t.label+' | '+t.town+' | '+t.mins);
+    await p.click('#list li button'); await p.waitForTimeout(400);
+    ok('location on: a place shows the time from where you are first, then from the start place',await p.evaluate(()=>{ const n=[...document.querySelectorAll('.times .time')].map(x=>x.textContent); return n.length===2&&/from where you are/.test(n[0])&&/from Boston/.test(n[1]); }));
+    ok('location on: directions start from the phone, not the start place',await p.evaluate(()=>{ const a=[...document.querySelectorAll('#v-detail a')].find(x=>/Directions/.test(x.textContent)); return !!a&&!/origin=/.test(a.href); }));
+    await p.click('#lb-loc'); await p.waitForTimeout(500); await p.click('#tab-list'); await p.waitForTimeout(300);
+    t=await top(); ok('location switched off again: back to the start place',t.label==='Nearest to Boston'&&!/Buffalo/.test(t.town),t.label+' | '+t.town);
+    ok('location: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();

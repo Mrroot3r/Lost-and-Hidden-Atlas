@@ -102,6 +102,14 @@ function dt(s){
   if(U.dtc&&U.dtc.key===homeKey()&&U.dtc.t[s.id]) return {min:U.dtc.t[s.id][0],mi:U.dtc.t[s.id][1],est:false};
   const H=homeObj(),d=dest(s),r=roughMin(hav(H.lat,H.lon,d.lat,d.lon)); return {min:r.min,mi:r.mi,est:true};
 }
+/* What "nearest" is measured from in the Places list: where the reader is, while their position is being followed (the
+   location button), otherwise their start place. The position used is a snapshot, renewed only after a quarter of a mile,
+   so the list does not reshuffle under a thumb. From a live position the time is a rough estimate, marked ~. */
+let nearAt=null;
+function nearFrom(){ const g=(typeof geo==='object'&&geo)?geo.ll:null; if(g){ if(!nearAt||hav(nearAt[0],nearAt[1],g[0],g[1])>0.25) nearAt=[g[0],g[1]]; } else nearAt=null; return nearAt; }
+function dtl(s){ if(!nearAt) return dt(s); const d=dest(s), r=roughMin(hav(nearAt[0],nearAt[1],d.lat,d.lon)); return {min:r.min,mi:r.mi,est:true,live:true}; }
+/* called when the position moves or is switched off: redo the list if its origin has changed */
+function nearMoved(){ const was=nearAt, now=nearFrom(); if(was===now) return; if(F.max) refresh(); else if(view==='list') renderList(); if(sel&&view==='detail') renderDetail(sel); }
 async function fetchDT(){
   const H=homeObj(),key=homeKey(),all=sites(),t={};
   try{
@@ -135,7 +143,7 @@ function match(s){
   if(F.reg&&s.reg!==F.reg) return false;
   if(F.acc.size&&!F.acc.has(s.acc)) return false;
   if(F.eff.size&&!F.eff.has(s.eff)) return false;
-  if(F.max&&dt(s).min>F.max) return false;
+  if(F.max&&dtl(s).min>F.max) return false;
   if(F.tag&&(s.tags||[]).indexOf(F.tag)<0) return false;
   if(F.now&&!s.now) return false;
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
@@ -200,7 +208,7 @@ function buildFilters(){
 let visible=[], listAll=false, listKey=''; const LISTCAP=120;
 function sortSites(a){
   const k=U.ui.sort;
-  const t=new Map(a.map(s=>[s.id,dt(s).min]));
+  const t=new Map(a.map(s=>[s.id,dtl(s).min]));
   if(F.line){ a.sort((x,y)=>F.line.ord.get(x.id)-F.line.ord.get(y.id)); return a; }
   if(k==='name') a.sort((x,y)=>x.name.localeCompare(y.name));
   else if(k==='reg') a.sort((x,y)=>(REG[x.reg]||'').localeCompare(REG[y.reg]||'')||x.name.localeCompare(y.name));
@@ -211,6 +219,8 @@ function sortSites(a){
 }
 function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' sq':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
 function renderList(){
+  nearFrom();
+  { const o=$('#sort').options[0], n=homeObj().name||'your start'; o.textContent=nearAt?'Nearest to you':'Nearest to '+(n.length>20?n.slice(0,19)+'…':n); }
   visible=sortSites(sites().filter(match));
   const ul=$('#list'); ul.textContent='';
   syncFcount();
@@ -223,7 +233,7 @@ function renderList(){
   const frag=document.createDocumentFragment(), rows=listAll?visible:visible.slice(0,LISTCAP);
   if(sel&&!listAll&&rows.indexOf(sel)<0&&visible.indexOf(sel)>=0) rows.push(sel);
   rows.forEach(s=>{
-    const d=dt(s), my=U.status[s.id];
+    const d=dtl(s), my=U.status[s.id];
     frag.append(el('li',null,el('button',{class:'item pad'+(sel&&sel.id===s.id?' cur':''),type:'button','data-id':s.id,onclick:()=>select(s,true)},
       dot(s),
       el('span',null,el('b',{text:s.name}),el('small',{text:[s.town,s.years].filter(Boolean).join(' · ')}),
@@ -637,7 +647,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
     tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
-    el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here. Until you choose one, the Atlas uses the start city nearest to where you are or last were.'})),
+    el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here, and the Places list puts the nearest first. While your location is switched on, the list counts from where you are instead. Until you choose a start place, the Atlas uses the start city nearest to where you are or last were.'})),
     el('div',{class:'field setrow'},el('label',{for:'set-find',text:'Or type your start place'}),el('div',{class:'findrow'},fq,fb),fm),
     H('Trip'),
     pick('tripStop','Time at each stop',[20,30,45,60,90,120].map(m=>[m,fmtMin(m)]),'Used for the arrival times and the sunset warning in the Trip tab.'),
@@ -1154,14 +1164,14 @@ function locate(){
   const mark=on=>{ const b=$('#lb-loc'); if(b) b.setAttribute('aria-pressed',String(on)); if(!on) geo.acc=null; setTimeout(()=>nmDraw(true),0); };
   if(geo.id!==null){
     if(rec){ if(geo.ll) map.setView(geo.ll,Math.max(map.getZoom(),16)); banner('Location stays on while a field log is recording.',false,4000); return; }
-    navigator.geolocation.clearWatch(geo.id); geo.id=null; geo.f=null; geo.ll=null; mark(false);
+    navigator.geolocation.clearWatch(geo.id); geo.id=null; geo.f=null; geo.ll=null; mark(false); nearMoved();
     if(U.last){ placeDot(U.last.ll,false); saveNow(); banner('Location off. The grey dot marks where you last were.',false,4000); }
     return; }
-  const fail=msg=>{ if(geo.id!==null){ try{ navigator.geolocation.clearWatch(geo.id); }catch(e){} } geo.id=null; geo.f=null; geo.ll=null; mark(false); if(geo.dot&&U.last) placeDot(U.last.ll,false); banner(msg,true,12000); if(rec&&!NATIVE) stopLog(); };
+  const fail=msg=>{ if(geo.id!==null){ try{ navigator.geolocation.clearWatch(geo.id); }catch(e){} } geo.id=null; geo.f=null; geo.ll=null; mark(false); nearMoved(); if(geo.dot&&U.last) placeDot(U.last.ll,false); banner(msg,true,12000); if(rec&&!NATIVE) stopLog(); };
   if(!navigator.geolocation){ fail('This browser has no location service.'); return; }
   geo.first=true; geo.f=null; mark(true); banner('Finding you…',false,6000);
   try{ geo.id=navigator.geolocation.watchPosition(g=>{ const c=g.coords, t=g.timestamp||Date.now(), p=gpsFilter(c,t); if(!p) return;
-      const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); recPoint(p,c.accuracy||50,t); geo.acc=c.accuracy||50; nmFix(p,geo.acc);
+      const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); nearMoved(); recPoint(p,c.accuracy||50,t); geo.acc=c.accuracy||50; nmFix(p,geo.acc);
       /* follow: if the dot was on screen and has now walked off it, bring the map along */
       if(pref('follow')&&!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
       if(geo.first){ geo.first=false; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,Math.max(map.getZoom(),16)); }
@@ -1792,10 +1802,12 @@ function renderDetail(s){
     tags));
   /* getting there */
   const times=el('div',{class:'times'});
-  times.append(el('div',{class:'time home'},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+miTxt(d.mi)));
+  if(nearFrom()){ const l=dtl(s); times.append(el('div',{class:'time home',id:'dt-live'},el('b',{text:'~'+fmtMin(l.min)}),'from where you are · '+miTxt(l.mi))); }
+  times.append(el('div',{class:'time'+(nearAt?'':' home')},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+miTxt(d.mi)));
   /* one time, from the reader's own start place; other cities' times were noise to anyone who does not live there */
   times.append(el('button',{class:'btn sm',type:'button',id:'dt-change',onclick:()=>{ openSettings(); setTimeout(()=>{ const n=$('#set-home'); if(n){ n.scrollIntoView({block:'center'}); n.focus(); } },80); }},'Change start place'));
-  const gd='https://www.google.com/maps/dir/?api=1&origin='+H.lat+','+H.lon+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
+  /* with the position on, leave the origin out: Google Maps then starts from where the phone is */
+  const gd='https://www.google.com/maps/dir/?api=1'+(nearAt?'':'&origin='+H.lat+','+H.lon)+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
   const cbtn=el('button',{class:'btn sm',type:'button'},'Copy'); cbtn.addEventListener('click',()=>copy(ll(p),cbtn));
   v.append(el('div',{class:'sec pad'},el('h3',{text:'Getting there'}),times,
     el('dl',{class:'kv',style:'margin-top:8px'},
