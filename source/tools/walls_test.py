@@ -25,6 +25,7 @@ segs=W.walls(a,margin=6)
 def near(seg,line,tol):
     r0,c0,r1,c1=seg; n=int(max(2,math.hypot(r1-r0,c1-c0))); t=np.linspace(0,1,n); pr=r0+(r1-r0)*t; pc=c0+(c1-c0)*t
     L0,K0,L1,K1=line[:4]; vy,vx=L1-L0,K1-K0; u=np.clip(((pr-L0)*vy+(pc-K0)*vx)/(vy*vy+vx*vx),0,1); d=np.hypot(pr-(L0+u*vy),pc-(K0+u*vx)); return (d<=tol).mean()
+import math
 ok=0
 def t(name,cond,extra=''):
     global ok
@@ -57,4 +58,26 @@ t('rough ground and a winding gully give nothing',not other,'%d pieces, %d m'%(l
 t('a dense boulder field gives a few short pieces at most',sum(L(s) for s in boul)<90,'%d pieces, %d m'%(len(boul),sum(L(s) for s in boul)))
 c=W.clip([10,10,10,100],40,80); t('a piece is cut at the edge of its tile',c is None) ; c=W.clip([50,10,50,100],40,80); t('and kept where it is inside',c is not None and abs(c[1]-40)<1e-6 and abs(c[3]-80)<1e-6,c)
 tw=W.tile_walls(a,N-80,40,lambda r,c:(42.0+(N-r)*1e-5,-74.0+c*1.3e-5)); t('tile pieces come out as whole numbers of 0.00001 degree',len(tw)>0 and all(isinstance(v,int) for w in tw for v in w),len(tw))
+# ---- which pieces go on the map (tools/walls_structure.py): runs, corners and yards stay, scatter goes
+import random
+from walls_structure import structured
+KX=1.1132*math.cos(math.radians(42.5))
+def sg(x0,y0,x1,y1): return [round(4250000+y0/1.1132),round(-7400000+x0/KX),round(4250000+y1/1.1132),round(-7400000+x1/KX)]      # metres -> 0.00001 degree
+run3=[sg(0,0,20,0),sg(25,0,45,0.5),sg(50,0.5,70,0)]
+t('three pieces in line make a run and stay',all(structured(run3)))
+rnd=random.Random(5); scat=[]
+for i in range(12):
+    x=2000+i*90; y=rnd.uniform(0,40); a=rnd.uniform(0,math.pi); scat.append(sg(x,y,x+22*math.cos(a),y+22*math.sin(a)))
+t('short pieces on their own, at any angle, go',not any(structured(scat)))
+yard=[sg(0,300,20,300),sg(20,300,20,322),sg(20,322,0,322),sg(0,322,0,300)]
+t('four short sides that meet squarely are a yard and stay',all(structured(yard)))
+tee=[sg(0,600,30,600),sg(32,600,62,600),sg(31,603,31,625)]
+t('a short piece that leaves a long run squarely stays',all(structured(tee)))
+slant=[sg(0,900,30,900),sg(32,900,62,900),sg(31,903,45,917)]
+t('one that leaves it at a slant goes',structured(slant)==[True,True,False])
+rough=[sg(5000,0,5030,0),sg(5032,0,5062,0)]; rr=random.Random(9)
+for i in range(30):
+    x=5000+rr.uniform(0,300); y=40+rr.uniform(0,300); a=rr.uniform(0,math.pi); rough.append(sg(x,y,x+20*math.cos(a),y+20*math.sin(a)))
+k=structured(rough); t('where nearly everything drawn is scatter the ground is rough, and even a run there is left out',sum(k)<=len(k)*0.2 and not k[0],sum(k))
+t('nothing in, nothing out',structured([])==[])
 print('wall finder test:',ok,'checks passed;',len(segs),'pieces on the made-up ground')
