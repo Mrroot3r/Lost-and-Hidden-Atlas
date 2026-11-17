@@ -37,6 +37,7 @@ fi
 # session has recorded and not yet published survive a second setup
 [ -d "$REPO/source/lidar/walls" ] && { mkdir -p "$W/lidar/walls"; for f in "$REPO"/source/lidar/walls/*.json; do [ -f "$f" ] && { [ -f "$W/lidar/walls/$(basename "$f")" ] || cp "$f" "$W/lidar/walls/"; }; done; }   # stone walls per unit; a unit mapped in this workspace is not overwritten
 [ -d "$REPO/source/lidar" ] && (cd "$W" && mkdir -p lidar && for f in "$REPO"/source/lidar/*; do [ -f "$f" ] && cp "$f" lidar/; done; python3 tools/lidar.py pull "$REPO/source/lidar/units" --base)
+echo "$REPO" > "$W/.repo"                                                 # tools/start.py reads LEADS.md and GUIDE.md from here
 git -C "$REPO" rev-parse HEAD > "$W/.setup_commit" 2>/dev/null || true    # publish.sh uses it to notice that main has moved on since
 # what this machine can and cannot do
 MISS=""
@@ -48,4 +49,6 @@ for m in requests PIL rasterio shapely numpy scipy pypdf; do
 done
 [ -n "$MISS" ] && echo "MISSING Python modules:$MISS  (requests: everything; PIL + rasterio: old-map crops and pin checks; shapely: rebuilding lines). Install: pip install --break-system-packages requests Pillow rasterio shapely"
 node -e "require('playwright')" 2>/dev/null || echo "MISSING Playwright for Node: the smoke test cannot run. Install: npm i playwright && npx playwright install chromium"
+(cd "$W" && python3 tools/build_sites.py >/dev/null 2>&1) || true         # the place list, so nearby.py and start.py work at once
 echo "Workspace ready at $W. Build with: ATLAS=$W bash $W/tools/all.sh"
+echo "Research session? Begin with:  cd $W && python3 tools/start.py \"Town, State\""
