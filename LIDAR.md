@@ -200,6 +200,15 @@ gh api repos/mrroot3r/Lost-and-Hidden-Atlas/pulls -f title="LiDAR: Burnt-Rossman
 
 **If the owner says a pull request "has conflicts"** (he merged another one first): in a session with a clone, `git checkout` that branch, set the workspace up from it (`bash source/tools/setup.sh`), then `bash tools/resync.sh $REPO $(git -C $REPO merge-base HEAD origin/main)`, build, publish to a new branch name, open a new pull request and ask him to close the old one.
 
+## Stone walls
+
+`sweep` also maps the stone walls of every unit it scans, in the same pass, and the site shows them as the **Stone walls** layer (Map options, "Found on LiDAR"): the walls themselves when zoomed in, shaded squares where they are thick when zoomed out. That shading is the quickest way to see where the farms were, so glance at it before choosing where to look for cellar holes.
+
+- You do nothing extra for a new unit. For a unit swept before walls were looked for, `status` lists it, and this maps it: `python3 tools/lidar.py walls "Unit Name"` (run again until `DONE`, like `sweep`; about 5 seconds a square kilometre tile).
+- The walls of a unit are kept in `lidar/walls/<unit>.json` and travel in your pull request like the ledger. The site build turns them into the layer.
+- Nobody looks at the walls one by one. They are what a program found: low straight ridges at least 18 m long that stand above the ground on both sides. It was checked by eye on three known walled yards and on made-up ground (`tools/walls_test.py`), and it traces yards, field walls and walled lanes. It also draws some ditch banks, old road edges and stream banks, and it misses walls that are low, tumbled or standing on a terrace edge. The layer says so.
+- Do not publish a place because the layer shows walls. Walls say "a farm was here"; the pit beside a map building is still what makes a lead.
+
 ## How much fits in a session
 
 | step | time | what it costs you |
@@ -236,7 +245,8 @@ Run one session at a time and merge its pull request before starting the next. I
 ## How it works, for whoever changes the tools
 
 - `tools/lidar_unit.py` fetches a unit's outline from PAD-US. `tools/lidar_scan.py` reads the state's 1 m ground model in 1 km tiles and keeps closed hollows 4 to 16 m across and 0.6 to 3.5 m deep on gentle ground away from streams; what each tile gave is kept, so a scan can stop and resume. `tools/lidar_buildings.py` finds building symbols on the oldest 15-minute USGS sheet. `tools/lidar_sweep.py` pairs pits with buildings within 90 m. `tools/lidar_triage.py` and `tools/lidar_sheet.py` draw the pictures. `tools/parcel.py` and `tools/pad.py` are the ownership checks.
+- `tools/lidar_walls.py` is the stone-wall finder (its header gives the method and what was tried and dropped), run on each tile by `lidar_scan.py` when `LIDAR_WALLS` is set. `tools/walls.py` builds the map layer from `lidar/walls/`: an index (`data/walls.json`) with the wall length in every 0.005-degree box, and one file of walls for each 0.05-degree cell. After changing any number in the finder run `python3 tools/walls_test.py` and look at `python3 tools/lidar_walls.py test` on real chips.
 - `tools/lidar.py` is the front door and owns the ledger: one file per unit in `lidar/units/` (in the repository as `source/lidar/units/`), one candidate per line, so two sessions' changes merge. Candidate ids are the unit's initials and a number in rank order (`brhsf3`) and never change once a unit is swept. `setup.sh` and `publish.sh` fold the repository's ledger and the workspace's together; neither overwrites the other.
 - Rank is depth (capped at 1.5 m) × 1 for a house-sized pit, 0.5 otherwise × 1 within 50 m of the map building, 0.7 beyond.
 - After changing `tools/lidar.py` run `python3 tools/lidar_test.py`. `tools/lidar_examples.py` redraws `lidar/examples.jpg`; add a chip when a new kind of false alarm turns up.
-- Not built: stone walls, mill races and charcoal hearths as their own detectors (one wall detector was tried and marked road banks; see GUIDE.md section 10), and any state but New York (each needs its own elevation service in `tools/lidar_dem.py` and its own parcel source).
+- Not built: mill races and charcoal hearths as their own detectors, and any state but New York (each needs its own elevation service in `tools/lidar_dem.py` and its own parcel source).

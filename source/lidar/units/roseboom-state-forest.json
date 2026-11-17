@@ -1,4 +1,4 @@
-{"name": "Roseboom State Forest", "code": "rosf", "state": "done", "tiles": 7, "swept": "2026-11-16", "buildings": 5, "sheets": ["NY_Cooperstown_137717_1907_62500_geo.tif"],
+{"name": "Roseboom State Forest", "code": "rosf", "state": "done", "tiles": 7, "swept": "2026-11-16", "buildings": 5, "sheets": ["NY_Cooperstown_137717_1907_62500_geo.tif"], "walls": 328, "wall_m": 11433,
 "cands":[
 {"id":"rosf1","lat":42.738182,"lon":-74.795756,"depth":0.88,"size":[6,5],"dist":61,"blat":42.73845,"blon":-74.79511,"sheet":"NY_Cooperstown_137717_1907_62500_geo.tif","year":1907,"status":"new"},
 {"id":"rosf2","lat":42.737157,"lon":-74.79633,"depth":0.67,"size":[4,7],"dist":44,"blat":42.73678,"blon":-74.79616,"sheet":"NY_Cooperstown_137717_1907_62500_geo.tif","year":1907,"status":"new"}

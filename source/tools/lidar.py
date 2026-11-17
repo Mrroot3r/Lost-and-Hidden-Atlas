@@ -8,6 +8,8 @@ Run from the workspace root (the folder that holds tools/ and src/). Every comma
   python3 tools/lidar.py near 43.30 -74.20 20      units within 20 miles of a point that have not been swept
   python3 tools/lidar.py sweep "Unit Name" ...     scan a unit and pair its pits with old-map buildings. It stops when
         [--minutes 1.6]                            its time is up and says so: run the same command again until DONE
+  python3 tools/lidar.py walls "Unit Name" ...     map the stone walls of a unit swept before walls were looked for
+        [--minutes 1.6]                            (a new sweep maps them in the same pass). Run again until DONE
   python3 tools/lidar.py next [36] [--unit text]   the next candidates nobody has looked at: one picture of LiDAR chips
   python3 tools/lidar.py sheet tpwf12 smwf3 ...    full comparison sheets: LiDAR | aerial | old map | 1940s map (three rows a picture)
   python3 tools/lidar.py mark tpwf12 no water      your verdict: no | maybe | yes, then a reason word, then any note
@@ -24,11 +26,13 @@ What is kept, and where:
   lidar/units/<unit>.json   one file for every unit swept: its candidates and the verdict on each. These are in the
                             repository (source/lidar/), so the next session starts where this one stopped. Do not edit
                             them by hand: use the commands.
+  lidar/walls/<unit>.json   the stone walls found in a unit, as straight pieces. In the repository too; the site build
+                            turns them into the "Stone walls" map layer (tools/walls.py).
   research/lidar/, cache/topo/   scans, pictures and downloaded maps. Not in the repository; made again when needed.
 New York State only: the ground model comes from the state's own elevation service (tools/lidar_dem.py)."""
 import sys,os,json,re,math,time,glob,subprocess,datetime,urllib.request,urllib.parse
 HERE=os.path.dirname(os.path.abspath(__file__)); PY=sys.executable
-LDIR='lidar/units'; WORK='research/lidar'; UA={'User-Agent':'lost-hidden-atlas-research/1.0'}
+LDIR='lidar/units'; WDIR='lidar/walls'; WORK='research/lidar'; UA={'User-Agent':'lost-hidden-atlas-research/1.0'}
 PAD='https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/PADUS_Public_Access/FeatureServer/0/query'
 REASONS={'faint':'no clear shape on LiDAR','water':'on a pond, lake or stream edge','road':'beside a paved road, a ditch or a parking area',
  'modern':'a building, park facility or fresh logging is there now','natural':'rough or rocky ground; reads as natural','coarse':'the ground model is too coarse there to judge',
@@ -92,6 +96,15 @@ def place_ids():
     for f in glob.glob(os.path.join(HERE,'data_*.py')): ids|=set(re.findall(r"N\('([a-z0-9\-]+)'",open(f,encoding='utf-8').read()))
     return ids
 
+def import_walls(u,pre):
+    """Keep the wall pieces a finished scan found (research/lidar/<prefix>_walls.json) as lidar/walls/<unit>.json."""
+    f=pre+'_walls.json'
+    if not os.path.exists(f): return None
+    w=json.load(open(f)); m=0.0
+    for a,b,c,d in w: m+=math.hypot((c-a)*1.1132,(d-b)*1.1132*math.cos(math.radians(a/1e5)))
+    os.makedirs(WDIR,exist_ok=True); g=os.path.join(WDIR,slug(u['name'])+'.json')
+    json.dump({'name':u['name'],'code':u['code'],'n':len(w),'m':round(m),'w':w},open(g+'.tmp','w'),separators=(',',':')); os.replace(g+'.tmp',g)
+    u['walls']=len(w); u['wall_m']=round(m); save(u); return len(w),round(m)
 def sync(L):
     """Bring a unit that tools/lidar_sweep.py has finished (research/lidar/sweep.json) into the ledger. One row per pit:
     where a pit lies near several map buildings the nearest is kept. A unit already 'done' is never touched again, so
@@ -161,6 +174,8 @@ def cmd_status(a):
     if by.get('maybe'): print('  settle the "maybe" ones on full sheets:  python3 tools/lidar.py sheet '+' '.join(c['id'] for c in cs if c['status']=='maybe')[:200])
     if by.get('new'): print('  look at the next batch:  python3 tools/lidar.py next')
     print('  sweep more ground:  python3 tools/lidar.py near <lat> <lon> <miles>   then   python3 tools/lidar.py sweep "<unit>"')
+    now=[u['name'] for u in done if u.get('walls') is None]
+    print('Stone walls are mapped in %d of %d swept units%s'%(len(done)-len(now),len(done),('. Not yet: '+'; '.join(now[:6])+(' and %d more'%(len(now)-6) if len(now)>6 else '')+'.  python3 tools/lidar.py walls "<unit>"') if now else '.'))
 
 # ---------- finding units ----------
 def pad_units(where,extra=None):
@@ -218,9 +233,9 @@ def cmd_sweep(a):
         if not u: u=L[name]={'name':name,'code':code_for(name,L),'state':'scanning','cands':[]}; save(u)
         pre=prefix(name)
         if not os.path.exists(pre+'_cands.json'):
-            env=dict(os.environ)
+            env=dict(os.environ); env['LIDAR_WALLS']='1'               # pits and stone walls from one fetch of the ground model
             if u.get('tries',0)>=2: env['LIDAR_ALLOW_GAPS']='1'       # the same tiles failed twice: go on without them
-            print(f'{name}: scanning the ground model...',flush=True)
+            print(f'{name}: scanning the ground model for pits and walls...',flush=True)
             r=subprocess.run([PY,os.path.join(HERE,'lidar_scan.py'),uf,pre,str(max(10,int(end-time.time()-8)))],env=env)
             if r.returncode in (3,4):
                 pj=json.load(open(pre+'_partial.json')); u.update({'state':'scanning','done':pj['done'],'total':pj['total']})
@@ -244,8 +259,32 @@ def cmd_sweep(a):
         if r.returncode!=0: print('THE OLD-MAP STEP FAILED for',name,'. Run the same command again; if it fails the same way twice, tell the owner.'); continue
         L=load(); new=sync(L); u=L[name]
         for k in ('btries','tries'): u.pop(k,None)
-        save(u)
+        save(u); wl=import_walls(u,pre)
+        if wl: print(f'{name}: {wl[0]} straight pieces of wall, {wl[1]/1000:.1f} km in all, kept for the "Stone walls" map layer.')
         print(f'DONE: {name}: {u.get("buildings",0)} buildings on the old sheets, {new} pits beside one.'+(f' See them:  python3 tools/lidar.py next --unit "{name[:24]}"' if new else ' Nothing to look at here.'))
+
+def cmd_walls(a):
+    a,end=budget(a,1.6)
+    if not a: die('Usage: lidar.py walls "Unit Name" ["Another"] [--minutes 1.6]')
+    L=load(); os.makedirs(WORK,exist_ok=True)
+    for name in a:
+        u=L.get(name)
+        if not u or u.get('state')!='done': print(f'"{name}" has not been swept. Sweep it instead (that maps its walls too):  python3 tools/lidar.py sweep "{name}"'); continue
+        if u.get('walls') is not None and os.path.exists(os.path.join(WDIR,slug(name)+'.json')): print('walls already mapped:',name,'-',u['walls'],'pieces'); continue
+        if end-time.time()<25: print(f'TIME IS UP before "{name}". Run the same command again.'); return
+        uf=outline(name)
+        if not uf: print(f'NO SUCH UNIT: "{name}".'); continue
+        pre=prefix(name); env=dict(os.environ); env['LIDAR_WALLS']='only'
+        if u.get('wtries',0)>=2: env['LIDAR_ALLOW_GAPS']='1'
+        print(f'{name}: reading the ground model for walls...',flush=True)
+        r=subprocess.run([PY,os.path.join(HERE,'lidar_scan.py'),uf,pre,str(max(10,int(end-time.time()-8)))],env=env)
+        if r.returncode in (3,4):
+            pj=json.load(open(pre+'_partial.json'))
+            if r.returncode==4: u['wtries']=u.get('wtries',0)+1; save(u)
+            print(f'NOT FINISHED: {name}: {pj["done"]} of {pj["total"]} tiles, about {max(1,round((pj["total"]-pj["done"])*4.5/60))} more minute(s). Run the same command again; it carries on from here.'); return
+        if r.returncode!=0: print('FAILED for',name,'(exit code %d). Run the same command again; if it fails the same way twice, tell the owner.'%r.returncode); continue
+        u.pop('wtries',None); wl=import_walls(u,pre)
+        print(f'DONE: {name}: {wl[0]} straight pieces of wall, {wl[1]/1000:.1f} km in all.' if wl else f'DONE: {name}: no wall file was written.')
 
 # ---------- looking ----------
 def metres(a,b,c,d): return math.hypot((c-a)*111320,(d-b)*111320*math.cos(math.radians(a)))
@@ -505,7 +544,7 @@ def cmd_pull(a):
         import shutil
         shutil.rmtree(WORK+'/base',ignore_errors=True); os.makedirs(WORK,exist_ok=True); shutil.copytree(a[0],WORK+'/base')
 
-CMDS={'status':cmd_status,'find':cmd_find,'near':cmd_near,'sweep':cmd_sweep,'next':cmd_next,'sheet':cmd_sheet,'mark':cmd_mark,'show':cmd_show,'check':cmd_check,'draft':cmd_draft,'report':cmd_report,'pull':cmd_pull}
+CMDS={'status':cmd_status,'find':cmd_find,'near':cmd_near,'sweep':cmd_sweep,'walls':cmd_walls,'next':cmd_next,'sheet':cmd_sheet,'mark':cmd_mark,'show':cmd_show,'check':cmd_check,'draft':cmd_draft,'report':cmd_report,'pull':cmd_pull}
 if __name__=='__main__':
     if len(sys.argv)<2 or sys.argv[1] not in CMDS: print(__doc__); sys.exit(0 if len(sys.argv)<2 else 1)
     if not os.path.isdir('tools') or not os.path.isdir('src'): die('Run this from the workspace root (the folder with tools/ and src/):  cd "$ATLAS" && python3 tools/lidar.py status')

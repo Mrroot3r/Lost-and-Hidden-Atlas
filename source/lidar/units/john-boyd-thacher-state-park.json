@@ -1,4 +1,4 @@
-{"name": "John Boyd Thacher State Park", "code": "jbtsp", "state": "done", "swept": "2026-11-16", "buildings": 77, "sheets": ["NY_Berne_123269_1900_62500_geo.tif", "NY_Albany_139136_1893_62500_geo.tif"],
+{"name": "John Boyd Thacher State Park", "code": "jbtsp", "state": "done", "swept": "2026-11-16", "buildings": 77, "sheets": ["NY_Berne_123269_1900_62500_geo.tif", "NY_Albany_139136_1893_62500_geo.tif"], "walls": 452, "wall_m": 13701,
 "cands":[
 {"id":"jbtsp1","lat":42.639781,"lon":-74.017859,"depth":0.98,"size":[6,6],"dist":14,"blat":42.63966,"blon":-74.01783,"sheet":"NY_Berne_123269_1900_62500_geo.tif","year":1900,"status":"published","place":"lidar-beaver-dam-road-house-site","batch":"lidar3","when":"2026-11-16"},
 {"id":"jbtsp2","lat":42.637221,"lon":-74.016432,"depth":1.28,"size":[9,8],"dist":84,"blat":42.63671,"blon":-74.01718,"sheet":"NY_Berne_123269_1900_62500_geo.tif","year":1900,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},

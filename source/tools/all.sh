@@ -6,6 +6,7 @@ python3 tools/build_sites.py | tail -1 | cut -c1-80   # merge the place lists in
 python3 tools/drive.py > /dev/null                    # drive times from each start city (needs network)
 python3 tools/padus.py                                # public-land status at each pin (cached)
 python3 tools/leads.py | cut -c1-80                   # leads layer, if the raw download is present
+python3 tools/walls.py | cut -c1-110                  # the stone-walls layer, from lidar/walls/ (no network)
 python3 tools/make.py                                 # writes dist/web (the hosted site) and the single-file copy
 python3 tools/export.py                               # CSV and KML
 node -e "const fs=require('fs'); new Function(fs.readFileSync('src/app.js','utf8')); console.log('syntax ok')"

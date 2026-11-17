@@ -394,7 +394,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); try{ window.__atlasMap=map; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -592,6 +592,10 @@ function buildSheet(){
   lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone. Orange dots, from town level in. Nine Northeast states, Missouri and Kansas',v=>{ xlSet('vanished',v); buildSheet(); }));
   if(xlOn('vanished')) lb.append(ck('xl-schools',U.ui.xl&&U.ui.xl.schools,'Old school sites too','Mostly one-room schoolhouses. There are thousands, so they are off unless you ask',v=>xlSet('schools',v)));
   lb.append(ck('xl-mines',xlOn('mines'),'Old mines and quarries','Iron mines, quarries, clay pits and prospects from the U.S. Geological Survey. Grey dots, from town level in. Positions are rough',v=>xlSet('mines',v)));
+  lb.append(H('Found on LiDAR'));
+  lb.append(ck('walls-on',U.ui.walls,'Stone walls','Low straight ridges a program picked out of the state\'s LiDAR: field walls, yard walls, walled lanes. Zoom in to street level to see each one; zoomed out, shaded squares show where they are thick, which is where the old farms were. Unchecked: some are ditch banks or old road edges, and many walls are missed. Only on the public land that has been swept so far'+(WALLS?' ('+WALLS.units.length+' forests and parks, '+WALLS.km+' km of wall)':''),v=>{ U.ui.walls=v; save(); drawWalls(); buildSheet(); }));
+  if(U.ui.walls||U.ui.tips) lb.append(el('div',{class:'lkeys'},el('span',{class:'lkey'},el('span',{class:'sw',style:'--c:#ff7a1a'}),'A wall found on LiDAR'),el('span',{class:'lkey'},el('span',{class:'sw',style:'--c:#c2410c;opacity:.5;height:9px'}),'Ground with many walls')));
+  lb.append(H('Places with history'));
   lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Old town centres, and other places where historical markers and National Register listings bunch together. Purple discs; zoom in to see each marker and listing',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); }));
   if(U.ui.pockets&&POCK){ const all=pockNear(pockList.mode), other=pockList.mode==='other';
     lb.append(ck('pock-c',U.ui.pockC,'Old town centres only','Hide the other pockets: estates, mill sites, battlefields, campuses',v=>{ U.ui.pockC=v; save(); pockReset(); }));
@@ -787,6 +791,32 @@ const XL={
 Object.keys(XL).forEach(k=>{ XL[k].k=k; XL[k].data=null; XL[k].idx=null; XL[k].layer=null; XL[k].wait=null; });
 const xlOn=k=>!!(U.ui.xl&&U.ui.xl[k]);
 const xlShow=(k,x)=>k!=='vanished'||x[2]!==1||!!(U.ui.xl&&U.ui.xl.schools);     /* old school sites are two thirds of the file: off unless asked for */
+/* ---------- stone walls found on LiDAR (tools/lidar_walls.py finds them, tools/walls.py builds the layer) ----------
+   data/walls.json says which 0.05-degree cells hold walls and how many metres of wall each 0.005-degree box has.
+   Zoom 9 to 13: the boxes are shaded, darker for more wall, which shows where the old farms were.
+   Zoom 14 and in: the walls themselves, one file for each cell in view, fetched when first needed. */
+let WALLS=null, wallsWait=null, wallBoxes=null; const wallCells=new Map();
+function wallsLoad(){ if(WALLS||wallsWait) return;
+  wallsWait=(AT?AT.fetch('data/walls.json'):fetch('data/walls.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(j=>{ WALLS=j; drawWalls(); if(!$('#sheet').hidden) buildSheet(); })
+    .catch(()=>{ wallsWait=null; if(U.ui.walls) banner('The stone walls could not load. Check your signal and switch them on again.',true,6000); }); }
+function drawWalls(){ if(!map) return;
+  if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
+  const on=!!U.ui.walls; if(on&&!WALLS){ wallsLoad(); return; } if(!WALLS) return;
+  if(!map._wlOn){ map._wlOn=true; map.on('moveend',drawWalls); }
+  const z=map.getZoom(), fine=on&&z>=14, coarse=on&&z>=9&&z<14;
+  if(coarse&&!wallBoxes){ wallBoxes=L.layerGroup(); WALLS.d.forEach(b=>{ const la=b[0]*0.005, lo=b[1]*0.005;
+      L.rectangle([[la,lo],[la+0.005,lo+0.005]],{pane:'lines',renderer:lineCanvas,stroke:false,fillColor:'#c2410c',fillOpacity:Math.min(0.6,0.14+b[2]/2200),interactive:false,wallBox:true}).addTo(wallBoxes); }); }
+  if(wallBoxes){ if(coarse&&!map.hasLayer(wallBoxes)) wallBoxes.addTo(map); else if(!coarse&&map.hasLayer(wallBoxes)) map.removeLayer(wallBoxes); }
+  const want=new Set();
+  if(fine){ const b=map.getBounds().pad(0.2); for(let i=Math.floor(b.getSouth()/0.05);i<=Math.floor(b.getNorth()/0.05);i++) for(let j=Math.floor(b.getWest()/0.05);j<=Math.floor(b.getEast()/0.05);j++){ const k=i+'_'+j; if(WALLS.c[k]) want.add(k); } }
+  wallCells.forEach((c,k)=>{ if(c.layer&&!want.has(k)&&map.hasLayer(c.layer)) map.removeLayer(c.layer); });
+  want.forEach(k=>{ let c=wallCells.get(k);
+    if(!c){ c={layer:null}; wallCells.set(k,c); const p='data/walls/'+k+'.json';
+      (AT?AT.fetch(p):fetch(p+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+        .then(j=>{ const o=j.o; c.layer=L.polyline(j.w.map(w=>[[(o[0]+w[0])/1e5,(o[1]+w[1])/1e5],[(o[0]+w[2])/1e5,(o[1]+w[3])/1e5]]),{pane:'lines',renderer:lineCanvas,color:'#ff7a1a',weight:2.2,opacity:0.95,interactive:false,wallCell:k}); drawWalls(); })
+        .catch(()=>{ wallCells.delete(k); });
+      return; }
+    if(c.layer&&!map.hasLayer(c.layer)) c.layer.addTo(map); }); }
 function xlLoad(k,quiet){ const X=XL[k]; if(X.data||X.wait) return;
   X.wait=(AT?AT.fetch(X.file):fetch(X.file+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
     .then(j=>{ X.data=j; X.idx={}; j.p.forEach(x=>{ const g=Math.floor(x[0]*20)+','+Math.floor(x[1]*20); (X.idx[g]=X.idx[g]||[]).push(x); }); drawXL(k); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })

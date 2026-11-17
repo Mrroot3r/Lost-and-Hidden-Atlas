@@ -59,11 +59,21 @@ while la<N+dlat/2:
         if any(inside(x,y) for x,y in pts): TILES.append((la,lo))
         lo+=dlon
     la+=dlat
-cands=[]; n=0; fresh=0; failed=0
+# Stone walls (tools/lidar_walls.py) are looked for in the same pass when LIDAR_WALLS=1, so the ground model is fetched
+# once. LIDAR_WALLS=only does walls alone, for a unit that was scanned for pits before walls were looked for.
+WALLS=os.environ.get('LIDAR_WALLS','')
+if WALLS: from lidar_walls import tile_walls
+def latlon_of(la,lo):
+    x0,y0=merc(la,lo); kk=1/math.cos(math.radians(la))
+    return lambda r,c: unmerc(x0+(c-(T/2+PAD))*kk,y0+((T/2+PAD)-r)*kk)
+cands=[]; wallsall=[]; n=0; fresh=0; failed=0
 for la,lo in TILES:
-    f=f'{TD}/{os.path.basename(pre)}_{la:.5f}_{lo:.5f}.npy'; fc=f[:-4]+'.cand.json'
-    if os.path.exists(fc):                                  # finished by an earlier run
-        cands+=json.load(open(fc)); n+=1; continue
+    f=f'{TD}/{os.path.basename(pre)}_{la:.5f}_{lo:.5f}.npy'; fc=f[:-4]+'.cand.json'; fw=f[:-4]+'.walls.json'
+    needp=WALLS!='only' and not os.path.exists(fc); needw=bool(WALLS) and not os.path.exists(fw)
+    if not needp and not needw:                             # finished by an earlier run
+        if os.path.exists(fc): cands+=json.load(open(fc))
+        if WALLS: wallsall+=json.load(open(fw))
+        n+=1; continue
     if BUDGET is not None and time.time()-T0>BUDGET:
         json.dump({'done':n,'total':len(TILES)},open(pre+'_partial.json','w'))
         print(pre,'PARTIAL: time is up after',n,'of',len(TILES),'tiles. Run the same command again to carry on.'); sys.exit(3)
@@ -75,15 +85,23 @@ for la,lo in TILES:
             except Exception as e: time.sleep(3); a=None
         if a is None: print('failed tile',la,lo); failed+=1; continue     # not marked done: the next run tries it again
         if KEEP: np.save(f,a)
-    found=pits(a,la,lo,f); cands+=found; n+=1; fresh+=1
-    json.dump(found,open(fc,'w'))
+    if needw:                                               # walls first: the pits file is what marks a tile done for a pits-only run
+        wl=[w for w in tile_walls(a,T,PAD,latlon_of(la,lo)) if inside((w[1]+w[3])/2e5,(w[0]+w[2])/2e5)]      # only walls whose middle is inside the unit
+        json.dump(wl,open(fw,'w')); wallsall+=wl
+    elif WALLS: wallsall+=json.load(open(fw))
+    if needp: found=pits(a,la,lo,f); json.dump(found,open(fc,'w'))
+    else: found=json.load(open(fc)) if os.path.exists(fc) else []
+    cands+=found; n+=1; fresh+=1
     if not KEEP and os.path.exists(f): os.remove(f)
     if fresh%25==0: print(f'  {n} of {len(TILES)} tiles, {len(cands)} pits so far, {int(time.time()-T0)} s',flush=True)
 if failed and not os.environ.get('LIDAR_ALLOW_GAPS'):
     # a tile the elevation service would not give is tried again by the next run; LIDAR_ALLOW_GAPS=1 accepts the gap
     json.dump({'done':n,'total':len(TILES),'failed':failed},open(pre+'_partial.json','w'))
     print(pre,'INCOMPLETE:',failed,'of',len(TILES),'tiles could not be fetched. Run the same command again.'); sys.exit(4)
-json.dump(cands,open(pre+'_cands.json','w'))
-json.dump({'tiles':n,'total':len(TILES),'failed':failed,'pits':len(cands)},open(pre+'_scan.json','w'))
+if WALLS: json.dump(wallsall,open(pre+'_walls.json','w'),separators=(',',':'))
+if WALLS!='only':
+    json.dump(cands,open(pre+'_cands.json','w'))
+    json.dump({'tiles':n,'total':len(TILES),'failed':failed,'pits':len(cands)},open(pre+'_scan.json','w'))
 if os.path.exists(pre+'_partial.json'): os.remove(pre+'_partial.json')
+if WALLS: print(pre,'wall pieces',len(wallsall))
 print(pre,'tiles',n,'of',len(TILES),'candidates',len(cands),('; '+str(failed)+' tiles could not be fetched' if failed else ''))

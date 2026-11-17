@@ -19,6 +19,10 @@ jobs:
         run: python3 source/tools/check.py .
       - name: The LiDAR ledger tool keeps its rules
         run: python3 source/tools/lidar_test.py
+      - name: The stone-wall finder still tells a wall from a bank
+        run: |
+          pip install --quiet scipy scikit-image
+          python3 source/tools/walls_test.py
       - name: App script parses
         run: node -e "new Function(require('fs').readFileSync('source/src/app.js','utf8'))"
       - name: The site opens at phone size
