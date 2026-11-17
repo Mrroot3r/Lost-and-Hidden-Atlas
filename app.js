@@ -59,7 +59,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:''};
+const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -118,10 +118,18 @@ async function fetchDT(){
 
 /* ---------- filters ---------- */
 const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,fresh:'',my:'any',hideDone:false};
+/* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
+   rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
+   somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
+const HAY=new Map(), fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+(s.name2||'')),t:fold(s.town),
+  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,Array.isArray(s.tags)?s.tags.join(' '):s.tags].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
+let qMemo=['',[]];
+function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
+function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
 function match(s){
   if(F.line&&!F.line.ids.has(s.id)) return false;
-  if(F.q){ const hay=(s.name+' '+(s.name2||'')+' '+(s.town||'')+' '+(s.years||'')+' '+(s.story||'')+' '+(s.look||'')).toLowerCase();
-    if(!F.q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>hay.indexOf(w)>=0)) return false; }
+  if(F.q){ const h=hay(s); if(!qWords().every(w=>h.n.indexOf(w)>=0||h.t.indexOf(w)>=0||h.x.indexOf(w)>=0)) return false; }
   if(F.cat.size&&!F.cat.has(s.cat)) return false;
   if(F.st.size&&!F.st.has(s.st)) return false;
   if(F.reg&&s.reg!==F.reg) return false;
@@ -188,7 +196,7 @@ function buildFilters(){
 }
 
 /* ---------- list ---------- */
-let visible=[];
+let visible=[], listAll=false, listKey=''; const LISTCAP=120;
 function sortSites(a){
   const k=U.ui.sort;
   const t=new Map(a.map(s=>[s.id,dt(s).min]));
@@ -197,6 +205,7 @@ function sortSites(a){
   else if(k==='reg') a.sort((x,y)=>(REG[x.reg]||'').localeCompare(REG[y.reg]||'')||x.name.localeCompare(y.name));
   else if(k==='left') a.sort((x,y)=>STRANK[x.st]-STRANK[y.st]||t.get(x.id)-t.get(y.id));
   else a.sort((x,y)=>t.get(x.id)-t.get(y.id));
+  if(F.q){ const tier=new Map(a.map(s=>[s.id,qTier(s)])); a.sort((x,y)=>tier.get(x.id)-tier.get(y.id)); }      /* the sort keeps the chosen order inside each tier */
   return a;
 }
 function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' sq':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
@@ -208,8 +217,11 @@ function renderList(){
   $('#count').textContent=visible.length+' of '+sites().length+' places';
   const lc=$('#linechip'); lc.textContent=''; lc.hidden=!F.line; if(F.line){ lc.append(el('span',{class:'chip','aria-pressed':'true'},el('span',{class:'sw',style:'--c:'+LK[F.line.k][1]}),'Along '+F.line.label,el('button',{type:'button',class:'x','aria-label':'Stop following this line',onclick:()=>{setLine(null);refresh();}},'✕'))); }
   if(!visible.length){ ul.append(el('li',{class:'empty pad'},'Nothing matches. Clear a filter or two.')); return; }
-  const frag=document.createDocumentFragment();
-  visible.forEach(s=>{
+  /* a long list is shown in two steps: the first 120 rows now, the rest when asked for. The map shows every pin either way. */
+  const key=visible.length+'|'+(visible[0]?visible[0].id:'')+'|'+F.q; if(key!==listKey){ listKey=key; listAll=false; }
+  const frag=document.createDocumentFragment(), rows=listAll?visible:visible.slice(0,LISTCAP);
+  if(sel&&!listAll&&rows.indexOf(sel)<0&&visible.indexOf(sel)>=0) rows.push(sel);
+  rows.forEach(s=>{
     const d=dt(s), my=U.status[s.id];
     frag.append(el('li',null,el('button',{class:'item pad'+(sel&&sel.id===s.id?' cur':''),type:'button','data-id':s.id,onclick:()=>select(s,true)},
       dot(s),
@@ -218,9 +230,11 @@ function renderList(){
       el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:miTxt(d.mi)})))));
   });
   ul.append(frag);
+  if(rows.length<visible.length) ul.append(el('li',{class:'pad'},el('button',{class:'btn',type:'button',id:'list-more',onclick:()=>{ listAll=true; renderList(); }},'Show the other '+(visible.length-rows.length)+' places')));
 }
 
 /* ---------- map ---------- */
+let clusLayer=null;
 let map=null, sel=null, markers=new Map(), baseLayer=null, cmpLayer=null, histLayer=null, selShapes=[], homeMarker=null, schematic=false, adding=false, pickingHome=false;
 const stage=$('#stage');
 const W=20037508.342789244;
@@ -385,7 +399,7 @@ function initMap(){
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
 }
-function onZoom(){ map.getContainer().classList.toggle('zfar',map.getZoom()<12); }
+function onZoom(){ map.getContainer().classList.toggle('zfar',map.getZoom()<12); if(markers.size||clusLayer) syncMarkers(); }
 function setBase(key,first){
   if(schematic) return;
   if(baseLayer) map.removeLayer(baseLayer);
@@ -482,6 +496,7 @@ function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawSca
 /* send the recorder's settings to the phone; it reads them when a recording starts and when a mark is dropped */
 function pushPrefs(){ if(NATIVE) AT.call('configure',{units:pref('units'),step:STEP(),every:({fine:1000,normal:2000,coarse:5000})[pref('detail')]||2000,buzz:!!pref('buzz')}).catch(()=>{}); }
 function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme(); drawScale(); pushPrefs();
+  if(k==='cluster') syncMarkers();
   if(k==='trk'){ if(rec) drawRec(); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
   if(k==='units'){ const nv=$('#v-near'); if(nv) nv.textContent=''; if(view==='near') renderNear(); nmPush(true); }
   if(k==='units'||k==='clock'){ renderList(); if(sel&&view==='detail') renderDetail(sel); if(view==='log') renderLog(); if(view==='trip') renderTrip(); syncRec(); } }
@@ -509,6 +524,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),
     H('Map'),
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
+    tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
     tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
     el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here. Until you choose one, the Atlas uses the start city nearest to where you are or last were.'})),
@@ -651,25 +667,60 @@ function linePopup(f,part,latlng){
     ext('https://www.google.com/maps/search/?api=1&query='+latlng.lat.toFixed(5)+','+latlng.lng.toFixed(5),'This spot in Google Maps','btn sm'));
   L.popup({maxWidth:270}).setLatLng(latlng).setContent(box).openOn(map);
 }
+/* ---- drawing the lines fast ----
+   The lines are 108,000 points in 16,000 pieces. Leaflet works out every point of every layer on the map again at each
+   zoom step, which took about 0.4 s of a 0.5 s step on a mid-range phone. So:
+   - a piece of line is on the map only while its half-degree cell is in or near the view, and is first made then;
+   - zoomed out to town level or wider (zoom 9 and under) a thinned copy is drawn: nothing it drops is a pixel wide;
+   - one layer draws both the white casing and the colour, where there used to be two. */
+const CasedLine=L.Polyline.extend({ _updatePath:function(){ const r=this._renderer, o=this.options; if(!r||!r._updatePoly) return;
+  const c=o.color, w=o.weight, d=o._dashArray, op=o.opacity;
+  o.color='#ffffff'; o.weight=o.casing; o._dashArray=null; o.opacity=0.75; r._updatePoly(this);
+  o.color=c; o.weight=w; o._dashArray=d; o.opacity=op; r._updatePoly(this); } });
+function thinPart(part,tol){ const n=part.length; if(n<3) return part;      /* Douglas-Peucker, in degrees */
+  const keep=new Uint8Array(n); keep[0]=keep[n-1]=1; const st=[0,n-1], kx=Math.cos(rad(part[0][0])), t2=tol*tol;
+  while(st.length){ const b=st.pop(), a=st.pop(), ax=part[a][1]*kx, ay=part[a][0], dx=part[b][1]*kx-ax, dy=part[b][0]-ay, l2=dx*dx+dy*dy; let md=0, mi=-1;
+    for(let i=a+1;i<b;i++){ const px=part[i][1]*kx-ax, py=part[i][0]-ay; let t=l2?(px*dx+py*dy)/l2:0; t=t<0?0:t>1?1:t; const ex=px-t*dx, ey=py-t*dy, e=ex*ex+ey*ey; if(e>md){ md=e; mi=i; } }
+    if(md>t2){ keep[mi]=1; st.push(a,mi,mi,b); } }
+  const out=[]; for(let i=0;i<n;i++) if(keep[i]) out.push(part[i]); return out; }
+let lineSet=null;
+function lineSets(){ if(lineSet) return lineSet; const data=linesData(); if(!data.length) return null; lineSet={};
+  Object.keys(LGRP).forEach(g=>{ lineSet[g]=[]; });
+  const grpOf={}; Object.keys(LGRP).forEach(g=>LGRP[g][1].forEach(k=>{ grpOf[k]=g; }));
+  data.forEach(f=>{ const g=grpOf[f.k]; if(!lineSet[g]) return; lineChunks(f).forEach(ch=>{ let a=90,b=-90,c=180,d=-180; ch.forEach(p=>p.forEach(q=>{ if(q[0]<a)a=q[0]; if(q[0]>b)b=q[0]; if(q[1]<c)c=q[1]; if(q[1]>d)d=q[1]; }));
+    lineSet[g].push({f:f,ch:ch,b:L.latLngBounds([a,c],[b,d]),lo:null,hi:null,on:''}); }); });
+  return lineSet; }
+function lineMake(c,mode){ const f=c.f, st=LK[f.k]; let geo=c.ch;
+  if(mode==='lo'){ geo=[]; c.ch.forEach(p=>{ const q=thinPart(p,0.0009); if(q.length>2||Math.abs(q[0][0]-q[q.length-1][0])+Math.abs(q[0][1]-q[q.length-1][1])>0.0012) geo.push(q); }); if(!geo.length) geo=[c.ch[0]]; }
+  const pl=new CasedLine(geo,{pane:'lines',renderer:lineCanvas,color:st[1],weight:f.k==='rr'?1.5:2.6,casing:f.k==='rr'?3.5:5,opacity:1,dashArray:st[2],bubblingMouseEvents:false});
+  pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } let part=c.ch[0], bd=1e12; if(c.ch.length>1) c.ch.forEach(q=>{ const d=distToPart(e.latlng.lat,e.latlng.lng,q); if(d<bd){ bd=d; part=q; } }); linePopup(f,part,e.latlng); });
+  return pl; }
+/* zoomed out past town level (zoom 8 and under) the whole of a kind of line is one layer, thinned to what a pixel can show */
+function lineWide(g){ const out=[];
+  LGRP[g][1].forEach(k=>{ const geo=[]; linesData().forEach(f=>{ if(f.k!==k) return; f.c.forEach(p=>{ const q=thinPart(p,0.004); if(q.length>2||Math.abs(q[0][0]-q[q.length-1][0])+Math.abs(q[0][1]-q[q.length-1][1])>0.005) geo.push(q); }); });
+    if(!geo.length) return; const st=LK[k];
+    const pl=new CasedLine(geo,{pane:'lines',renderer:lineCanvas,color:st[1],weight:k==='rr'?1.5:2.6,casing:k==='rr'?3.5:5,opacity:1,dashArray:st[2],bubblingMouseEvents:false});
+    pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } const la=e.latlng.lat, lo=e.latlng.lng; let bf=null, bp=null, bd=1e12;
+      linesData().forEach(f=>{ if(f.k!==k||la<f.bb[0]-0.1||la>f.bb[2]+0.1||lo<f.bb[1]-0.1||lo>f.bb[3]+0.1) return; f.c.forEach(q=>{ const d=distToPart(la,lo,q); if(d<bd){ bd=d; bf=f; bp=q; } }); });
+      if(bf) linePopup(bf,bp,e.latlng); });
+    out.push(pl); });
+  return out; }
+function syncLines(){ if(!map||!lineSets()) return; const z=map.getZoom(), mode=z<=8?'xl':z<=9?'lo':'hi', vb=map.getBounds().pad(0.35);
+  if(!lineSet._w) lineSet._w={};
+  Object.keys(LGRP).forEach(g=>{ const on=!!U.ui.lines[g], wide=on&&mode==='xl';
+    if(wide&&!lineSet._w[g]) lineSet._w[g]=lineWide(g);
+    (lineSet._w[g]||[]).forEach(pl=>{ if(wide&&!map.hasLayer(pl)) pl.addTo(map); else if(!wide&&map.hasLayer(pl)) map.removeLayer(pl); });
+    lineSet[g].forEach(c=>{ const want=on&&mode!=='xl'&&vb.intersects(c.b)?mode:'';
+      if(c.on===want) return;
+      if(c.on) map.removeLayer(c[c.on]);
+      if(want){ if(!c[want]) c[want]=lineMake(c,want); c[want].addTo(map); }
+      c.on=want; }); });
+  if(lineHi) lineHi.bringToBack(); }
 function drawLines(){
   if(!map) return; if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
   if(!LINES){ linesData(); if(!LINES) return; }
-  Object.keys(LGRP).forEach(g=>{
-    const on=!!U.ui.lines[g];
-    if(!on){ if(lineLayer[g]){ map.removeLayer(lineLayer[g]); } return; }
-    if(!lineLayer[g]){ const grp=L.layerGroup();
-      linesData().forEach(f=>{ if(LGRP[g][1].indexOf(f.k)<0) return; const st=LK[f.k];
-        /* one layer for each feature in each half-degree cell, not one for each piece: a whole state has tens of thousands of pieces,
-           and a layer that is off screen costs the canvas almost nothing */
-        lineChunks(f).forEach(ch=>{
-          L.polyline(ch,{pane:'lines',renderer:lineCanvas,color:'#ffffff',weight:f.k==='rr'?3.5:5,opacity:0.75,interactive:false}).addTo(grp);
-          const pl=L.polyline(ch,{pane:'lines',renderer:lineCanvas,color:st[1],weight:f.k==='rr'?1.5:2.6,opacity:1,dashArray:st[2],bubblingMouseEvents:false}).addTo(grp);
-          pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } let part=ch[0], bd=1e12; if(ch.length>1) ch.forEach(q=>{ const d=distToPart(e.latlng.lat,e.latlng.lng,q); if(d<bd){ bd=d; part=q; } }); linePopup(f,part,e.latlng); });
-        }); });
-      lineLayer[g]=grp; }
-    lineLayer[g].addTo(map);
-  });
-  if(lineHi) lineHi.bringToBack();
+  if(!map._lnOn){ map._lnOn=true; map.on('moveend',syncLines); }
+  syncLines();
 }
 function nearLines(p){ const out=[], seen=new Set(); linesData().forEach(f=>{ if(f.k==='rr'||f.k==='cn') return; if(f.n){ const d=distToFeat(p,f); if(d<=350&&!seen.has(f.k+f.n)){ seen.add(f.k+f.n); out.push({f:f,d:d}); } }
     else f.c.forEach(part=>{ const d=distToFeat(p,f,[part]); if(d<=350) out.push({f:f,parts:[part],d:d}); }); });
@@ -1476,22 +1527,41 @@ function pinIcon(s){
   const my=U.status[s.id]; if(my) c.push('my-'+my); if(sel&&sel.id===s.id) c.push('sel');
   return L.divIcon({className:'pinwrap',html:'<span class="'+c.join(' ')+'" style="--c:'+((CAT[s.cat]||CAT.landmark)[1])+'"></span>',iconSize:[22,22],iconAnchor:[11,11]});
 }
+/* Zoomed out to town level or wider, pins that would sit on top of each other are replaced by one numbered disc.
+   A cell of the screen with four or more pins becomes a disc; the selected place always keeps its own pin. */
+const CLUSZ=9, CLUSPX=58, CLUSMIN=4;
+function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return null;
+  const z=map.getZoom(), cells=new Map();
+  sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
+    let c=cells.get(k); if(!c){ c={ids:[],la:0,lo:0,a:90,b:-90,c:180,d:-180}; cells.set(k,c); }
+    c.ids.push(s.id); c.la+=p.lat; c.lo+=p.lon; if(p.lat<c.a)c.a=p.lat; if(p.lat>c.b)c.b=p.lat; if(p.lon<c.c)c.c=p.lon; if(p.lon>c.d)c.d=p.lon; });
+  const single=new Set(), groups=[]; cells.forEach(c=>{ if(c.ids.length<CLUSMIN) c.ids.forEach(i=>single.add(i)); else groups.push(c); });
+  if(sel) single.add(sel.id); return {single:single,groups:groups}; }
 function syncMarkers(){
   if(!map) return;
   const show=new Set(visible.map(s=>s.id)); if(sel) show.add(sel.id);
+  const plan=clusterPlan(show), pinned=id=>show.has(id)&&(!plan||plan.single.has(id));
   const all=sites(), ids=new Set(all.map(s=>s.id));
-  markers.forEach((m,id)=>{ if(!ids.has(id)||!show.has(id)){ map.removeLayer(m); markers.delete(id); } });
+  markers.forEach((m,id)=>{ if(!ids.has(id)||!pinned(id)){ map.removeLayer(m); markers.delete(id); } });
   all.forEach(s=>{
-    if(!show.has(s.id)) return;
-    const p=pos(s); let m=markers.get(s.id);
-    if(!m){ m=L.marker([p.lat,p.lon],{icon:pinIcon(s),keyboard:false,riseOnHover:true});
+    if(!pinned(s.id)) return;
+    const p=pos(s), ic=pinIcon(s), sig=ic.options.html; let m=markers.get(s.id);
+    if(!m){ m=L.marker([p.lat,p.lon],{icon:ic,keyboard:false,riseOnHover:true}); m._sig=sig;
       const tip=el('span',{text:s.name}); m.bindTooltip(tip,{direction:'top',offset:[0,-9]});
       m.on('click',()=>{ if(adding||pickingHome) return; select(byId(s.id)||s,false); });
       m.on('dragend',()=>{ const q=m.getLatLng(); U.moved[s.id]=[+q.lat.toFixed(6),+q.lng.toFixed(6)]; save(); m.dragging.disable(); banner('Pin moved. It is saved in this browser.',false,3500); refresh(); });
       m.addTo(map); markers.set(s.id,m); }
-    else { m.setLatLng([p.lat,p.lon]); m.setIcon(pinIcon(s)); }
+    else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
     m.setZIndexOffset(sel&&sel.id===s.id?1000:(s.cat==='landmark'?-200:0));
   });
+  if(clusLayer){ map.removeLayer(clusLayer); clusLayer=null; }
+  if(plan&&plan.groups.length){ clusLayer=L.layerGroup();
+    plan.groups.forEach(c=>{ const n=c.ids.length, d=n<10?30:n<40?36:42;
+      const m=L.marker([c.la/n,c.lo/n],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'clus',html:String(n),iconSize:[d,d],iconAnchor:[d/2,d/2]})});
+      m.bindTooltip(n+' places. Tap to zoom in',{direction:'top',offset:[0,-d/2]});
+      m.on('click',()=>{ if(adding||pickingHome) return; map.fitBounds(L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25),{maxZoom:Math.max(map.getZoom()+2,CLUSZ+1)}); });
+      m.addTo(clusLayer); });
+    clusLayer.addTo(map); }
 }
 function drawHome(){ if(!map) return; if(homeMarker) map.removeLayer(homeMarker); const H=homeObj();
   homeMarker=L.marker([H.lat,H.lon],{interactive:false,keyboard:false,zIndexOffset:-500,icon:L.divIcon({className:'pinwrap',html:'<span class="homepin">H</span>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map); }
