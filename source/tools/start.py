@@ -52,6 +52,10 @@ try:
         print(f'== State: {sname}. Region codes for reg= (places so far; * = used by places within {max(km,40):g} km of here):')
         print('   '+'   '.join(f"{c}{'*' if c in near else ''} = {l} ({cnt.get(c,0)})" for c,l in row['regions']))
 except Exception as e: print('== (region list not read:',str(e)[:60]+')')
+try:
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from ortho import which
+    w=which(la,lo); print('== The pin check (tools/pincheck.py) will show: '+w+('. Expect leaves on the trees: for anything in woods the --lidar sheet is the one that shows the ground.' if 'Esri' in w else '. Bare trees: a ruin in woods can show on it; look at the --lidar sheet as well.' if 'leaf-off' in w else '. A state flight. The trees were bare in the frames looked at when it was added (tools/ortho.py), but check that in each tile; look at the --lidar sheet as well.')+(' This state\'s server takes several seconds a pin.' if 'Pennsylvania' in w else ''))
+except Exception as e: print('== (which aerial the pin check uses: not worked out,',str(e)[:60]+')')
 # ---- what is already there
 print(subprocess.run([sys.executable,'tools/nearby.py',str(la),str(lo),str(km)],capture_output=True,text=True).stdout.rstrip())
 files={}

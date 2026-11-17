@@ -29,6 +29,6 @@ New places, corrected pins and field reports are welcome. **You do not need to k
 
 ## Data credits
 
-Imagery: New York State ITS Geospatial Services, MassGIS, Vermont Center for Geographic Information, RIGIS and the URI Environmental Data Center, USGS, Esri.
+Imagery: New York State ITS Geospatial Services, MassGIS, Vermont Center for Geographic Information, RIGIS and the URI Environmental Data Center, New Jersey Office of GIS, CT ECO (University of Connecticut), NH GRANIT (University of New Hampshire), Pennsylvania Emergency Management Agency through PASDA, Maine GeoLibrary, Kansas NG911 through the Kansas Geological Survey, USGS (including the 3DEP elevation service), Esri.
 Lines and leads: OpenStreetMap contributors, OpenHistoricalMap, MassGIS, U.S. DOT.
 Public land: USGS PAD-US. Parcels: NYS tax parcel file, NYS DEC, MassGIS.

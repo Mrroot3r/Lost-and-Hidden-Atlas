@@ -265,37 +265,70 @@ function regionOf(lat,lon){
   if(regMemo.size>4000) regMemo.clear(); regMemo.set(key,v); return v; }
 function tileCenter(c){ const n=Math.pow(2,c.z); return [Math.atan(Math.sinh(Math.PI*(1-2*(c.y+0.5)/n)))*180/Math.PI,(c.x+0.5)/n*360-180]; }
 let PXM=1;   /* 2 while a big tile's address is being built (FnLayer, below) */
-function exportUrl(base,c,extra){ const n=Math.pow(2,c.z),r=2*W/n,x0=-W+c.x*r,y1=W-c.y*r,px=PXQ()*PXM;
-  return base+'?bbox='+[x0,y1-r,x0+r,y1].map(v=>v.toFixed(2)).join(',')+'&bboxSR=3857&imageSR=3857&size='+px+','+px+'&format=jpg&f=image'+(extra||''); }
+/* fmt 'jpgpng' (image services only): a JPEG where the service has the whole square, a see-through PNG where it has holes */
+function exportUrl(base,c,extra,fmt){ const n=Math.pow(2,c.z),r=2*W/n,x0=-W+c.x*r,y1=W-c.y*r,px=PXQ()*PXM;
+  return base+'?bbox='+[x0,y1-r,x0+r,y1].map(v=>v.toFixed(2)).join(',')+'&bboxSR=3857&imageSR=3857&size='+px+','+px+'&format='+(fmt||'jpg')+'&f=image'+(extra||''); }
 function xyz(tpl,c,maxN){ let z=c.z,x=c.x,y=c.y,dz=0; if(z>maxN){ dz=z-maxN; x=x>>dz; y=y>>dz; z=maxN; }
   const u=tpl.replace('{z}',z).replace('{y}',y).replace('{x}',x); return dz?{url:u,dz:dz,ox:c.x-(x<<dz),oy:c.y-(y<<dz)}:u; }
 const RIG='https://maps.edc.uri.edu/rigis/rest/services/', RILEAF=RIG+'IMG/RI_202603_RGB_3in_web/ImageServer/exportImage', RIDEM=RIG+'TOPO/Elevation_2022_Lidar_web/ImageServer/exportImage';
 const hsRule=g=>'&interpolation=RSP_BilinearInterpolation&renderingRule='+encodeURIComponent(JSON.stringify({rasterFunction:'Hillshade',rasterFunctionArguments:{Azimuth:g[1],Altitude:g[2],ZFactor:g[3]},variableName:'DEM'}));
 const NYHS='https://elevation.its.ny.gov/arcgis/rest/services/NYS_Statewide_Hillshade/MapServer/export', NYDEM='https://elevation.its.ny.gov/arcgis/rest/services/Latest_DEM/ImageServer/exportImage';
 const WORLDIMG='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+/* State flights beyond the first four. Ready-cut tiles: New Jersey 2020, Connecticut spring 2023, New Hampshire spring 2021-22.
+   Cut to order: Kansas 2024 (about a second a tile), Maine's statewide mosaic (one to two seconds, and it has holes in the
+   north woods), Pennsylvania 2021-23 (three to nine seconds a tile: the slowest server here). */
+const NJLEAF='https://maps.nj.gov/arcgis/rest/services/Basemap/Orthos_Natural_2020_NJ_WM/MapServer/tile/{z}/{y}/{x}',
+  CTLEAF='https://cteco.uconn.edu/ctraster/rest/services/images/Ortho_2023_tiled/ImageServer/tile/{z}/{y}/{x}',
+  NHLEAF='https://nhgeodata.unh.edu/image/rest/services/ImageServices/NH_2021_2022_6in_tiled/ImageServer/tile/{z}/{y}/{x}',
+  KSLEAF='https://services.kgs.ku.edu/arcgis7/rest/services/IMAGERY_STATEWIDE/NG911_Imagery_2024/ImageServer/exportImage',
+  MELEAF='https://gis.maine.gov/image/rest/services/Misc/MaineOrthoimageryAggregate/ImageServer/exportImage',
+  PALEAF='https://imagery.pasda.psu.edu/arcgis/rest/services/pasda/PEMAImagery2021_2023/MapServer/export';
 function leafUrl(c){
   /* zoomed far out, a state flight and the world imagery look the same; the world imagery is ready-cut tiles that arrive at
      once and has no white blocks beyond a state's edge. An older flight, picked by year, is kept from zoom 9. */
-  if(c.z<(U.ui.year==='Latest'?11:9)) return xyz(WORLDIMG,c,19);
+  const z=c.gz||c.z;                                   /* the map's zoom: one more than a big tile's own (FnLayer._req) */
+  if(z<(U.ui.year==='Latest'?11:9)) return xyz(WORLDIMG,c,19);
   const p=tileCenter(c), r=regionOf(p[0],p[1]);
   if(r==='ny') return exportUrl('https://orthos.its.ny.gov/arcgis/rest/services/wms/'+U.ui.year+'/MapServer/export',c);
   if(r==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/orthos2023/MapServer/tile/{z}/{y}/{x}',c,20);
   if(r==='vt') return xyz('https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/IMG_VCGI_CLR_WM_CACHE/ImageServer/tile/{z}/{y}/{x}',c,19);
-  if(r==='ri'&&c.z>=12) return exportUrl(RILEAF,c);
+  if(r==='ri'&&z>=12) return exportUrl(RILEAF,c);
+  if(z>=12){ if(r==='nj') return xyz(NJLEAF,c,20); if(r==='ct') return xyz(CTLEAF,c,20); if(r==='nh') return xyz(NHLEAF,c,20); }
+  if(z>=14){ if(r==='ks') return exportUrl(KSLEAF,c,'','jpgpng'); if(r==='pa') return exportUrl(PALEAF,c,'&layers=show:3'); }     /* layer 3 is the picture alone: layer 0 draws the tiles' outlines over it */
+  if(r==='me'&&z>=15) return exportUrl(MELEAF,c,'&bandIds=0,1,2','jpgpng');
   return xyz(WORLDIMG,c,19); }
 const WORLDHS='https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}';
-function lidarUrl(c){ if(c.z<9) return xyz(WORLDHS,c,15);
+const CTHS='https://cteco.uconn.edu/ctraster/rest/services/elevation/Hillshade/ImageServer/exportImage',
+  NHDEM='https://nhgeodata.unh.edu/image/rest/services/ImageServices/LiDAR_Bare_Earth_DEM_NH_2022/ImageServer/exportImage',
+  MEDEM='https://gis.maine.gov/image/rest/services/DEM/Maine_Elevation_DEM_Statewide/ImageServer/exportImage',
+  USDEM='https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage',
+  CANADA={on:1,qc:1,nb:1,ns:1,pe:1,nl:1,mb:1,sk:1,ab:1,bc:1};
+function lidarUrl(c){ const z=c.gz||c.z; if(z<9) return xyz(WORLDHS,c,15);
   const p=tileCenter(c), r=regionOf(p[0],p[1]);
-  if(r==='ny'){ if(c.z<14) return exportUrl(NYHS,c); const g=LIGHT[U.ui.light]||LIGHT.nw;
+  if(r==='ny'){ if(z<14) return exportUrl(NYHS,c); const g=LIGHT[U.ui.light]||LIGHT.nw;
     return exportUrl(NYDEM,c,hsRule(g)); }
-  if(r==='ri'&&c.z>=11) return exportUrl(RIDEM,c,hsRule(LIGHT[U.ui.light]||LIGHT.nw));
+  if(r==='ri'&&z>=11) return exportUrl(RIDEM,c,hsRule(LIGHT[U.ui.light]||LIGHT.nw));
   if(r==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/LiDAR_ShadedRelief/MapServer/tile/{z}/{y}/{x}',c,18);
   if(r==='vt') return xyz('https://maps.vcgi.vermont.gov/arcgis/rest/services/EGC_services/IMG_VCGI_LIDARHILLSHD_WM_CACHE_v1/ImageServer/tile/{z}/{y}/{x}',c,19);
+  if(z>=14){ const g=LIGHT[U.ui.light]||LIGHT.nw;
+    if(r==='ct') return exportUrl(CTHS,c,'','jpgpng');                       /* drawn by the state with the sun in the northwest: the light setting does not move it */
+    if(r==='nh') return exportUrl(NHDEM,c,hsRule(g),'jpgpng');
+    if(r==='me') return exportUrl(MEDEM,c,hsRule(g),'jpgpng');
+    /* every other state: the national elevation service has 1-metre LiDAR for most of the country. It takes three to ten
+       seconds a tile, so it starts only where the world hillshade's ready-cut tiles run out of detail. */
+    if(z>=16&&r!=='other'&&!CANADA[r]) return exportUrl(USDEM,c,hsRule(g),'jpgpng'); }
   return xyz(WORLDHS,c,15); }
+/* Who to credit depends on the ground in view: one short line for the states on screen, not every state's office at once. */
+const CREDIT={leaf:{ny:'NYS ITS',ma:'MassGIS',vt:'VCGI',ri:'RIGIS',nj:'NJ Office of GIS',ct:'CT ECO',nh:'NH GRANIT',pa:'PEMA, PASDA',me:'Maine GeoLibrary',ks:'Kansas NG911, DASC'},
+  lidar:{ny:'NYS ITS',ma:'MassGIS',vt:'VCGI',ri:'RIGIS',ct:'CT ECO',nh:'NH GRANIT',me:'Maine GeoLibrary'}};
+function creditFor(kind){ return m=>{ const b=m.getBounds(), c=m.getCenter(), out=[];
+  [[c.lat,c.lng],[b.getNorth(),b.getWest()],[b.getNorth(),b.getEast()],[b.getSouth(),b.getWest()],[b.getSouth(),b.getEast()]].forEach(p=>{ const r=regionOf(p[0],p[1]);
+    const t=CREDIT[kind][r]||(kind==='lidar'&&r!=='other'&&!CANADA[r]?'USGS 3DEP':''); if(t&&out.indexOf(t)<0) out.push(t); });
+  out.push('Esri'); return out.join(', '); }; }
 const LD={
   streets:{n:'Streets',d:'Roads and place names',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:19,attribution:'Esri, HERE, Garmin, USGS'})},
-  leaf:{n:'Leaf-off aerial',d:'State spring flights. The ground shows through bare trees',mk:p=>new FnLayer('',bigOpt({pane:p,maxZoom:20,ghost:true,fn:leafUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS, Esri'}))},
-  lidar:{n:'LiDAR terrain',d:'Bare ground with the trees stripped off. Sharpens to 1 m as you zoom in',mk:p=>new FnLayer('',bigOpt({pane:p,maxZoom:20,ghost:true,fn:lidarUrl,attribution:'NYS ITS, MassGIS, VCGI, RIGIS, Esri'}))},
+  leaf:{n:'Leaf-off aerial',d:'State spring flights. The ground shows through bare trees',mk:p=>new FnLayer('',bigOpt({pane:p,maxZoom:20,ghost:true,fn:leafUrl,fast:c=>xyz(WORLDIMG,c,19),credit:creditFor('leaf')}))},
+  lidar:{n:'LiDAR terrain',d:'Bare ground with the trees stripped off. Sharpens to 1 m as you zoom in',mk:p=>new FnLayer('',bigOpt({pane:p,maxZoom:20,ghost:true,fn:lidarUrl,fast:c=>xyz(WORLDHS,c,15),credit:creditFor('lidar')}))},
   sat:{n:'Satellite',d:'World imagery, usually leaves on',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:19,attribution:'Esri, Maxar, Earthstar Geographics'})},
   topo:{n:'USGS topo, current',d:'Contours, streams and trails',mk:p=>new CachedXYZ('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:16,attribution:'USGS The National Map'})},
   oldtopo:{n:'USGS topo, 1940s–80s',d:'Scanned paper quads. Purple marks later photo-revisions',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:15,attribution:'USGS, National Geographic, i-cubed'})}
@@ -337,17 +370,21 @@ async function tcClear(){ TC.mem.clear(); const db=await tcOpen(); if(!db) retur
    - only a few run at a time for each server, the newest first, so what the map shows NOW is fetched before what it showed
      a moment ago;
    - a tile the map no longer wants (you zoomed on) is never asked for at all. */
-const TQ={q:[],run:new Map(),max:8,avg:900,retried:0,dropped:0};
+const TQ={q:[],run:new Map(),max:8,avg:900,hav:new Map(),retried:0,dropped:0};
 const tqHost=u=>{ const m=/^https?:\/\/([^/]+)/.exec(u); return m?m[1]:''; };
-async function fetchTile(url){ let err=null;
-  for(let k=0;k<3;k++){ const ac=typeof AbortController==='function'?new AbortController():null, lim=Math.min(20000,Math.max(5000,TQ.avg*5))*(k+1), t0=Date.now(), tm=ac?setTimeout(()=>ac.abort(),lim):0;
+/* How long a tile usually takes is kept for each server: the national elevation service and Pennsylvania's aerials take
+   several seconds a tile, and must be given that long without making the wait on a quick server longer. */
+const SLOWHOST={'elevation.nationalmap.gov':3000,'imagery.pasda.psu.edu':3500};
+const tqAvg=h=>TQ.hav.has(h)?TQ.hav.get(h):(SLOWHOST[h]||TQ.avg);
+async function fetchTile(url){ let err=null; const h=tqHost(url);
+  for(let k=0;k<3;k++){ const ac=typeof AbortController==='function'?new AbortController():null, lim=Math.min(20000,Math.max(5000,tqAvg(h)*5)*(k+1)), t0=Date.now(), tm=ac?setTimeout(()=>ac.abort(),lim):0;
     if(k) TQ.retried++;
     try{ const r=await fetch(url,{mode:'cors',credentials:'omit',signal:ac?ac.signal:undefined});
       if(!r.ok){ err=new Error('http '+r.status); if(r.status<500&&r.status!==429) break; continue; }
       const ct=r.headers.get('content-type')||''; if(ct.indexOf('image')<0&&ct.indexOf('octet-stream')<0){ err=new Error('not an image'); break; }
-      const b=await r.blob(); TQ.avg=TQ.avg*0.9+(Date.now()-t0)*0.1; return b; }
+      const b=await r.blob(); TQ.hav.set(h,tqAvg(h)*0.9+(Date.now()-t0)*0.1); return b; }
     catch(e){ err=e; if(navigator.onLine===false) break;
-      if(e.name==='AbortError') TQ.avg=Math.max(TQ.avg,lim/3);                        /* on a slow connection, wait longer next time and do not ask twice */
+      if(e.name==='AbortError') TQ.hav.set(h,Math.max(tqAvg(h),lim/3));                        /* on a slow connection, wait longer next time and do not ask twice */
       else if(k>=1) break; }                                                          /* a hang is tried three times; any other failure twice */
     finally{ clearTimeout(tm); } }
   throw err||new Error('tile failed'); }
@@ -371,7 +408,7 @@ const CacheMixin={ createTile:function(c,done){
   const img=document.createElement('img'); img.alt=''; img.setAttribute('role','presentation'); const url=this.getTileUrl(c);
   const direct=()=>{ img.onload=()=>{ TC.directOk++; if(TC.fetchOk===0&&TC.fetchFail>=4&&TC.directOk>=4) TC.off=true; done(null,img); }; img.onerror=e=>done(e,img); img.src=url; };
   if(TC.off){ direct(); return img; }
-  tileBlob(url,false,()=>img.isConnected!==false).then(b=>{ const u=URL.createObjectURL(b); img.onload=()=>{ URL.revokeObjectURL(u); done(null,img); }; img.onerror=()=>{ URL.revokeObjectURL(u); done(new Error('bad tile'),img); }; img.src=u; },
+  tileBlob(url,false,()=>img.isConnected!==false).then(b=>{ img._gap=b.type==='image/png'; const u=URL.createObjectURL(b); img.onload=()=>{ URL.revokeObjectURL(u); done(null,img); }; img.onerror=()=>{ URL.revokeObjectURL(u); done(new Error('bad tile'),img); }; img.src=u; },
     e=>{ if(e&&e.message==='dropped') return;                                       /* the map moved on before its turn came */
       if(navigator.onLine===false){ done(new Error('offline'),img); } else direct(); });
   return img; } };
@@ -452,15 +489,24 @@ function initMap(){
   const isExp=t=>typeof t==='string'&&t.indexOf('bbox=')>0;
   const abs=(n,x,y,w,h)=>{ n.style.cssText='position:absolute;max-width:none;left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+h+'px'; return n; };
   FnLayer=L.TileLayer.extend({ options:{updateWhenZooming:false,keepBuffer:4},
+    onAdd:function(m){ L.TileLayer.prototype.onAdd.call(this,m); if(!this.options.credit) return;
+      this._crFn=()=>{ const ac=this._map&&this._map.attributionControl; if(!ac) return; const t=this.options.credit(this._map); if(t===this._crText) return;
+        if(this._crText) ac.removeAttribution(this._crText); this._crText=t; if(t) ac.addAttribution(t); };
+      m.on('moveend',this._crFn); this._crFn(); },
+    onRemove:function(m){ if(this._crFn){ m.off('moveend',this._crFn); if(this._crText&&m.attributionControl) m.attributionControl.removeAttribution(this._crText); this._crText=null; this._crFn=null; }
+      L.TileLayer.prototype.onRemove.call(this,m); },
     _rc:function(c){ return this.options.big?{x:c.x,y:c.y,z:c.z-1}:c; },
-    _req:function(rc,small){ PXM=this.options.big&&!small?2:1; try{ return this.options.fn(rc); } finally{ PXM=1; } },
+    /* A big tile covers the ground of four ordinary ones, so its own z is one less than the map's. Which server to ask is
+       decided by the map's zoom (gz), or a wide screen would cross every threshold a level late and ask a slow server
+       for four small pictures where one big one will do. */
+    _req:function(rc,small){ const big=this.options.big&&!small; PXM=big?2:1; try{ return this.options.fn(big&&rc.gz===undefined?{x:rc.x,y:rc.y,z:rc.z,gz:rc.z+1}:rc); } finally{ PXM=1; } },
     getTileUrl:function(c){ const t=this._req(this._rc(c)); return typeof t==='string'?t:t.url; },
     /* the address that will be fetched for the ground under ordinary tile x,y,z: what "save for offline" must keep */
     saveUrl:function(x,y,z){ const t=this._req({x:x,y:y,z:z},true);
       if(this.options.big&&isExp(t)&&z>0){ const b=this._req({x:x>>1,y:y>>1,z:z-1}); if(isExp(b)) return b; }
       return typeof t==='string'?t:t.url; },
     /* one ordinary tile drawn into a square of the given size; cb(error) when it has loaded or failed */
-    _piece:function(rc,size,cb){ const t=this._req(rc,true);
+    _piece:function(rc,size,cb,t){ t=t||this._req(rc,true);
       /* an image with no picture yet is kept hidden: Chrome draws a grey outline round one */
       if(typeof t==='string'){ const im=CacheMixin.createTile.call({getTileUrl:()=>t},rc,e=>{ if(!e) im.style.visibility=''; cb(e); }); abs(im,0,0,size,size); im.style.visibility='hidden'; return im; }
       const bx=document.createElement('div'); bx.style.overflow='hidden'; const k=1<<t.dz, im=CacheMixin.createTile.call({getTileUrl:()=>t.url},rc,e=>{ if(!e) im.style.visibility=''; cb(e); });
@@ -485,16 +531,26 @@ function initMap(){
       if(!isExp(t)){                                                   /* ready-cut tiles: quick, and never stretched */
         if(big) box.appendChild(this._quad(rc,sz,e=>{ box._real=!e; done(e,box); })); else if(typeof t==='string') return CacheMixin.createTile.call(this,c,done); else box.appendChild(this._piece(rc,sz,e=>{ box._real=!e; done(e,box); }));
         return box; }
-      let told=false, fin=false, ghost=null; const tell=e=>{ if(!told){ told=true; done(e,box); } };
+      let told=false, fin=false, ghost=null, under=null; const tell=e=>{ if(!told){ told=true; done(e,box); } }, fastFn=this.options.fast;
+      /* The world's ready-cut tile for the same ground, laid beneath. It is fetched when a slow state tile has not come and
+         nothing held can stand in for it, and it stays when the state's picture has holes in it or never comes. */
+      const lay=cb=>{ if(under||!fastFn){ if(cb) cb(under?null:new Error('no world tile')); return; }
+        const u=this._piece(rc,sz,e=>{ if(under===u){ if(e){ u.remove(); under=null; } else box._under=true; } if(cb) cb(e); },fastFn(rc)); under=u; box.insertBefore(u,box.firstChild); };
+      const unlay=()=>{ if(under){ under.remove(); under=null; box._under=false; } };
       const img=CacheMixin.createTile.call({getTileUrl:()=>t},c,e=>{ fin=true;
-        if(!e){ box._real=true; img.style.visibility=''; if(ghost){ ghost.remove(); ghost=null; } tell(null); return; }
+        if(!e){ box._real=true; img.style.visibility=''; if(ghost){ ghost.remove(); ghost=null; }
+          if(img._gap) lay(); else unlay();
+          tell(null); return; }
         if(ghost){ tell(null); return; }                               /* the real tile failed: the stand-in stays */
+        if(fastFn&&navigator.onLine!==false){ img.remove(); lay(e2=>tell(e2?e:null)); return; }   /* or the world's tile takes its place */
         if(big&&navigator.onLine===false){ img.remove(); box.appendChild(this._quad(rc,sz,e2=>tell(e2))); return; }   /* no signal: ordinary tiles kept from before may cover it */
         tell(e); });
       box.appendChild(abs(img,0,0,sz+1,sz+1)); img.style.visibility='hidden'; Promise.resolve().then(()=>{ box.style.width=box.style.height=(sz+1)+'px'; });    /* one pixel over its neighbours: no hairline between tiles while a level is stretched */
       /* only when the real tile is not here within a moment: a tile this browser holds arrives sooner than a stand-in could be made */
       if(this.options.ghost&&!TC.mem.has(t)) setTimeout(()=>{ if(fin||box.isConnected===false) return;
         this._ghost(rc,sz).then(g=>{ if(g&&!fin&&box.isConnected!==false){ ghost=g; box._ghost=true; box.insertBefore(g,img); tell(null); } },()=>{}); },70);
+      if(fastFn&&!TC.mem.has(t)) setTimeout(()=>{ if(fin||ghost||box.isConnected===false) return;
+        lay(e=>{ if(!e&&!fin&&box.isConnected!==false){ box._ghost=true; tell(null); } }); },1200);
       return box; } });
   CachedXYZ=L.TileLayer.extend(Object.assign({options:{keepBuffer:4}},CacheMixin));
   setTimeout(tcScan,4000);
@@ -683,10 +739,10 @@ function buildSheet(){
   else {
     lb.append(H('Leaf-off aerial'));
     const y=el('select',{id:'leaf-year','aria-label':'Flight year',onchange:e=>{ U.ui.year=e.target.value; save(); if(U.ui.base==='leaf') setBase('leaf'); if(cmp.on&&cmp.key==='leaf') setCmp(); }},YEARS.map(v=>el('option',{value:v,text:v==='napp'?'1990s infrared':v==='Latest'?'Latest flight':v})));
-    y.value=U.ui.year; lb.append(el('div',{class:'lsub'},el('span',{text:'Flight year'}),y),note('The year applies to New York. Blank? That year skipped this county. Massachusetts and Vermont show their own latest state flight (the Vermont one is not always leaf-off). Rhode Island shows its March 2026 state flight once you zoom in past town level. Connecticut and New Hampshire fall back to satellite for now.'));
+    y.value=U.ui.year; lb.append(el('div',{class:'lsub'},el('span',{text:'Flight year'}),y),note('The year applies to New York. Blank? That year skipped this county. Massachusetts, Vermont, New Jersey, Connecticut and New Hampshire show their own latest state flight (the Vermont one is not always leaf-off). Rhode Island, Kansas, Pennsylvania and Maine show theirs once you zoom in past town level. Pennsylvania\'s server is slow: the satellite picture shows first and the bare-tree flight takes its place after a few seconds. Everywhere else is satellite, usually with leaves on.'));
     lb.append(H('LiDAR light'));
     const s=el('select',{id:'lidar-light','aria-label':'Light direction',onchange:e=>{ U.ui.light=e.target.value; save(); if(U.ui.base==='lidar') setBase('lidar'); if(cmp.on&&cmp.key==='lidar') setCmp(); }},Object.keys(LIGHT).map(v=>el('option',{value:v,text:LIGHT[v][0]})));
-    s.value=U.ui.light; lb.append(el('div',{class:'lsub'},s),note('Changing the light makes faint walls and grades pop. It applies in New York and Rhode Island once you zoom in past town level. Massachusetts and Vermont use their own fixed-light LiDAR.'));
+    s.value=U.ui.light; lb.append(el('div',{class:'lsub'},s),note('Changing the light makes faint walls and grades pop. It applies once you zoom in close, everywhere except Massachusetts, Vermont and Connecticut, which draw their LiDAR with a fixed light. Outside New York and New England the 1-metre LiDAR comes from the USGS at the last few zoom levels and takes a few seconds a tile; a coarser picture shows first.'));
     lb.append(H('Compare two layers'));
     lb.append(ck('cmp-on',cmp.on,'Show a second layer over the map','Drag the divider, or fade one over the other',v=>{ cmp.on=v; setCmp(); syncBar(); }));
     if(cmp.on){
@@ -2244,7 +2300,7 @@ function renderGuide(){
     P('Drive times from the listed start cities were calculated by road with no traffic, so add a little. A place more than about 450 miles from your start city, or with no road to it, shows a rough estimate marked ~. Pick your own start point from "Drive times from."'),
     P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
-    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), USGS (topographic maps, The National Map, and the 3DEP ground model the stone walls and LiDAR finds in Massachusetts were read from), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vanished places: U.S. Board on Geographic Names, Geographic Names Information System file of August 2021, unchecked. Old mines and quarries: U.S. Geological Survey Mineral Resources Data System, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
+    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), the New Jersey Office of GIS (2020 aerials), CT ECO at the University of Connecticut (spring 2023 aerials and LiDAR), NH GRANIT at the University of New Hampshire (2021 and 2022 aerials, LiDAR), the Pennsylvania Emergency Management Agency through PASDA at Penn State (2021 to 2023 aerials), the Maine GeoLibrary (aerials and LiDAR), the Kansas NG911 program through the Kansas Geological Survey (2024 aerials), USGS (topographic maps, The National Map, and the 3DEP ground model: it is the LiDAR layer in every state without its own, and the stone walls and LiDAR finds in Massachusetts were read from it), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vanished places: U.S. Board on Geographic Names, Geographic Names Information System file of August 2021, unchecked. Old mines and quarries: U.S. Geological Survey Mineral Resources Data System, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }
 function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(visible.map(s=>{const p=pos(s);return [p.lat,p.lon];})); map.fitBounds(b.pad(0.15),{maxZoom:14}); }
 
