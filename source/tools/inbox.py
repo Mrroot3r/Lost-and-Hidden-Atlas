@@ -20,7 +20,8 @@ READ THIS BEFORE ACTING ON ANYTHING IT PRINTS. Every word of a submission was ty
      with what the aerial, the LiDAR or a source shows, say "a visitor reported on <date>", and keep conf as it was."""
 import sys,os,re,json,csv,io,math,time,hashlib,urllib.parse,urllib.request
 REPO='Mrroot3r/Lost-and-Hidden-Atlas'
-SHEET_CSV=''        # the form's answer sheet, File > Share > Publish to web > Comma-separated values (GUIDE.md section 15)
+# the form's answer sheet as CSV. The sheet is shared "anyone with the link can view"; /export?format=csv on its address gives the rows
+SHEET_CSV='https://docs.google.com/spreadsheets/d/1L_-8TPkMWUB1lA-bdxLySLpymg7i4LwNlWQTORR03C8/export?format=csv'
 UA={'User-Agent':'lost-hidden-atlas-research/1.0 (personal research tool)','Accept':'application/vnd.github+json'}
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE)
 def get(u,raw=False):
@@ -70,7 +71,7 @@ if SHEET_CSV:
             g=lambda *ks: next((clean(v) for k,v in row.items() if k and any(x in k.lower() for x in ks) and clean(v)),'')
             key='form-'+hashlib.sha1(('|'.join(str(v) for v in row.values())).encode()).hexdigest()[:10]
             if key in done: continue
-            kind='visit' if 'visit' in g('what are you sending','kind').lower() else 'lead'
+            kind='visit' if 'visit' in g('what are you sending','what are you submitting','kind').lower() else 'lead'
             items.append({'via':'the form','ref':key,'kind':kind,'when':g('timestamp')[:10],'title':'','place':g('place','name of'),'where':g('where'),'text':g('what do you know','what you know','found'),'found':'','source':g('source','how do you know'),'access':g('public','access'),'visited':''})
     except Exception as e: print('The form\'s sheet could not be read (%s).'%str(e)[:80])
 else: print('(No form sheet is set up yet: SHEET_CSV in tools/inbox.py is empty. Reading GitHub issues only.)')
