@@ -92,6 +92,7 @@ Places someone read about while researching but did not add, with what is missin
 | Thomas J. Pendergast headquarters | 1908 Main St, Kansas City, MO | Wikipedia (Tom Pendergast): the political boss ruled from this two-story building; on the Kansas City register | A source on its present use; a pin check |
 | WILLIAM S. MITCHELL dredge | Missouri River, Kansas City, MO | National Register list: destroyed in the 1993 flood | Whether any wreckage remains |
 | Independence Mines | Hatcher Pass, Alaska | Wikipedia: second-largest hard-rock gold mine in the state, worked 1934–1943 and 1948–1950, now a state historical park | What stands today, hours and road season, a pin check |
+| Battle of Fort Anne, Battle Hill | Fort Ann, NY (HMdb markers 89662 at 43.42433, -73.48160, and 248989 at the Fort Anne wayside) | Markers for the battle of July 8, 1777: about 1,000 Americans attacked about 200 British pursuing them from Ticonderoga; the fight lasted over two hours | Only markers and a wayside; add if a series wants battlefields, with who owns Battle Hill |
 | Fort DuPont | Delaware City, DE | Wikipedia: river fort of 1900–1942, part of it a state park since 1992 | Which batteries are open to walk; a pin |
 | Kaniakapūpū | Nuʻuanu, Oahu, HI | Wikipedia: ruins of Kamehameha III's summer palace; officially off-limits, trespassers cited | Do not add unless the state opens it |
 | Fort Atkinson State Preserve | Fort Atkinson, IA | Wikipedia: remnants of an 1840 Army post, a state preserve | What remains, hours, a pin check |
