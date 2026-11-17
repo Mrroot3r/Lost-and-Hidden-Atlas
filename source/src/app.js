@@ -148,13 +148,12 @@ function match(s){
   return true;
 }
 function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
 function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 const BATCHES=D.batches||[];
 const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
-  ['Worcester County',()=>{ F.reg='worc'; }],
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
-  ['Trolley parks',()=>{ F.tag='trolleyparks'; }],
   ['Within 30 min',()=>{ F.max=30; }],
   ['Changing now',()=>{ F.now=true; }],
   ['Standing landmarks',()=>{ F.cat.add('landmark'); }],
@@ -173,6 +172,8 @@ function chipGroup(label,map,set,colors){
 }
 function buildFilters(){
   const fb=$('#fbody'); fb.textContent='';
+  /* shortcuts: each clears the filters and sets one common combination */
+  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Shortcuts'}),el('div',{class:'chips',id:'presets'},PRESETS.map(p=>el('button',{class:'chip',type:'button',onclick:()=>{clearF();$('#q').value='';p[1]();refresh();}},p[0])))));
   fb.append(chipGroup("What's left to see",STS,F.st));
   fb.append(chipGroup('Kind of place',CAT,F.cat,true));
   const reg=el('select',{id:'f-reg',onchange:e=>{F.reg=e.target.value;refresh();}},el('option',{value:'',text:'All regions'}),STATES.map(st=>{ const used=st.regions.filter(r=>BASE.some(x=>x.reg===r[0])); return used.length?el('optgroup',{label:st.name},used.map(r=>el('option',{value:r[0],text:r[1]}))):null; }));
@@ -190,9 +191,9 @@ function buildFilters(){
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
   fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
-  fb.append(el('div',null,el('button',{class:'btn sm',type:'button',onclick:()=>{clearF();$('#q').value='';refresh();}},'Clear all filters')));
-  const pr=$('#presets'); pr.textContent='';
-  PRESETS.forEach(p=>pr.append(el('button',{class:'chip',type:'button',onclick:()=>{clearF();$('#q').value='';p[1]();refresh();}},p[0])));
+  /* the way out of a long panel: close it and go to the list */
+  fb.append(el('div',{class:'row fdone'},el('button',{class:'btn pri',type:'button',id:'f-done',onclick:()=>{ $('#filters').open=false; syncFcount(); const t=$('#v-list'); if(t&&t.scrollIntoView) t.scrollIntoView({block:'start'}); }},'Show '+visible.length+(visible.length===1?' place':' places')),
+    el('button',{class:'btn sm',type:'button',onclick:()=>{clearF();$('#q').value='';refresh();}},'Clear all filters')));
 }
 
 /* ---------- list ---------- */
@@ -212,9 +213,9 @@ function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st
 function renderList(){
   visible=sortSites(sites().filter(match));
   const ul=$('#list'); ul.textContent='';
-  const n=activeCount();
-  $('#fcount').textContent=n?n+' on':'';
+  syncFcount();
   $('#count').textContent=visible.length+' of '+sites().length+' places';
+  { const fd=$('#f-done'); if(fd) fd.textContent='Show '+visible.length+(visible.length===1?' place':' places'); }
   const lc=$('#linechip'); lc.textContent=''; lc.hidden=!F.line; if(F.line){ lc.append(el('span',{class:'chip','aria-pressed':'true'},el('span',{class:'sw',style:'--c:'+LK[F.line.k][1]}),'Along '+F.line.label,el('button',{type:'button',class:'x','aria-label':'Stop following this line',onclick:()=>{setLine(null);refresh();}},'✕'))); }
   if(!visible.length){ ul.append(el('li',{class:'empty pad'},'Nothing matches. Clear a filter or two.')); return; }
   /* a long list is shown in two steps: the first 120 rows now, the rest when asked for. The map shows every pin either way. */
@@ -1792,8 +1793,8 @@ function renderDetail(s){
   /* getting there */
   const times=el('div',{class:'times'});
   times.append(el('div',{class:'time home'},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+miTxt(d.mi)));
-  /* the three nearest other start cities, not all of them */
-  if(s.dt) HUBS.filter(h=>h.id!==U.home.id&&s.dt[h.id]).sort((a,b)=>s.dt[a.id][0]-s.dt[b.id][0]).slice(0,3).forEach(h=>times.append(el('div',{class:'time'},el('b',{text:fmtMin(s.dt[h.id][0])}),h.name)));
+  /* one time, from the reader's own start place; other cities' times were noise to anyone who does not live there */
+  times.append(el('button',{class:'btn sm',type:'button',id:'dt-change',onclick:()=>{ openSettings(); setTimeout(()=>{ const n=$('#set-home'); if(n){ n.scrollIntoView({block:'center'}); n.focus(); } },80); }},'Change start place'));
   const gd='https://www.google.com/maps/dir/?api=1&origin='+H.lat+','+H.lon+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
   const cbtn=el('button',{class:'btn sm',type:'button'},'Copy'); cbtn.addEventListener('click',()=>copy(ll(p),cbtn));
   v.append(el('div',{class:'sec pad'},el('h3',{text:'Getting there'}),times,
@@ -2205,7 +2206,9 @@ $('#home').addEventListener('change',e=>{
   if(v==='custom') return;
   U.home={id:v,by:1}; save(); buildHome(); drawHome(); refresh(); if(sel) renderDetail(sel); { const H=homeObj(); if(map&&e.go) map.setView([H.lat,H.lon],10); }
 });
-$('#q').addEventListener('input',debounce(e=>{ F.q=e.target.value.trim(); renderList(); syncMarkers(); $('#fcount').textContent=activeCount()?activeCount()+' on':''; },150));
+$('#q').addEventListener('input',debounce(e=>{ F.q=e.target.value.trim(); renderList(); syncMarkers(); syncFcount(); },150));
+/* the Filters button opens the panel under the search box and shows how many filters are on (the search box is not counted) */
+$('#filt-btn').addEventListener('click',()=>{ const d=$('#filters'); d.open=!d.open; syncFcount(); });
 $('#sort').addEventListener('change',e=>{ U.ui.sort=e.target.value; save(); renderList(); });
 $('#sort').value=U.ui.sort||'time';
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{ const v=b.getAttribute('data-view'); if(v==='list'&&sel&&view!=='detail'){ showView('detail'); } else if(v==='list'){ if(sel) deselect(); else showView('list'); } else showView(v); }));
