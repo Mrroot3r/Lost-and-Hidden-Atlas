@@ -65,6 +65,8 @@ echo "--- staged on branch $BR ---"; git status --short | awk '{print $1}' | sor
 echo "--- checks ---"; if [ -n "$FULL" ]; then python3 source/tools/check.py "$REPO"; else python3 source/tools/check.py "$REPO" --sources; fi
 cat <<MSG
 --- next ---
+0. NOW is the time to edit GUIDE.md, LEADS.md or CLAUDE.md, in the clone ($REPO), on this branch. They are not copied
+   from the workspace, and editing them before this command makes it stop ("uncommitted changes"). Then: git -C $REPO add -A
 1. git -C $REPO commit            (say what changed, what you verified and what you could not)
 2. git -C $REPO push -u origin $BR
 3. Open a pull request into main and stop. The owner merges it. Do not merge it yourself.

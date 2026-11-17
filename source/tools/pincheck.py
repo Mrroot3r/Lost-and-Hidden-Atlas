@@ -28,6 +28,16 @@ def grab(url,la,lo):
     lo_,hi_=im.resize((8,8)).convert('L').getextrema()
     if hi_-lo_<12: raise ValueError('blank image')
     return im
+PADQ='https://services.arcgis.com/v01gqwM5QqNysAAi/arcgis/rest/services/PADUS_Public_Access/FeatureServer/0/query'
+def land(s):
+    """The public-land unit under a pin, from the place itself if the build looked it up, else asked for now."""
+    if s.get('pl'): return '%s (%s)'%(s['pl'][0],s['pl'][2])
+    try:
+        fs=requests.get(PADQ,params={'geometry':'%s,%s'%(s['lon'],s['lat']),'geometryType':'esriGeometryPoint','inSR':4326,'spatialRel':'esriSpatialRelIntersects','outFields':'Unit_Nm,Pub_Access','returnGeometry':'false','f':'json'},timeout=40).json().get('features',[])
+        fs=sorted(fs,key=lambda f:f['attributes'].get('Pub_Access') not in ('OA','RA'))
+        return '%s (%s)'%(fs[0]['attributes']['Unit_Nm'],fs[0]['attributes']['Pub_Access']) if fs else None
+    except Exception: return 'land lookup failed'
+WARN=[]
 tiles=[]
 for i in ids:
     s=S.get(i)
@@ -46,12 +56,16 @@ for i in ids:
     if im is None:
         try: im=grab(ESRI,s['lat'],s['lon'])
         except Exception as e: im=Image.new('RGB',(PX,PX),'#444'); src='no image: '+str(e)[:30]
+    ld=land(s)
+    if s.get('acc')=='public' and (not ld or ld.endswith('(XA)')): WARN.append('%s is marked public, but the pin is %s'%(i,('on land the public-land map calls closed: '+ld) if ld else 'not on mapped public land: say in the access note who owns it and how you know, or change the access type'))
     d=ImageDraw.Draw(im); c=PX//2; r=30/(2*HALF)*PX
     d.ellipse([c-r,c-r,c+r,c+r],outline='#ff2d95',width=3); d.line([c-8,c,c+8,c],fill='#ff2d95',width=2); d.line([c,c-8,c,c+8],fill='#ff2d95',width=2)
     d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]",fill='#ffffff'); d.text((5,18),f"{s['lat']},{s['lon']}  {src}",fill='#bbbbbb')
-    tiles.append(im); print(i,src)
+    d.rectangle([0,PX-16,PX,PX],fill='#000000'); d.text((5,PX-14),('land: '+ld) if ld else 'land: not on mapped public land',fill='#7CFC98' if ld and not ld.endswith('(XA)') else '#ffb347')
+    tiles.append(im); print(i,'|',src,'| land:',ld or 'not on mapped public land')
 os.makedirs('research',exist_ok=True); PER=12
 for n in range(0,len(tiles),PER):
     part=tiles[n:n+PER]; cols=4; rows=math.ceil(len(part)/cols); sh=Image.new('RGB',(cols*PX,rows*PX),'#222')
     for k,im in enumerate(part): sh.paste(im,((k%cols)*PX,(k//cols)*PX))
     p=f'research/pincheck_{tag}_{n//PER+1}.jpg'; sh.save(p,quality=82); print('wrote',p)
+for w in WARN: print('CHECK ACCESS:',w)

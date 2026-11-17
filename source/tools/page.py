@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """Read a web page as text and print the sentences that match a pattern.
-   python3 tools/page.py [-n CHARS] [-g pattern] URL ...     (cached in research/pages/)"""
+   python3 tools/page.py [-n CHARS] [-g pattern] URL ...     (cached in research/pages/)
+   python3 tools/page.py --all [-n CHARS] URL ...            the whole text in reading order, for a history page you
+                                                             need to read through (default 12,000 characters)"""
 import sys,re,os,hashlib,html,requests
-a=sys.argv[1:]; N=1500; pat=r'hours|fee|admission|open |closed|parking|trail|mile|permit|gate|daily|season|free|access|road|owned|managed|private|ruin|remain'
+a=sys.argv[1:]; N=1500; ALL='--all' in a
+if ALL: a.remove('--all'); N=12000
+pat=r'hours|fee|admission|open |closed|parking|trail|mile|permit|gate|daily|season|free|access|road|owned|managed|private|ruin|remain'
 while a and a[0] in('-n','-g'):
     if a[0]=='-n': N=int(a[1])
     else: pat=a[1]
@@ -20,6 +24,7 @@ for u in a:
         except Exception as e: print('##',u,'-> ERROR',str(e)[:90],'\n'); continue
     t=re.sub(r'(?is)<(script|style|noscript|svg|nav|footer|header)[^>]*>.*?</\1>',' ',t)
     t=re.sub(r'(?i)<(br|/p|/div|/li|/h\d|/tr)[^>]*>','. ',t); t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
+    if ALL: print('##',u,f'({len(t)} chars of text)\n'+t[:N]+('\n[... %d more characters; raise -n to see them]'%(len(t)-N) if len(t)>N else '')+'\n'); continue
     sents=[s.strip(' .') for s in re.split(r'(?<=[.!?])\s+',t)]; seen=set(); out=[]; used=0
     for s in sents:
         if len(s)<25 or len(s)>420 or s in seen or not re.search(pat,s,re.I): continue
