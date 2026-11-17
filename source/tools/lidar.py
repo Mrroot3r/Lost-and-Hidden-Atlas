@@ -29,7 +29,9 @@ What is kept, and where:
   lidar/walls/<unit>.json   the stone walls found in a unit, as straight pieces. In the repository too; the site build
                             turns them into the "Stone walls" map layer (tools/walls.py).
   research/lidar/, cache/topo/   scans, pictures and downloaded maps. Not in the repository; made again when needed.
-New York State only: the ground model comes from the state's own elevation service (tools/lidar_dem.py)."""
+New York and Massachusetts. The ground model is New York's own elevation service in New York and the USGS 3DEP service
+in Massachusetts (tools/lidar_dem.py); the tax parcels are each state's own file (tools/parcel.py); the leaf-off aerial
+is each state's own (tools/ortho.py). STATES below says what a state needs; LIDAR.md, "Another state", says how to add one."""
 import sys,os,json,re,math,time,glob,subprocess,datetime,urllib.request,urllib.parse
 HERE=os.path.dirname(os.path.abspath(__file__)); PY=sys.executable
 LDIR='lidar/units'; WDIR='lidar/walls'; WORK='research/lidar'; UA={'User-Agent':'lost-hidden-atlas-research/1.0'}
@@ -39,11 +41,33 @@ REASONS={'faint':'no clear shape on LiDAR','water':'on a pond, lake or stream ed
  'nomap':'the map "building" is lettering, a line or a survey mark','private':'the tax parcel is private','noland':'no public-land record at the point',
  'dup':'the same site as another candidate','other':'see the note'}
 ORDER={'new':0,'no':1,'maybe':2,'yes':3,'published':4}
-REGION={'Albany':'albco','Rensselaer':'renss','Schenectady':'sch','Saratoga':'sar','Washington':'wash','Montgomery':'mohw','Schoharie':'scho','Otsego':'scho','Delaware':'scho',
+# The states this tool is set up for. box: west,south,east,north, generous (it takes in the edges of the neighbours).
+# src: where the ground model comes from (tools/lidar_dem.py). A unit record carries its state as "st"; one without is New York.
+STATES={'ny':{'name':'New York','box':'-79.8,40.45,-71.8,45.05','src':'ny'},
+        'ma':{'name':'Massachusetts','box':'-73.52,41.2,-69.9,42.9','src':'3dep'}}
+ALLBOX='-79.8,40.45,-69.9,45.05'
+# county -> the Atlas region key (tools/states.py) a drafted place gets. A county that is split between two regions is left as
+# a TODO naming the choices, so the writer decides from the town.
+REGION={'ny':{'Albany':'albco','Rensselaer':'renss','Schenectady':'sch','Saratoga':'sar','Washington':'wash','Montgomery':'mohw','Schoharie':'scho','Otsego':'scho','Delaware':'scho',
  'Greene':'cat','Ulster':'cat','Sullivan':'cat','Columbia':'hud','Dutchess':'hud','Orange':'midh','Putnam':'midh','Rockland':'midh','Westchester':'midh',
  'St. Lawrence':'nny','Jefferson':'nny','Lewis':'nny','Oneida':'cny','Madison':'cny','Chenango':'cny','Onondaga':'cny','Oswego':'cny','Cortland':'cny','Broome':'cny','Tioga':'cny','Tompkins':'cny','Cayuga':'cny',
- 'New York':'nyc','Kings':'nyc','Queens':'nyc','Bronx':'nyc','Richmond':'nyc','Nassau':'nyc','Suffolk':'nyc'}
-for _c in ('Warren','Essex','Hamilton','Franklin','Clinton','Fulton','Herkimer'): REGION[_c]='adk'
+ 'New York':'nyc','Kings':'nyc','Queens':'nyc','Bronx':'nyc','Richmond':'nyc','Nassau':'nyc','Suffolk':'nyc'},
+ 'ma':{'Berkshire':'berk','Essex':'nshore','Suffolk':'bos','Norfolk':'bos','Plymouth':'south','Bristol':'south','Barnstable':'south','Dukes':'south','Nantucket':'south',
+ 'Franklin':'TODO: region: pv (Pioneer Valley), or cmass for the Quabbin towns','Hampshire':'TODO: region: pv (Pioneer Valley), or cmass for the Quabbin towns','Hampden':'pv',
+ 'Worcester':'TODO: region: cmass (Quabbin and central) or worc (Worcester and Blackstone Valley)','Middlesex':'TODO: region: bos (Greater Boston and MetroWest) or nshore (Merrimack Valley)'}}
+for _c in ('Warren','Essex','Hamilton','Franklin','Clinton','Fulton','Herkimer'): REGION['ny'][_c]='adk'
+def st_of(u): return (u or {}).get('st') or 'ny'
+def unit_state(rings):
+    """The state a unit lies in, as a key of STATES or another two-letter code, from the middle of its outline: the Census
+    Bureau's answer when it gives one (exact), otherwise the Atlas's coarse state outlines."""
+    xs=[p[0] for r in rings for p in r]; ys=[p[1] for r in rings for p in r]; lo=sum(xs)/len(xs); la=sum(ys)/len(ys)
+    try:
+        j=fetch('https://geocoding.geo.census.gov/geocoder/geographies/coordinates',{'x':lo,'y':la,'benchmark':'Public_AR_Current','vintage':'Current_Current','layers':'States','format':'json'},timeout=30,tries=2)
+        return j['result']['geographies']['States'][0]['STUSAB'].lower()
+    except Exception:
+        sys.path.insert(0,HERE)
+        from lidar_dem import state_of
+        return state_of(la,lo)
 TODAY=str(datetime.date.today())
 
 def die(msg): print(msg); sys.exit(1)
@@ -155,7 +179,9 @@ def counts(cs):
 def cmd_status(a):
     L=load(); sync(L); cs=[c for u,c in allc(L)]; by=counts(cs)
     done=[u for u in L.values() if u.get('state')=='done']; part=[u for u in L.values() if u.get('state') in ('scanning','pairing')]
-    print(f"{len(done)} units swept; {len(cs)} pits beside an old-map building.")
+    bs={}
+    for u in done: bs[st_of(u)]=bs.get(st_of(u),0)+1
+    print(f"{len(done)} units swept"+(' ('+', '.join('%s %d'%(STATES[k]['name'],n) for k,n in sorted(bs.items()))+')' if len(bs)>1 else '')+f"; {len(cs)} pits beside an old-map building.")
     print('  not looked at yet: %d   set aside: %d   maybe: %d   yes, not written up: %d   published: %d'%tuple(by.get(k,0) for k in ('new','no','maybe','yes','published')))
     for u in part: print(f"  NOT FINISHED: {u['name']}. Run:  python3 tools/lidar.py sweep \"{u['name']}\"")
     left={}
@@ -196,10 +222,19 @@ def show_units(U,L,limit=30):
     print('Access: OA open, RA restricted (permit or season), XA closed, UK unknown. Sweep only OA and RA.')
     print('A scan takes about a minute for every 2,000 acres. Give "sweep" the name exactly as printed, capitals included.')
     print('Best ground: hill farms the state bought and reforested (state forests, wildlife areas). Parks give more false alarms.')
+def take_state(a):
+    """Takes --state xx out of the arguments. Returns (the rest, the state key or None)."""
+    st=None
+    if '--state' in a:
+        i=a.index('--state'); st=(a[i+1] if i+1<len(a) else '').lower(); a=a[:i]+a[i+2:]
+        if st not in STATES: die('--state must be one of: '+', '.join('%s (%s)'%(k,v['name']) for k,v in STATES.items()))
+    return a,st
 def cmd_find(a):
-    if not a: die('Usage: lidar.py find "part of a name"')
-    # the service's state field is not filled in for every unit, so New York is taken as a box (it takes in the edges of its neighbours)
-    show_units(pad_units("Unit_Nm LIKE '%"+a[0].replace("'","''")+"%'",{'geometry':'-79.8,40.45,-71.8,45.05','geometryType':'esriGeometryEnvelope','inSR':4326,'spatialRel':'esriSpatialRelIntersects'}),load())
+    a,st=take_state(a)
+    if not a: die('Usage: lidar.py find "part of a name" [--state ny|ma]')
+    # the service's state field is not filled in for every unit, so a state is taken as a box (it takes in the edges of its neighbours)
+    show_units(pad_units("Unit_Nm LIKE '%"+a[0].replace("'","''")+"%'",{'geometry':STATES[st]['box'] if st else ALLBOX,'geometryType':'esriGeometryEnvelope','inSR':4326,'spatialRel':'esriSpatialRelIntersects'}),load())
+    if not st: print('Searched: '+' and '.join(v['name'] for v in STATES.values())+'. To search one only, add  --state '+' or --state '.join(STATES)+'.')
 def cmd_near(a):
     if len(a)<3: die('Usage: lidar.py near <lat> <lon> <miles>')
     la,lo,mi=float(a[0]),float(a[1]),float(a[2]); dla=mi/69.0; dlo=mi/(69.0*math.cos(math.radians(la)))
@@ -208,39 +243,49 @@ def cmd_near(a):
     print('Listed: units of 300 acres or more that touch the box and are not yet swept. Names such as "Memorial Park" or\n"Conservation Area" belong to many places at once: leave those alone.')
 
 # ---------- sweeping ----------
-def outline(name):
+def outline(name,st=None):
+    """The file holding a unit's outline, fetched if it is not there: pieces of that exact name inside the state's box
+    (or, with no state given, inside all the states this tool covers)."""
     f=WORK+'/unit_'+''.join(ch for ch in name if ch.isalnum())+'.json'
     if os.path.exists(f): return f
-    r=run([os.path.join(HERE,'lidar_unit.py'),name,'save']); m=re.search(r'wrote (\S+\.json)',r.stdout)
+    r=run([os.path.join(HERE,'lidar_unit.py'),name,'save',STATES[st]['box'] if st else ALLBOX]); m=re.search(r'wrote (\S+\.json)',r.stdout)
     return m.group(1) if m else None
 def cmd_sweep(a):
     mins=1.6; wide=False
     if '--minutes' in a: i=a.index('--minutes'); mins=float(a[i+1]); a=a[:i]+a[i+2:]
     if '--wide' in a: wide=True; a.remove('--wide')
-    if not a: die('Usage: lidar.py sweep "Unit Name" ["Another"] [--minutes 1.6]')
+    a,want=take_state(a)
+    if not a: die('Usage: lidar.py sweep "Unit Name" ["Another"] [--minutes 1.6] [--state ny|ma]')
     t0=time.time(); end=t0+mins*60; L=load(); os.makedirs(WORK,exist_ok=True)
     if mins<3: print(f'Working for {int(mins*60)} seconds, then stopping cleanly. To do more in one go: --minutes 9, with your command time limit set to 10 minutes.',flush=True)
     for name in a:
-        if (L.get(name) or {}).get('state')=='done': print('already swept:',name); continue
+        u=L.get(name)
+        if u and want and st_of(u)!=want: print(f'SKIPPED "{name}": the ledger already has a unit of this name in {STATES[st_of(u)]["name"]}. One name is one unit here; tell the owner.'); continue
+        if (u or {}).get('state')=='done': print('already swept:',name); continue
         if end-time.time()<25: print(f'TIME IS UP before "{name}". Run the same command again.'); return
-        uf=outline(name)
+        uf=outline(name,want or (u and st_of(u)))
         if not uf: print(f'NO SUCH UNIT: "{name}". Use the exact name printed by "lidar.py find" or "lidar.py near".'); continue
         rings=json.load(open(uf))['rings']; xs=[p[0] for r in rings for p in r]; ys=[p[1] for r in rings for p in r]
         span=max((max(ys)-min(ys))*111,(max(xs)-min(xs))*111*math.cos(math.radians(sum(ys)/len(ys))))
         if span>90 and not wide:
-            print(f'SKIPPED "{name}": pieces with this name lie {int(span)} km apart, so it is probably several places that share a name.\n  If it really is one big unit, add --wide.'); continue
-        u=L.get(name)
-        if not u: u=L[name]={'name':name,'code':code_for(name,L),'state':'scanning','cands':[]}; save(u)
-        pre=prefix(name)
+            os.remove(uf)
+            print(f'SKIPPED "{name}": pieces with this name lie {int(span)} km apart, so it is probably several places that share a name.\n  If the others are in another state, name the state:  --state '+' or --state '.join(STATES)+'.  If it really is one big unit, add --wide.'); continue
+        if not u:
+            st=want or unit_state(rings)
+            if st not in STATES:
+                os.remove(uf); print(f'SKIPPED "{name}": it lies in {(st or "no state this tool knows").upper()}. This tool is set up for '+' and '.join(v['name'] for v in STATES.values())+' (LIDAR.md, "Another state", says what a new one needs).'); continue
+            u=L[name]={'name':name,'code':code_for(name,L),'st':st,'state':'scanning','cands':[]}; save(u)
+        st=st_of(u); pre=prefix(name)
         if not os.path.exists(pre+'_cands.json'):
             env=dict(os.environ); env['LIDAR_WALLS']='1'               # pits and stone walls from one fetch of the ground model
+            env.setdefault('LIDAR_SRC',STATES[st]['src'])             # the whole unit from one source
             if u.get('tries',0)>=2: env['LIDAR_ALLOW_GAPS']='1'       # the same tiles failed twice: go on without them
-            print(f'{name}: scanning the ground model for pits and walls...',flush=True)
+            print(f'{name} ({STATES[st]["name"]}): scanning the ground model for pits and walls...',flush=True)
             r=subprocess.run([PY,os.path.join(HERE,'lidar_scan.py'),uf,pre,str(max(10,int(end-time.time()-8)))],env=env)
             if r.returncode in (3,4):
                 pj=json.load(open(pre+'_partial.json')); u.update({'state':'scanning','done':pj['done'],'total':pj['total']})
                 if r.returncode==4 and pj['done']==0:
-                    save(u); print(f'NO GROUND MODEL for "{name}": not one tile could be fetched. The elevation service covers New York State only. If this unit is in New York the service may be down: try again later.'); continue
+                    save(u); print(f'NO GROUND MODEL for "{name}": not one tile could be fetched. The elevation service for {STATES[st]["name"]} may be down: try again later (tools/lidar_dem.py names the services).'); continue
                 if r.returncode==4: u['tries']=u.get('tries',0)+1
                 save(u); left=max(1,round((pj['total']-pj['done'])*2.2/60))
                 print(f'NOT FINISHED: {name}: {pj["done"]} of {pj["total"]} tiles scanned, about {left} more minute(s) of scanning. Run the same command again; it carries on from here.'); return
@@ -248,6 +293,9 @@ def cmd_sweep(a):
         sj=json.load(open(pre+'_scan.json')) if os.path.exists(pre+'_scan.json') else {}
         u.update({'state':'pairing','tiles':sj.get('total')}); u.pop('done',None); u.pop('total',None)
         if sj.get('failed'): u['gaps']=sj['failed']
+        if sj.get('coarse'):
+            u['coarse']=sj['coarse']
+            print(f'WARNING: {name}: {sj["coarse"]} of {sj.get("total")} tiles have no 1 m LiDAR (the national model is coarse there). Nothing can be found on those: "nothing here" is not a finding for that part of the unit.')
         save(u)
         if end-time.time()<20: print(f'NOT FINISHED: {name}: the scan is complete; the old maps are next. Run the same command again.'); return
         print(f'{name}: scan complete. Finding buildings on the old survey sheets (each sheet is a 10 to 20 MB download, once)...',flush=True)
@@ -272,9 +320,9 @@ def cmd_walls(a):
         if not u or u.get('state')!='done': print(f'"{name}" has not been swept. Sweep it instead (that maps its walls too):  python3 tools/lidar.py sweep "{name}"'); continue
         if u.get('walls') is not None and os.path.exists(os.path.join(WDIR,slug(name)+'.json')): print('walls already mapped:',name,'-',u['walls'],'pieces'); continue
         if end-time.time()<25: print(f'TIME IS UP before "{name}". Run the same command again.'); return
-        uf=outline(name)
+        uf=outline(name,st_of(u))
         if not uf: print(f'NO SUCH UNIT: "{name}".'); continue
-        pre=prefix(name); env=dict(os.environ); env['LIDAR_WALLS']='only'
+        pre=prefix(name); env=dict(os.environ); env['LIDAR_WALLS']='only'; env.setdefault('LIDAR_SRC',STATES[st_of(u)]['src'])
         if u.get('wtries',0)>=2: env['LIDAR_ALLOW_GAPS']='1'
         print(f'{name}: reading the ground model for walls...',flush=True)
         r=subprocess.run([PY,os.path.join(HERE,'lidar_scan.py'),uf,pre,str(max(10,int(end-time.time()-8)))],env=env)
@@ -432,12 +480,18 @@ def cmd_check(a):
     for cid in a:
         u,c=get(L,cid); la,lo=c['lat'],c['lon']; k={}
         if time.time()>end-10: left.append(c['id']); continue
-        r=run([os.path.join(HERE,'parcel.py'),str(la),str(lo)]); line=(r.stdout.strip().splitlines() or [''])[-1]
+        st=st_of(u); r=run([os.path.join(HERE,'parcel.py'),'--state',st,str(la),str(lo)]); line=(r.stdout.strip().splitlines() or [''])[-1]
         if 'lookup failed' in line: print(c['id'],': the parcel service did not answer. Run check again.'); continue
         if '->' in line:
             f=[x.strip() for x in line.split('->',1)[1].split('|')]
             k['parcel']={'kind':f[0],'class':f[1].replace('class','').strip() if len(f)>1 else '','acres':f[2].replace('acres','').strip() if len(f)>2 else '','muni':f[3] if len(f)>3 else '','addr':f[4] if len(f)>4 else ''}
         else: k['parcel']=None
+        # the lots round about: a pit on public land can be 40 m from somebody's house lot, and the 200 m sheet does not show it
+        ring=[]; kk=math.cos(math.radians(la))
+        for nm,dx,dy in (('north',0,1),('north-east',.7,.7),('east',1,0),('south-east',.7,-.7),('south',0,-1),('south-west',-.7,-.7),('west',-1,0),('north-west',-.7,.7)):
+            ring+=[nm,'%.6f'%(la+75*dy/111320),'%.6f'%(lo+75*dx/(111320*kk))]
+        r=run([os.path.join(HERE,'parcel.py'),'--state',st]+[x for i,x in enumerate(ring) if i%3]); rl=r.stdout.strip().splitlines()
+        k['near']=[ring[3*i] for i in range(8) if i<len(rl) and '-> PRIVATE' in rl[i]] if len(rl)==8 else None
         r=run([os.path.join(HERE,'pad.py'),'%s,%s,%s'%(c['id'],la,lo)])
         if 'ERROR' in r.stdout: print(c['id'],': the public-land service did not answer. Run check again.'); continue
         pu=re.findall(r"\('([^']*)', '([^']*)', '([^']*)'\)",r.stdout); pu=sorted(pu,key=lambda x:(x[2] not in ('OA','RA'),x[0]!=u['name']))
@@ -452,12 +506,17 @@ def cmd_check(a):
         p=k['parcel']; pd=k['padus']
         if p and p['kind']=='PRIVATE': k['rule']='private'; say='DO NOT PUBLISH: the tax parcel is PRIVATE. Now run:  python3 tools/lidar.py mark %s no private'%c['id']
         elif p and (p['kind']=='STATE LAND' or p['kind'].startswith('public')): k['rule']='parcel'; say='MAY PUBLISH: the tax parcel is public land.'
-        elif pd and pd['access'] in ('OA','RA'): k['rule']='padus'; say='MAY PUBLISH WITH A CAVEAT: no owner in the tax-parcel file here, but the federal public-land record names the unit. The draft writes the caveat for you.'
+        elif pd and pd['access'] in ('OA','RA'):
+            k['rule']='padus'
+            say=('MAY PUBLISH WITH A CAVEAT: the tax parcel is tax-exempt land that is not government-owned (a land trust or the like), and the federal public-land record names the unit as open. The draft writes the caveat; find the owner\'s own visiting rules for the access line.' if p and p['kind'].startswith('tax-exempt')
+                 else 'MAY PUBLISH WITH A CAVEAT: no owner in the tax-parcel file here, but the federal public-land record names the unit. The draft writes the caveat for you.')
         else: k['rule']='none'; say='DO NOT PUBLISH: no public owner in the parcel file and no public-land record. Add a row to LEADS.md, then run:  python3 tools/lidar.py mark %s no noland'%c['id']
         c['check']=k; save(u)
         print(c['id'],'|',k.get('town') or '?','|',(k.get('county') or '?'),'County | nearest named road:',k.get('road') or 'none found')
-        print('   tax parcel:',('%s, class %s, %s acres%s'%(p['kind'],p['class'],p['acres'],(', '+p['addr']) if p['addr'] and p['kind']!='PRIVATE' else '')) if p else 'no record (this county is not in the state file, or the point is on a road)')
+        print('   tax parcel:',('%s, class %s, %s acres%s'%(p['kind'],p['class'],p['acres'],(', '+p['addr']) if p['addr'] and p['kind']!='PRIVATE' else '')) if p else ('no record (this county is not in the state file, or the point is on a road)' if st=='ny' else 'no record (the point is on a road, a railway or water)'))
         print('   public-land record:',('%s (%s), access %s'%(pd['unit'],pd['manager'],pd['access'])) if pd else 'nothing at this point')
+        if k.get('near'): print('   PRIVATE LAND within about 75 m, to the '+', '.join(k['near'])+'. Look at the aerial for a house there (tools/pincheck.py shows 300 m) and say in the access line which side is public.')
+        elif k.get('near') is None: print('   the lots round about could not be read (the parcel service did not answer for all eight points)')
         print('  ',say)
     if left: print('NOT FINISHED (time was up). Run:  python3 tools/lidar.py check '+' '.join(left))
 
@@ -477,7 +536,7 @@ def cmd_draft(a):
     while os.path.exists(os.path.join(HERE,'data_%s.py'%key)): k+=1; key='lidar_%s_%s%d'%(datetime.date.today().strftime('%m%d'),todo[0][0]['code'],k+1)
     f=os.path.join(HERE,'data_%s.py'%key); body=[]; notes=[]
     for u,c,pid in todo:
-        k=c['check']; w,h=c['size']; q=quad(c['sheet']); late=c.get('late'); p=k.get('parcel'); pd=k.get('padus')
+        k=c['check']; w,h=c['size']; q=quad(c['sheet']); late=c.get('late'); p=k.get('parcel'); pd=k.get('padus'); st=st_of(u)
         story="The %d USGS survey (%s sheet) draws a building about %d m from here. TODO: what is beside it on that map (a road, a stream, a crossroads)? %s"%(c['year'],q,c['dist'],
               ("TODO: what does the %d sheet (%s) show at this spot? Is the building still drawn?"%(late[0],quad(late[1]))) if late else "No later map was looked at, so when it went is not known.")
         look="On LiDAR: TODO: the shape you see (round or square, a rim, walls, banks or an old road beside it); the pit is about %d by %d m and %.1f m deep. The leaf-off aerial shows TODO: woods, brush or field, and nothing standing. Not checked on the ground."%(w,h,c['depth'])
@@ -485,17 +544,20 @@ def cmd_draft(a):
         if k['rule']=='parcel':
             acc="%s: the tax parcel under the pin is a %s-acre lot%s%s. %s TODO: the marked trail or parking place for this spot, or say that none was found."%('State land' if p['kind']=='STATE LAND' else 'Public or conservation land',p['acres'],' owned by the state' if p['kind']=='STATE LAND' else '',(', in '+pd['unit']) if pd else '',('The nearest road OpenStreetMap names is '+road+'.') if road else 'No named road is near.')
         else:
-            why=("%s County is not in the state's public parcel file"%(k.get('county') or 'This')) if not p else "the county's parcel record does not give the owner"
-            acc="No tax-parcel record could be checked: %s. The federal protected-areas database puts the spot inside %s, open to the public%s. Public land is a patchwork with private lots inside it, so confirm with the Owner? button or the state boundary signs before you leave the road."%(why,pd['unit'],(', and the nearest road OpenStreetMap names is '+road) if road else '. No named road is near')
+            if p and p['kind'].startswith('tax-exempt'): lead='The tax parcel under the pin is tax-exempt land that is not government-owned (a land trust, a charity or the like). TODO: who that is, and their own visiting rules, from their own page.'
+            elif st=='ny': lead="No tax-parcel record could be checked: %s."%(("%s County is not in the state's public parcel file"%(k.get('county') or 'This')) if not p else "the county's parcel record does not give the owner")
+            else: lead="No tax-parcel record could be checked: %s."%('no parcel covers the pin (it may sit on an old road layout)' if not p else 'the parcel record does not give the owner')
+            acc=lead+" The federal protected-areas database puts the spot inside %s, open to the public%s. Public land is a patchwork with private lots inside it, so confirm with the Owner? button or the state boundary signs before you leave the road."%(pd['unit'],(', and the nearest road OpenStreetMap names is '+road) if road else '. No named road is near')
         tail='+HUNT' if re.search(r'Forest|Wma|Wildlife|Wild Forest|Wilderness|Multiple Use',u['name']) else "+' TODO: the opening hours and any fee, from the managing body\\'s own page.'"
         years=('before %d'%c['year'])+(('–TODO: add "before %d" if the later sheet no longer draws it'%late[0]) if late else '')
-        body.append("# %s  rank %.2f  verdict note: %s\nN(%r,%r,%r,%r,'lidar','traces',%s,%s,%r,'public','hike','',%r,\n  %r,\n  %r,\n  %r,\n  %r%s,SRC,conf='lead'),"%(c['id'],rank(c),c.get('note') or '(none)',pid,'TODO: a plain name, what it is and where',k.get('town') or 'TODO: town',REGION.get(k.get('county') or '','TODO: region key from tools/states.py'),c['lat'],c['lon'],'exact' if c['dist']<=60 else 'site',years,story,look,'TODO: one short line, why it is worth the walk',acc,tail))
+        if k.get('near'): acc+=' Private land lies within about 75 m to the %s: TODO: say which side of the road or wall is public, and whether a house stands there (look at the pin check).'%', '.join(k['near'])
+        body.append("# %s  rank %.2f  verdict note: %s\nN(%r,%r,%r,%r,'lidar','traces',%s,%s,%r,'public','hike','',%r,\n  %r,\n  %r,\n  %r,\n  %r%s,SRC,conf='lead'),"%(c['id'],rank(c),c.get('note') or '(none)',pid,'TODO: a plain name, what it is and where',k.get('town') or 'TODO: town',REGION.get(st,{}).get(k.get('county') or '','TODO: region key from tools/states.py'),c['lat'],c['lon'],'exact' if c['dist']<=60 else 'site',years,story,look,'TODO: one short line, why it is worth the walk',acc,tail))
         notes.append(" %r:%r,"%(pid,"The pin is the pit on LiDAR. The building on the %d sheet is drawn about %d m away%s. Looked at on LiDAR and the leaf-off aerial; not seen on the ground."%(c['year'],c['dist'],'; sheets of that scale can be 50 to 100 m out' if c['dist']>30 else '')))
         for kk in ('why',): c.pop(kk,None)
         c.update({'status':'published','place':pid,'batch':key,'when':TODAY}); save(u)
     units=sorted({u['name'] for u,c,pid in todo})
     open(f,'w',encoding='utf-8').write('''# %s: LiDAR finds in %s, drafted by tools/lidar.py (method: LIDAR.md).
-# Every entry is an unverified lead (conf='lead'): a pit on the state's LiDAR ground model beside a building on an old
+# Every entry is an unverified lead (conf='lead'): a pit on the LiDAR ground model beside a building on an old
 # USGS sheet, nothing standing on the leaf-off aerial, on land the records show as public. Nothing was seen on the ground.
 # FINISH EVERY "TODO" BEFORE BUILDING: tools/check.py refuses a place that still has one. Say only what you saw.
 from data_b import N
@@ -507,7 +569,7 @@ PLACES=[
 PIN_NOTES={
 %s
 }
-'''%(datetime.date.today().strftime('%B %d, %Y'),', '.join(units),key,datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),'\n'.join(body),'\n'.join(notes)))
+'''%(datetime.date.today().strftime('%B %d, %Y'),', '.join(units),key,datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d %H:%M'),'\n'.join(body),'\n'.join(notes)))
     print('wrote',f,'with',len(todo),'place(s). Now:')
     print('  1. Open that file and replace every TODO with what you saw on the sheets. Change nothing you did not check.')
     print('  2. python3 tools/topo_all.py '+' '.join(pid for u,c,pid in todo))

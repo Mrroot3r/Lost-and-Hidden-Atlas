@@ -1,0 +1,6 @@
+{"name": "Catamount State Forest", "code": "casf", "st": "ma", "state": "done", "tiles": 13, "swept": "2026-11-16", "buildings": 24, "sheets": ["MA_Greenfield_352726_1890_62500_geo.tif", "MA_Hawley_352777_1890_62500_geo.tif"], "walls": 66, "wall_m": 2003,
+"cands":[
+{"id":"casf1","lat":42.650936,"lon":-72.753958,"depth":0.72,"size":[9,8],"dist":26,"blat":42.65116,"blon":-72.75404,"sheet":"MA_Hawley_352777_1890_62500_geo.tif","year":1890,"status":"maybe","when":"2026-11-16","late":[1945,"MA_Heath_351792_1945_31680_geo.tif"],"seen":"2026-11-16","note":"two small pits beside the old Catamount Hill road where the 1890 sheet draws a building; the ground model is soft here"},
+{"id":"casf2","lat":42.650837,"lon":-72.753805,"depth":0.71,"size":[12,8],"dist":41,"blat":42.65116,"blon":-72.75404,"sheet":"MA_Hawley_352777_1890_62500_geo.tif","year":1890,"status":"no","why":"dup","when":"2026-11-16"},
+{"id":"casf3","lat":42.652621,"lon":-72.771123,"depth":0.69,"size":[10,15],"dist":6,"blat":42.65257,"blon":-72.77112,"sheet":"MA_Hawley_352777_1890_62500_geo.tif","year":1890,"status":"no","why":"faint","when":"2026-11-16"}
+]}

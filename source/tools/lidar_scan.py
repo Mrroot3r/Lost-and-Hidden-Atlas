@@ -11,7 +11,7 @@
 import sys,json,math,os,time,numpy as np
 from scipy import ndimage as ndi
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
-from lidar_dem import dem,merc,unmerc
+from lidar_dem import dem,merc,unmerc,coarse
 unit=json.load(open(sys.argv[1])); pre=sys.argv[2]; rings=unit['rings']
 BUDGET=float(sys.argv[3]) if len(sys.argv)>3 else None; T0=time.time(); KEEP=os.environ.get('LIDAR_KEEP_TILES')=='1'
 xs=[p[0] for r in rings for p in r]; ys=[p[1] for r in rings for p in r]; W,E,S,N=min(xs),max(xs),min(ys),max(ys)
@@ -67,6 +67,9 @@ def latlon_of(la,lo):
     x0,y0=merc(la,lo); kk=1/math.cos(math.radians(la))
     return lambda r,c: unmerc(x0+(c-(T/2+PAD))*kk,y0+((T/2+PAD)-r)*kk)
 cands=[]; wallsall=[]; n=0; fresh=0; failed=0
+# Tiles whose ground model is not real 1 m LiDAR (the national service fills gaps with a 10 m model): nothing can be found
+# on those, and a sweep that says "nothing here" must not be believed there. Their centres are kept in <pre>_coarse.json.
+CO=set(json.load(open(pre+'_coarse.json'))) if os.path.exists(pre+'_coarse.json') else set()
 for la,lo in TILES:
     f=f'{TD}/{os.path.basename(pre)}_{la:.5f}_{lo:.5f}.npy'; fc=f[:-4]+'.cand.json'; fw=f[:-4]+'.walls.json'
     needp=WALLS!='only' and not os.path.exists(fc); needw=bool(WALLS) and not os.path.exists(fw)
@@ -75,16 +78,25 @@ for la,lo in TILES:
         if WALLS: wallsall+=json.load(open(fw))
         n+=1; continue
     if BUDGET is not None and time.time()-T0>BUDGET:
-        json.dump({'done':n,'total':len(TILES)},open(pre+'_partial.json','w'))
-        print(pre,'PARTIAL: time is up after',n,'of',len(TILES),'tiles. Run the same command again to carry on.'); sys.exit(3)
+        json.dump({'done':n,'total':len(TILES),'failed':failed},open(pre+'_partial.json','w'))
+        # Tiles that would not load use up the time (each is tried for a minute or two). Say so with code 4, not 3, so the
+        # caller counts the attempt: otherwise a unit with a handful of bad tiles is "not finished" for ever.
+        print(pre,'PARTIAL: time is up after',n,'of',len(TILES),'tiles'+(f' ({failed} would not load)' if failed else '')+'. Run the same command again to carry on.'); sys.exit(4 if failed else 3)
     a=None
     if os.path.exists(f): a=np.load(f)
     else:
         for k in range(3):
             try: a,_=dem(la,lo,T/2+PAD,T+2*PAD); break
             except Exception as e: time.sleep(3); a=None
-        if a is None: print('failed tile',la,lo); failed+=1; continue     # not marked done: the next run tries it again
+        if a is None:
+            print('failed tile',la,lo); failed+=1
+            if os.environ.get('LIDAR_ALLOW_GAPS'):                         # tried in earlier runs too: leave it out for good, so the scan can end
+                if needp: json.dump([],open(fc,'w'))
+                if needw: json.dump([],open(fw,'w'))
+                n+=1
+            continue                                                       # otherwise not marked done: the next run tries it again
         if KEEP: np.save(f,a)
+    if coarse(a) and f'{la:.5f},{lo:.5f}' not in CO: CO.add(f'{la:.5f},{lo:.5f}'); json.dump(sorted(CO),open(pre+'_coarse.json','w'))
     if needw:                                               # walls first: the pits file is what marks a tile done for a pits-only run
         wl=[w for w in tile_walls(a,T,PAD,latlon_of(la,lo)) if inside((w[1]+w[3])/2e5,(w[0]+w[2])/2e5)]      # only walls whose middle is inside the unit
         json.dump(wl,open(fw,'w')); wallsall+=wl
@@ -101,7 +113,8 @@ if failed and not os.environ.get('LIDAR_ALLOW_GAPS'):
 if WALLS: json.dump(wallsall,open(pre+'_walls.json','w'),separators=(',',':'))
 if WALLS!='only':
     json.dump(cands,open(pre+'_cands.json','w'))
-    json.dump({'tiles':n,'total':len(TILES),'failed':failed,'pits':len(cands)},open(pre+'_scan.json','w'))
+    json.dump({'tiles':n,'total':len(TILES),'failed':failed,'pits':len(cands),'coarse':len(CO)},open(pre+'_scan.json','w'))
 if os.path.exists(pre+'_partial.json'): os.remove(pre+'_partial.json')
+if CO: print(pre,'COARSE GROUND:',len(CO),'of',len(TILES),'tiles are not 1 m LiDAR; nothing can be found on those')
 if WALLS: print(pre,'wall pieces',len(wallsall))
 print(pre,'tiles',n,'of',len(TILES),'candidates',len(cands),('; '+str(failed)+' tiles could not be fetched' if failed else ''))

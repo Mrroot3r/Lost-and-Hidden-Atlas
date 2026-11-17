@@ -33,6 +33,16 @@ def sheets(lo,la):
         b=it.get('boundingBox') or {}
         out.append((int(m.group(2)),m.group(1),url,(b.get('minX'),b.get('minY'),b.get('maxX'),b.get('maxY'))))
     return sorted(out)
+_INK={}
+def ink(tif):
+    """How dark a scanned sheet prints black: red+green+blue of its darkest ink. Under about 100 is a good scan; 250 is pale."""
+    if tif not in _INK:
+        try:
+            import rasterio,numpy as np
+            with rasterio.open(tif) as ds: a=ds.read(out_shape=(ds.count,ds.height//4,ds.width//4)).astype('int32')
+            _INK[tif]=float(np.percentile(a[:3].sum(0),0.2))
+        except Exception: _INK[tif]=0.0
+    return _INK[tif]
 def rank(c):
     """Higher is more promising. A cellar is 5 to 12 m across and at least 0.6 m deep, and sits where the map says."""
     w,h=c['size']; big=max(w,h); small=min(w,h)
@@ -63,7 +73,7 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
     # The oldest sheet over every 15-minute square the unit's outline touches (old sheets are 15 minutes on a side).
     # The first version asked only at the four corners of the unit's box and its middle, which for a big unit made of
     # scattered pieces (a wild forest) can miss every piece: Taylor Pond Wild Forest came back with no buildings at all.
-    cells={}
+    cells={}; ALT={}
     for x,y in P: cells.setdefault((math.floor(x*4),math.floor(y*4)),[]).append((x,y))
     asks=[(sum(a for a,b in v)/len(v),sum(b for a,b in v)/len(v)) for k,v in sorted(cells.items(),key=lambda kv:-len(kv[1]))[:14]]
     want={}
@@ -71,14 +81,27 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
         ss=[s for s in sheets(lo,la) if s[0]<=1915]
         if ss:
             quad=ss[0][1].split('_')[1]
-            want.setdefault(quad,ss[0])
+            if quad not in want: want[quad]=ss[0]; ALT[quad]=[s for s in ss[1:] if s[1].split('_')[1]==quad][:2]     # later printings of the same sheet, in case the oldest is a pale scan
     nb=0; found=[]; MISSED=[]
-    for quad,(year,fn,url,bb) in want.items():
+    def have(fn,url):
         tif='cache/topo/'+urllib.parse.quote(fn) if os.path.exists('cache/topo/'+urllib.parse.quote(fn)) else 'cache/topo/'+fn
         if not os.path.exists(tif):
             g=subprocess.run([sys.executable,'tools/lidar_sheet.py','get',url],capture_output=True,text=True)
             tif=(g.stdout.strip().splitlines() or [''])[-1]
-            if not os.path.exists(tif): print('  sheet download failed',fn); MISSED.append(fn); continue
+        return tif if os.path.exists(tif) else None
+    for quad in list(want):
+        year,fn,url,bb=want[quad]
+        tif=have(fn,url)
+        if not tif: print('  sheet download failed',fn); MISSED.append(fn); continue
+        # A pale scan (its black ink is grey) gives far fewer buildings than a dark scan of the same plate. When the oldest
+        # sheet is pale and a later printing from before 1916 exists, take the darkest of them.
+        k=ink(tif)
+        if k>150 and not os.path.exists(pre+'_b_'+re.sub(r'[^A-Za-z0-9]+','',fn)[:60]+'.txt'):
+            for alt in ALT.get(quad,[]):
+                t2=have(alt[1],alt[2])
+                if t2 and ink(t2)<k-60:
+                    print(f"  the {year} {quad} sheet is a pale scan; using the {alt[0]} printing instead",flush=True)
+                    k=ink(t2); year,fn,url,bb=alt; tif=t2; want[quad]=alt
         bcf=lambda f: pre+'_b_'+re.sub(r'[^A-Za-z0-9]+','',f)[:60]+'.txt'
         bc=bcf(fn)                           # this sheet's buildings, kept so a run that is cut off need not repeat it
         if os.path.exists(bc): bout=open(bc).read()

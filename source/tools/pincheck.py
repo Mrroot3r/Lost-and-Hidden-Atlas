@@ -16,6 +16,10 @@ PX=420; HALF=150
 ESRI='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export'
 STATE=[('New York leaf-off',lambda la,lo:la>40.4 and -80.0<lo and (lo<-73.3 or (la<42.0 and lo<-73.48)),'https://orthos.its.ny.gov/arcgis/rest/services/wms/Latest/MapServer/export'),
        ('Rhode Island March 2026',lambda la,lo:la<42.02 and -71.9<lo<-71.1,'https://maps.edc.uri.edu/rigis/rest/services/IMG/RI_202603_RGB_3in_web/ImageServer/exportImage')]
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
+from ortho import ortho
+from lidar_dem import state_of
+MA_TEST=lambda la,lo: state_of(la,lo)=='ma'
 def merc(la,lo): return lo*20037508.34/180, math.log(math.tan((90+la)*math.pi/360))*20037508.34/math.pi
 def grab(url,la,lo):
     x,y=merc(la,lo); h=HALF/math.cos(math.radians(la))
@@ -29,8 +33,13 @@ for i in ids:
     s=S.get(i)
     if not s: print('unknown id',i); continue
     src='Esri satellite (leaves may be on)'; im=None
+    if MA_TEST(s['lat'],s['lon']):                         # Massachusetts: the state's leaf-off imagery comes as tiles (tools/ortho.py)
+        try:
+            im,src=ortho(s['lat'],s['lon'],HALF,PX)
+            if src.startswith('no aerial'): im=None
+        except Exception: im=None
     for name,test,url in STATE:
-        if test(s['lat'],s['lon']):
+        if im is None and test(s['lat'],s['lon']):
             try: im=grab(url,s['lat'],s['lon']); src=name
             except Exception: im=None
             break

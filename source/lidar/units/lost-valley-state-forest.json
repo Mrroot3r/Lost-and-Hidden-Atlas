@@ -1,4 +1,4 @@
-{"name": "Lost Valley State Forest", "code": "lvsf", "state": "done", "swept": "2026-11-16", "buildings": 15, "sheets": ["NY_Fonda_139538_1896_62500_geo.tif"],
+{"name": "Lost Valley State Forest", "code": "lvsf", "state": "done", "swept": "2026-11-16", "buildings": 15, "sheets": ["NY_Fonda_139538_1896_62500_geo.tif"], "walls": 195, "wall_m": 7498,
 "cands":[
 {"id":"lvsf1","lat":42.829892,"lon":-74.29647,"depth":0.71,"size":[10,8],"dist":14,"blat":42.82983,"blon":-74.29662,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
 {"id":"lvsf2","lat":42.843847,"lon":-74.287326,"depth":0.68,"size":[9,7],"dist":21,"blat":42.84369,"blon":-74.28719,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"new"},

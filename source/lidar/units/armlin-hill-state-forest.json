@@ -1,4 +1,4 @@
-{"name": "Armlin Hill State Forest", "code": "ahsf", "state": "done", "swept": "2026-11-16", "buildings": 2, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"],
+{"name": "Armlin Hill State Forest", "code": "ahsf", "state": "done", "swept": "2026-11-16", "buildings": 2, "sheets": ["NY_Schoharie_129440_1898_62500_geo.tif"], "walls": 130, "wall_m": 4319,
 "cands":[
 {"id":"ahsf1","lat":42.54785,"lon":-74.337326,"depth":1.1,"size":[7,6],"dist":20,"blat":42.548,"blon":-74.33746,"sheet":"NY_Schoharie_129440_1898_62500_geo.tif","year":1898,"status":"no","why":"noland","note":"a sharp pit, but no public-land record at the point; it is in LEADS.md","when":"2026-11-16"}
 ]}

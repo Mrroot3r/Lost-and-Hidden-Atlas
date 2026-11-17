@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Offline test of the LiDAR ledger (tools/lidar.py): no network, standard library only, works in a scratch folder.
+"""Offline test of the LiDAR ledger (tools/lidar.py): no network, works in a scratch folder. The ledger checks need only the
+standard library; the last block (which state a point is in, coarse ground, the Massachusetts parcel rules, the tiled
+aerial) needs numpy, scipy, PIL and requests and says so if they are missing.
    python3 tools/lidar_test.py
 Run it after changing tools/lidar.py. It covers the parts a mistake would quietly spoil: ids that must never change,
 the one-candidate-per-line file, the verdict rules, folding two copies of the ledger together, and the draft guard."""
@@ -68,4 +70,58 @@ t('merge brings in a new unit','Gamma State Forest' in L)
 t('merge takes the later verdict',lidar.get(L,i3)[1]['status']=='no' and lidar.get(L,i3)[1]['why']=='road')
 t('merge keeps the verdict the other copy lacks',lidar.get(L,i2)[1]['status']=='yes')
 t('status runs',('units swept' in out(lidar.cmd_status,[])) and 'report' not in out(lidar.cmd_report,[]))
+# ---- more than one state (New York and Massachusetts)
+t('a unit without a state is New York',lidar.st_of({})=='ny' and lidar.st_of({'st':'ma'})=='ma' and lidar.st_of(None)=='ny')
+t('--state is taken out of the arguments',lidar.take_state(['Some Forest','--state','MA'])==(['Some Forest'],'ma') and lidar.take_state(['x'])==(['x'],None))
+t('--state refuses a state the tool is not set up for','must be one of' in out(lidar.take_state,['x','--state','vt']))
+t('regions go by state: Franklin County is two places',lidar.REGION['ny']['Franklin']=='adk' and lidar.REGION['ma']['Berkshire']=='berk' and lidar.REGION['ma']['Franklin'].startswith('TODO'))
+t('every state names its box and its ground model',all(len(v['box'].split(','))==4 and v['src'] in ('ny','3dep','ma') for v in lidar.STATES.values()))
+json.dump({'name':'Zeta State Forest','rings':[[[-72.7,43.9],[-72.69,43.9],[-72.69,43.91],[-72.7,43.9]]]},open('research/lidar/unit_ZetaStateForest.json','w'))
+_us=lidar.unit_state; lidar.unit_state=lambda rings:'vt'
+o=out(lidar.cmd_sweep,['Zeta State Forest'])
+t('a unit in a state the tool does not cover is refused, and no ledger file is made','SKIPPED' in o and 'VT' in o and 'Zeta State Forest' not in lidar.load() and not os.path.exists('research/lidar/unit_ZetaStateForest.json'))
+lidar.unit_state=_us
+L=lidar.load(); g=L['Gamma State Forest']; g['st']='ma'; lidar.save(g)
+t('status counts the states apart','Massachusetts 1' in out(lidar.cmd_status,[]))
+t('a second unit of the same name in another state is refused','already has a unit of this name' in out(lidar.cmd_sweep,['Gamma State Forest','--state','ny']))
+# ---- the ground model, the parcel rules and the aerial: these need numpy, scipy, PIL and requests (the site build has them)
+try:
+    import numpy as np, lidar_dem, parcel, ortho
+    from scipy import ndimage as ndi
+except Exception as e: print('(skipped: the ground-model, parcel and aerial checks need numpy, scipy, PIL and requests: %s)'%str(e)[:60])
+else:
+    t('the outlines tell New York from Massachusetts',lidar_dem.state_of(42.65,-73.75)=='ny' and lidar_dem.state_of(42.4226,-72.2253)=='ma' and lidar_dem.state_of(41.0,-69.0) is None)
+    os.environ.pop('LIDAR_SRC',None)
+    t('the ground model goes by the state',lidar_dem.source(42.65,-73.75)=='ny' and lidar_dem.source(42.4226,-72.2253)=='3dep')
+    os.environ['LIDAR_SRC']='ma'; t('LIDAR_SRC overrides it',lidar_dem.source(42.65,-73.75)=='ma'); os.environ.pop('LIDAR_SRC')
+    rng=np.random.default_rng(3); big=ndi.gaussian_filter(rng.normal(0,1,(300,300)),25)*400; fine=big+ndi.gaussian_filter(rng.normal(0,1,(300,300)),0.8)*0.05
+    t('real 1 m ground is not called coarse',not lidar_dem.coarse(fine))
+    t('a 10 m model blown up to 1 m is called coarse',lidar_dem.coarse(ndi.zoom(fine[::10,::10],10,order=1)))
+    t('still water is not called coarse',not lidar_dem.coarse(np.zeros((200,200),'float32')+7))
+    t('an empty answer is known as empty',lidar_dem.empty(np.full((50,50),-9999.0)) and lidar_dem.empty(np.full((50,50),np.nan)) and not lidar_dem.empty(fine))
+    calls=[]
+    def fake(src,x,y,h,px):
+        calls.append(src)
+        if src=='ny': raise OSError('image file is truncated (282 bytes not processed)')
+        return fine
+    _g=lidar_dem._get; lidar_dem._get=fake; os.environ['LIDAR_SRC']='ny'
+    a,sc=lidar_dem.dem(42.62,-73.30,150,300)
+    t('a New York tile that cannot be read comes from the national model, at once',calls==['ny','3dep'] and a is fine)
+    calls.clear(); lidar_dem._get=lambda src,x,y,h,px:(calls.append(src),np.full((9,9),-9999.0) if src=='ny' else fine)[1]
+    t('so does an empty one',lidar_dem.dem(42.62,-73.30,150,300)[0] is fine and calls==['ny','3dep'])
+    lidar_dem._get=_g; os.environ.pop('LIDAR_SRC')
+    K=parcel.ma_kind
+    t('Massachusetts: the Commonwealth by name is state land',K('COMMONWEALTH OF MASS','9150')=='STATE LAND' and K('MASS COMMONWEALTH OF DCR','')=='STATE LAND')
+    t('Massachusetts: a house lot is private',K('SOMEBODY JANE','101')=='PRIVATE')
+    t('Massachusetts: a town lot is public, a land trust is not government',K('TOWN OF SOMEWHERE','9300').startswith('public') and K('A LAND TRUST INC','950').startswith('tax-exempt') and not K('A CHURCH','960').startswith('public'))
+    t('Massachusetts: nothing known is not called private',K('','')=='owner not published')
+    class R:
+        status_code=200
+        def __init__(s,z,y,x):
+            from PIL import Image
+            b=io.BytesIO(); Image.new('RGB',(256,256),((x*37)%256,(y*53)%256,90)).save(b,'PNG'); s.content=b.getvalue()
+    import re as _re
+    ortho.requests.get=lambda u,**k: R(*[int(v) for v in _re.search(r'/tile/(\d+)/(\d+)/(\d+)$',u).groups()])
+    im=ortho.tiles(ortho.MA,42.4226,-72.2253,100,500)
+    t('the Massachusetts aerial is pieced together from tiles to the size asked',im.size==(500,500) and len(set(im.resize((8,8)).convert('L').tobytes()))>1)
 shutil.rmtree(tmp,ignore_errors=True); print('lidar ledger test:',ok,'checks passed')

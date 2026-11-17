@@ -1,4 +1,4 @@
-{"name": "Terry Mountain State Forest", "code": "tmsf", "state": "done", "swept": "2026-11-16", "buildings": 104, "sheets": ["NY_Dannemora_137946_1913_62500_geo.tif"],
+{"name": "Terry Mountain State Forest", "code": "tmsf", "state": "done", "swept": "2026-11-16", "buildings": 104, "sheets": ["NY_Dannemora_137946_1913_62500_geo.tif"], "walls": 331, "wall_m": 10015,
 "cands":[
 {"id":"tmsf1","lat":44.565402,"lon":-73.664224,"depth":1.01,"size":[12,12],"dist":31,"blat":44.56544,"blon":-73.66461,"sheet":"NY_Dannemora_137946_1913_62500_geo.tif","year":1913,"status":"no","why":"faint","note":"a soft dimple","when":"2026-11-16"},
 {"id":"tmsf2","lat":44.549776,"lon":-73.712981,"depth":0.82,"size":[9,9],"dist":30,"blat":44.54974,"blon":-73.71336,"sheet":"NY_Dannemora_137946_1913_62500_geo.tif","year":1913,"status":"no","why":"other","note":"set aside in round 5, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},

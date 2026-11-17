@@ -1,4 +1,4 @@
-{"name": "Charleston State Forest", "code": "csf", "state": "done", "swept": "2026-11-16", "buildings": 65, "sheets": ["NY_Fonda_139538_1896_62500_geo.tif"],
+{"name": "Charleston State Forest", "code": "csf", "state": "done", "swept": "2026-11-16", "buildings": 65, "sheets": ["NY_Fonda_139538_1896_62500_geo.tif"], "walls": 1124, "wall_m": 36410,
 "cands":[
 {"id":"csf1","lat":42.852125,"lon":-74.314331,"depth":0.92,"size":[12,8],"dist":29,"blat":42.85236,"blon":-74.31447,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},
 {"id":"csf2","lat":42.861521,"lon":-74.302107,"depth":0.9,"size":[8,8],"dist":26,"blat":42.8614,"blon":-74.30184,"sheet":"NY_Fonda_139538_1896_62500_geo.tif","year":1896,"status":"no","why":"other","note":"set aside in round 3, before the ledger was kept; the reason was not recorded","when":"2026-11-16"},

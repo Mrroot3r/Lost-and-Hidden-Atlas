@@ -1,3 +1,3 @@
-{"name": "Capital District Wma", "code": "cdw", "state": "done", "swept": "2026-11-16", "buildings": 0, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif"],
+{"name": "Capital District Wma", "code": "cdw", "state": "done", "swept": "2026-11-16", "buildings": 0, "sheets": ["NY_Berlin_123252_1888_62500_geo.tif"], "walls": 1750, "wall_m": 52385,
 "cands":[
 ]}

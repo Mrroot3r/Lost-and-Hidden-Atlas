@@ -1,3 +1,3 @@
-{"name": "Stone Store State Forest", "code": "sssf", "state": "done", "swept": "2026-11-16", "buildings": 3, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif", "NY_Schoharie_129440_1898_62500_geo.tif"],
+{"name": "Stone Store State Forest", "code": "sssf", "state": "done", "swept": "2026-11-16", "buildings": 3, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif", "NY_Schoharie_129440_1898_62500_geo.tif"], "walls": 286, "wall_m": 9965,
 "cands":[
 ]}
