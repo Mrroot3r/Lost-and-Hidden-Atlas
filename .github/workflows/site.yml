@@ -75,5 +75,8 @@ jobs:
           BEFORE: ${{ github.event.before }}
         run: |
           APP="${{ steps.publish.outputs.app }}"
-          if [ -z "$APP" ] && [ -n "$BEFORE" ] && gh api "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename' 2>/dev/null | grep -q '^android-app/'; then APP=yes; fi
+          # The app carries its own copy of the page, so its style sheet and its HTML are "its code" as much as app.js is:
+          # a change to source/src/app.css alone (the sideways-phone layout, November 2026) changes none of the three
+          # built scripts, and without this line the phone would never get it.
+          if [ -z "$APP" ] && [ -n "$BEFORE" ] && gh api "repos/$GITHUB_REPOSITORY/compare/$BEFORE...$GITHUB_SHA" --jq '.files[].filename' 2>/dev/null | grep -q '^android-app/\|^source/src/'; then APP=yes; fi
           if [ "$APP" = "yes" ]; then gh workflow run app.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "Started the app build."; else echo "The app's code did not change."; fi
