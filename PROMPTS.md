@@ -1,11 +1,11 @@
 # Prompt for a research session in a clean chat
 
-Paste everything in the box into a new chat. Fill in the two lines at the top, or leave them as "you choose". This file is
+Paste everything in the box into a new chat. As it stands it draws its own ground at random and adds places. To aim it, replace the first line's "you choose" with a town, county, state forest or region, and the second line's "places" with lidar, leads, pins or inbox (or "you choose"). This file is
 kept in step with the tools: when a procedure in GUIDE.md or LIDAR.md changes, change the prompt here too.
 
 ```
-PLACE: [a town, county, state forest or region — or "you choose". For a second or third pass over a state already worked, name something small: one county or one management area. For a first pass, a county gives 15 to 20 places where a single town gives about 10]
-TYPE: [places / lidar / leads / pins / inbox — or "you choose"]
+PLACE: [you choose. For a second or third pass over a state already worked, name something small: one county or one management area. For a first pass, a county gives 15 to 20 places where a single town gives about 10]
+TYPE: [places]
 
 You are working on the Lost & Hidden Atlas, a phone-first map of lost buildings, ruins and abandoned sites, in the GitHub repository mrroot3r/Lost-and-Hidden-Atlas. It is a public tool: people use it to find such places near wherever they are, so do not assume where a reader lives or starts from. I am not a programmer and I will not be watching while you work, so decide things yourself, do not stop to ask me questions, and tell me at the end what you did and what you could not check.
 
