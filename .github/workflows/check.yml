@@ -32,3 +32,33 @@ jobs:
           python3 -m http.server 8766 &
           sleep 2
           node source/tools/smoke.js http://localhost:8766/
+  # A pull request that only adds or changes places merges by itself once everything above has passed (GUIDE.md section 3).
+  # Only from a branch of this repository: a pull request from somebody's copy always waits for the owner, and GitHub
+  # gives such a run a read-only token in any case. This job runs none of the pull request's own code.
+  merge:
+    needs: check
+    if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: write
+    steps:
+      - name: Merge a research-only pull request and mark it not double-checked
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          FILES=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/files?per_page=100" --paginate --jq '.[].filename')
+          OTHER=$(echo "$FILES" | grep -v -E '^(source/tools/data_[a-z0-9_]+\.py|source/tools/bricks_[a-z0-9_]+\.py|notes/[A-Za-z0-9_.-]+\.md|LEADS\.md)$' || true)
+          CORE=$(echo "$FILES" | grep -E '^source/tools/data_(a|b|states)\.py$' || true)
+          if [ -z "$FILES" ] || [ -n "$OTHER" ] || [ -n "$CORE" ]; then echo "This pull request changes more than place lists, brick files and notes. It waits for the owner."; exit 0; fi
+          if gh api "repos/$GITHUB_REPOSITORY/issues/$PR/labels" --jq '.[].name' | grep -qx 'hold'; then echo "Labelled hold. It waits for the owner."; exit 0; fi
+          gh api -X POST "repos/$GITHUB_REPOSITORY/labels" -f name='not double-checked' -f color='fbca04' -f description='Research that merged by itself: nobody has looked at its pins and sources a second time' > /dev/null 2>&1 || true
+          gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR/labels" -f 'labels[]=not double-checked' > /dev/null
+          gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$PR/merge" -f merge_method=merge -f sha="$SHA" > /dev/null
+          echo "Merged #$PR as research only, labelled not double-checked."
+          # a merge made by a workflow starts no other workflow, so ask for the site build by name
+          gh workflow run site.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "Started the site build."

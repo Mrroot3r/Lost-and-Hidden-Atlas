@@ -46,6 +46,7 @@ for b in B+C:
            tags=[t for t in b['tags'].split(',') if t],years=b['years'],conf=(b['conf'] or '').lower() or (conf_of(e['conf']) if e else 'verified'),
            story=b['story'],look=b['look'],hook=b['hook'],accn=b['accn'],links=(b['links'] or (e['links'] if e else [])),now='now' in b['tags'].split(','))
     if b.get('th'): s['th']=b['th']; s['thn']=b.get('thn','')
+    if b.get('brick') in ('yes','some','no'): s['bk']=b['brick'][0]      # red brick: y, s or n; left out when nobody has looked
     sites.append(s)
 # landmarks
 LREG={'Albany':'alb','Menands':'albco','Normanskill Farm':'alb','Rensselaer':'renss','Troy':'troy','Cohoes':'conf','Waterford':'conf','Schenectady':'sch','Rotterdam Junction':'mohawk','Scotia':'mohawk','Colonie':'albco','Fort Hunter':'mohawk','Schoharie':'mohawk','Saratoga Springs':'sar','Mount McGregor':'sar','Catskill':'hud','Hudson':'hud','Coxsackie':'hud','Hudson River':'hud','Woodstock':'cat','Saugerties':'cat','Ticonderoga':'adk','Raquette Lake':'adk'}
@@ -70,6 +71,14 @@ for s in sites:
     if s['id'] in FR: s['fr']=FR[s['id']]
     if s['id'] in BATCH_OF: s['new']=BATCH_OF[s['id']]
     if s['id'] in EXTRA_C: s['story']=(s['story']+EXTRA_C[s['id']]).strip()
+# Red brick found out after a place was written: tools/bricks_*.py, each BRICK={id:(yes|some|no, how it is known)} (tools/brick.py writes them).
+# A place's own brick= wins; among these files the later name wins.
+BRICKS={}
+for f in sorted(glob.glob('tools/bricks_*.py')):
+    BRICKS.update(importlib.import_module(os.path.basename(f)[:-3]).BRICK)
+for s in sites:
+    v=BRICKS.get(s['id'])
+    if v and 'bk' not in s and v[0] in ('yes','some','no'): s['bk']=v[0][0]
 ids=[s['id'] for s in sites]
 dup=sorted({i for i in ids if ids.count(i)>1})
 if dup: raise SystemExit('Duplicate place ids: '+', '.join(dup)+'. Ids are shared across every state, so add a town or state suffix to the NEW one (queens-fort-exeter). Never rename an id that is already published.')
