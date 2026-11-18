@@ -31,5 +31,5 @@ for d,c,a,b,name in rows[:12]:
         fs=get(PAD,{'geometry':f'{b},{a}','geometryType':'esriGeometryPoint','inSR':4326,'spatialRel':'esriSpatialRelIntersects','outFields':'Unit_Nm,Pub_Access','returnGeometry':'false','f':'json'}).get('features',[])
         if fs: land='%s (%s)'%(fs[0]['attributes']['Unit_Nm'],fs[0]['attributes']['Pub_Access'])
     except Exception: land='land lookup failed'
-    print(f"  {d:5.0f} m {c:2}  {a:.5f}, {b:.5f}  |  {', '.join(name.split(', ')[:3])}  |  land: {land or 'not on mapped public land'}")
+    print(f"  {d:5.0f} m {c:2}  {a:.5f}, {b:.5f}  |  {', '.join(name.split(', ')[:3])}  |  land under the lot: {land or 'not on mapped public land'}")
 if rows: print('Check the one you use on the aerial: the pin check draws a TRAILHEAD tile for a place that has th=[lat,lon].')

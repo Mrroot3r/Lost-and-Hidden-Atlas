@@ -5,9 +5,10 @@ yes (mostly brick), some (part brick: a chimney, an arch, brick over stone), no,
    python3 tools/brick.py                       how many places are settled, and how many wait, state by state
    python3 tools/brick.py list [state|region]   the standing places, ruins and traces nobody has looked at, with their links
                                                 (--n 40 for how many; in a different order each time, those with an encyclopedia article first)
-   python3 tools/brick.py look <id> [picture address]
+   python3 tools/brick.py look <id> [--pic N] [picture address]
                                                 fetch a picture of the place into research/brick/<id>.jpg and say where it
-                                                came from: the lead picture of its Wikipedia article, or the address you give.
+                                                came from: a picture of its Wikipedia article (it lists them all with their captions;
+                                                --pic 2 takes the second), or the address you give.
                                                 Open that file and LOOK at it.
    python3 tools/brick.py set <id> yes|some|no "<what you saw, and the picture's address or the source's words>"
                                                 record it in tools/bricks_<four letters>.py (this workspace's own file, so
@@ -82,7 +83,8 @@ if a[0]=='list':
     sys.exit(0)
 if a[0]=='look':
     s=BY.get(a[1]) or sys.exit('No such place id: '+a[1])
-    os.makedirs('research/brick',exist_ok=True); out='research/brick/%s.jpg'%s['id']; src=None
+    os.makedirs('research/brick',exist_ok=True); out='research/brick/%s.jpg'%s['id']; src=None; n=1
+    if '--pic' in a: k=a.index('--pic'); n=max(1,int(a[k+1])); del a[k:k+2]
     if len(a)>2: src=a[2]; page=a[2]
     else:
         t=wiki(s)
@@ -91,11 +93,20 @@ if a[0]=='look':
         # then the first picture it names, by file name, from Wikimedia Commons.
         t=urllib.parse.unquote(t).replace('_',' '); w,t2=raw(t)
         if not w or w.startswith('HTTP '): sys.exit('The article "%s" could not be read (%s). Try again later, or give a picture address.'%(t,w or 'no such article'))
-        m=re.search(r'\|\s*(?:image|image_name|photo|image_skyline)\s*=\s*(?:\[\[)?(?:File:|Image:)?([^\|\]\n<{]+?\.(?:jpe?g|png))',w,re.I) or re.search(r'\[\[(?:File|Image):([^\|\]\n]+?\.(?:jpe?g|png))',w,re.I)
-        if not m: sys.exit('The article "%s" names no picture. Find one on the place\'s sources and give its address.'%t2)
-        fn=m.group(1).strip(); cap=re.search(r'\|\s*(?:caption|image_caption)[ \t]*=[ \t]*([^\n]*)',w); cap=re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]|'{2,}",r'\1',cap.group(1)).strip() if cap else ''
+        # every picture the article names, in order: the infobox picture first, then those in the text, with their captions
+        pics=[]
+        m=re.search(r'\|\s*(?:image|image_name|photo|image_skyline)\s*=\s*(?:\[\[)?(?:File:|Image:)?([^\|\]\n<{]+?\.(?:jpe?g|png))',w,re.I)
+        if m:
+            cap=re.search(r'\|\s*(?:caption|image_caption)[ \t]*=[ \t]*([^\n]*)',w); pics.append((m.group(1).strip(),cap.group(1) if cap else ''))
+        for m in re.finditer(r'\[\[(?:File|Image):([^\|\]\n]+?\.(?:jpe?g|png))((?:\|(?:[^\[\]]|\[\[[^\]]*\]\])*)?)\]\]',w,re.I):
+            if m.group(1).strip() not in [x[0] for x in pics]: pics.append((m.group(1).strip(),(m.group(2) or '').split('|')[-1]))
+        if not pics: sys.exit('The article "%s" names no picture. Find one on the place\'s sources and give its address.'%t2)
+        clean=lambda c:re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]|'{2,}|<[^>]+>|\{\{[^}]*\}\}",r'\1',c).strip()[:150]
+        if n>len(pics): sys.exit('The article "%s" names only %d picture(s).'%(t2,len(pics)))
+        print('Article: %s. It names %d picture(s):'%(t2,len(pics)))
+        for k,(f,c) in enumerate(pics[:8],1): print('  %s%d. %s%s'%('>' if k==n else ' ',k,f,(' | '+clean(c)) if clean(c) else ''))
+        fn=pics[n-1][0]
         src='https://commons.wikimedia.org/wiki/Special:FilePath/'+urllib.parse.quote(fn.replace(' ','_'))+'?width=960'; page='https://en.wikipedia.org/wiki/'+t2.replace(' ','_')
-        print('Article: %s. Its first picture: %s%s'%(t2,fn,('. Caption: '+cap[:160]) if cap else ' (no caption given)'))
     import time
     for go in range(4):          # Wikimedia answers 429 when pictures are asked for quickly: wait and ask again
         try:
@@ -106,7 +117,8 @@ if a[0]=='look':
             if go==3: sys.exit('The picture could not be fetched (%s). Wait a minute and try again.'%str(ex)[:70])
             time.sleep(10*(go+1))
     print('Saved %s (%d KB) from %s'%(os.path.join(W,out),len(d)//1024,src))
-    print('It is the FIRST picture of that article, which may show the town, a map or another building. Open it and decide:' if len(a)<=2 else 'Open it and decide:')
+    if len(a)<=2: print('That is picture %d of the article. The first is often a drawing, a map or an old postcard: only a photograph of the place as it stands settles brick. For another:  python3 tools/brick.py look %s --pic <number>'%(n,s['id']))
+    print('Open it and decide:')
     print('is it plainly %s (%s)? Then:  python3 tools/brick.py set %s yes|some|no "<what you saw>; %s"'%(s['name'],s['town'],s['id'],page))
     sys.exit(0)
 if a[0]=='set':
