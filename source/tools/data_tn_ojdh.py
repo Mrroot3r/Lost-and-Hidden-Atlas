@@ -1,0 +1,162 @@
+# November 18, 2026: Tennessee, northern Cumberland Plateau (Morgan, Scott, Anderson and Campbell counties): the
+# Rugby colony, Brushy Mountain prison, the Coal Creek mining towns and the Big South Fork.
+# Facts from the linked sources only, read in this session: National Register nomination forms (NPGallery text
+# layers and the Tennessee Historical Commission's file for the O&W bridge), Wikipedia, the managing bodies' own
+# pages (Historic Rugby, Tennessee State Parks, tourbrushy.com, the National Park Service) and HMdb markers.
+# Where sources disagree the text gives both and conf='mixed'. Hours that could not be read live say so.
+from data_b import N
+from data_ma import W
+
+def NR(ref, label='National Register nomination form'):
+    return [label, 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/%s_text' % ref]
+
+RUGBY = ['Historic Rugby (hours, tours, lodging)', 'https://historicrugby.org/']
+RUGBY_NR = NR('72001249', 'Rugby Colony National Register form (1972)')
+RUGBY_PARK = [36.36122, -84.70225]
+RUGBY_PARKN = 'Mapped lot on Rugby Parkway in the village'
+RUGBY_ACC = ('Historic Rugby, Inc., a nonprofit, runs the guided tours, which start at the Rugby Visitor Centre with a free 22-minute film. '
+             'Its page gives the Visitor Centre hours as Thursday to Saturday 9 to 5 and Sunday noon to 5, Eastern time (read November 18, 2026). ')
+
+BATCH = {'key': 'tn_ojdh', 'label': 'Tennessee: Rugby, Brushy Mountain and Coal Creek', 'added': '2026-11-18 22:58'}
+
+PLACES = [
+# ---- Rugby (Morgan and Scott counties) ----
+N('christ-church-episcopal-rugby', 'Christ Church Episcopal, Rugby', 'Rugby', 'tn', 'civic', 'standing', 36.36019, -84.69961, 'exact', 'public', 'walk', '', '1887',
+  'The English author Thomas Hughes founded Rugby in 1880 as a colony for the younger sons of the English gentry. Christ Church was chartered by the Episcopal bishop of Tennessee on the colony\'s opening day, October 5, 1880, and its building was finished and opened for services on October 16, 1887. Most of the colony failed, but the church stayed in use, and the 1972 Register form calls it an outstanding example of Carpenter Gothic.',
+  'The 1972 Register form says the church looked inside and out as it did when built. It names a stained glass window in the apse, made in Germany in 1887 in memory of Hughes\'s mother Margaret and of the mother of the first rector, and a rosewood reed organ it calls thought to be the oldest still in use in the country. Inside on Historic Rugby\'s guided village tour; whether the glass and organ are as the form describes was not checked.',
+  'A Victorian English colony\'s church on the Cumberland Plateau.',
+  RUGBY_ACC + 'The 1972 form gives the owner as the Episcopal Diocese of Tennessee. Park in the village.',
+  [RUGBY, RUGBY_NR, ['TNGenWeb Morgan County: Christ Church Episcopal', 'https://tngenweb.org/morgan/?p=1493'], W('Rugby, Tennessee')],
+  th=RUGBY_PARK, thn=RUGBY_PARKN, brick='no'),
+N('thomas-hughes-library-rugby', 'Thomas Hughes Free Public Library', 'Rugby', 'tn', 'civic', 'standing', 36.35962, -84.69974, 'exact', 'public', 'walk', '', '1882',
+  'The colony\'s library was built in 1882 on the block the original survey set aside for public buildings, and chartered by the state that year. Historic Rugby calls it the first free public library in the South. The 1972 form says it held 7,000 volumes given between 1880 and 1884 by thirty-eight American and English publishers and individuals.',
+  'The library with its Victorian book collection, shown on Historic Rugby\'s guided tour; the 1972 form says researchers could use it by appointment. The tour also takes in the 1907 schoolhouse and its exhibits, a short walk away. Interior as it is today not checked.',
+  '', RUGBY_ACC + 'The 1972 form gives the owner as the Hughes Public Library Board.',
+  [RUGBY, RUGBY_NR, W('Rugby, Tennessee')], th=RUGBY_PARK, thn=RUGBY_PARKN, brick='?'),
+N('kingstone-lisle-rugby', 'Kingstone Lisle, Thomas Hughes\'s cottage', 'Rugby', 'tn', 'landmark', 'standing', 36.36029, -84.70086, 'exact', 'public', 'walk', '', '1884',
+  'The cottage built for Thomas Hughes, the colony\'s founder. Historic Rugby dates it 1884. Robert Walton\'s son William kept it, the library and the church up until the mid-twentieth century, and preservationists formed Historic Rugby in 1966 to look after the surviving buildings.',
+  'A board-sided cottage. The 1972 form says it had been restored to its original look apart from a small rear addition and was a museum house. Inside on the guided tour; furnishings not checked.',
+  '', RUGBY_ACC + 'The 1972 form gives the owner as the Rugby Restoration Association.',
+  [RUGBY, RUGBY_NR, W('Rugby, Tennessee')], th=RUGBY_PARK, thn=RUGBY_PARKN, brick='no'),
+N('laurel-dale-cemetery-rugby', 'Laurel Dale Cemetery, Rugby', 'Rugby', 'tn', 'burial', 'standing', 36.36856, -84.69777, 'site', 'view', 'walk', 'cemeteries', '1880s',
+  'The colony\'s burying ground, just over the county line in Scott County and part of the Rugby Colony historic district. The 1972 form says many of the original settlers lie here, among them Thomas Hughes\'s mother. Seven colonists died of typhoid in the summer of 1881.',
+  'Graves of the English colonists in the woods north of the village. Which graves are the typhoid victims\' was not checked.',
+  '', 'Reached by Laurel Dale Cemetery Road, which is also the way to two Big South Fork trails (the Gentlemen\'s Swimming Hole and the Meeting of the Waters) according to Historic Rugby. A small lot is mapped at the cemetery. Who owns the cemetery and its visiting rules were not checked.',
+  [RUGBY, RUGBY_NR, W('Rugby, Tennessee')], th=[36.36894, -84.69809], thn='Mapped lot on Laurel Dale Cemetery Road', brick='?'),
+N('rm-brooks-store-rugby', 'R. M. Brooks General Store', 'Rugby', 'tn', 'town', 'standing', 36.35639, -84.72243, 'site', 'public', 'drive', '', '1930',
+  'A frame general store built in 1930 in the fork of Brewstertown Road and State Highway 52, west of the colony buildings. It served as Rugby\'s post office in the mid-twentieth century. The store and the family\'s house formed an L, with a false front on the store.',
+  'The false-fronted store, with a cast-iron stove on a brick flue inside according to the 1992 Register form. Historic Rugby now runs lunch here.',
+  '', 'Historic Rugby gives lunch until 5 pm daily except Sundays and Mondays, and breakfast on Saturdays (read November 18, 2026). The 1992 form says the house part of the building is gone and the barn was in poor condition.',
+  [RUGBY, NR('92000364', 'R. M. Brooks Store National Register form (1992)')], brick='?'),
+# ---- Morgan County ----
+N('sixteen-tunnel-sunbright', 'Sixteen Tunnel', 'Sunbright', 'tn', 'rail', 'standing', 36.260024, -84.660800, 'site', 'ask', 'hike', '', 'c. 1879',
+  'A 1,084-foot railroad tunnel built about 1879 for the Cincinnati Southern Railway, by a labour force the Register form says included leased convicts. It was lined with timber at first and relined with brick and stone about 1885. When the line was rebuilt in 1919 and 1920 the tunnel was kept for southbound trains and a new track was laid to the east; its rails were taken up some time after 1955.',
+  'Two arched portals of coursed cut limestone with stone wing walls, at the ends of a cut through a narrow ridge, in woods about 0.2 mile east of US 27 near Scott Branch.',
+  '', 'Private: the 2017 Register form says the abandoned right-of-way is owned by Norfolk Southern. Ask before going. The active main line runs close by to the east; stay off it. No public way in was found.',
+  [NR('100001306', 'Sixteen Tunnel National Register form (2017)')], brick='?'),
+N('wartburg-presbyterian-church', 'Wartburg Presbyterian Church', 'Wartburg', 'tn', 'civic', 'standing', 36.102768, -84.596928, 'site', 'view', 'drive', '', '1883',
+  'Wartburg was settled by Swiss and German immigrants; this frame church of 1883 was the house of worship of the town\'s non-German minority. It is a front-gabled Folk Victorian building with a steeple. In 1979 the city leased part of the lot and built the town library beside it.',
+  'The 2013 Register form describes a single room with plaster walls, beadboard wainscoting and tongue-and-groove floor and ceiling, original vestibule doors and hardware, chandeliers of 1937, and pews that replaced theatre seats in 1953. Interior visiting not checked.',
+  '', 'An active church on the south edge of Wartburg, with a paved lot shared with the public library next door. See it from the street; when it is open to visitors was not checked.',
+  [NR('13000952', 'Wartburg Presbyterian Church National Register form (2013)')], brick='no'),
+N('tanner-store-wartburg', 'Tanner Store', 'Wartburg', 'tn', 'town', 'standing', 36.105775, -84.596819, 'exact', 'view', 'drive', '', 'c. 1906',
+  'A one-story frame building on the north-east corner of Wartburg\'s courthouse square. The small south-west part was built about 1906 for the Citizens Bank and Trust of Wartburg; the larger addition of about 1923 became the Tanner Store, later known as Tanner\'s Drugs and Tanner Cafe, Sundries and Antiques.',
+  'A small-town store on a limestone foundation, with a corner door and a porch on turned posts. The 2017 Register form says the bank\'s vault survives in a closet between the two parts. Current use not checked.',
+  '', 'At 201 Court Street. See it from the street; whether it is open was not checked.',
+  [NR('100001369', 'Tanner Store National Register form (2017)')], brick='?'),
+N('brushy-mountain-state-penitentiary', 'Brushy Mountain State Penitentiary', 'Petros', 'tn', 'inst', 'standing', 36.1074, -84.45526, 'site', 'public', 'walk', '', '1896–2009',
+  'Tennessee built this prison and its coal mine after the Coal Creek War of 1891, when miners rose against convict leasing. It took its first prisoners in 1896, and they built a rail spur and worked the mine and coke ovens. The first wooden prison was replaced in the 1920s by a castle-like building of stone quarried on the property. James Earl Ray escaped from it in 1977 and was caught within 58 hours. It closed on June 11, 2009, and has been open as a tourist site since 2018. Wikipedia also says it closed in 1972 after a guards\' strike; how long that closure lasted was not checked.',
+  'The stone cell block, cafeteria, laundry, gym, exercise yard and "the Hole", seen on a self-guided audio tour of 22 stations, with a museum. The site also has a restaurant, distillery and RV park.',
+  'Tennessee\'s first maximum-security prison, built where convicts dug coal.',
+  'Privately run as Historic Brushy Mtn State Pen (tourbrushy.com), paid entry. Its page says tours run from opening until last entry at 5 pm (read November 18, 2026); opening days and season not checked. Pets are not allowed on tours, according to its FAQ. Parking at the site.',
+  [['Historic Brushy Mtn State Pen: visit', 'https://tourbrushy.com/visit-brushy'], ['Brushy: FAQ', 'https://tourbrushy.com/faq'], W('Brushy Mountain State Penitentiary')],
+  conf='mixed', th=[36.10701, -84.45446], thn='Mapped lot by Petros Highway', brick='?'),
+N('stonecipher-kelly-house', 'Stonecipher-Kelly House', 'Petros', 'tn', 'landmark', 'standing', 36.07288, -84.49322, 'site', 'public', 'drive', '', '1814–1815',
+  'The oldest standing house in Morgan County, built in 1814 and 1815 by Ezra Stonecipher, a gunsmith and furniture maker from a German immigrant family. In the mid-1800s the Kelly family, related by marriage, bought it and farmed the land. The state bought it in 2014, restored it, and opened it as part of Frozen Head State Park on June 7, 2025.',
+  'A two-and-a-half-story saddlebag log house: two rooms either side of a central chimney, with half-dovetailed hewn logs, wide floorboards and beaded board panelling that were hidden for years under later siding. Interpretive signs on the grounds.',
+  '', 'Tennessee State Parks (Frozen Head State Park). The state\'s 2025 announcement says it is open April to October, Thursday to Sunday, 10 am to 4 pm. Off State Route 62, about 10 miles east of Wartburg. The main part of Frozen Head was under renovation in 2026, with many trails closed (park page read November 18, 2026).',
+  [['TDEC: grand opening of the Stonecipher Kelly House (2025)', 'https://www.tn.gov/environment/news/2025/5/29/frozen-head-sp-grand-opening-historic-home-june-7.html'],
+   ['TNGenWeb Morgan County: Stonecipher/Kelly Home Place', 'https://tngenweb.org/morgan/stonecipherkelly-home-place/'],
+   ['Tennessee State Parks: Frozen Head', 'https://tnstateparks.com/parks/frozen-head']],
+  th=[36.07371, -84.49413], thn='Gravel lot on the Frozen Head state land, north-west of the house', brick='?'),
+# ---- Coal Creek valley (Anderson County) ----
+N('briceville-community-church', 'Briceville Community Church', 'Briceville', 'tn', 'civic', 'standing', 36.1785, -84.18312, 'exact', 'view', 'drive', 'cemeteries', '1887',
+  'Volunteers built this Gothic Revival church in 1887 on a hill in the middle of the mining town. After the Coal Creek War began in 1891 with the seizure of a convict stockade in Briceville, the church served as a temporary jail. It held the memorial services after the Fraterville (1902) and Cross Mountain (1911) mine disasters, and victims of both lie in its cemetery. It was Methodist until 1995 and is now a community building.',
+  'A weatherboarded church on a hill seen from most of the town, with the cemetery climbing the slope behind it. The grave of Eugene Ault, a Cross Mountain miner, carries the farewell message he wrote while trapped. Interior not checked.',
+  'The miners\' church of the Coal Creek War.',
+  'On State Route 116 in Briceville. Owned by the Briceville Community Church according to the 2003 Register form. See it from the road and the churchyard; opening times not checked.',
+  [NR('03000697', 'Briceville Community Church National Register form (2003)'), W('Briceville Community Church'), W('Cross Mountain Mine disaster')], brick='no'),
+N('cross-mountain-miners-circle', 'Cross Mountain Miners\' Circle', 'Briceville', 'tn', 'burial', 'standing', 36.17204, -84.18618, 'site', 'view', 'drive', 'cemeteries', '1911',
+  'An explosion in the Cross Mountain Mine on December 9, 1911, killed 84 miners; five were rescued in one of the first big operations of the new federal Bureau of Mines. At least 22 of the dead were buried in a ring around a marble obelisk that the United Mine Workers put up with all 84 names. A larger cemetery has grown around the circle.',
+  'The ring of graves around the obelisk, on Circle Cemetery Lane. OpenStreetMap shows an information board at the cemetery.',
+  '', 'On Circle Cemetery Lane off State Route 116. The 2006 Register form names a caretaker, not an owner; visiting rules were not checked. Be respectful: this is a working cemetery.',
+  [NR('06000134', 'Cross Mountain Miners\' Circle National Register form (2006)'), W('Cross Mountain Mine disaster')], brick='no'),
+N('fraterville-miners-circle', 'Fraterville Miners\' Circle', 'Rocky Top', 'tn', 'burial', 'standing', 36.20835, -84.14055, 'site', 'view', 'drive', 'cemeteries', '1902',
+  'The Fraterville Mine explosion of May 19, 1902, killed 216 men according to official records, the worst mine disaster in Tennessee. Eighty-nine of them were buried together in a circle at Leach Cemetery in Coal Creek, the town now called Rocky Top.',
+  'The circle of miners\' graves with marble stones in Leach Cemetery.',
+  '', 'On Leach Cemetery Lane, off New Clear Branch Road, south of Rocky Top. The 2005 Register form marks the property private; visiting rules not checked. Be respectful: this is a cemetery.',
+  [NR('04001459', 'Fraterville Miners\' Circle National Register form (2005)'), W('Fraterville Mine disaster')], brick='no'),
+N('fort-anderson-militia-hill', 'Fort Anderson on Militia Hill', 'Rocky Top', 'tn', 'fort', 'traces', 36.215633, -84.175481, 'area', 'ask', 'walk', 'forts', '1892',
+  'In January 1892, during the Coal Creek War, the state built Fort Anderson on this steep hill above the Coal Creek water gap to guard about 200 convict miners, with some 80 militiamen, cannon and a Gatling gun. Miners besieged it and ambushed a relief column from Knoxville. Violence peaked in the summer of 1892, when the militia arrested over 500 miners.',
+  'Earthen breastworks and the main camp entrenchment. The 2011 Register form measures one trench at the north-east corner at about 14.5 m long and 4 m deep. The Coal Creek Watershed Foundation put up a set of markers on the hilltop in 2010.',
+  'Where the state used a Gatling gun to keep convicts in the mines.',
+  'The 2011 Register form marks the land private. The Coal Creek Watershed Foundation, which cleaned the site and put up the markers, calls it the Coal Creek War Battlefield Park, but whether the public may walk in was not confirmed: ask first. HMdb places the markers on Vowell Mountain Lane near Beech Grove Road, about 770 m east of the pin; the Fort Anderson marker stands at that road junction. No parking lot was found; the nearest mapped lot is about 870 m north-west on Beech Grove Lane and was not used as a parking point.',
+  [NR('11000830', 'Fort Anderson National Register form (2011)'), ['HMdb: Fort Anderson marker', 'https://www.hmdb.org/m.asp?m=101893'], ['HMdb: Breastworks marker', 'https://www.hmdb.org/m.asp?m=102279'],
+   ['Coal Creek Watershed Foundation: the Militia Hill markers', 'https://www.coalcreekaml.com/MilitiaHillMarkers.htm'], W('Coal Creek War')],
+  conf='mixed', brick='no'),
+# ---- Scott County ----
+N('old-scott-county-jail-huntsville', 'Old Scott County Jail', 'Huntsville', 'tn', 'civic', 'standing', 36.40942, -84.49057, 'area', 'public', 'drive', '', '1904',
+  'The county jail in the middle of Huntsville, of rough red sandstone blocks from nearby quarries that were cut at the town spring, hauled by oxen and lifted by mules. The sources disagree on its date: the 1974 Register form says 1907, and the museum\'s operators told the Courier News in 2021 that it was built in 1904 and got its third floor in 1922. It was a jail until 2008, and opened as a museum in 2021.',
+  'Three stories of rock-faced sandstone with four belt courses. Inside, the cells, on tours run by the paranormal investigators who lease it from the city.',
+  'A sandstone jail now run as a haunted-history museum.',
+  'Owned by the City of Huntsville and leased to the museum\'s operators (Courier News, 2021). Opening days and fees not checked.',
+  [NR('74001927', 'Old Scott County Jail National Register form (1974)'), ['Courier News: ghosthunters reopen Scott jail as museum (2021)', 'https://mycouriernews.com/articles/2021/09/5081/a-haunting-experience-ghosthunters-reopen-scott-jail-as-museum']],
+  conf='mixed', brick='no'),
+N('first-national-bank-huntsville-tn', 'First National Bank of Huntsville', 'Huntsville', 'tn', 'town', 'standing', 36.4092, -84.4908, 'site', 'view', 'drive', '', '1909',
+  'A small one-story bank on the courthouse square, built by Rufus M. Holmes in 1909, the year the bank was incorporated. The 1985 Register form found it little altered, with a drive-through added to the west in 1974.',
+  'A 32-by-22-foot block of rock-faced sandstone with projecting sandstone string courses on every side and a sandstone chimney. Current use not checked.',
+  '', 'On the courthouse square. See it from the street; the 1985 form gives the owner as the First National Bank of Oneida.',
+  [NR('85001510', 'First National Bank of Huntsville National Register form (1985)')], brick='no'),
+N('barton-chapel-robbins', 'Barton Chapel', 'Robbins', 'tn', 'civic', 'standing', 36.3517, -84.5886, 'site', 'view', 'drive', '', '1926',
+  'A Congregational church built in 1926 in the small town of Robbins, a vernacular building with Gothic details. The 1984 Register form found it relatively unaltered.',
+  'Brick laid in running bond, a steep roof of flat clay tiles with tile cresting, a large pointed leaded glass window in a stone arch over the entrance, and an open brick belfry with stone trim. The 1984 form describes exposed trusses, a pointed chancel arch, carved wooden pews and a heavy double batten door inside. Interior visiting not checked; the colour of the brick was not checked.',
+  '', 'Faces west onto State Route 27, the main road through Robbins. Owned by the Barton Chapel Congregational United Church of Christ according to the 1984 form. See it from the road.',
+  [NR('84003679', 'Barton Chapel National Register form (1984)')], brick='?'),
+N('ow-bridge-big-south-fork', 'O&W Railroad Bridge', 'Oneida', 'tn', 'rail', 'standing', 36.45412, -84.65152, 'exact', 'public', 'drive', '', '1880s–1954',
+  'A wrought-iron Whipple through-truss with a 200-foot span. It was built elsewhere in the 1880s, taken down and put up again over the Big South Fork by the Nashville Bridge Company between 1913 and 1915 for the Oneida and Western Railroad, which ran coal, lumber, mail and passengers between Oneida and Jamestown. The last train ran on March 31, 1954. The National Park Service calls it one of the few Whipple through-truss bridges left in the country.',
+  'The iron truss itself. Wood decking has replaced the ties and rails, and chain-link fencing was added along the sides in 2017 so walkers and cars can use it.',
+  'A railroad truss from the 1880s that now carries a gravel road over the Big South Fork.',
+  'Big South Fork National River and Recreation Area (National Park Service). At the end of O&W Road, a one-lane gravel road, about seven miles west of Oneida; the bridge is the hub of several hiking and horse trails. The park closes the road at the bridge during repairs: check its news page before going. No parking lot is mapped.',
+  [['Tennessee Historical Commission: Oneida and Western Bridge nomination', 'https://www.tn.gov/content/dam/tn/historicalcommission/archive/national-register/2025-nr-listings/thc_nr_oneida-and-western_nomination.pdf'],
+   ['NPS Big South Fork: O&W Bridge closed for repair work', 'https://www.nps.gov/biso/learn/news/o-and-w-bridge-closed-for-repair-work-starting-march-6.htm'], W('Oneida and Western Railroad')],
+  brick='no'),
+# ---- Campbell County ----
+N('lafollette-coke-ovens', 'LaFollette Coke Ovens', 'LaFollette', 'tn', 'industry', 'ruins', 36.395761, -84.127767, 'site', 'view', 'walk', '', 'c. 1894–1924',
+  'Beehive coke ovens of the LaFollette Coal, Iron and Railway Company, built from about 1894, which baked low-grade coal into coke. At its peak the company claimed 293 ovens. They shut down in 1924; the area was later a city dump, with a water plant and dog pound nearby, none of them still in use.',
+  'Rows of domed ovens, back to back in two double batteries, with their doorways in outer walls of stacked stone, open to the weather and overgrown. Also a stone retaining wall, the foundation of a washed-coal bunker at Water Plant Road and Ivydell Road, and stone abutments by Big Creek under the CSX line.',
+  'Coke-oven batteries in the woods at the edge of a coal town.',
+  'The 2016 Register form marks the ownership private. It mentions a rough gravel lot north of Water Plant Road, east of a grassed strip below the west battery; whether visitors may use it was not checked. Ask first, or look from the road. The federal public-land map puts the pin inside the North Cumberland Wildlife Management Area, which disagrees with the form; who owns the ovens now was not settled. The CSX railroad beside the site is active: stay off it.',
+  [NR('16000811', 'LaFollette Coke Ovens National Register form (2016)')], conf='mixed', brick='?'),
+]
+
+PIN_NOTES = {
+ 'christ-church-episcopal-rugby': 'OpenStreetMap place of worship "Christ Episcopal Church", 1332 Rugby Parkway.',
+ 'thomas-hughes-library-rugby': 'OpenStreetMap library "Thomas Hughes Free Public Library", 1281 Rugby Parkway.',
+ 'kingstone-lisle-rugby': 'OpenStreetMap historic building "Kingstone Lisle" on Rugby Parkway.',
+ 'laurel-dale-cemetery-rugby': 'OpenStreetMap cemetery "Laurel Dale Cemetery".',
+ 'rm-brooks-store-rugby': 'ArcGIS place "RM Brooks Store"; the National Register list gives 36.356389, -84.7225, about 20 m away.',
+ 'sixteen-tunnel-sunbright': 'National Register list coordinate (2017 form). On LiDAR it sits where a rail cut from the south meets the ridge, so it is about the south portal.',
+ 'wartburg-presbyterian-church': 'National Register list coordinate; on the aerial it falls by the street at the south edge of town, close to buildings but not clearly on the church.',
+ 'tanner-store-wartburg': 'National Register list coordinate.',
+ 'brushy-mountain-state-penitentiary': 'OpenStreetMap building "Historic Brushy Mountain State Penitentiary"; Wikipedia gives 36.1052, -84.4529.',
+ 'stonecipher-kelly-house': 'ArcGIS place "Stonecipher/Kelly Home"; on the aerial it is under trees north of State Route 62, on the Frozen Head state land. The parking point is a gravel lot seen on the aerial, not a mapped one.',
+ 'briceville-community-church': 'OpenStreetMap place of worship "Briceville Community Church".',
+ 'cross-mountain-miners-circle': 'OpenStreetMap cemetery "Miners Circle Cemetary"; the National Register list gives 36.173889, -84.186389, about 200 m north.',
+ 'fraterville-miners-circle': 'ArcGIS place "Leach Cemetery"; the National Register list gives 36.210833, -84.140278.',
+ 'fort-anderson-militia-hill': 'National Register list coordinate, on a wooded hillside; nothing can be told on the aerial. HMdb gives every Militia Hill marker one position (36 12.883 N, 84 10.017 W), about 770 m east at the junction of Beech Grove Road and Vowell Mountain Lane, among houses, so the pin was not put there.',
+ 'old-scott-county-jail-huntsville': 'Pin is the Scott County Courthouse (OpenStreetMap); the jail is on Court Street by the square but its building could not be picked out on the aerial. The National Register list coordinate (36.4083, -84.4908) falls in woods south of the square.',
+ 'first-national-bank-huntsville-tn': 'National Register list coordinate; it falls on a small building at the south-west corner of the square, which was not confirmed to be the bank.',
+ 'barton-chapel-robbins': 'National Register list coordinate.',
+ 'ow-bridge-big-south-fork': 'Middle of the four boundary corners in the Register nomination.',
+ 'lafollette-coke-ovens': 'National Register list coordinate; on the aerial it is where the gravel road crosses the railroad, with the ovens hidden under trees nearby.',
+}
