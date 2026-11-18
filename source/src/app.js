@@ -136,7 +136,7 @@ async function fetchDT(){
 }
 
 /* ---------- filters ---------- */
-const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,fresh:'',my:'any',hideDone:false};
+const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,before:0,fresh:'',my:'any',hideDone:false};
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
@@ -159,6 +159,7 @@ function match(s){
   if(F.now&&!s.now) return false;
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
+  if(F.before){ const y=yearOf(s); if(!y||y>=F.before) return false; }      /* a place with no year it dates from is left out, not guessed */
   if(F.brick&&s.bk!=='y'&&s.bk!=='s') return false;      /* red brick: bk is y (mostly), s (some), n (none); absent when nobody has looked */
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
   if(F.fresh&&s.new!==F.fresh) return false;
@@ -167,13 +168,22 @@ function match(s){
   if(F.hideDone&&(my==='filmed'||my==='skip')) return false;
   return true;
 }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+/* The year a place dates from: the earliest year in its "years" text ("1764", "c. 1750–1924", "1840s", "18th century").
+   Text that opens with what ended it ("razed 1962", "flooded 1950s") gives none: that year is not when it was built. */
+const YEAR=new Map();
+function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.years||''); let y=0;
+  if(!/^\s*(razed|burned|flooded|filled|piped|closed|demolished|drowned|lost|gone|removed)/i.test(t)){
+    (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
+    const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
+  YEAR.set(s.id,y); return y; }
+function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.fresh='';F.my='any';F.hideDone=false; }
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 const BATCHES=D.batches||[];
 const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
+  ['Standing, from before 1800',()=>{ F.st.add('standing'); F.before=1800; }],
   ['Red brick',()=>{ F.brick=true; }],
   ['Within 30 min',()=>{ F.max=30; }],
   ['Changing now',()=>{ F.now=true; }],
@@ -208,7 +218,10 @@ function buildFilters(){
   ser.value=F.tag;
   const my=el('select',{id:'f-my',onchange:e=>{F.my=e.target.value;refresh();}},el('option',{value:'any',text:'Any'}),Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})),el('option',{value:'mine',text:'Places I added'}));
   my.value=F.my;
+  const bef=el('select',{id:'f-before',onchange:e=>{F.before=+e.target.value;refresh();}},[[0,'Any age'],[1700,'Before 1700'],[1750,'Before 1750'],[1800,'Before 1800'],[1850,'Before 1850'],[1900,'Before 1900']].map(o=>el('option',{value:String(o[0]),text:o[1]})));
+  bef.value=String(F.before);
   fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Video series'}),ser),el('label',{class:'field'},el('span',{text:'My progress'}),my)));
+  fb.append(el('label',{class:'field'},el('span',{text:'Dates from'}),bef));
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
   fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));

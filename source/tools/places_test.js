@@ -44,6 +44,14 @@ const { chromium } = require('playwright');
     ok(name+': "Change start place" opens Settings at the start place',await vis('#set-home'));
     await p.selectOption('#set-home','bost'); await p.waitForTimeout(400);
     ok(name+': choosing a start city there changes the drive time',await p.evaluate(()=>/from Boston/.test(document.querySelector('.times .time').textContent)));
+    // the age filter: "Standing, from before 1800" lists standing places whose years begin before 1800, and no others
+    { await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+      await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(b=>b.textContent==='Standing, from before 1800').click(); }); await p.waitForTimeout(300);
+      const r=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), by={}; D.sites.forEach(x=>{ by[x.id]=x; });
+        const rows=[...document.querySelectorAll('#list li button[data-id]')].map(b=>by[b.dataset.id]); const yr=x=>Math.min(...(String(x.years).match(/(1[5-9]\d\d)(?!\d)/g)||['9999']).map(Number));
+        return {n:+document.querySelector('#count').textContent.split(' ')[0],rows:rows.length,bad:rows.filter(x=>x.st!=='standing'||yr(x)>=1800).map(x=>x.id+' '+x.years),sel:document.querySelector('#f-before').value,
+          razed:D.sites.filter(x=>/^razed/.test(x.years||'')).length}; });
+      ok(name+': "Standing, from before 1800" lists standing places from before 1800 and no others',r.n>20&&r.rows>0&&r.bad.length===0&&r.sel==='1800',r.n+' listed; wrong: '+(r.bad.slice(0,3).join(', ')||'none')); }
     // the Red brick shortcut: only places marked yes or some, and the place page says so
     { const want=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.filter(x=>x.bk==='y'||x.bk==='s').length);
       await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
