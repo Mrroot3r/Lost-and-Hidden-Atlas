@@ -3,6 +3,8 @@
 // Run it after changing the Places header in app.body.html, buildFilters(), the chips' styles, or "Getting there" in renderDetail().
 // What it holds the app to: the list starts high on a phone; a filter that is switched on looks different from one that is
 // off, in dark and light; the Filters button shows how many are on; the start place is chosen under the gear only.
+// And the first visit: the map opens on the whole country, nothing is measured from a city the reader never chose, and a card
+// asks where they start from (their location, a place they choose, or not now).
 const { chromium } = require('playwright');
 (async()=>{
   const fails=[]; const ok=(name,cond,extra)=>{ console.log((cond?'ok   ':'FAIL ')+name+(extra!==undefined?'  ['+extra+']':'')); if(!cond) fails.push(name); };
@@ -10,6 +12,7 @@ const { chromium } = require('playwright');
   for(const [name,vp,dpr,mobile,scheme] of [['phone, dark',{width:390,height:844},2,true,'dark'],['desktop, dark',{width:1400,height:900},1,false,'dark'],['desktop, light',{width:1400,height:900},1,false,'light']]){
     const c=await b.newContext({viewport:vp,deviceScaleFactor:dpr,isMobile:mobile,hasTouch:mobile,colorScheme:scheme}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); }catch(e){} });      // a reader with a start place; the first visit is tested further down
     await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(700);
     const vis=sel=>p.evaluate(sel=>{ const n=document.querySelector(sel); return !!n&&n.offsetParent!==null; },sel);
     const total=await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0]);
@@ -42,6 +45,46 @@ const { chromium } = require('playwright');
     await p.selectOption('#set-home','bost'); await p.waitForTimeout(400);
     ok(name+': choosing a start city there changes the drive time',await p.evaluate(()=>/from Boston/.test(document.querySelector('.times .time').textContent)));
     ok(name+': no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- the first visit: nothing saved, no start place
+  { const mk=async(geo,seed)=>{ const c=await b.newContext(Object.assign({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true},geo?{geolocation:geo,permissions:['geolocation']}:{})); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+      await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+      if(seed) await p.addInitScript(x=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify(x)); }catch(e){} },seed);
+      await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800); return {c,p,errs}; };
+    const state=p=>p.evaluate(()=>{ const m=window.__atlasMap, b=m.getBounds(), card=document.querySelector('#startcard'), li=document.querySelector('#list li');
+      return {card:!!card&&card.offsetParent!==null,btns:card?[...card.querySelectorAll('button')].map(x=>x.textContent):[],mins:document.querySelectorAll('#list .mins').length,rows:document.querySelectorAll('#list .item').length,
+        label:document.querySelector('#sort').options[0].textContent,zoom:m.getZoom(),coast:b.contains([47.6,-122.3])&&b.contains([25.8,-80.2])&&b.contains([44.6,-68.0]),home:document.querySelectorAll('.homepin').length,
+        gap:Math.round(li.getBoundingClientRect().top-document.querySelector('.tabs').getBoundingClientRect().bottom),U:JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}')}; });
+    let A=await mk(), s=await state(A.p);
+    ok('first visit: the map opens on the whole country, Seattle to Miami to Maine',s.coast&&s.zoom<=5,'zoom '+s.zoom);
+    ok('first visit: a card asks where you start from, with three answers',s.card&&s.btns.join('|')==='Use my location|Choose a place|Not now',s.btns.join('|'));
+    ok('first visit: no drive time is shown from a city nobody chose, and no start pin',s.rows>0&&s.mins===0&&s.home===0&&s.label==='Nearest first',s.mins+' times on '+s.rows+' rows; "'+s.label+'"');
+    ok('first visit: with the card, the first place still starts within 250 points of the tabs',s.gap>0&&s.gap<=250,s.gap);
+    await A.p.click('#list .item'); await A.p.waitForTimeout(400);
+    ok('first visit: a place page shows no time from anywhere, and offers to set a start place',await A.p.evaluate(()=>document.querySelectorAll('.times .time').length===0&&/Set a start place/.test(document.querySelector('#dt-change').textContent)));
+    ok('first visit: directions do not start from a city nobody chose',await A.p.evaluate(()=>{ const a=[...document.querySelectorAll('#v-detail a')].find(x=>/Directions/.test(x.textContent)); return !!a&&!/origin=/.test(a.href); }));
+    await A.p.click('#tab-list'); await A.p.waitForTimeout(250); await A.p.click('#sc-pick'); await A.p.waitForTimeout(400);
+    ok('"Choose a place" opens Settings at the start place, which reads "Not chosen yet"',await A.p.evaluate(()=>{ const n=document.querySelector('#set-home'); return !!n&&n.offsetParent!==null&&n.options[n.selectedIndex].textContent==='Not chosen yet'; }));
+    await A.p.selectOption('#set-home','bost'); await A.p.waitForTimeout(500); await A.p.click('#sheet-x').catch(()=>{}); await A.p.waitForTimeout(250); s=await state(A.p);
+    ok('choosing Boston: the card goes, times count from Boston, and the map goes there',!s.card&&s.mins>0&&s.label==='Nearest to Boston'&&s.home===1&&s.zoom>=9&&s.U.home.id==='bost'&&s.U.home.by===1,'"'+s.label+'", zoom '+s.zoom+', '+s.mins+' times');
+    ok('first visit, a place chosen: no script errors',A.errs.length===0,A.errs.join(' | ').slice(0,200)); await A.c.close();
+    A=await mk(); await A.p.click('#sc-no'); await A.p.waitForTimeout(300); s=await state(A.p);
+    ok('"Not now": the card goes and still nothing is measured from anywhere',!s.card&&s.mins===0&&s.label==='Nearest first'&&s.gap<=130,'gap '+s.gap);
+    await A.p.reload(); await A.p.waitForFunction(()=>window.__atlasMap); await A.p.waitForTimeout(600); s=await state(A.p);
+    ok('"Not now" is remembered on the next visit',!s.card&&s.mins===0);
+    ok('"Not now": no script errors',A.errs.length===0,A.errs.join(' | ').slice(0,200)); await A.c.close();
+    A=await mk(null,{v:1,trip:['joliet-iron-works'],ui:{noStart:1}}); await A.p.click('#tab-trip'); await A.p.waitForTimeout(300);
+    ok('a trip with no start place asks for one and does not plan from a city nobody chose',await A.p.evaluate(()=>{ const v=document.querySelector('#v-trip'); return !!v.querySelector('#startcard')&&!v.querySelector('#sc-no')&&!v.querySelector('#trip-day')&&!/Albany/.test(v.textContent); }));
+    ok('a trip with no start place: no script errors',A.errs.length===0,A.errs.join(' | ').slice(0,200)); await A.c.close();
+    A=await mk({latitude:39.0997,longitude:-94.5786,accuracy:15}); await A.p.click('#sc-me'); await A.p.waitForFunction(()=>document.querySelector('#sort').options[0].textContent==='Nearest to you',null,{timeout:9000}).catch(()=>{}); await A.p.waitForTimeout(400); s=await state(A.p);
+    ok('"Use my location" (in Kansas City): the card goes and the list counts from where you are',!s.card&&s.mins>0&&s.label==='Nearest to you','"'+s.label+'", '+s.mins+' times');
+    ok('and the nearest start city becomes the start place, with the map at town scale, not street scale',s.U.home.id==='kc'&&s.U.home.by===2&&s.zoom===10,(s.U.home.id||'')+' by '+s.U.home.by+', zoom '+s.zoom);
+    await A.p.click('#lb-loc'); await A.p.waitForTimeout(500); s=await state(A.p);
+    ok('location off again: the list counts from Kansas City, and no card',!s.card&&s.label==='Nearest to Kansas City'&&s.mins>0,'"'+s.label+'"');
+    ok('"Use my location": no script errors',A.errs.length===0,A.errs.join(' | ').slice(0,200)); await A.c.close();
+    /* somebody who was near Albany all along: the device says so, and Albany then counts as chosen */
+    A=await mk({latitude:42.66,longitude:-73.78,accuracy:15}); await A.p.click('#sc-me'); await A.p.waitForFunction(()=>document.querySelector('#sort').options[0].textContent==='Nearest to you',null,{timeout:9000}).catch(()=>{}); await A.p.waitForTimeout(400); await A.p.click('#lb-loc'); await A.p.waitForTimeout(500); s=await state(A.p);
+    ok('a reader whose device is near Albany: Albany becomes the start place by position, not by default',!s.card&&s.label==='Nearest to Albany'&&s.U.home.id==='alb'&&s.U.home.by===2&&s.home===1,'"'+s.label+'" by '+s.U.home.by);
+    await A.c.close(); }
   // ---- "Nearest first" counts from where the reader is while location is on, otherwise from the start place
   { const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true,geolocation:{latitude:42.8864,longitude:-78.8784,accuracy:12},permissions:['geolocation']}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));

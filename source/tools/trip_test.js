@@ -6,7 +6,7 @@ const { chromium, devices } = require('playwright');
   const b=await chromium.launch({proxy:{server:process.env.HTTPS_PROXY||'http://x',bypass:'localhost,127.0.0.1'}});
   const c=await b.newContext(Object.assign({},devices['Pixel 7'],{timezoneId:'America/New_York',locale:'en-US'})); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   const TRIP=['lidar-high-knob-walled-yard','lidar-rossman-hill-road-house-site','lidar-ccc-road-pits'];
-  await c.addInitScript(t=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({trip:t})); },TRIP);
+  await c.addInitScript(t=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({trip:t,home:{id:'alb',by:1}})); },TRIP);      // a trip needs a start place (places_test.js covers a reader who has none)
   await p.goto(process.argv[2]||'http://localhost:8766/index.html'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600);
   const U=()=>p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'));
   const mins=s=>{ const m=/(\d{1,2}):(\d\d)\s*(AM|PM)/i.exec(s||''); if(!m) return null; return (+m[1]%12+(/pm/i.test(m[3])?12:0))*60+ +m[2]; };

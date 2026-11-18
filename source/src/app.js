@@ -74,15 +74,25 @@ const sites=()=>BASE.concat(U.custom);
 const byId=id=>sites().find(s=>s.id===id);
 const pos=s=>{ const m=U.moved[s.id]; return m?{lat:m[0],lon:m[1]}:{lat:s.lat,lon:s.lon}; };
 const dest=s=>s.th?{lat:s.th[0],lon:s.th[1]}:pos(s);
+/* Nothing is measured from anywhere until the reader has a start place: one they chose (by 1), or the nearest start city to
+   where their device said they were (by 2). The Atlas is used all over the map, so it does not open on one city's ground
+   or count drive times from it for somebody who never asked. homeObj() still answers with the first start city then,
+   for code that needs a point; nothing on the page shows it. */
+const homePicked=()=>!!(U.home.by||U.home.id!=='alb');       /* 'alb' with no mark is only the value a fresh copy starts with; any other was chosen, by hand or by position */
+const fromOK=()=>homePicked()||!!nearAt;                 /* a start place, or the reader's position while it is on */
 function homeObj(){ if(U.home.id==='custom') return {id:'custom',name:U.home.name||'My spot',lat:U.home.lat,lon:U.home.lon}; return HUBS.find(h=>h.id===U.home.id)||HUBS[0]; }
 const MAXB=[[17.5,-170.0],[72.0,-50.0]];
 const inMap=(la,lo)=>la>=MAXB[0][0]&&la<=MAXB[1][0]&&lo>=MAXB[0][1]&&lo<=MAXB[1][1];
 /* Until a start place is chosen by hand, it follows the nearest start city to where the reader is (or last was). */
 function nearHome(ll,say){ if(!ll||U.home.by===1||U.home.id==='custom') return false; let b=null,bd=1e9; HUBS.forEach(h=>{ const d=hav(ll[0],ll[1],h.lat,h.lon); if(d<bd){ bd=d; b=h; } });
-  if(!b||bd>300||b.id===U.home.id) return false; U.home={id:b.id,by:2}; save();
+  if(!b||bd>300) return false;
+  if(b.id===U.home.id){ if(!U.home.by){ U.home.by=2; save(); if(say){ buildHome(); drawHome(); refresh(); } } return false; }      /* already the nearest: it now counts as chosen */
+  U.home={id:b.id,by:2}; save();
   if(say){ buildHome(); drawHome(); refresh(); banner('Drive times now count from '+b.name+', the nearest start city. Change it under the gear in Map options.',false,7000); } return true; }
+const USBOX=[[24.5,-125],[49.5,-66.5]];                  /* the first view for somebody new: the whole country, pins grouped */
 function startView(){ const v=U.ui.view, H=homeObj();
   if(pref('start')!=='home'&&v&&inMap(v[0],v[1])) return {c:[v[0],v[1]],z:Math.max(3,Math.min(20,v[2]||9))};
+  if(!homePicked()) return {b:USBOX};
   if(H.id==='alb') return {c:[42.82,-73.86],z:9}; return {c:[H.lat,H.lon],z:H.id==='custom'?11:10}; }
 function setSpot(la,lo,name){ U.home={id:'custom',lat:+(+la).toFixed(5),lon:+(+lo).toFixed(5),by:1}; if(name) U.home.name=String(name).slice(0,60); save(); buildHome(); drawHome(); refresh(); banner('Working out drive times from '+(name||'your spot')+'…',false);
   fetchDT().then(ok=>{ banner(ok?'Drive times updated from '+(name||'your spot')+'.':'Could not reach the routing service, so times are rough estimates (marked ~).',!ok,5000); refresh(); }); }
@@ -144,7 +154,7 @@ function match(s){
   if(F.reg&&s.reg!==F.reg) return false;
   if(F.acc.size&&!F.acc.has(s.acc)) return false;
   if(F.eff.size&&!F.eff.has(s.eff)) return false;
-  if(F.max&&dtl(s).min>F.max) return false;
+  if(F.max&&fromOK()&&dtl(s).min>F.max) return false;
   if(F.tag&&(s.tags||[]).indexOf(F.tag)<0) return false;
   if(F.now&&!s.now) return false;
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
@@ -208,20 +218,30 @@ function buildFilters(){
 /* ---------- list ---------- */
 let visible=[], listAll=false, listKey=''; const LISTCAP=120;
 function sortSites(a){
-  const k=U.ui.sort;
-  const t=new Map(a.map(s=>[s.id,dtl(s).min]));
+  const ok=fromOK(), k=!ok&&U.ui.sort==='time'?'reg':U.ui.sort;      /* nowhere to count from yet: by region, then name */
+  const t=new Map(a.map(s=>[s.id,ok?dtl(s).min:0]));
   if(F.line){ a.sort((x,y)=>F.line.ord.get(x.id)-F.line.ord.get(y.id)); return a; }
   if(k==='name') a.sort((x,y)=>x.name.localeCompare(y.name));
   else if(k==='reg') a.sort((x,y)=>(REG[x.reg]||'').localeCompare(REG[y.reg]||'')||x.name.localeCompare(y.name));
-  else if(k==='left') a.sort((x,y)=>STRANK[x.st]-STRANK[y.st]||t.get(x.id)-t.get(y.id));
+  else if(k==='left') a.sort((x,y)=>STRANK[x.st]-STRANK[y.st]||t.get(x.id)-t.get(y.id)||x.name.localeCompare(y.name));
   else a.sort((x,y)=>t.get(x.id)-t.get(y.id));
   if(F.q){ const tier=new Map(a.map(s=>[s.id,qTier(s)])); a.sort((x,y)=>tier.get(x.id)-tier.get(y.id)); }      /* the sort keeps the chosen order inside each tier */
   return a;
 }
+/* Shown at the head of the list, and in the trip builder, until there is a start place. */
+function startCard(must){ const pick=()=>{ openSettings(); setTimeout(()=>{ const n=$('#set-home'); if(n){ n.scrollIntoView({block:'center'}); n.focus(); } },80); };
+  return el('div',{class:'startcard',id:'startcard'},
+    el('b',{text:'Where are you starting from?'}),
+    el('p',{text:'Drive times and "nearest first" count from there.'}),
+    el('div',{class:'row'},
+      el('button',{class:'btn sm',type:'button',id:'sc-me',onclick:()=>{ if(!map){ banner('Your location needs the map, and the map has not loaded. Choose a place instead.',true,7000); return; } if(geo.id===null){ geo.wide=true; locate(); } }},'Use my location'),
+      el('button',{class:'btn sm',type:'button',id:'sc-pick',onclick:pick},'Choose a place'),
+      must?null:el('button',{class:'later',type:'button',id:'sc-no',onclick:()=>{ U.ui.noStart=1; save(); renderList(); }},'Not now'))); }
 function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' sq':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
 function renderList(){
   listFrom=nearFrom();
-  { const o=$('#sort').options[0], n=homeObj().name||'your start'; o.textContent=nearAt?'Nearest to you':'Nearest to '+(n.length>20?n.slice(0,19)+'…':n); }
+  { const o=$('#sort').options[0], n=homeObj().name||'your start'; o.textContent=nearAt?'Nearest to you':!homePicked()?'Nearest first':'Nearest to '+(n.length>20?n.slice(0,19)+'…':n); }
+  { const slot=$('#startslot'); if(slot){ slot.textContent=''; if(!fromOK()&&!U.ui.noStart) slot.append(startCard()); } }
   visible=sortSites(sites().filter(match));
   const ul=$('#list'); ul.textContent='';
   syncFcount();
@@ -234,12 +254,12 @@ function renderList(){
   const frag=document.createDocumentFragment(), rows=listAll?visible:visible.slice(0,LISTCAP);
   if(sel&&!listAll&&rows.indexOf(sel)<0&&visible.indexOf(sel)>=0) rows.push(sel);
   rows.forEach(s=>{
-    const d=dtl(s), my=U.status[s.id];
+    const d=dtl(s), my=U.status[s.id], far=fromOK();
     frag.append(el('li',null,el('button',{class:'item pad'+(sel&&sel.id===s.id?' cur':''),type:'button','data-id':s.id,onclick:()=>select(s,true)},
       dot(s),
       el('span',null,el('b',{text:s.name}),el('small',{text:[s.town,s.years].filter(Boolean).join(' · ')}),
         el('small',null,STS[s.st],s.now?' · changing now':'',s.prec==='area'?' · rough pin':'',my?' · '+MY[my]:'',U.trip.indexOf(s.id)>=0?' · in trip':'')),
-      el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:miTxt(d.mi)})))));
+      far?el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:miTxt(d.mi)})):null)));
   });
   ul.append(frag);
   if(rows.length<visible.length) ul.append(el('li',{class:'pad'},el('button',{class:'btn',type:'button',id:'list-more',onclick:()=>{ listAll=true; renderList(); }},'Show the other '+(visible.length-rows.length)+' places')));
@@ -556,7 +576,7 @@ function initMap(){
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
-  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:3,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); map.setView(sv.c,sv.z); }
+  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:3,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); if(sv.b) map.fitBounds(sv.b,{animate:false}); else map.setView(sv.c,sv.z); }
   L.control.zoom({position:'bottomright'}).addTo(map);
   drawScale();
   map.attributionControl.setPrefix(false);
@@ -686,7 +706,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     x.addEventListener('change',()=>{ const c=choices.find(c=>String(c[0])===x.value); setPref(key,c?c[0]:x.value); }); return el('label',{class:'field setrow',for:id},el('span',{text:label}),x,sub?el('small',{class:'snote',text:sub}):null); };
   const tog=(key,label,sub)=>{ const id='set-'+key; return el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!pref(key),onchange:e=>setPref(key,e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null)); };
   const sw=el('div',{class:'swatches',role:'radiogroup','aria-label':'Track colour'}); [['#e11d74','Pink'],['#2563eb','Blue'],['#dc2626','Red'],['#7c3aed','Purple'],['#111827','Black']].forEach(c=>{ const b=el('button',{type:'button',role:'radio','aria-checked':String(pref('trk')===c[0]),'aria-label':c[1],title:c[1],style:'--c:'+c[0]}); b.addEventListener('click',()=>{ setPref('trk',c[0]); buildSettings(); }); sw.append(b); });
-  const hs=el('select',{id:'set-home'}); [...$('#home').children].forEach(n=>hs.append(n.cloneNode(true))); hs.value=U.home.id; hs.addEventListener('change',()=>{ const h=$('#home'); h.value=hs.value; if(hs.value==='pick') closeSheet(); const ev=new Event('change'); ev.go=true; h.dispatchEvent(ev); });
+  const hs=el('select',{id:'set-home'}); [...$('#home').children].forEach(n=>hs.append(n.cloneNode(true))); hs.value=homePicked()?U.home.id:''; hs.addEventListener('change',()=>{ const h=$('#home'); h.value=hs.value; if(hs.value==='pick') closeSheet(); const ev=new Event('change'); ev.go=true; h.dispatchEvent(ev); });
   const fq=el('input',{type:'text',id:'set-find',placeholder:'Town, address, ZIP or 39.10, -94.58',autocomplete:'off',enterkeyhint:'search'}), fb=el('button',{type:'button',class:'btn',text:'Set'}), fm=el('small',{class:'snote',text:'Use this when the device cannot find you, such as a desktop with location turned off. Names are looked up with OpenStreetMap; coordinates are not sent anywhere.'});
   const go=async()=>{ fb.disabled=true; fm.textContent='Looking…'; const r=await findSpot(fq.value); fb.disabled=false; if(r.err){ fm.textContent=r.err; return; } setSpot(r.lat,r.lon,r.name); if(map) map.setView([r.lat,r.lon],11); buildSettings(); };
   fb.addEventListener('click',go); fq.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } });
@@ -779,10 +799,11 @@ function buildSheet(){
   if(U.ui.pockets&&POCK){ const all=pockNear(pockList.mode), other=pockList.mode==='other';
     lb.append(ck('pock-c',U.ui.pockC,'Old town centres only','Hide the other pockets: estates, mill sites, battlefields, campuses',v=>{ U.ui.pockC=v; save(); pockReset(); }));
     const seg=el('div',{class:'pockseg'}); [['rich','Richest'],['near','Nearest'],['other','Other pockets']].forEach(m=>seg.append(el('button',{class:'btn sm'+(pockList.mode===m[0]?' on':''),type:'button','aria-pressed':String(pockList.mode===m[0]),onclick:()=>{ pockList={mode:m[0],n:8}; buildSheet(); }},m[1])));
-    lb.append(note(other?'Estates, mill sites, battlefields and other pockets within 40 miles of your start place.':'Old town centres within 40 miles of your start place. Tap one to go there.'),seg);
+    const from=homePicked()?'your start place':'the middle of the map';
+    lb.append(note(other?'Estates, mill sites, battlefields and other pockets within 40 miles of '+from+'.':'Old town centres within 40 miles of '+from+'. Tap one to go there.'),seg);
     if(all.length){ const ul=el('div',{class:'pocklist'}); all.slice(0,pockList.n).forEach(o=>ul.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ closeSheet(); map.setView([o.k[0],o.k[1]],15); }},el('b',{text:o.k[7]}),el('small',{text:' '+pockLine(o)})))); lb.append(ul);
       if(all.length>pockList.n) lb.append(el('button',{class:'btn sm',type:'button',id:'pock-more',onclick:()=>{ pockList.n+=8; buildSheet(); }},'Show more ('+(all.length-pockList.n)+')')); }
-    else lb.append(note('None are mapped within 40 miles of your start place yet. The layer covers '+Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', ')+' so far.')); }
+    else lb.append(note('None are mapped within 40 miles of '+from+' yet. The layer covers '+Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', ')+' so far.')); }
   if(map&&!schematic){ lb.append(H('Offline'));
     lb.append(el('button',{class:'btn sm',type:'button',id:'view-off','aria-expanded':String(viewOpen),onclick:()=>{ viewOpen=!viewOpen; buildSheet(); }},viewOpen?'Close':'Save this map view for offline…'));
     if(viewOpen) lb.append(viewBox()); }
@@ -1143,7 +1164,7 @@ function pockItemPopup(t,x){
   L.popup({maxWidth:270}).setLatLng([x[0],x[1]]).setContent(box).openOn(map); }
 /* for the map options sheet: old town centres within reach of the start place, richest or nearest first, or the other pockets.
    "Nearest" leaves out the thinnest centres when there are plenty, so the list is not all crossroads with one plaque. */
-function pockNear(mode){ if(!POCK) return []; const H=homeObj();
+function pockNear(mode){ if(!POCK) return []; let H=homeObj(); if(!homePicked()&&map){ const c=map.getCenter(); H={lat:c.lat,lon:c.lng}; }
   let a=POCK.k.filter(k=>(mode==='other')!==pockC(k)).map(k=>({k:k,mi:hav(H.lat,H.lon,k[0],k[1])})).filter(o=>o.mi<=40);
   if(mode==='near'){ const solid=a.filter(o=>o.k[11]>=10); if(solid.length>=8) a=solid; return a.sort((x,y)=>x.mi-y.mi); }
   return a.sort((x,y)=>y.k[11]-x.k[11]); }
@@ -1254,7 +1275,7 @@ function locate(){
       const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); nearMoved(); recPoint(p,c.accuracy||50,t); geo.acc=c.accuracy||50; nmFix(p,geo.acc);
       /* follow: if the dot was on screen and has now walked off it, bring the map along */
       if(pref('follow')&&!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
-      if(geo.first){ geo.first=false; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,Math.max(map.getZoom(),16)); }
+      if(geo.first){ geo.first=false; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,geo.wide?10:Math.max(map.getZoom(),16)); geo.wide=false; }
     },e=>{ if(e&&e.code===1){ fail(LOCAL||HOSTED?'Location was refused. Allow it for this page in your browser settings, then tap again.':'This online copy is not allowed to use your location. It works when the Atlas is opened as a file or from your own web address.'); return; }
       if(geo.f) return;   /* a passing timeout after we already had a fix: keep listening */
       fail('Could not get a GPS fix. Step into the open and try again.'); },
@@ -1810,7 +1831,7 @@ function syncMarkers(){
       m.addTo(clusLayer); });
     clusLayer.addTo(map); }
 }
-function drawHome(){ if(!map) return; if(homeMarker) map.removeLayer(homeMarker); const H=homeObj();
+function drawHome(){ if(!map) return; if(homeMarker){ map.removeLayer(homeMarker); homeMarker=null; } if(!homePicked()) return; const H=homeObj();
   homeMarker=L.marker([H.lat,H.lon],{interactive:false,keyboard:false,zIndexOffset:-500,icon:L.divIcon({className:'pinwrap',html:'<span class="homepin">H</span>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map); }
 function drawSel(){
   if(!map) return; selShapes.forEach(x=>map.removeLayer(x)); selShapes=[];
@@ -1897,11 +1918,11 @@ function renderDetail(s){
   /* getting there */
   const times=el('div',{class:'times'});
   if(nearFrom()){ const l=dtl(s); times.append(el('div',{class:'time home',id:'dt-live'},el('b',{text:'~'+fmtMin(l.min)}),'from where you are · '+miTxt(l.mi))); }
-  times.append(el('div',{class:'time'+(nearAt?'':' home')},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+miTxt(d.mi)));
+  if(homePicked()) times.append(el('div',{class:'time'+(nearAt?'':' home')},el('b',{text:(d.est?'~':'')+fmtMin(d.min)}),'from '+H.name+' · '+miTxt(d.mi)));
   /* one time, from the reader's own start place; other cities' times were noise to anyone who does not live there */
-  times.append(el('button',{class:'btn sm',type:'button',id:'dt-change',onclick:()=>{ openSettings(); setTimeout(()=>{ const n=$('#set-home'); if(n){ n.scrollIntoView({block:'center'}); n.focus(); } },80); }},'Change start place'));
+  times.append(el('button',{class:'btn sm',type:'button',id:'dt-change',onclick:()=>{ openSettings(); setTimeout(()=>{ const n=$('#set-home'); if(n){ n.scrollIntoView({block:'center'}); n.focus(); } },80); }},homePicked()?'Change start place':'Set a start place to see the drive time'));
   /* with the position on, leave the origin out: Google Maps then starts from where the phone is */
-  const gd='https://www.google.com/maps/dir/?api=1'+(nearAt?'':'&origin='+H.lat+','+H.lon)+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
+  const gd='https://www.google.com/maps/dir/?api=1'+(nearAt||!homePicked()?'':'&origin='+H.lat+','+H.lon)+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
   const cbtn=el('button',{class:'btn sm',type:'button'},'Copy'); cbtn.addEventListener('click',()=>copy(ll(p),cbtn));
   v.append(el('div',{class:'sec pad'},el('h3',{text:'Getting there'}),times,
     el('dl',{class:'kv',style:'margin-top:8px'},
@@ -2150,6 +2171,7 @@ function renderTrip(){
   const box=el('div',{class:'pad',style:'padding-block:12px'}); v.append(box);
   box.append(el('h2',{style:'font-size:22px',text:'Trip builder'}),el('p',{style:'color:var(--mute);margin:4px 0 10px',text:'Add places from their pages, put them in order, then hand the route to Google Maps for live traffic and turn-by-turn.'}));
   if(!st.length){ box.append(el('p',{class:'empty',text:'No stops yet. Open a place and choose "Add to trip".'})); return; }
+  if(!homePicked()){ box.append(el('p',{style:'margin:0 0 4px',text:'A trip starts from your start place, and you have not chosen one yet.'}),startCard(true)); return; }
   const ul=el('ol',{class:'stops'}), pts0=[H].concat(st.map(dest)).concat(trip.round?[H]:[]), ck=tripClock(pts0,st);
   st.forEach((s,i)=>{ const mv=d=>()=>{ const j=i+d; if(j<0||j>=U.trip.length) return; const a=U.trip; const t=a[i]; a[i]=a[j]; a[j]=t; trip.real=null; save(); renderTrip(); };
     ul.append(el('li',null,el('span',null,el('button',{type:'button',style:'background:none;border:0;padding:0;font-weight:600;text-align:left;color:var(--ink)',onclick:()=>select(s,true)},s.name),el('small',{text:[s.town,EFF[s.eff],ACC[s.acc]].filter(Boolean).join(' · ')}),el('small',{class:'stop-at'+(ck.late>=0&&i>=ck.late?' late':''),text:'there about '+hm(ck.at[i])})),
@@ -2341,15 +2363,16 @@ function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(
 /* ---------- wiring ---------- */
 function buildHome(){
   const h=$('#home'); h.textContent='';
+  if(!homePicked()) h.append(el('option',{value:'',text:'Not chosen yet'}));
   STATES.forEach(st=>{ const hs=HUBS.filter(x=>x.st===st.k); if(hs.length) h.append(el('optgroup',{label:st.name},hs.map(x=>el('option',{value:x.id,text:x.name})))); });
   HUBS.filter(x=>!x.st).forEach(x=>h.append(el('option',{value:x.id,text:x.name})));
   if(U.home.id==='custom') h.append(el('option',{value:'custom',text:(U.home.name||'My spot')+' ('+U.home.lat.toFixed(3)+', '+U.home.lon.toFixed(3)+')'}));
   h.append(el('option',{value:'pick',text:'Pick a spot on the map…'}));
-  h.value=U.home.id;
+  h.value=homePicked()?U.home.id:'';
 }
 $('#home').addEventListener('change',e=>{
-  const v=e.target.value;
-  if(v==='pick'){ if(!map){ e.target.value=U.home.id; return; } pickingHome=true; stage.classList.add('adding'); $('#addbar').hidden=false; $('#addbar span').textContent='Click the map where you start from.'; e.target.value=U.home.id; return; }
+  const v=e.target.value; if(v==='') return;
+  if(v==='pick'){ const was=homePicked()?U.home.id:''; if(!map){ e.target.value=was; return; } pickingHome=true; stage.classList.add('adding'); $('#addbar').hidden=false; $('#addbar span').textContent='Click the map where you start from.'; e.target.value=was; return; }
   if(v==='custom') return;
   U.home={id:v,by:1}; save(); buildHome(); drawHome(); refresh(); if(sel) renderDetail(sel); { const H=homeObj(); if(map&&e.go) map.setView([H.lat,H.lon],10); }
 });

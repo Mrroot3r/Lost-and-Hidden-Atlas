@@ -7,7 +7,7 @@ const { chromium, devices } = require('playwright');
   const b=await chromium.launch({proxy:{server:process.env.HTTPS_PROXY||'http://x',bypass:'localhost,127.0.0.1'}});
   const c=await b.newContext(Object.assign({},devices['Pixel 7'])); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   // a trip of two places, put in before the page first loads
-  await c.addInitScript(()=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({trip:['joliet-iron-works','lidar-high-knob-walled-yard']})); });
+  await c.addInitScript(()=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},trip:['joliet-iron-works','lidar-high-knob-walled-yard']})); });
   await p.goto(process.argv[2]||'http://localhost:8766/index.html'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600);
   const U=()=>p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'));
   const shown=sel=>p.evaluate(sel=>[...document.querySelectorAll(sel)].filter(n=>n.offsetParent!==null&&n.getClientRects().length).length,sel);

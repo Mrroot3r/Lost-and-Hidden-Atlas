@@ -408,6 +408,12 @@ details>.phs{margin:8px 0 0}
 /* visit reports on a place page */
 .visit-item{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px}
 .visit-item p{margin:4px 0}
+/* the card that asks a new reader where they start from */
+.startcard{margin:8px 14px 2px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--accent-soft)}
+.startcard b{display:block;font-size:15px}
+.startcard p{margin:3px 0 9px;font-size:13px;color:var(--mute)}
+.startcard .row{gap:8px;align-items:center}
+.startcard .later{background:none;border:0;padding:8px 6px;font-size:13px;color:var(--mute);text-decoration:underline;min-height:36px}
 .sharebox{border:1px dashed var(--line);border-radius:8px;padding:8px 10px;margin-top:8px;background:var(--bg)}
 .sharebox .row{margin-top:6px}
 .visit-item .row{margin-top:6px}
