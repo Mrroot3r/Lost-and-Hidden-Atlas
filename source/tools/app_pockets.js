@@ -42,7 +42,7 @@ const fails = []; const ok = (name, cond, detail) => { console.log((cond ? 'ok  
   async function open(base, block) {
     const c = await browser.newContext({ ...devices['Pixel 7'] }), p = await c.newPage(), errs = [], reqs = [];
     p.on('pageerror', e => errs.push(e.message)); p.on('request', r => { const u = r.url(); if (u.indexOf('/data/pock') >= 0) reqs.push((u.indexOf(app.url) === 0 ? 'app:' : u.indexOf(base) === 0 ? 'atlas:' : '?:') + u.replace(/^.*\/data\//, '').split('?')[0]); });
-    await c.addInitScript(b => { try { localStorage.setItem('atlas-base', b); } catch (e) {} }, base);
+    await c.addInitScript(b => { try { localStorage.setItem('atlas-base', b); if (!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1', JSON.stringify({ v: 1, home: { id: 'alb', by: 1 } })); } catch (e) {} }, base);   // a start place, so the list of pockets near it has something in it
     if (block) await p.route(app.url + 'data/pock/' + block + '.json', r => r.fulfill({ status: 404, body: 'not built in' }));
     await p.goto(app.url); await p.waitForFunction(() => window.__atlasMap, null, { timeout: 30000 }); await p.waitForTimeout(1500);
     const go = async (ll, z) => { await p.evaluate(([ll, z]) => { window.__atlasMap.setView(ll, z, { animate: false }); }, [ll, z]); await p.waitForTimeout(2500); };
