@@ -103,7 +103,6 @@ Places someone read about while researching but did not add, with what is missin
 | Fort DuPont | Delaware City, DE | Wikipedia: river fort of 1900–1942, part of it a state park since 1992 | Which batteries are open to walk; a pin |
 | Kaniakapūpū | Nuʻuanu, Oahu, HI | Wikipedia: ruins of Kamehameha III's summer palace; officially off-limits, trespassers cited | Do not add unless the state opens it |
 | Fort Atkinson State Preserve | Fort Atkinson, IA | Wikipedia: remnants of an 1840 Army post, a state preserve | What remains, hours, a pin check |
-| Garnet | Granite County, MT | Wikipedia: 1890s mining town, preserved buildings open to visitors, Bureau of Land Management | Road season, fees, a pin check |
 | Lost Cove | Yancey County, NC | Wikipedia: ghost town above the Nolichucky, last family left 1957, fires in 2007, reached only on foot | Who owns the land now and which trail is legal; what survived the fires |
 | Old Sheldon Church ruins | Beaufort County, SC | Wikipedia: church of 1745–53, twice ruined; the article notes limits on use since 2015 | Whether visitors may still walk in or only look from the fence |
 | Kay Moor | Fayetteville, WV | Wikipedia: abandoned mine, coal plant and town in the New River Gorge | National Park Service trail and stair details; a pin for each level |
