@@ -23,3 +23,5 @@ A tidied note has a `tidied:` line at its head, an empty leads table and a line 
 stays for good: it is the record of the batch, and `start.py` shows it to the next session in that state.
 
 Batches added before November 18, 2026 have no note: their lines are in `GUIDE.md` sections 8 and 10 and in `LEADS.md`.
+
+A "brick" session (`PROMPTS.md`, type 6) adds no places and so leaves no note: it says in its pull request how many places it settled and how many it left unset.
