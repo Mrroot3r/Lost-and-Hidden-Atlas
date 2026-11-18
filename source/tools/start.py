@@ -112,6 +112,19 @@ mine.sort(key=lambda n:(not (set(re.split(r'[,\s]+',n['region']))&regs),n['date'
 if mine:
     print(f'== Notes from earlier sessions in {sname}: {len(mine)} (nearest ground first; the whole of each is in notes/<key>.md)')
     for n in mine[:6]: print('  [%s, %s, region %s] %s'%(n['key'],n['date'],n['region'],(n['what'].replace('\n',' ') if len(n['what'])<600 else n['what'].replace('\n',' ')[:600]+' …')))
+# ---- what the tidy job has kept from earlier notes (GUIDE.md section 16): the lists for every state and for this one
+m16=re.search(r'^## 16\.[^\n]*\n(.*?)(?=^## \d|\Z)',g,re.M|re.S)
+if m16:
+    def kept(h):
+        mm=re.search(r'^### '+re.escape(h)+r'[ \t]*\n(.*?)(?=^### |\Z)',m16.group(1),re.M|re.S)
+        return [l.strip() for l in (mm.group(1) if mm else '').split('\n') if l.strip().startswith('- ')]
+    here=kept(sname) if sname else []; every=kept('Every state')
+    if here:
+        print(f'== What earlier sessions learned in {sname} (GUIDE.md section 16): {len(here)}')
+        for t in here: print('  '+t)
+    if every:
+        print(f'== What earlier sessions learned that holds in every state (GUIDE.md section 16): {len(every)}')
+        for t in every: print('  '+t)
 tips=[]
 for n in sorted(NOTES,key=lambda n:n['date'],reverse=True):
     for t in n['tips']: tips.append((n in mine,n['date'],n['key'],t))
@@ -131,5 +144,6 @@ print('''== The order of work (GUIDE.md sections 4 to 6 have the detail)
   2. Write tools/data_<area>.py (BATCH, PLACES, PIN_NOTES). Batch time: copy the output of  date -u '+%Y-%m-%d %H:%M'
   3. Parking for each place: tools/parking.py <lat> <lon>  -> th=[lat,lon], thn='...'
   4. python3 tools/build_sites.py && python3 tools/pincheck.py --batch <key> --lidar ; look at both sheets; move pins with tools/pix.py
+     (fifteen places take two to four minutes with --lidar: give the command a long timeout, or run it in the background)
   5. ATLAS=$PWD bash tools/all.sh ; the smoke test ; then tools/publish.sh <clone> <branch> ONCE ; then  python3 tools/note.py <batch key> <clone>
      and fill in notes/<batch key>.md. Do NOT edit GUIDE.md, LEADS.md or PROMPTS.md: other sessions are writing too.''')
