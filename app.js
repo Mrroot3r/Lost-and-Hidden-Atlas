@@ -565,7 +565,7 @@ function initMap(){
   map.on('moveend',()=>{ if(U.ui.land) drawLand(); if(view==='near'&&NM.org==='map') nmDraw(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
   if(!LD[U.ui.base]) U.ui.base='streets';
   setBase(U.ui.base,true);
-  map.on('zoomend',onZoom); onZoom();
+  map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
   map.on('move zoom zoomend moveend resize viewreset',clipCmp);
   map.on('click',onMapClick);
   map.on('contextmenu',onContext);
@@ -576,7 +576,7 @@ function initMap(){
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
 }
-function onZoom(){ map.getContainer().classList.toggle('zfar',map.getZoom()<12); if(markers.size||clusLayer) syncMarkers(); }
+function onZoom(){ map.getContainer().classList.toggle('zfar',map.getZoom()<12); }
 function setBase(key,first){
   if(schematic) return;
   if(baseLayer) map.removeLayer(baseLayer);
@@ -855,9 +855,12 @@ function linePopup(f,part,latlng){
 }
 /* ---- drawing the lines fast ----
    The lines are 108,000 points in 16,000 pieces. Leaflet works out every point of every layer on the map again at each
-   zoom step, which took about 0.4 s of a 0.5 s step on a mid-range phone. So:
-   - a piece of line is on the map only while its half-degree cell is in or near the view, and is first made then;
-   - zoomed out to town level or wider (zoom 9 and under) a thinned copy is drawn: nothing it drops is a pixel wide;
+   zoom step, in view or not, and each layer costs something on top of its points. So what is on the map depends on the zoom:
+   - zoom 13 and closer: one layer for each piece of each line, at full detail, only where its half-degree cell is in or
+     near the view. A tap picks the line directly.
+   - wider than that (LLEV): one layer for each kind of line in each square of the map, thinned to what a pixel can show at
+     that zoom, and only the squares in or near the view. The squares grow as the map zooms out. Measured round Albany:
+     zoom 8 had 21,000 points on the map and has 13,500; zoom 9 had 337 layers and has 35.
    - one layer draws both the white casing and the colour, where there used to be two. */
 const CasedLine=L.Polyline.extend({ _updatePath:function(){ const r=this._renderer, o=this.options; if(!r||!r._updatePoly) return;
   const c=o.color, w=o.weight, d=o._dashArray, op=o.opacity;
@@ -870,36 +873,45 @@ function thinPart(part,tol){ const n=part.length; if(n<3) return part;      /* D
     if(md>t2){ keep[mi]=1; st.push(a,mi,mi,b); } }
   const out=[]; for(let i=0;i<n;i++) if(keep[i]) out.push(part[i]); return out; }
 let lineSet=null;
+const LKG={}; Object.keys(LGRP).forEach(g=>LGRP[g][1].forEach(k=>{ LKG[k]=g; }));              /* kind of line -> its switch */
 function lineSets(){ if(lineSet) return lineSet; const data=linesData(); if(!data.length) return null; lineSet={};
   Object.keys(LGRP).forEach(g=>{ lineSet[g]=[]; });
-  const grpOf={}; Object.keys(LGRP).forEach(g=>LGRP[g][1].forEach(k=>{ grpOf[k]=g; }));
-  data.forEach(f=>{ const g=grpOf[f.k]; if(!lineSet[g]) return; lineChunks(f).forEach(ch=>{ let a=90,b=-90,c=180,d=-180; ch.forEach(p=>p.forEach(q=>{ if(q[0]<a)a=q[0]; if(q[0]>b)b=q[0]; if(q[1]<c)c=q[1]; if(q[1]>d)d=q[1]; }));
-    lineSet[g].push({f:f,ch:ch,b:L.latLngBounds([a,c],[b,d]),lo:null,hi:null,on:''}); }); });
+  data.forEach(f=>{ const g=LKG[f.k]; if(!lineSet[g]) return; lineChunks(f).forEach(ch=>{ let a=90,b=-90,c=180,d=-180; ch.forEach(p=>p.forEach(q=>{ if(q[0]<a)a=q[0]; if(q[0]>b)b=q[0]; if(q[1]<c)c=q[1]; if(q[1]>d)d=q[1]; }));
+    lineSet[g].push({f:f,ch:ch,b:L.latLngBounds([a,c],[b,d]),pl:null,on:false}); }); });
   return lineSet; }
-function lineMake(c,mode){ const f=c.f, st=LK[f.k]; let geo=c.ch;
-  if(mode==='lo'){ geo=[]; c.ch.forEach(p=>{ const q=thinPart(p,0.0009); if(q.length>2||Math.abs(q[0][0]-q[q.length-1][0])+Math.abs(q[0][1]-q[q.length-1][1])>0.0012) geo.push(q); }); if(!geo.length) geo=[c.ch[0]]; }
-  const pl=new CasedLine(geo,{pane:'lines',renderer:lineCanvas,color:st[1],weight:f.k==='rr'?1.5:2.6,casing:f.k==='rr'?3.5:5,opacity:1,dashArray:st[2],bubblingMouseEvents:false});
+/* wide: square ends and plain corners. Rounding every end and corner of thousands of short pieces was a third of the cost
+   of drawing a wide view, and cannot be seen on a line under 3 pixels thick. */
+const lineStyle=(k,wide)=>{ const st=LK[k], o={pane:'lines',renderer:lineCanvas,color:st[1],weight:k==='rr'?1.5:2.6,casing:k==='rr'?3.5:5,opacity:1,dashArray:st[2],bubblingMouseEvents:false};
+  if(wide){ o.lineCap='butt'; o.lineJoin='bevel'; } return o; };
+function lineMake(c){ const f=c.f, pl=new CasedLine(c.ch,lineStyle(f.k));
   pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } let part=c.ch[0], bd=1e12; if(c.ch.length>1) c.ch.forEach(q=>{ const d=distToPart(e.latlng.lat,e.latlng.lng,q); if(d<bd){ bd=d; part=q; } }); linePopup(f,part,e.latlng); });
   return pl; }
-/* zoomed out past town level (zoom 8 and under) the whole of a kind of line is one layer, thinned to what a pixel can show */
-function lineWide(g){ const out=[];
-  LGRP[g][1].forEach(k=>{ const geo=[]; linesData().forEach(f=>{ if(f.k!==k) return; f.c.forEach(p=>{ const q=thinPart(p,0.004); if(q.length>2||Math.abs(q[0][0]-q[q.length-1][0])+Math.abs(q[0][1]-q[q.length-1][1])>0.005) geo.push(q); }); });
-    if(!geo.length) return; const st=LK[k];
-    const pl=new CasedLine(geo,{pane:'lines',renderer:lineCanvas,color:st[1],weight:k==='rr'?1.5:2.6,casing:k==='rr'?3.5:5,opacity:1,dashArray:st[2],bubblingMouseEvents:false});
-    pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } const la=e.latlng.lat, lo=e.latlng.lng; let bf=null, bp=null, bd=1e12;
-      linesData().forEach(f=>{ if(f.k!==k||la<f.bb[0]-0.1||la>f.bb[2]+0.1||lo<f.bb[1]-0.1||lo>f.bb[3]+0.1) return; f.c.forEach(q=>{ const d=distToPart(la,lo,q); if(d<bd){ bd=d; bf=f; bp=q; } }); });
-      if(bf) linePopup(bf,bp,e.latlng); });
-    out.push(pl); });
-  return out; }
-function syncLines(){ if(!map||!lineSets()) return; const z=map.getZoom(), mode=z<=8?'xl':z<=9?'lo':'hi', vb=map.getBounds().pad(0.35);
-  if(!lineSet._w) lineSet._w={};
-  Object.keys(LGRP).forEach(g=>{ const on=!!U.ui.lines[g], wide=on&&mode==='xl';
-    if(wide&&!lineSet._w[g]) lineSet._w[g]=lineWide(g);
-    (lineSet._w[g]||[]).forEach(pl=>{ if(wide&&!map.hasLayer(pl)) pl.addTo(map); else if(!wide&&map.hasLayer(pl)) map.removeLayer(pl); });
-    lineSet[g].forEach(c=>{ const want=on&&mode!=='xl'&&vb.intersects(c.b)?mode:'';
-      if(c.on===want) return;
-      if(c.on) map.removeLayer(c[c.on]);
-      if(want){ if(!c[want]) c[want]=lineMake(c,want); c[want].addTo(map); }
+/* The wider levels. z: the closest zoom the level serves; cell: the side of its squares in degrees; tol: how
+   far a thinned line may stray, in degrees of latitude, about one pixel at that zoom. */
+const LLEV=[{z:6,cell:8,tol:0.016},{z:8,cell:2,tol:0.004},{z:10,cell:1,tol:0.0009},{z:12,cell:0.5,tol:0.00018}];
+const lineLevel=z=>{ for(let i=0;i<LLEV.length;i++) if(z<=LLEV[i].z) return i; return -1; };
+let lineIdx=[];
+function lineTiles(li){ if(lineIdx[li]) return lineIdx[li]; const S=LLEV[li].cell, m=new Map();
+  linesData().forEach(f=>{ if(!LKG[f.k]) return; f.c.forEach(p=>{ const key=f.k+'|'+Math.floor(p[0][0]/S)+','+Math.floor(p[0][1]/S); let t=m.get(key); if(!t){ t={k:f.k,raw:[],a:90,b:-90,c:180,d:-180,pl:null,on:false}; m.set(key,t); }
+    t.raw.push(p); p.forEach(q=>{ if(q[0]<t.a)t.a=q[0]; if(q[0]>t.b)t.b=q[0]; if(q[1]<t.c)t.c=q[1]; if(q[1]>t.d)t.d=q[1]; }); }); });
+  m.forEach(t=>{ t.bb=L.latLngBounds([t.a,t.c],[t.b,t.d]); });
+  return lineIdx[li]=m; }
+function lineTileMake(t,li){ const tol=LLEV[li].tol, min=tol*1.3, geo=[], k=t.k;
+  t.raw.forEach(p=>{ const q=thinPart(p,tol); if(q.length>2||Math.abs(q[0][0]-q[q.length-1][0])+Math.abs(q[0][1]-q[q.length-1][1])>min) geo.push(q); });      /* a piece shorter than a pixel is left out */
+  if(!geo.length) return false;
+  const pl=new CasedLine(geo,lineStyle(k,true));
+  pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } const la=e.latlng.lat, lo=e.latlng.lng; let bf=null, bp=null, bd=1e12;
+    linesData().forEach(f=>{ if(f.k!==k||la<f.bb[0]-0.1||la>f.bb[2]+0.1||lo<f.bb[1]-0.1||lo>f.bb[3]+0.1) return; f.c.forEach(q=>{ const d=distToPart(la,lo,q); if(d<bd){ bd=d; bf=f; bp=q; } }); });
+    if(bf) linePopup(bf,bp,e.latlng); });
+  return pl; }
+function syncLines(){ if(!map||!lineSets()) return; const li=lineLevel(map.getZoom()), vb=map.getBounds().pad(0.35);
+  LLEV.forEach((_,i)=>{ if(i!==li&&!lineIdx[i]) return;                        /* a level never looked at has nothing on the map */
+    lineTiles(i).forEach(t=>{ const want=i===li&&!!U.ui.lines[LKG[t.k]]&&vb.intersects(t.bb);
+      if(want){ if(t.pl===null) t.pl=lineTileMake(t,i); if(t.pl&&!t.on){ t.pl.addTo(map); t.on=true; } }
+      else if(t.on){ map.removeLayer(t.pl); t.on=false; } }); });
+  Object.keys(LGRP).forEach(g=>{ const on=li<0&&!!U.ui.lines[g];
+    lineSet[g].forEach(c=>{ const want=on&&vb.intersects(c.b); if(c.on===want) return;
+      if(want){ if(!c.pl) c.pl=lineMake(c); c.pl.addTo(map); } else map.removeLayer(c.pl);
       c.on=want; }); });
   if(lineHi) lineHi.bringToBack(); }
 function drawLines(){
@@ -946,16 +958,25 @@ function drawLots(){
       if(regionOf(p[0],p[1])==='ma') return xyz('https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/MassGIS_Level3_Parcels/MapServer/tile/{z}/{y}/{x}',c,20);
       return exportUrl('https://gisservices.dec.ny.gov/arcgis/rest/services/parcel_boundaries/MapServer/export',c,'&transparent=true').replace('format=jpg','format=png32'); }}); }
   lotLayer.addTo(map); }
+/* Dots that are on the map only while they are in or near the view. Leaflet works out the position of every layer on the
+   map again at each zoom step, on screen or not, so a few thousand dots a long way off made every zoom step slow.
+   V = viewDots(); viewSync(V, the items wanted now, make(item) -> layer) returns how many were added. */
+function viewDots(){ return {grp:L.layerGroup(),on:new Set(),mk:new Map()}; }
+function viewSync(V,want,make){ const w=new Set(want); let added=0;
+  V.on.forEach(x=>{ if(!w.has(x)){ V.grp.removeLayer(V.mk.get(x)); V.on.delete(x); } });
+  want.forEach(x=>{ if(V.on.has(x)) return; let m=V.mk.get(x); if(!m){ m=make(x); V.mk.set(x,m); } V.grp.addLayer(m); V.on.add(x); added++; });
+  return added; }
 let LEADS=null, leadGrp=null;
 function drawLeads(){
   if(!map) return;
-  if(!U.ui.leads){ if(leadGrp) map.removeLayer(leadGrp); return; }
+  if(!U.ui.leads){ if(leadGrp) map.removeLayer(leadGrp.grp); return; }
   if(!LEADS){ leadsLoad(); if(!LEADS) return; }
-  if(!leadGrp){
-    leadGrp=L.layerGroup();
-    LEADS.p.forEach(p=>{ const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false}).addTo(leadGrp);
-      m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } leadPopup(p); }); }); }
-  leadGrp.addTo(map); }
+  if(!leadGrp){ leadGrp=viewDots(); map.on('moveend',()=>{ if(U.ui.leads&&LEADS) leadSync(); }); }
+  leadSync(); leadGrp.grp.addTo(map); }
+function leadSync(){ const b=map.getBounds().pad(0.25), s=b.getSouth(), n=b.getNorth(), w=b.getWest(), e=b.getEast();
+  viewSync(leadGrp,LEADS.p.filter(p=>p[0]>=s&&p[0]<=n&&p[1]>=w&&p[1]<=e),p=>{
+    const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false});
+    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } leadPopup(p); }); return m; }); }
 /* ---------- two more lead layers, drawn only where the map is looking ----------
    data/vanished.json (tools/vanished.py): places the federal names file of 2021 marks "(historical)".
        p = [lat,lon,type,name,GNIS id,state]
@@ -1007,16 +1028,16 @@ function xlInView(k,b){ const X=XL[k], out=[]; if(!X.idx) return out;
   for(let i=Math.floor(b.getSouth()*20);i<=Math.floor(b.getNorth()*20);i++) for(let j=Math.floor(b.getWest()*20);j<=Math.floor(b.getEast()*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(k,x)&&b.contains([x[0],x[1]])) out.push(x); });
   return out; }
 function drawXL(k){ const X=XL[k]; if(!map) return;
-  if(X.layer){ map.removeLayer(X.layer); X.layer=null; }
-  if(!xlOn(k)) return;
-  if(!X.data){ xlLoad(k); return; }
+  const off=()=>{ if(X.layer){ map.removeLayer(X.layer.grp); X.layer=null; } };
+  if(!xlOn(k)){ off(); return; }
+  if(!X.data){ off(); xlLoad(k); return; }
   if(!map._xlOn){ map._xlOn=true; map.on('moveend',()=>Object.keys(XL).forEach(drawXL)); }
-  if(map.getZoom()<X.z) return;
+  if(map.getZoom()<X.z){ off(); return; }
   if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
-  const g=L.layerGroup(); xlInView(k,map.getBounds().pad(0.1)).slice(0,1500).forEach(x=>{
-    const m=L.circleMarker([x[0],x[1]],{pane:'lines',renderer:lineCanvas,radius:5,color:X.ring,weight:1.3,fillColor:X.fill,fillOpacity:0.95,bubblingMouseEvents:false}).addTo(g);
-    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } xlPopup(k,x); }); });
-  X.layer=g.addTo(map); }
+  if(!X.layer){ X.layer=viewDots(); X.layer.grp.addTo(map); }                /* a dot already drawn stays; only what came into view is made */
+  viewSync(X.layer,xlInView(k,map.getBounds().pad(0.1)).slice(0,1500),x=>{
+    const m=L.circleMarker([x[0],x[1]],{pane:'lines',renderer:lineCanvas,radius:5,color:X.ring,weight:1.3,fillColor:X.fill,fillOpacity:0.95,bubblingMouseEvents:false});
+    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } xlPopup(k,x); }); return m; }); }
 function xlLine(k,x){ const t=XL[k].data.t[x[2]];
   return k==='mines'?t+(x[5]?' · '+x[5].toLowerCase():'')+' · '+(x[6]==='S'?'prospect':'past producer')+(x[7]?', last worked '+x[7]:''):t; }
 function xlPopup(k,x){ const X=XL[k], pt={lat:x[0],lon:x[1]}, name=x[3]||X.data.t[x[2]];
@@ -1036,37 +1057,39 @@ function xlSet(k,v){ U.ui.xl=U.ui.xl||{}; U.ui.xl[k]=v; save(); if(k==='schools'
      m = markers [lat,lon,HMdb number,title], r = listings [lat,lon,NRIS ref,name,kind,contributing buildings (-1 unknown),year],
      d = district outlines [ref,[[lat,lon]...]]
    A pocket is drawn as one disc; the single markers and listings appear only from zoom 15, and only those in view. */
-let POCK=null, pockGrp=null, pockTier={}, pockItems=null, pockLab=null, pockWait=null, pockIdx={}, pockDet={}, pockList={mode:'rich',n:8};
+let POCK=null, pockGrp=null, pockItems=null, pockLab=null, pockWait=null, pockIdx={}, pockDet={}, pockList={mode:'rich',n:8};
 const PKK={b:'building',d:'historic district',s:'site',t:'structure',o:'object'}, PKS={C:'city',t:'town',v:'village',h:'hamlet'};
 const pockC=k=>k[10]==='c';
 const pockColor=k=>{ const s=k[11]; return !pockC(k)?'#8d86ad':s>=40?'#3b1a9e':s>=25?'#5b3fd6':s>=14?'#7a62e8':'#9d8bf2'; };
 function pockPx(k,z){ const real=k[2]/(156543.03392*Math.cos(rad(k[0]))/Math.pow(2,z)); return Math.max(real,pockC(k)?5+Math.min(8,k[11]/6):3.5+Math.min(4,k[11]/9)); }
 /* Zoomed out, only the richest show, or a state full of old villages is one purple smear: each disc has a zoom it appears from. */
-const PKT=['p11','p10','p9','c11','c10','c9','c8','c0'];
 const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8?10:11):(s>=25?9:s>=15?10:11); };
-/* close in, a disc would tint the whole screen: fade its fill and leave the ring */
-function pockZoom(){ if(!U.ui.pockets||!pockGrp) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
-  const want=PKT.filter(t=>pockTier[t]&&z>=+t.slice(1)).join();       /* plain pockets underneath, the richest town centres on top */
-  if(want!==pockGrp._want){ pockGrp._want=want; pockGrp.clearLayers(); want.split(',').forEach(t=>{ if(t) pockGrp.addLayer(pockTier[t]); }); }
-  POCK.k.forEach(k=>{ if(!k.c||z<pockFrom(k)) return; const px=Math.round(pockPx(k,z)*2)/2; if(k.px!==px){ k.px=px; k.c.setRadius(px); } const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; k.c.setStyle({fillOpacity:ff}); } }); }
+/* The discs on the map are only those in or near the view, from the zoom each appears at (viewDots, above, says why: there
+   are some four thousand). Plain pockets lie underneath and the richest town centres on top: the rows come best first, so
+   they are gone through backwards, and the order is put right whenever a disc joins ones already drawn.
+   Close in, a disc would tint the whole screen: its fill fades and the ring stays. */
+function pockZoom(){ if(!U.ui.pockets||!pockGrp||!POCK) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
+  const b=map.getBounds().pad(0.3), S=b.getSouth(), N=b.getNorth(), W=b.getWest(), E=b.getEast(), only=U.ui.pockC, want=[];
+  for(let i=POCK.k.length-1;i>=0;i--){ const k=POCK.k[i], r=k[2]/70000;                      /* its radius in degrees, generously */
+    if(z<pockFrom(k)||k[0]+r<S||k[0]-r>N||k[1]+r<W||k[1]-r>E||(only&&!pockC(k))) continue; want.push(k); }
+  const had=pockGrp.on.size, added=viewSync(pockGrp,want,k=>{ const tc=pockC(k), c=pockColor(k); k.px=k.f=null;
+    const m=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:pockPx(k,z),color:tc?c:'#6d6790',weight:tc?2:1.2,dashArray:tc?null:'3 4',opacity:0.95,fillColor:c,fillOpacity:tc?0.3:0.12,bubblingMouseEvents:false});
+    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,e.latlng); }); return m; });
+  if(added&&had) want.forEach(k=>pockGrp.mk.get(k).bringToFront());
+  want.forEach(k=>{ const c=pockGrp.mk.get(k), px=Math.round(pockPx(k,z)*2)/2; if(k.px!==px){ k.px=px; c.setRadius(px); } const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; c.setStyle({fillOpacity:ff}); } }); }
 function pockLoad(quiet){ if(POCK||pockWait) return;
   pockWait=(AT?AT.fetch('data/pockets.json'):fetch('data/pockets.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
     .then(j=>{ POCK=j; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
     .catch(()=>{ pockWait=null; if(!quiet||U.ui.pockets) banner('Historic pockets could not load. Check your signal and turn them on again.',true,6000); }); }
 /* after "old town centres only" is switched: draw the discs afresh */
-function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.c=null; k.f=null; k.px=null; }); drawPockets(); }
+function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp.grp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.f=null; k.px=null; }); drawPockets(); }
 function drawPockets(){
   if(!map) return;
-  if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp); [pockItems,pockLab].forEach(g=>{ if(g) map.removeLayer(g); }); pockItems=pockLab=null; return; }
+  if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp.grp); [pockItems,pockLab].forEach(g=>{ if(g) map.removeLayer(g); }); pockItems=pockLab=null; return; }
   if(!POCK){ pockLoad(); return; }
   if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
-  if(!pockGrp){ const first=!map._pockOn; map._pockOn=true; pockGrp=L.layerGroup(); pockTier={}; const z=map.getZoom();
-    for(let i=POCK.k.length-1;i>=0;i--){ const k=POCK.k[i], tc=pockC(k), c=pockColor(k);     /* plain pockets first, so that town centres sit on top */
-      if(U.ui.pockC&&!tc) continue;
-      k.c=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:pockPx(k,z),color:tc?c:'#6d6790',weight:tc?2:1.2,dashArray:tc?null:'3 4',opacity:0.95,fillColor:c,fillOpacity:tc?0.3:0.12,bubblingMouseEvents:false}); const t=(tc?'c':'p')+pockFrom(k); k.c.addTo(pockTier[t]||(pockTier[t]=L.layerGroup()));
-      k.c.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,e.latlng); }); }
-    if(first){ map.on('zoomend',pockZoom); map.on('moveend',pockDetail); } }
-  pockGrp.addTo(map); pockGrp._want=null; pockZoom(); pockDetail(); }
+  if(!pockGrp){ pockGrp=viewDots(); if(!map._pockOn){ map._pockOn=true; map.on('moveend',()=>{ pockZoom(); pockDetail(); }); } }
+  pockGrp.grp.addTo(map); pockZoom(); pockDetail(); }
 /* names on the best town centres in view, so a disc can be told without tapping it. Best score first; a name that
    would sit on top of one already placed is left out. */
 function pockLabels(){
@@ -1750,23 +1773,34 @@ function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return nul
     c.ids.push(s.id); c.la+=p.lat; c.lo+=p.lon; if(p.lat<c.a)c.a=p.lat; if(p.lat>c.b)c.b=p.lat; if(p.lon<c.c)c.c=p.lon; if(p.lon>c.d)c.d=p.lon; });
   const single=new Set(), groups=[]; cells.forEach(c=>{ if(c.ids.length<CLUSMIN) c.ids.forEach(i=>single.add(i)); else groups.push(c); });
   if(sel) single.add(sel.id); return {single:single,groups:groups}; }
+/* Pins are on the map only in and around the view, a screen's width beyond each edge. With every place on the map,
+   each zoom step moved 800 pins and took a mid-range phone about 80 ms; it took 16 ms with none. A pin that has been made
+   is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
+   the list, the filters or the chosen place change. */
+const pinPool=new Map(); let clusSig='';
 function syncMarkers(){
   if(!map) return;
   const show=new Set(visible.map(s=>s.id)); if(sel) show.add(sel.id);
-  const plan=clusterPlan(show), pinned=id=>show.has(id)&&(!plan||plan.single.has(id));
-  const all=sites(), ids=new Set(all.map(s=>s.id));
-  markers.forEach((m,id)=>{ if(!ids.has(id)||!pinned(id)){ map.removeLayer(m); markers.delete(id); } });
-  all.forEach(s=>{
-    if(!pinned(s.id)) return;
-    const p=pos(s), ic=pinIcon(s), sig=ic.options.html; let m=markers.get(s.id);
+  const plan=clusterPlan(show), vb=map.getBounds().pad(1), S=vb.getSouth(), N=vb.getNorth(), W=vb.getWest(), E=vb.getEast();
+  const all=sites(), want=new Map();
+  all.forEach(s=>{ if(!show.has(s.id)||(plan&&!plan.single.has(s.id))) return; const p=pos(s);
+    if((sel&&sel.id===s.id)||(p.lat>=S&&p.lat<=N&&p.lon>=W&&p.lon<=E)) want.set(s.id,s); });
+  markers.forEach((m,id)=>{ if(!want.has(id)){ map.removeLayer(m); markers.delete(id); } });
+  if(pinPool.size>all.length){ const ids=new Set(all.map(s=>s.id)); pinPool.forEach((m,id)=>{ if(!ids.has(id)) pinPool.delete(id); }); }      /* a place of your own that was deleted */
+  want.forEach(s=>{
+    const p=pos(s), ic=pinIcon(s), sig=ic.options.html; let m=pinPool.get(s.id);
     if(!m){ m=L.marker([p.lat,p.lon],{icon:ic,keyboard:false,riseOnHover:true}); m._sig=sig;
       const tip=el('span',{text:s.name}); m.bindTooltip(tip,{direction:'top',offset:[0,-9]});
       m.on('click',()=>{ if(adding||pickingHome) return; select(byId(s.id)||s,false); });
       m.on('dragend',()=>{ const q=m.getLatLng(); U.moved[s.id]=[+q.lat.toFixed(6),+q.lng.toFixed(6)]; save(); m.dragging.disable(); banner('Pin moved. It is saved in this browser.',false,3500); refresh(); });
-      m.addTo(map); markers.set(s.id,m); }
+      pinPool.set(s.id,m); }
     else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
-    m.setZIndexOffset(sel&&sel.id===s.id?1000:(s.cat==='landmark'?-200:0));
+    if(!markers.has(s.id)){ m.addTo(map); markers.set(s.id,m); }
+    const zo=sel&&sel.id===s.id?1000:(s.cat==='landmark'?-200:0); if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
   });
+  /* the grouped pins are made again only when the groups change, not each time the map is nudged */
+  const sig=plan?map.getZoom()+'|'+plan.groups.map(c=>c.ids.length+':'+c.la.toFixed(3)+':'+c.lo.toFixed(3)).join():'';
+  if(sig===clusSig&&(!sig||clusLayer)) return; clusSig=sig;
   if(clusLayer){ map.removeLayer(clusLayer); clusLayer=null; }
   if(plan&&plan.groups.length){ clusLayer=L.layerGroup();
     plan.groups.forEach(c=>{ const n=c.ids.length, d=n<10?30:n<40?36:42;
