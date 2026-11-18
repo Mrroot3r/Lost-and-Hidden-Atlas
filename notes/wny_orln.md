@@ -1,0 +1,24 @@
+# wny_orln: Orleans County: the Erie Canal, Medina sandstone and cobblestones
+state: New York
+region: wny
+date: 2026-11-18
+places: 16
+file: data_wny_orln.py
+
+## What this batch is
+Sixteen places in Orleans County, New York, the first pass there (region `wny` drawn at random by `choose.py`; it offered Holley, Clarendon and Jamestown, and the Atlas had nothing within 25 km of Albion). Canal: Culvert Road (the one road under the Erie Canal), the Medina aqueduct and falls, and Holley Canal Falls (a waste-weir waterfall). Ruins: the Waterport trestle piers and two older bridge walls below the Waterport Dam. Standing: Medina's Main Street district, the 1905 wooden freight depot (Medina Railroad Museum) and the sandstone armory (YMCA); in Albion the courthouse square, the Pullman Memorial Universalist Church (Tiffany windows), the canal-front North Main–Bank Streets district and Mount Albion Cemetery with its climbable Civil War tower; the Cobblestone Museum's NHL district at Childs, the Gaines District No. 2 cobblestone school, the Cobblestone Inn on Ridge Road (private home), the Clarendon Stone Store and Hillside Cemetery at Clarendon. Sources: Wikipedia as raw text (`wiki_raw.py`, including `--rows` for the Register list), the HAER record for Culvert Road (PDF), and Orleans Hub, Orleans County Tourism, the Cobblestone Museum, the Medina Railroad Museum and gowaterfalling.com through `page.py`. Hours were read for the Cobblestone Museum and the railroad museum only; Mount Albion (and the tower), the Gaines school, the armory, Hillside Cemetery and Holley Canal Park hours are not checked. Sources disagree on the Medina aqueduct (1849 sandstone per the tourism page, 1913–1918 concrete per the Orleans Hub), the Culvert Road date (1823 sign vs. rebuilt 1855 and 1895), the Pullman church's Tiffany window count (56 or 41) and the names on the Mount Albion tower (463 or 466); both are given. The Waterport pin is the OpenStreetMap rail crossing, `prec='area'`; who owns the west bank with the older walls was not checked. Brick: `'?'` for the Cobblestone Inn, the Cobblestone Museum (brick lintels and chimney, colour not stated), the courthouse square and Hillside Cemetery. Nothing was checked on the ground.
+
+## Leads
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| Holley Loop (original 1823 Erie Canal bed) | Holley, NY (trail off NY 31 west of Bennetts Corners Road; the north end of Bennetts Corners Road maps at 43.22706, -78.01277 but lands by a house) | Orleans Hub, Oct. 14, 2015 (orleanshub.com/?p=12340): the only original canal bed west of Rochester, stone remnants beside a village trail, a culvert of the old canal visible from Route 31 a few houses east of Glenside Automotive; state "Holley Loop" panel by the Holley lift bridge | The trail head or the culvert on the aerial, so the pin is on public ground and not a yard |
+| Holley Village Historic District and the Holley depot | Holley, NY (43.225767, -78.0266787, Register list) | Wikipedia: Public Square, Salisbury Fountain (1914), Hotel Holley by A. J. Warner (1893); the Murray-Holley Historical Society uses the railroad depot | Depot location and opening hours |
+| Medina sandstone quarries | Hulberton, Holley, Medina (USGS leads: Holly Quarry and Mill 43.19055, -78.0608; Medina Sandstone Quarry 43.22609, -78.4325) | The Sandstone Society's book and Orleans Hub "sandstone heritage" pages document the quarries | A quarry face on public land with a named way in |
+| Bacon–Harding Farm, Butterfield Cobblestone House, Jackson Blood Cobblestone House, John Shelp Cobblestone House, Skinner–Tinkham House | Gaines, Clarendon, Lyndonville, West Shelby, Barre Center (Register list coordinates) | Register list rows: 1830s–1840s cobblestone and Federal houses | All private homes; whether any is worth a view-only place beyond its age |
+| Millville: T. O. Castle and Son General Store and Millville Cemetery | Millville, Shelby (43.2077, -78.3250 and 43.189722, -78.324444) | Register list rows only | Not read beyond the list |
+
+## Tips
+- Orleans Hub (orleanshub.com/?p=<n>) reads in full with `page.py --all`; its local-history and "sandstone heritage" series is the best source for what is on the ground in Orleans County. The site menu fills the first ~800 characters: cut at "legal/meeting notices".
+- orleanscountytourism.com reads with `page.py --all` (one "Off the beaten path" blog page was 404 and the bare orleanscountytourism.com host without www failed to connect: use the www address).
+- `start.py "Albion, New York"` lists three New Orleans, Louisiana rows from LEADS.md as "leads on file for this ground": the town match seems to take "Orleans" from Orleans County.
+- The Wikipedia coordinates for the Medina Railroad Museum and for Hillside Cemetery (Clarendon) are off the structure (29 m south of the freight house, and on the road beside the cemetery).
