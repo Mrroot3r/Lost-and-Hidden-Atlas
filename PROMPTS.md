@@ -1,6 +1,6 @@
 # Prompt for a research session in a clean chat
 
-Paste everything in the box into a new chat. As it stands it draws its own ground at random and adds places. To aim it, replace the first line's "you choose" with a town, county, state forest or region, and the second line's "places" with lidar, leads, pins or inbox (or "you choose"). This file is
+Paste everything in the box into a new chat. As it stands it draws its own ground at random and adds places. To aim it, replace the first line's "you choose" with a town, county, state forest or region, and the second line's "places" with lidar, leads, pins or inbox (or "you choose"). Two shorter prompts follow it: one for the tidy job, which folds the sessions' notes into the guide and the leads list, and one for a review. This file is
 kept in step with the tools: when a procedure in GUIDE.md or LIDAR.md changes, change the prompt here too.
 
 ```
@@ -45,6 +45,26 @@ If PLACE is "you choose", do not choose by reasoning: several sessions are often
 If TYPE is "you choose": use lidar when PLACE is a state forest, wildlife area or other public woodland in New York or Massachusetts; use places for a town, county or region; use leads if LEADS.md already has several rows there. Use inbox only when asked for it by name.
 
 When you finish, write me a short plain-English report: what you added, anything I should know before visiting (ask-first land, look-only sites), a list of every pin that marks only a trailhead or a general area and not the thing itself, any claim that rests on one local source or somebody's memory, what you could not verify, the tips you left in your note, and the link to the pull request.
+```
+
+## Tidying the notes
+
+Each research session leaves a note file with its leads and tips. When about ten have piled up (`python3 tools/tidy.py <clone>` says how many are waiting), paste this into a clean chat. One session at a time: it is the only kind that edits `GUIDE.md` and `LEADS.md`.
+
+```
+You are working on the Lost & Hidden Atlas, in the GitHub repository mrroot3r/Lost-and-Hidden-Atlas. I am not a programmer and I will not be watching, so decide things yourself and do not stop to ask me questions.
+
+Your job is the tidy job: fold what research sessions left in their note files into the shared files. Attach the repository to this session with push access and clone it. Run setup (bash source/tools/setup.sh), read CLAUDE.md in full and GUIDE.md sections 3 and 6, then run  python3 tools/build_sites.py  and  python3 tools/tidy.py <path to the clone>  from the working folder. Its output is your list of work and gives the steps in order. Before step 1, make your branch with tools/publish.sh (it will have nothing of its own to stage; that is expected).
+
+What I care about most:
+- Keep what a note said. Shorten and merge, but do not turn a tip into something its session did not find, and do not add tips of your own.
+- A tip that is really a fault in a tool: fix the tool if the fix is small, run its test, and do not copy the tip into the guide.
+- Every tip you leave out is listed in the pull request with the reason.
+- Look at each lead row the tool says may already be on the map, and delete it only if that place was added.
+- You are the one session allowed to edit GUIDE.md and LEADS.md. Do not change PROMPTS.md, the app or any place entry.
+- Finish with ONE pull request and stop. Do not merge it and do not push to main. I merge.
+
+When you finish, tell me in plain English: how many leads you moved, where each tip you kept went, each tip you dropped and why, any tool you changed, and the link to the pull request.
 ```
 
 ## Reviewing a session's pull request
