@@ -10,7 +10,7 @@ the same region. A claim lapses after eight hours. Ground named in an open pull 
 A region is thin when it has few places; regions in the states the tools know best (leaf-off imagery, LiDAR, old town
 centres) are twice as likely to come up, and a state with rows waiting in LEADS.md half as likely again. After the draw it
 names up to three old town centres in the region that have no Atlas place yet, drawn at random from the better half:
-old centres are where the brick mills, depots and oldest buildings are, and naming them stops every session reasoning
+old centres are where the mills, depots, churches and oldest buildings are, and naming them stops every session reasoning
 its way to the same county seat. After the claim, run  python3 tools/start.py "<one of those towns, or the start city>".
 From a copy of the repository (a contributor's fork) the claim cannot reach the owner's repository; the draw still
 works, and the open pull requests it reads are the owner's."""
@@ -137,7 +137,7 @@ if a[:1]==['--claim']:
     if pushed: print('Claimed on the "claims" branch. Run  python3 tools/choose.py --release %s  once your pull request is open.'%clone)
     tc=centres(c,k)
     if tc: print('Old town centres there with no Atlas place yet (drawn at random; take one, or the country round it): '+'; '.join('%s (%.3f, %.3f)'%(r[7],r[0],r[1]) for r in tc))
-    print('What the channel looks for most is red brick: mills, factories, kilns, powerhouses, depots, standing or in ruins. Put those first among your candidates.')
+    print('Wanted: interesting old buildings and what is left of them, of any kind and any age (the 1700s and earlier are welcome), standing as much as ruined. Take what is most worth a visit there, not one kind of thing.')
     print('Work anywhere inside that region: pick a town or county in it and run  python3 tools/start.py "<Town, %s>"'%sn+(('   (start cities in the state: '+', '.join(h['name'] for h in hubs[:3])+')') if hubs else ''))
     print('Use reg=\'%s\', and a file name and batch key that start with it and end in four random letters, such as data_%s_%s.py with key %s_xxxx.'%(c,c,''.join(random.SystemRandom().choice('abcdefghjkmnpqrstvwxyz') for _ in range(4)),c))
     sys.exit(0)
