@@ -14,8 +14,6 @@ Twelve places in Schenectady County, mostly outside the city, drawn at random by
 | Jenkins Octagon House | Duanesburg, NY, on NY 395 north of Delanson (Register point 42.758611, -74.185278) | Wikipedia: octagon farmhouse of about 1855 by "Boss" Jones, stacked-plank walls; private | The Register point is in woods 250 m west of NY 395 on the aerial, and the house could not be picked out among those on the road; an address would settle the pin |
 | Shute Octagon House | Duanesburg, NY, McGuire School Road (Register point 42.774444, -74.219444) | Wikipedia: the other Boss Jones octagon of about 1855, with widow's walk and porte cochere of 1906; private | Pin not checked on the aerial; a second source |
 | Indian Kill Preserve dam | Glenville, NY (Schenectady County preserve, open dawn to dusk) | nnywaterfalls.com: a small dam a little over 100 yards from the trailhead, and two falls | Any source for the dam's age or what it served; its position |
-| North Mansion and Duane Mansion | Duanesburg, NY (42.75361, -74.11444 and 42.75444, -74.12806) | Wikipedia: General William North's Georgian house of about 1795 with a 1780s tenant house; James Duane's family's Federal mansion of 1812–1816 with carriage barns | Both private; whether either can be seen from a public road was not checked |
-| Swart House and Tavern | Glenville, NY (42.88611, -74.05056) | Wikipedia: rear wing about 1750, enlarged about 1792, stone smokehouse; private | A second source and whether it is visible from the road |
 
 ## Tips
 - The NPGallery `GetAsset/NRHP/<ref>_text` address returned a one-page scan with no text layer for all four Schenectady County forms tried (87000911, 70000433, 84003270, 07001205); do not spend more tries there for this county.

@@ -1,0 +1,25 @@
+# sch_ywhu: Schenectady County: Mohawk shore, Glenville, Delanson, city landmarks
+state: New York
+region: sch
+date: 2026-11-18
+places: 12
+file: data_sch_ywhu.py
+
+## What this batch is
+Twelve places in Schenectady County, a second pass after `sch_gqli` (region `sch`, drawn at random by `choose.py --state ny`; it offered Esperance, which is over the line in Schoharie County, so the session stayed in Schenectady County where Rotterdam Junction and Glenville had nothing). Mohawk shore: the Mabee Farm Historic Site (1705 stone house, 1760s brick house, 1790s inn, Dutch barn; Schenectady County Historical Society, hours and fee from its page), Enlarged Erie Canal Lock 25 (Clute's Lock) on the Empire State Trail at Rotterdam Junction, the Swart House and Tavern (private, `conf='mixed'`: Wikipedia gives about 1750 and 1792, a 2015 Grems-Doolittle Library post says built of brick in 1735) and the Glen-Sanders House of 1713 in Scotia (inn and venue; a 2026 report says it is for sale, whether it is open was not checked). Glenville: the 1825 Green Corners one-room school (Register form read as text; open only for special occasions) and the 1949 Bishop Lustron house. Duanesburg: the General William North house (from the `sch_gqli` leads; pin on a house beside the road, not confirmed to be the North house) and the Delanson historic district. City of Schenectady: City Hall (McKim, Mead and White), the 1929 Central Fire Station (Edison Plaza), the 1936 Armory (Armory Studios) and the Union Street Historic District. Wikipedia was read as raw text with `wiki_raw.py`; HMdb marker pages, the Historical Society, Clio, the Grems-Doolittle blog, a 2026 property report and the Register form through `page.py`. Not checked: anything on the ground; City Hall's hours; who owns the Lock 25 walls beside the trail; whether the Armory or the Central Fire Station can be entered; parking for the Green Corners school and the Swart tavern. Pins that mark only an area: the Swart tavern (in trees between NY 5 and the railroad; the building was not picked out), Delanson and Union Street (district points). The Green Corners pin sits on the road edge in front of the school. Red brick: City Hall set `yes` from a 2008 photograph; the Mabee buildings `no` (whitewashed in a 2017 photograph); five left `?`.
+
+## Leads
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| Jenkins Octagon House | Duanesburg, NY, on NY 395 north of Delanson (Register point 42.758611, -74.185278) | Wikipedia: Boss Jones octagon of about 1855, stacked-plank walls; private | Looked at again on a 700 m aerial: the Register point is in woods and no house on NY 395 could be picked out as an octagon. An address |
+| Shute Octagon House | Duanesburg, NY, McGuire School Road (Register point 42.774444, -74.219444) | Wikipedia: the other Boss Jones octagon, widow's walk, 1906 porte cochere; private | The Register point is in a field; the houses on McGuire School Road on a 700 m aerial could not be told apart. An address |
+| Duane Mansion | Duanesburg, NY (42.75444, -74.12806) | Wikipedia: Federal mansion of 1812–1816 by Solomon Kelly, carriage barns; private | The Register point is in a yard on a long private drive with a house about 40 m east; whether it can be seen from any public road |
+| Rosendale Common School (Niskayuna Grange) | Niskayuna, NY (Wikipedia 42.79611, -73.85861) | Wikipedia: timber-frame district school of about 1850, Grange hall since 1948 | The Wikipedia point is in woods south of the road with no building; an address |
+| Bradt House | Rotterdam, NY, Schermerhorn Road west of Rice Road (HMdb marker 42.82028, -73.99132) | HMdb 123077: 1937 state marker, "early type of Dutch farmhouse", 1735 | Any second source, and whether the house stands |
+| Van Eps cement mill and kiln site | Glenville, NY, Touareuna Road (HMdb 42.89745, -74.08148) | HMdb 130684: Town of Glenville marker, kiln and mill of John Van Eps & Sons, 1825–45, first hydraulic cement in that part of the state | Whether anything of the kiln is left; the LiDAR there was not looked at |
+
+## Tips
+- The Wikipedia and Register points for Schenectady County's private houses (Rosendale school, Lustron house, Green Corners school, both octagons) were off by 100 to 250 m, often in woods; the ArcGIS geocoder's PointAddress result for a street address landed on the building every time it was tried.
+- The Green Corners School Register form (2011, npgallery GetAsset 0bfb5390-...) has a text layer, unlike the older Schenectady County forms the `sch_gqli` note found as scans.
+- `schenectadyhistory.org/mabee-farm/` is 404; the Historical Society's site is now `schenectadyhistorical.org` (`/site/mabee-farm-historic-site/` has hours and fees).
+- Writing `N(...)` with no `tags` argument (no `''` between `eff` and `years`) raises no error: the years go into tags and every later field shifts by one, so the links come out empty. `build_sites.py` did not catch it; check that `links` is not empty for every new place.
