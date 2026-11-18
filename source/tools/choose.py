@@ -3,6 +3,7 @@
    python3 tools/choose.py                     show the candidates and what is taken; choose nothing
    python3 tools/choose.py --claim <clone>     pick one AT RANDOM among thin regions nobody has taken, and claim it
    python3 tools/choose.py --release <clone>   give the claim up (run it after the pull request is open)
+   python3 tools/choose.py --claim <clone> --state ny     the same draw, kept to one state or province (its two-letter key)
 Why random: "take the thinnest region" is the same answer for every session, so four sessions started in one hour all
 took the same county. A claim is one line added to claims.txt on the repository's "claims" branch, pushed at once. Git refuses the second of
 two pushes made at the same moment, and that session reads again and picks other ground, so two sessions cannot hold
@@ -87,7 +88,8 @@ def lead_states(clone):
     except Exception: pass
     return out
 def pick(tk,leads=()):
-    cand=[(c,l,sn,k) for c,l,sn,k in REG if c not in tk]
+    cand=[(c,l,sn,k) for c,l,sn,k in REG if c not in tk and (not ONLY or k==ONLY)]
+    if not cand: sys.exit('Every region of %s is taken just now (%s). Wait for a claim to lapse, or work on leads or pins there instead.'%(ONLY.upper(),', '.join(sorted(c for c,l,sn,k in REG if k==ONLY))))
     w=[(2.0 if k in DEEP else 1.0)*(1.5 if k in leads else 1.0)/(cnt.get(c,0)+3) for c,l,sn,k in cand]
     return random.SystemRandom().choices(cand,weights=w,k=1)[0]
 def km(a,b,c,d):
@@ -112,6 +114,10 @@ def centres(reg,st):
     out.sort(key=lambda r:-r[11]); out=out[:max(3,len(out)//2)]
     return random.SystemRandom().sample(out,min(3,len(out)))
 a=sys.argv[1:]
+ONLY=''
+if '--state' in a:
+    i=a.index('--state'); ONLY=a[i+1].lower(); del a[i:i+2]
+    if not any(k==ONLY for c,l,sn,k in REG): sys.exit('No state or province has the key "%s". Keys are two letters, such as ny, ma, pa, on.'%ONLY)
 if a[:1]==['--release']:
     clone=a[1]; f=os.path.join(W,'.claim')
     if not os.path.exists(f): sys.exit('No claim is recorded in this workspace.')
