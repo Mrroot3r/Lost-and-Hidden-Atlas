@@ -492,7 +492,7 @@ function offlineBox(id,pts,label){
     msg.textContent=s2?('Saved '+new Date(s2.at).toLocaleDateString()+': '+s2.mb+(s2.miss?', '+s2.miss+' tiles missing':'')+'. Works with no signal on this device.'):''; };
   btn.addEventListener('click',async()=>{
     if(saving){ if(saving.id===id) saving.cancel=true; else banner('Another area is still saving. Wait for it or stop it first.',true,5000); return; }
-    topoWarm((id.indexOf('trip:')===0?id.slice(5).split(','):[id]).map(byId).filter(Boolean));
+    topoWarm((id.indexOf('trip:')===0?id.slice(5).split(','):[id]).map(byId).filter(Boolean)); linesWarm(pts);
     const t=saveArea(id,urls); saving.render=show; show(); const r=await t;
     if(!r.cancel||r.done>0){ U.saved[id]={at:Date.now(),label:label,mb:mb(r.bytes),n:r.done-r.fail,miss:r.fail+(r.n-r.done),y:U.ui.year,pts:pts.map(p=>[+p.lat.toFixed(5),+p.lon.toFixed(5)])}; save(); }
     show(); if(r.cancel) msg.textContent='Stopped. '+(r.done-r.fail)+' tiles kept.'; else if(r.fail) msg.textContent+=' Some tiles failed; try Save again on better wifi.'; });
@@ -575,7 +575,7 @@ function initMap(){
   CachedXYZ=L.TileLayer.extend(Object.assign({options:{keepBuffer:4}},CacheMixin));
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
-  window.addEventListener('online',()=>{ banner('Back online.',false,2500); drawLines(); });
+  window.addEventListener('online',()=>{ banner('Back online.',false,2500); linesRetry(); drawLines(); });
   map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:3,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); if(sv.b) map.fitBounds(sv.b,{animate:false}); else map.setView(sv.c,sv.z); }
   L.control.zoom({position:'bottomright'}).addTo(map);
   drawScale();
@@ -591,7 +591,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -832,12 +832,51 @@ let LINES=null, lineLayer={}, lineHi=null, lineCanvas=null;
 function prepLines(a){ a.forEach(f=>{ let x=90,b=-90,c=180,d=-180; f.c.forEach(p=>p.forEach(q=>{ if(q[0]<x)x=q[0]; if(q[0]>b)b=q[0]; if(q[1]<c)c=q[1]; if(q[1]>d)d=q[1]; })); f.bb=[x,c,b,d]; }); return a; }
 function lineChunks(f){ if(f.c.length<2) return [f.c]; const m={}, o=[]; f.c.forEach(p=>{ const k=Math.floor(p[0][0]*2)+','+Math.floor(p[0][1]*2); if(!m[k]){ m[k]=[]; o.push(m[k]); } m[k].push(p); }); return o; }
 let linesWait=null, linesTold=false;
-function linesData(){ if(LINES) return LINES; const n=document.getElementById('d-lines'); if(!n){ loadLines(); return []; }
+/* ---- where the lines come from ----
+   The Android app and the single-file copies hold every line in one file (data/lines.json, or the page itself).
+   The hosted copy fetches them a state at a time, because all of them together are several megabytes and a reader looks
+   at one or two states. The page data lists what there is (D.lx, written by tools/lines_split.py):
+     data/lines/wide.json     every state's lines thinned for a wide view: what zoom 8 and wider are drawn from
+     data/lines/<state>.json  one state at full detail: fetched from zoom 9 for each state with lines in or near the view,
+                              and for the state a place page is in
+   LINES is then whatever has arrived so far, so the code below never assumes a line is there. Each address carries a
+   stamp of its content, and the offline worker keeps these files across builds (sw.js). */
+const LX=HOSTED&&!AT&&D.lx&&D.lx.s?D.lx:null, LWIDE=2;         /* LWIDE: how many levels of LLEV are drawn from wide.json */
+let lineWide=null, lineWideWait=0, lineGot={}, lineCells=null;   /* lineGot: state -> 1 asked for, 2 here, or the time it failed */
+function linesData(){ if(LINES) return LINES; if(LX) return LINES=[]; const n=document.getElementById('d-lines'); if(!n){ loadLines(); return []; }
   try{ LINES=JSON.parse(n.textContent); }catch(e){ LINES=[]; } return prepLines(LINES); }
+function linesArrived(full){ drawLines();
+  if(full&&sel&&view==='detail'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'')){ const v=$('#v-detail'), y=v.scrollTop; renderDetail(sel); v.scrollTop=y; } }
+function linesFailed(){ if(!linesTold){ linesTold=true; banner('Old rail and canal lines could not load. They will try again when you are back online.',true,7000); } }
 function loadLines(){ if(linesWait||LINES) return;
-  linesWait=(AT?AT.fetch('data/lines.json'):fetch('data/lines.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(a=>{ LINES=prepLines(a); drawLines();
-      if(sel&&view==='detail'&&!/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement||{}).tagName||'')){ const v=$('#v-detail'), y=v.scrollTop; renderDetail(sel); v.scrollTop=y; } })
-    .catch(()=>{ linesWait=null; if(!linesTold){ linesTold=true; banner('Old rail and canal lines could not load. They will try again when you are back online.',true,7000); } }); }
+  linesWait=(AT?AT.fetch('data/lines.json'):fetch('data/lines.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(a=>{ LINES=prepLines(a); linesArrived(true); })
+    .catch(()=>{ linesWait=null; linesFailed(); }); }
+/* the states with lines in a box, from the half-degree squares each state's lines touch */
+let lineBox=null;                                              /* the box round every line there is */
+function lineStatesIn(s,w,n,e){ const out=new Set(); if(!LX) return out;
+  if(!lineCells){ lineCells=new Map(); let a0=1e9,b0=1e9,a1=-1e9,b1=-1e9; Object.keys(LX.s).forEach(k=>{ const c=LX.s[k].c||[]; for(let i=0;i<c.length;i+=2){ const q=c[i]+','+c[i+1], a=lineCells.get(q); if(a) a.push(k); else lineCells.set(q,[k]);
+      if(c[i]<a0)a0=c[i]; if(c[i]>a1)a1=c[i]; if(c[i+1]<b0)b0=c[i+1]; if(c[i+1]>b1)b1=c[i+1]; } }); lineBox=a1>=a0?L.latLngBounds([a0/2,b0/2],[(a1+1)/2,(b1+1)/2]):null; }
+  if(n===undefined) return out;                                /* called only to work out lineBox */
+  const i0=Math.floor(s*2), i1=Math.floor(n*2), j0=Math.floor(w*2), j1=Math.floor(e*2); if((i1-i0+1)*(j1-j0+1)>3000) return out;
+  for(let i=i0;i<=i1;i++) for(let j=j0;j<=j1;j++){ const a=lineCells.get(i+','+j); if(a) a.forEach(k=>out.add(k)); }
+  return out; }
+function lineFetch(k){ const g=lineGot[k]; if(g===1||g===2||(g&&Date.now()-g<30000)) return; lineGot[k]=1;
+  fetch('data/lines/'+k+'.json?v='+LX.s[k].h).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(a=>{ lineGot[k]=2; LINES=(LINES||[]).concat(prepLines(a)); lineForget(LWIDE,LLEV.length+1); linesArrived(true);
+      /* the wide picture too, a little later, so that zooming out works with no signal; not when no line is switched on (a place page asked) or the phone is saving data */
+      if(!lineWide&&Object.keys(LGRP).some(g=>U.ui.lines[g])&&!(navigator.connection&&navigator.connection.saveData)) setTimeout(lineWideFetch,6000); })
+    .catch(()=>{ lineGot[k]=Date.now(); linesFailed(); }); }
+function lineWideFetch(){ if(lineWide||lineWideWait===1||Date.now()-lineWideWait<30000) return; lineWideWait=1;
+  fetch('data/lines/wide.json?v='+LX.w).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(j=>{ lineWide=j; lineWideWait=0; lineForget(0,LWIDE); linesArrived(false); })
+    .catch(()=>{ lineWideWait=Date.now(); const z=map?map.getZoom():0; if(z>=LMINZ&&lineLevel(z)>=0&&lineLevel(z)<LWIDE) linesFailed(); }); }
+/* new lines have arrived: take what was drawn from the old set off the map and forget it (levels a to b-1 of LLEV; the
+   close-up pieces too when b is past the last level). The next syncLines() builds it again, for the view only. */
+function lineForget(a,b){ for(let i=a;i<b&&i<LLEV.length;i++){ const m=lineIdx[i]; if(m){ m.forEach(t=>{ if(t.on) map.removeLayer(t.pl); }); lineIdx[i]=null; } }
+  if(b>LLEV.length&&lineSet){ Object.keys(lineSet).forEach(g=>lineSet[g].forEach(c=>{ if(c.on) map.removeLayer(c.pl); })); lineSet=null; } }
+function linesRetry(){ linesTold=false; if(lineWideWait>1) lineWideWait=0; Object.keys(lineGot).forEach(k=>{ if(lineGot[k]>2) delete lineGot[k]; }); }
+/* the state files for some spots (a place page, an area being saved for offline) */
+function linesWarm(pts){ if(LX) pts.forEach(p=>lineStatesIn(p.lat-0.01,p.lon-0.01,p.lat+0.01,p.lon+0.01).forEach(lineFetch)); }
 function distToPart(lat,lon,part){ const kx=Math.cos(rad(lat))*111320, ky=110540; let best=1e12;
   for(let i=1;i<part.length;i++){ const ax=(part[i-1][1]-lon)*kx, ay=(part[i-1][0]-lat)*ky, bx=(part[i][1]-lon)*kx, by=(part[i][0]-lat)*ky, dx=bx-ax, dy=by-ay, L=dx*dx+dy*dy; let t=L?-(ax*dx+ay*dy)/L:0; t=t<0?0:t>1?1:t; const x=ax+t*dx, y=ay+t*dy, d2=x*x+y*y; if(d2<best) best=d2; }
   return Math.sqrt(best); }
@@ -865,6 +904,10 @@ function setLine(sel2,quiet){
   if(map){ lineHi=L.polyline(parts,{pane:'lines',renderer:lineCanvas,color:'#ffe600',weight:9,opacity:0.55,interactive:false}).addTo(map); lineHi.bringToBack(); }
   if(!quiet){ showView('list'); sel=null; drawSel(); showHist(); refresh(); if(map){ try{ map.fitBounds(L.latLngBounds(parts.reduce((x,p)=>x.concat(p),[])).pad(0.1)); }catch(e){} } }
 }
+function lineWidePopup(k,latlng){
+  const box=el('div',{class:'ctx'},el('b',{text:LK[k][0]}),el('span',{style:'color:#5b6660',text:'Zoom in for its name and the Atlas places along it.'}),
+    el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); map.setView(latlng,11); }},'Zoom in here'));
+  L.popup({maxWidth:270}).setLatLng(latlng).setContent(box).openOn(map); }
 function linePopup(f,part,latlng){
   const whole={f:f}, one={f:f,parts:[part]}; const tgt=f.n?whole:one;
   const cp=corridor(f,f.n?null:part); const n=sites().filter(s=>distToFeat(pos(s),f,cp)<=450).length;
@@ -911,10 +954,14 @@ function lineMake(c){ const f=c.f, pl=new CasedLine(c.ch,lineStyle(f.k));
    far a thinned line may stray, in degrees of latitude, about one pixel at that zoom. */
 const LLEV=[{z:6,cell:8,tol:0.016},{z:8,cell:2,tol:0.004},{z:10,cell:1,tol:0.0009},{z:12,cell:0.5,tol:0.00018}];
 const lineLevel=z=>{ for(let i=0;i<LLEV.length;i++) if(z<=LLEV[i].z) return i; return -1; };
+const LMINZ=5;      /* wider than this (the whole country on a phone) the lines are a smudge on one corner: none are drawn, and the hosted copy fetches none */
 let lineIdx=[];
-function lineTiles(li){ if(lineIdx[li]) return lineIdx[li]; const S=LLEV[li].cell, m=new Map();
-  linesData().forEach(f=>{ if(!LKG[f.k]) return; f.c.forEach(p=>{ const key=f.k+'|'+Math.floor(p[0][0]/S)+','+Math.floor(p[0][1]/S); let t=m.get(key); if(!t){ t={k:f.k,raw:[],a:90,b:-90,c:180,d:-180,pl:null,on:false}; m.set(key,t); }
-    t.raw.push(p); p.forEach(q=>{ if(q[0]<t.a)t.a=q[0]; if(q[0]>t.b)t.b=q[0]; if(q[1]<t.c)t.c=q[1]; if(q[1]>t.d)t.d=q[1]; }); }); });
+function lineTiles(li){ if(lineIdx[li]) return lineIdx[li]; const wide=!!LX&&li<LWIDE; if(wide&&!lineWide) return null;
+  const S=LLEV[li].cell, m=new Map();
+  const put=(k,p)=>{ const key=k+'|'+Math.floor(p[0][0]/S)+','+Math.floor(p[0][1]/S); let t=m.get(key); if(!t){ t={k:k,raw:[],a:90,b:-90,c:180,d:-180,pl:null,on:false}; m.set(key,t); }
+    t.raw.push(p); p.forEach(q=>{ if(q[0]<t.a)t.a=q[0]; if(q[0]>t.b)t.b=q[0]; if(q[1]<t.c)t.c=q[1]; if(q[1]>t.d)t.d=q[1]; }); };
+  if(wide) Object.keys(lineWide).forEach(k=>{ if(LKG[k]) lineWide[k].forEach(p=>put(k,p)); });
+  else linesData().forEach(f=>{ if(LKG[f.k]) f.c.forEach(p=>put(f.k,p)); });
   m.forEach(t=>{ t.bb=L.latLngBounds([t.a,t.c],[t.b,t.d]); });
   return lineIdx[li]=m; }
 function lineTileMake(t,li){ const tol=LLEV[li].tol, min=tol*1.3, geo=[], k=t.k;
@@ -923,15 +970,23 @@ function lineTileMake(t,li){ const tol=LLEV[li].tol, min=tol*1.3, geo=[], k=t.k;
   const pl=new CasedLine(geo,lineStyle(k,true));
   pl.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } const la=e.latlng.lat, lo=e.latlng.lng; let bf=null, bp=null, bd=1e12;
     linesData().forEach(f=>{ if(f.k!==k||la<f.bb[0]-0.1||la>f.bb[2]+0.1||lo<f.bb[1]-0.1||lo>f.bb[3]+0.1) return; f.c.forEach(q=>{ const d=distToPart(la,lo,q); if(d<bd){ bd=d; bf=f; bp=q; } }); });
+    /* the hosted copy, wide view: the line under the finger may be in a state not fetched yet, and the nearest line that
+       has been fetched is then some other one. 12 pixels and the thinning are as far as the real line can be from a tap. */
+    if(LX&&li<LWIDE&&bd>12*40075016*Math.cos(rad(la))/(256*Math.pow(2,map.getZoom()))+tol*111000){ lineWidePopup(k,e.latlng); return; }
     if(bf) linePopup(bf,bp,e.latlng); });
   return pl; }
-function syncLines(){ if(!map||!lineSets()) return; const li=lineLevel(map.getZoom()), vb=map.getBounds().pad(0.35);
+function syncLines(){ if(!map||(!LX&&!lineSets())) return; const z=map.getZoom(), li=z<LMINZ?-2:lineLevel(z), vb=map.getBounds().pad(0.35);      /* li: a level of LLEV, -1 close up, -2 too wide to draw any */
+  if(LX&&li>-2&&Object.keys(LGRP).some(g=>U.ui.lines[g])){     /* the hosted copy: ask for what this view is drawn from */
+    if(li<0||li>=LWIDE) lineStatesIn(vb.getSouth(),vb.getWest(),vb.getNorth(),vb.getEast()).forEach(lineFetch);
+    else { lineStatesIn(); if(lineBox&&vb.intersects(lineBox)) lineWideFetch(); } }      /* a wide view of ground with no lines at all fetches nothing */
   LLEV.forEach((_,i)=>{ if(i!==li&&!lineIdx[i]) return;                        /* a level never looked at has nothing on the map */
-    lineTiles(i).forEach(t=>{ const want=i===li&&!!U.ui.lines[LKG[t.k]]&&vb.intersects(t.bb);
+    const T=lineTiles(i); if(!T) return;                                       /* the wide picture has not arrived yet */
+    T.forEach(t=>{ const want=i===li&&!!U.ui.lines[LKG[t.k]]&&vb.intersects(t.bb);
       if(want){ if(t.pl===null) t.pl=lineTileMake(t,i); if(t.pl&&!t.on){ t.pl.addTo(map); t.on=true; } }
       else if(t.on){ map.removeLayer(t.pl); t.on=false; } }); });
-  Object.keys(LGRP).forEach(g=>{ const on=li<0&&!!U.ui.lines[g];
-    lineSet[g].forEach(c=>{ const want=on&&vb.intersects(c.b); if(c.on===want) return;
+  const S=lineSets();
+  if(S) Object.keys(LGRP).forEach(g=>{ const on=li===-1&&!!U.ui.lines[g];
+    S[g].forEach(c=>{ const want=on&&vb.intersects(c.b); if(c.on===want) return;
       if(want){ if(!c.pl) c.pl=lineMake(c); c.pl.addTo(map); } else map.removeLayer(c.pl);
       c.on=want; }); });
   if(lineHi) lineHi.bringToBack(); }
@@ -941,7 +996,7 @@ function drawLines(){
   if(!map._lnOn){ map._lnOn=true; map.on('moveend',syncLines); }
   syncLines();
 }
-function nearLines(p){ const out=[], seen=new Set(); linesData().forEach(f=>{ if(f.k==='rr'||f.k==='cn') return; if(f.n){ const d=distToFeat(p,f); if(d<=350&&!seen.has(f.k+f.n)){ seen.add(f.k+f.n); out.push({f:f,d:d}); } }
+function nearLines(p){ linesWarm([p]); const out=[], seen=new Set(); linesData().forEach(f=>{ if(f.k==='rr'||f.k==='cn') return; if(f.n){ const d=distToFeat(p,f); if(d<=350&&!seen.has(f.k+f.n)){ seen.add(f.k+f.n); out.push({f:f,d:d}); } }
     else f.c.forEach(part=>{ const d=distToFeat(p,f,[part]); if(d<=350) out.push({f:f,parts:[part],d:d}); }); });
   return out.sort((a,b)=>a.d-b.d).slice(0,6); }
 
@@ -2256,7 +2311,7 @@ function dataSections(v){
     P('For offline use, open the Atlas from the downloaded file or your own web address, not the online copy in Claude. On iPhone, Safari may clear saved tiles if you do not open the Atlas for a few weeks; adding it to your Home Screen helps.')]);
   if(HOSTED){ const all=BASE.filter(x=>x.tm), ab=el('button',{class:'btn sm',type:'button'},'Keep every old map on this phone ('+all.length+' maps, about '+Math.round(all.length*0.031)+' MB)'), am=el('span',{class:'note-saved'});
     ab.addEventListener('click',async()=>{ ab.disabled=true; let ok=0,bad=0; for(let i=0;i<all.length;i+=6){ await Promise.all(all.slice(i,i+6).map(x=>(AT?topoSrc(x).then(u=>!!u):fetch(topoImg(x)).then(r=>r.ok,()=>false)).then(good=>{ if(good) ok++; else bad++; }))); am.textContent=' '+(ok+bad)+' of '+all.length; } am.textContent=' Done: '+ok+' kept'+(bad?', '+bad+' failed':'')+'.'; ab.disabled=false; });
-    offSec.lastChild.append(el('p',{text:(AT?'The app opens with no signal: the place list, lines and leads are built in.':'This hosted copy keeps itself on the phone after the first visit, so it opens with no signal.')+' Old survey maps are fetched one place at a time as you open them; saving a place for offline keeps its old map too.'}),el('div',{class:'row'},ab,am)); }
+    offSec.lastChild.append(el('p',{text:(AT?'The app opens with no signal: the place list, lines and leads are built in.':'This hosted copy keeps itself on the phone after the first visit, so it opens with no signal.')+' Old survey maps are fetched one place at a time as you open them; saving a place for offline keeps its old map too.'+(LX?' Old rail and canal lines are fetched one state at a time, when the map or a place page first goes there, and then kept; saving a place for offline fetches its state.':'')}),el('div',{class:'row'},ab,am)); }
   offSec.addEventListener('toggle',()=>{ if(offSec.open) fillStor(); }); v.append(offSec);
 }
 function renderGuide(){
@@ -2356,7 +2411,7 @@ function renderGuide(){
     P('Drive times from the listed start cities were calculated by road with no traffic, so add a little. A place more than about 450 miles from your start city, or with no road to it, shows a rough estimate marked ~. Pick your own start point from "Drive times from."'),
     P('Later batches added '+BASE.filter(s=>s.new).length+' places: '+BATCHES.map(b=>b.label+' ('+b.n+')').join(', ')+'. Their pins come from the source named in each pin note and many were not checked on imagery, so read the pin note before you drive.'),
     P('Histories come from the Lost & Hidden catalogue and its linked sources. "Lead" entries were not re-checked against a source. Hours, access rules and demolition schedules change, so confirm before you drive.'),
-    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), the New Jersey Office of GIS (2020 aerials), CT ECO at the University of Connecticut (spring 2023 aerials and LiDAR), NH GRANIT at the University of New Hampshire (2021 and 2022 aerials, LiDAR), the Pennsylvania Emergency Management Agency through PASDA at Penn State (2021 to 2023 aerials), the Maine GeoLibrary (aerials and LiDAR), the Kansas NG911 program through the Kansas Geological Survey (2024 aerials), USGS (topographic maps, The National Map, and the 3DEP ground model: it is the LiDAR layer in every state without its own, and the stone walls and LiDAR finds in Massachusetts were read from it), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for all of New York and Massachusetts so far, with a strip of western Connecticut and Vermont; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vanished places: U.S. Board on Geographic Names, Geographic Names Information System file of August 2021, unchecked. Old mines and quarries: U.S. Geological Survey Mineral Resources Data System, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
+    P('Imagery: New York State ITS Geospatial Services (orthoimagery and LiDAR), MassGIS and the Vermont Center for Geographic Information (their own spring flights and LiDAR), RIGIS and the University of Rhode Island Environmental Data Center (Rhode Island March 2026 aerials and 2022 LiDAR), the New Jersey Office of GIS (2020 aerials), CT ECO at the University of Connecticut (spring 2023 aerials and LiDAR), NH GRANIT at the University of New Hampshire (2021 and 2022 aerials, LiDAR), the Pennsylvania Emergency Management Agency through PASDA at Penn State (2021 to 2023 aerials), the Maine GeoLibrary (aerials and LiDAR), the Kansas NG911 program through the Kansas Geological Survey (2024 aerials), USGS (topographic maps, The National Map, and the 3DEP ground model: it is the LiDAR layer in every state without its own, and the stone walls and LiDAR finds in Massachusetts were read from it), Esri and its data partners (streets and satellite). Rail and canal lines: OpenStreetMap contributors and OpenHistoricalMap (old lines), U.S. DOT North American Rail Network (lines in use); volunteer-mapped, so a missing line does not mean no line. Historic pockets: marker titles and positions from HMdb.org, the Historical Marker Database (hmdb.org), which the Atlas holds only in part for the busiest counties; National Register of Historic Places listings from the National Park Service, with positions corrected from Wikidata; town and village centres from OpenStreetMap contributors. The score shown on a pocket is a rough guide worked out by the Atlas, not a rating from any of these sources. Old lines are drawn for New York, the six New England states, New Jersey and Pennsylvania so far; other places have none yet. Public land: USGS Protected Areas Database (PAD-US), which can miss small local parks and lags new purchases. Owners and lot lines: NYS tax parcel file, NYS DEC and MassGIS property tax parcels; not every New York county shares owner names, and none of it is a survey. Leads: OpenStreetMap contributors, unchecked. Vanished places: U.S. Board on Geographic Names, Geographic Names Information System file of August 2021, unchecked. Old mines and quarries: U.S. Geological Survey Mineral Resources Data System, unchecked. Vector outline: Natural Earth. Routing: OSRM and OpenStreetMap contributors.')]));
 }
 function fitVisible(){ if(!map||!visible.length) return; const b=L.latLngBounds(visible.map(s=>{const p=pos(s);return [p.lat,p.lon];})); map.fitBounds(b.pad(0.15),{maxZoom:14}); }
 

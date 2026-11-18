@@ -34,10 +34,12 @@ const { chromium } = require('playwright');
     if(any){ for(let n=any._renderer._drawFirst;n;n=n.next){ const o=n.layer.options; if(!n.layer.getRadius||!(o.fillOpacity<=0.3)) continue; if(o.dashArray==='3 4'){ if(seenCentre) order=false; } else seenCentre=true; } }
     return {z:m.getZoom(),layers,pins,pinsIn,placesIn:S.filter(s=>b.contains([s.lat,s.lon])).length,places:S.length,leads,leadsIn,leadsData:LD.p.length,leadsDataIn:LD.p.filter(q=>b.contains([q[0],q[1]])).length,discs,order,lines,xl,xlIds,
       clus:document.querySelectorAll('.leaflet-marker-pane .clus').length,selPin:document.querySelectorAll('.leaflet-marker-pane .pin.sel').length}; });
-  const go=async(la,lo,z)=>{ await p.evaluate(a=>{ window.__atlasMap.setView([a[0],a[1]],a[2],{animate:false}); },[la,lo,z]); await p.waitForTimeout(350); };
+  /* the old lines are fetched a state at a time (tools/lines_test.js is their own test): wait for what a view asked for */
+  const lined=async()=>{ for(let i=0;i<40;i++){ const s=await p.evaluate(()=>window.__atlasLines?window.__atlasLines():{got:{}}); if(!Object.values(s.got).some(v=>v===1)&&s.wideWait!==1) return; await p.waitForTimeout(100); } };
+  const go=async(la,lo,z)=>{ await p.evaluate(a=>{ window.__atlasMap.setView([a[0],a[1]],a[2],{animate:false}); },[la,lo,z]); await p.waitForTimeout(350); await lined(); };
   const pan=async(x,y)=>{ await p.evaluate(a=>{ window.__atlasMap.panBy(a,{animate:false}); },[x,y]); await p.waitForTimeout(350); };
   // 1. pins
-  let s=await snap();
+  await lined(); let s=await snap();
   ok('zoom 13: every place in view has its pin',s.placesIn>0&&s.pinsIn===s.placesIn,s.pinsIn+' pins for '+s.placesIn+' places in view');
   ok('zoom 13: most places out of view have no pin on the map',s.pins<s.places/2,s.pins+' pins on the map of '+s.places+' places');
   await pan(380,-610); s=await snap(); ok('after a pan of a screen and more toward Troy: the pins for the new ground are there',s.placesIn>0&&s.pinsIn===s.placesIn,s.pinsIn+' of '+s.placesIn);
@@ -62,7 +64,8 @@ const { chromium } = require('playwright');
   ok('everything switched on at zoom 13: hundreds of layers, not thousands',s.layers<900,s.layers+' layers');
   // 5. lines
   const tap=()=>p.evaluate(()=>{ const m=window.__atlasMap, b=m.getBounds(); m.closePopup(); let hit=null; m.eachLayer(l=>{ if(hit||!(l.options&&l.options.casing)) return; const g=l.getLatLngs(); (Array.isArray(g[0])?g:[g]).forEach(q=>q.forEach(pt=>{ if(!hit&&b.contains(pt)) hit=[l,pt]; })); });
-    if(!hit) return 'no line in view'; hit[0].fire('click',{latlng:hit[1]}); const e=document.querySelector('.leaflet-popup-content'); return e?e.textContent.slice(0,60):'no box'; });
+    if(!hit) return 'no line in view'; hit[0].fire('click',{latlng:hit[1]}); const e=m._popup&&m._popup.isOpen()&&m._popup.getElement();      /* the map's own box: one that is closing can still be in the page */
+    return e?e.querySelector('.leaflet-popup-content').textContent.slice(0,60):'no box'; });
   let t=await tap(); ok('zoom 13: a tap on a line opens its box',t.length>5&&!/^no /.test(t),t);
   for(const z of [11,9,8,6]){ await go(42.75,-73.9,z); s=await snap(); t=await tap();
     ok('zoom '+z+': the lines are a handful of layers and a tap still opens a box',s.lines>0&&s.lines<90&&t.length>5&&!/^no /.test(t),s.lines+' layers; '+t); }

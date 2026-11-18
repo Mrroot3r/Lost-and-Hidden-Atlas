@@ -109,6 +109,24 @@ if not SRC_ONLY:
             if not os.path.exists(os.path.join(REPO,'data','pock',k+'.json')): err.append(f'data/pockets.json lists {k} but data/pock/{k}.json is missing (the workspace lost build/pock: run setup.sh again, or tools/pockets.py)')
         if not pj.get('k'): err.append('data/pockets.json holds no pockets')
     except Exception: pass
+    # the old rail and canal lines: the hosted copy fetches them a state at a time (tools/lines_split.py), so every state the
+    # page lists needs its file, and the file must be the one the page's stamp was made from
+    if mm:
+        import hashlib
+        lx=D.get('lx') or {}
+        if not lx.get('s'): err.append('the page data has no index of the old lines ("lx"): rebuild with tools/make.py')
+        for k,v in (lx.get('s') or {}).items():
+            pth=os.path.join(REPO,'data','lines',k+'.json')
+            if not os.path.exists(pth): err.append(f'the page lists old lines for {k} but data/lines/{k}.json is missing (rebuild needed)')
+            elif hashlib.md5(open(pth,'rb').read()).hexdigest()[:8]!=v.get('h'): err.append(f'data/lines/{k}.json is not the file the page was built with (rebuild needed)')
+        if lx.get('s') and not os.path.exists(os.path.join(REPO,'data','lines','wide.json')): err.append('data/lines/wide.json is missing (rebuild needed)')
+# ---- the old lines: every feature says which state it is in, or the hosted copy cannot fetch them a state at a time ----
+_lp=os.path.join(REPO,'data','lines.json')
+if os.path.exists(_lp):
+    try:
+        _nos=sum(1 for f in json.load(open(_lp,encoding='utf-8')) if not f.get('s'))
+        if _nos: err.append(f'data/lines.json: {_nos} lines carry no state ("s"). The file was not written by the current tools/lines.py: run it (GUIDE.md section 8, "Lines and leads for a new state")')
+    except Exception as ex: err.append('data/lines.json cannot be read: '+str(ex)[:80])
 # ---- the LiDAR ledger (source/lidar/units, kept by tools/lidar.py; LIDAR.md) ----
 LSEEN={}
 for f in sorted(glob.glob(os.path.join(REPO,'source','lidar','units','*.json'))):
