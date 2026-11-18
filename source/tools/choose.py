@@ -8,7 +8,12 @@ took the same county. A claim is one line added to claims.txt on the repository'
 two pushes made at the same moment, and that session reads again and picks other ground, so two sessions cannot hold
 the same region. A claim lapses after eight hours. Ground named in an open pull request counts as taken too.
 A region is thin when it has few places; regions in the states the tools know best (leaf-off imagery, LiDAR, old town
-centres) are twice as likely to come up. After the claim, run  python3 tools/start.py "<the region's start city>"."""
+centres) are twice as likely to come up, and a state with rows waiting in LEADS.md half as likely again. After the draw it
+names up to three old town centres in the region that have no Atlas place yet, drawn at random from the better half:
+old centres are where the brick mills, depots and oldest buildings are, and naming them stops every session reasoning
+its way to the same county seat. After the claim, run  python3 tools/start.py "<one of those towns, or the start city>".
+From a copy of the repository (a contributor's fork) the claim cannot reach the owner's repository; the draw still
+works, and the open pull requests it reads are the owner's."""
 import sys,os,re,json,time,random,subprocess,urllib.request,datetime
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE); os.chdir(W); sys.path.insert(0,HERE)
 REPO='Mrroot3r/Lost-and-Hidden-Atlas'
@@ -70,10 +75,42 @@ def taken(clone=None):
                 if c in re.split(r'[^a-z0-9]+',p['head']['ref'].lower()) or (words and any(w in txt for w in words)): out.setdefault(c,[]).append('open pull request #%d'%p['number'])
     except Exception as e: print('(The open pull requests could not be listed: %s. Look at them on GitHub before trusting this list.)'%str(e)[:60])
     return out
-def pick(tk):
+def lead_states(clone):
+    """states with rows waiting in LEADS.md: the two-letter state at the end of a row's "Where" column"""
+    out=set(); ks={st['k'] for st in STATES}
+    try:
+        for l in open(os.path.join(clone,'LEADS.md'),encoding='utf-8') if clone else ():
+            col=l.split('|')
+            if len(col)>3:
+                for m in re.findall(r',\s*([A-Z]{2})\b',col[2]):
+                    if m.lower() in ks: out.add(m.lower())
+    except Exception: pass
+    return out
+def pick(tk,leads=()):
     cand=[(c,l,sn,k) for c,l,sn,k in REG if c not in tk]
-    w=[(2.0 if k in DEEP else 1.0)/(cnt.get(c,0)+3) for c,l,sn,k in cand]
+    w=[(2.0 if k in DEEP else 1.0)*(1.5 if k in leads else 1.0)/(cnt.get(c,0)+3) for c,l,sn,k in cand]
     return random.SystemRandom().choices(cand,weights=w,k=1)[0]
+def km(a,b,c,d):
+    import math
+    return math.hypot((a-c)*111.2,(b-d)*111.2*math.cos(math.radians(a)))
+def centres(reg,st):
+    """up to three old town centres (tools/pockets.py) in this region with no Atlas place within 4 km, at random from the
+    better half by score. In a state with several regions a centre counts for the region of the nearest Atlas place."""
+    try: P=json.load(open('build/pockets.json',encoding='utf-8'))['k']
+    except Exception: return []
+    mine=[s for s in S if s['reg']==reg]; same=[s for s in S if any(c==s['reg'] for c,l,sn,k in REG if k==st)]
+    multi=sum(1 for c,l,sn,k in REG if k==st)>1
+    out=[]
+    for r in P:
+        if r[8]!=st or r[10]!='c': continue
+        if multi:
+            if not same: continue
+            near=min(same,key=lambda s:km(r[0],r[1],s['lat'],s['lon']))
+            if near['reg']!=reg: continue
+        if any(abs(s['lat']-r[0])<0.05 and km(r[0],r[1],s['lat'],s['lon'])<4 for s in S): continue
+        out.append(r)
+    out.sort(key=lambda r:-r[11]); out=out[:max(3,len(out)//2)]
+    return random.SystemRandom().sample(out,min(3,len(out)))
 a=sys.argv[1:]
 if a[:1]==['--release']:
     clone=a[1]; f=os.path.join(W,'.claim')
@@ -89,7 +126,7 @@ if a[:1]==['--claim']:
     if os.path.exists(os.path.join(W,'.claim')): sys.exit('This workspace already holds a claim: '+open(os.path.join(W,'.claim')).read().strip()+'. Work on that, or --release it first.')
     pushed=False
     for attempt in range(8):
-        lines,par=read_claims(clone); tk=taken(clone); c,l,sn,k=pick(tk)
+        lines,par=read_claims(clone); tk=taken(clone); c,l,sn,k=pick(tk,lead_states(clone))
         stamp=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S'); tag='%04x'%random.SystemRandom().randrange(65536)
         r=write_claims(clone,lines+['%s %s %s'%(c,stamp,tag)],par,'claim '+c)
         if r.returncode==0: pushed=True; open(os.path.join(W,'.claim'),'w').write('%s %s %s'%(c,stamp,tag)); break
@@ -98,6 +135,9 @@ if a[:1]==['--claim']:
     hubs=[h for h in json.load(open('build/hubs.json')) if h.get('st')==k] if os.path.exists('build/hubs.json') else []
     print('CHOSEN: region %s = %s, %s (%d places so far).'%(c,l,sn,cnt.get(c,0)))
     if pushed: print('Claimed on the "claims" branch. Run  python3 tools/choose.py --release %s  once your pull request is open.'%clone)
+    tc=centres(c,k)
+    if tc: print('Old town centres there with no Atlas place yet (drawn at random; take one, or the country round it): '+'; '.join('%s (%.3f, %.3f)'%(r[7],r[0],r[1]) for r in tc))
+    print('What the channel looks for most is red brick: mills, factories, kilns, powerhouses, depots, standing or in ruins. Put those first among your candidates.')
     print('Work anywhere inside that region: pick a town or county in it and run  python3 tools/start.py "<Town, %s>"'%sn+(('   (start cities in the state: '+', '.join(h['name'] for h in hubs[:3])+')') if hubs else ''))
     print('Use reg=\'%s\', and a file name and batch key that start with it and end in four random letters, such as data_%s_%s.py with key %s_xxxx.'%(c,c,''.join(random.SystemRandom().choice('abcdefghjkmnpqrstvwxyz') for _ in range(4)),c))
     sys.exit(0)

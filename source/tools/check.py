@@ -62,6 +62,10 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
     for p in m.PLACES:
         i=p['id']; w=f'{name}:{i}'; seen(i,name)
         if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*',i): err.append(f'{w}: id must be lowercase words joined by hyphens')
+        # red brick (GUIDE.md section 4): every place written since November 19, 2026 says yes, some, no, or ? for not checked
+        _bk=p.get('brick') or ''
+        if _bk not in ('','yes','some','no','?'): err.append(f"{w}: brick='{_bk}' must be yes, some, no or ? (not checked)")
+        if not _bk and _ad[:10]>='2026-11-19': err.append(f"{w}: no brick=. Say whether red brick can be seen there: brick='yes' (mostly brick), 'some' (part brick), 'no', or '?' if no source or picture settles it")
         for fld,ok in(('cat',CAT),('st',ST),('prec',PREC),('acc',ACC),('eff',EFF)):
             if p[fld] not in ok: err.append(f"{w}: {fld}='{p[fld]}' is not one of {' '.join(ok)}")
         if p['reg'] not in REG: err.append(f"{w}: region '{p['reg']}' is not listed in tools/states.py")
@@ -120,6 +124,14 @@ if not SRC_ONLY:
             if not os.path.exists(pth): err.append(f'the page lists old lines for {k} but data/lines/{k}.json is missing (rebuild needed)')
             elif hashlib.md5(open(pth,'rb').read()).hexdigest()[:8]!=v.get('h'): err.append(f'data/lines/{k}.json is not the file the page was built with (rebuild needed)')
         if lx.get('s') and not os.path.exists(os.path.join(REPO,'data','lines','wide.json')): err.append('data/lines/wide.json is missing (rebuild needed)')
+# ---- red brick found out later (tools/bricks_*.py, written by tools/brick.py) ----
+for f in sorted(glob.glob(os.path.join(T,'bricks_*.py'))):
+    nm=os.path.basename(f)[:-3]
+    try: BR=importlib.import_module(nm).BRICK
+    except Exception as ex: err.append(f'{nm}: cannot be read ({str(ex)[:60]})'); continue
+    for i,v in BR.items():
+        if i not in ids: err.append(f'{nm}: {i} is not a place id')
+        elif not(isinstance(v,(list,tuple)) and len(v)==2 and v[0] in ('yes','some','no') and len(str(v[1]).strip())>=12): err.append(f"{nm}: {i} must be ('yes'|'some'|'no', 'how it is known: the picture's address, or the words of the source')")
 # ---- the old lines: every feature says which state it is in, or the hosted copy cannot fetch them a state at a time ----
 _lp=os.path.join(REPO,'data','lines.json')
 if os.path.exists(_lp):

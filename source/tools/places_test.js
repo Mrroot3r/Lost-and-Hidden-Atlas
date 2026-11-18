@@ -44,6 +44,15 @@ const { chromium } = require('playwright');
     ok(name+': "Change start place" opens Settings at the start place',await vis('#set-home'));
     await p.selectOption('#set-home','bost'); await p.waitForTimeout(400);
     ok(name+': choosing a start city there changes the drive time',await p.evaluate(()=>/from Boston/.test(document.querySelector('.times .time').textContent)));
+    // the Red brick shortcut: only places marked yes or some, and the place page says so
+    { const want=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.filter(x=>x.bk==='y'||x.bk==='s').length);
+      await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+      await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(b=>b.textContent==='Red brick').click(); }); await p.waitForTimeout(300);
+      const got=await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0]);
+      ok(name+': the Red brick shortcut lists the places marked as having it, and only those',want>20&&got===want,got+' listed, '+want+' marked');
+      await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); document.querySelector('#list li button').click(); }); await p.waitForTimeout(500);
+      const sub=await p.evaluate(()=>(document.querySelector('#v-detail .sub2')||{}).textContent||'');
+      ok(name+': a place page says Red brick or Some red brick',/red brick/i.test(sub),sub.slice(0,80)); }
     ok(name+': no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the first visit: nothing saved, no start place
   { const mk=async(geo,seed)=>{ const c=await b.newContext(Object.assign({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true},geo?{geolocation:geo,permissions:['geolocation']}:{})); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
