@@ -66,7 +66,11 @@ const KM=()=>pref('units')==='km';
 const fmtMi=(mi,dg)=>KM()?(mi*1.609344).toFixed(dg)+' km':(+mi).toFixed(dg)+' mi';            /* a distance measured in miles, shown in the chosen unit */
 const miTxt=mi=>KM()?Math.round(mi*1.609344)+' km':mi+' mi';
 const STEP=()=>({fine:2,normal:4,coarse:10})[pref('detail')]||4;                                 /* metres between saved track points */
-function applyTheme(){ const t=pref('theme'), r=document.documentElement; if(t==='light'||t==='dark') r.setAttribute('data-theme',t); else r.removeAttribute('data-theme'); r.style.setProperty('--trk',pref('trk')); }
+/* Colour schemes (app.css has one block of colours for each). 'auto' follows the phone: Brick and paper by day, Tomorrow
+   by night. 'light' and 'dark' are those two under the names older saved settings used. */
+const THEMES=[['auto','Follow the phone'],['light','Brick and paper (light)'],['dark','Tomorrow (dark)'],['morning','Tomorrow morning (dark, warm)'],['blueprint','Blueprint night (dark)'],['slate','Slate and copper (light)'],['survey','Survey green (light)']];
+function applyTheme(){ let t=pref('theme'); const r=document.documentElement; if(!THEMES.some(x=>x[0]===t)) t='auto'; if(t!=='auto') r.setAttribute('data-theme',t); else r.removeAttribute('data-theme');
+  try{ const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content',getComputedStyle(r).getPropertyValue('--accent').trim()||'#a33a24'); }catch(e){} r.style.setProperty('--trk',pref('trk')); }
 applyTheme();
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
 
@@ -730,7 +734,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
   const ks=el('textarea',{id:'set-kitSign',rows:'2',placeholder:'More walks: youtube.com/@yourchannel'}); ks.value=pref('kitSign'); ['change','blur'].forEach(ev=>ks.addEventListener(ev,()=>{ if(ks.value.trim()!==pref('kitSign')) setPref('kitSign',ks.value.trim()); }));
   const add=(...a)=>a.forEach(x=>{ if(x) lb.append(x); });      /* Element.append(null) would print the word "null" */
   add(H('Look and units'),
-    pick('theme','Theme',[['auto','Follow the phone'],['light','Light'],['dark','Dark']]),
+    pick('theme','Colours',THEMES),
     pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
     pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
     el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),
@@ -1907,7 +1911,7 @@ function drawHome(){ if(!map) return; if(homeMarker){ map.removeLayer(homeMarker
   homeMarker=L.marker([H.lat,H.lon],{interactive:false,keyboard:false,zIndexOffset:-500,icon:L.divIcon({className:'pinwrap',html:'<span class="homepin">H</span>',iconSize:[24,24],iconAnchor:[12,12]})}).addTo(map); }
 function drawSel(){
   if(!map) return; selShapes.forEach(x=>map.removeLayer(x)); selShapes=[];
-  if(!sel) return; const p=pos(sel), acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#a3238e';
+  if(!sel) return; const p=pos(sel), acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#a33a24';
   selShapes.push(L.circle([p.lat,p.lon],{radius:(PREC[sel.prec]||PREC.site)[2],color:acc,weight:1.5,dashArray:'5 5',fill:false,interactive:false}).addTo(map));
   if(sel.th){ selShapes.push(L.polyline([[sel.th[0],sel.th[1]],[p.lat,p.lon]],{color:'#1f5fbf',weight:2,dashArray:'2 6',interactive:false}).addTo(map));
     const tm=L.marker([sel.th[0],sel.th[1]],{keyboard:false,icon:L.divIcon({className:'pinwrap',html:'<span class="thpin">P</span>',iconSize:[20,20],iconAnchor:[10,10]})}).addTo(map);
@@ -2423,7 +2427,7 @@ function renderGuide(){
   v.append(sec('Add places with your own Claude',false,[P('The Atlas grows by research sessions: a Claude session reads the sources, looks at every pin on the aerial and sends its places in. If you have Claude with Claude Code, yours can do the same for any town or county you choose, on your own account. Nothing of it reaches the map until the owner of the Atlas has looked at it. To tell us about a single place, "+ Add" and then "Suggest it to the Atlas" is quicker.'),
     el('div',{class:'row'},ext('https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/blob/main/CONTRIBUTING.md','How to add places with your own Claude','btn sm'))]));
   v.append(sec('Settings, backups and storage',false,[P('Backups, restoring, offline map storage and the app\'s own settings are under the gear: tap More under the map, then the gear next to Done.'),
-    el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>openSettings()},'Open Settings')),P('Settings holds: theme, units and clock; how the map opens and your start place; Near me (how far to list, when to buzz); the field log; the episode kit; trimming a shared walk; backups; where the app gets its places; offline storage.'),
+    el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>openSettings()},'Open Settings')),P('Settings holds: colours, units and clock; how the map opens and your start place; Near me (how far to list, when to buzz); the field log; the episode kit; trimming a shared walk; backups; where the app gets its places; offline storage.'),
     el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>{ openSheet(); showSettings(true); }},'Open settings'))]));
   v.append(sec('About this data',false,[
     P(BASE.length+' places, built '+D.built+'. '+BASE.filter(s=>s.tm).length+' have an old USGS map overlay. Pins: '+BASE.filter(s=>s.prec==='exact').length+' exact, '+BASE.filter(s=>s.prec==='site').length+' on site, '+BASE.filter(s=>s.prec==='area').length+' approximate.'),
