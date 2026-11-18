@@ -59,19 +59,28 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={theme:'auto',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
 const fmtMi=(mi,dg)=>KM()?(mi*1.609344).toFixed(dg)+' km':(+mi).toFixed(dg)+' mi';            /* a distance measured in miles, shown in the chosen unit */
 const miTxt=mi=>KM()?Math.round(mi*1.609344)+' km':mi+' mi';
 const STEP=()=>({fine:2,normal:4,coarse:10})[pref('detail')]||4;                                 /* metres between saved track points */
-/* Colour schemes (app.css has one block of colours for each). 'auto' follows the phone: Brick and paper by day, Tomorrow
-   by night. 'light' and 'dark' are those two under the names older saved settings used. */
-const THEMES=[['auto','Follow the phone'],['light','Brick and paper (light)'],['dark','Tomorrow (dark)'],['morning','Tomorrow morning (dark, warm)'],['blueprint','Blueprint night (dark)'],['slate','Slate and copper (light)'],['survey','Survey green (light)']];
-function applyTheme(){ let t=pref('theme'); const r=document.documentElement; if(!THEMES.some(x=>x[0]===t)) t='auto'; if(t!=='auto') r.setAttribute('data-theme',t); else r.removeAttribute('data-theme');
+/* Colour schemes: app.css has one block of colours for each. The reader chooses one light scheme and one dark scheme
+   (themeL, themeD) and when each is used (theme: 'auto' lets the phone decide, 'light', 'dark'). To add a scheme: its
+   block in app.css and a line here saying which kind it is; the two lists in Settings are made from this. */
+const THEMES=[['brick','Brick and paper','l'],['slate','Slate and copper','l'],['survey','Survey green','l'],['daylight','Daylight, high contrast','l'],
+  ['tomorrow','Tomorrow','d'],['oled','Tomorrow, true black (OLED)','d'],['morning','Tomorrow morning','d'],['blueprint','Blueprint night','d'],['black','Black and yellow, high contrast','d']];
+const themeKind=k=>{ const t=THEMES.find(x=>x[0]===k); return t?t[2]:''; };
+const DARKQ=window.matchMedia?window.matchMedia('(prefers-color-scheme: dark)'):null;
+/* a build before November 18, 2026 kept one name in "theme" for mode and scheme together: split it once */
+function themeMigrate(){ if(!U.set) return; const t=U.set.theme, k=themeKind(t); if(k==='l'){ U.set.themeL=t; U.set.theme='light'; } else if(k==='d'){ U.set.themeD=t; U.set.theme='dark'; } }
+function themeNow(){ const m=pref('theme'), dark=m==='dark'||(m!=='light'&&!!(DARKQ&&DARKQ.matches));
+  let k=dark?pref('themeD'):pref('themeL'); if(themeKind(k)!==(dark?'d':'l')) k=dark?'tomorrow':'brick'; return k; }
+function applyTheme(){ themeMigrate(); const r=document.documentElement; r.setAttribute('data-theme',themeNow());
   try{ const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content',getComputedStyle(r).getPropertyValue('--accent').trim()||'#a33a24'); }catch(e){} r.style.setProperty('--trk',pref('trk')); }
 applyTheme();
+if(DARKQ&&DARKQ.addEventListener) DARKQ.addEventListener('change',applyTheme);      /* the phone went to night mode, or back */
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
 
 const sites=()=>BASE.concat(U.custom);
@@ -734,7 +743,9 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
   const ks=el('textarea',{id:'set-kitSign',rows:'2',placeholder:'More walks: youtube.com/@yourchannel'}); ks.value=pref('kitSign'); ['change','blur'].forEach(ev=>ks.addEventListener(ev,()=>{ if(ks.value.trim()!==pref('kitSign')) setPref('kitSign',ks.value.trim()); }));
   const add=(...a)=>a.forEach(x=>{ if(x) lb.append(x); });      /* Element.append(null) would print the word "null" */
   add(H('Look and units'),
-    pick('theme','Colours',THEMES),
+    pick('theme','Colours',[['auto','Follow the phone: light by day, dark by night'],['light','Always light'],['dark','Always dark']]),
+    pick('themeL','Light colours',THEMES.filter(t=>t[2]==='l')),
+    pick('themeD','Dark colours',THEMES.filter(t=>t[2]==='d')),
     pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
     pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
     el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),

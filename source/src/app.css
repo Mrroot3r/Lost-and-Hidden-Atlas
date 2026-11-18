@@ -1,8 +1,10 @@
 /* Layout: one-screen survey desk. Index panel on the left, map sheet on the right; on a phone the sheet sits on top.
    Colours: six schemes, chosen under the gear (Settings, "Colours"; applyTheme() in app.js sets data-theme).
-   Brick and paper is the light default and Tomorrow the dark one; "Follow the phone" (no data-theme) picks between those two.
-   A scheme is one block of the same seventeen values. To add one: a block here, a line in THEMES in app.js, and
-   tools/theme_test.js checks its contrast. */
+   The reader picks one light scheme and one dark scheme, and whether the phone decides between them. Brick and paper and
+   Tomorrow are the defaults (and what shows before the script has run). A scheme is one block of the same seventeen
+   values; the two high-contrast ones (daylight, black) also set --btnline, --btnw and --chipline for heavier outlines.
+   To add one: a block here, a line in THEMES in app.js saying whether it is light or dark, and tools/theme_test.js
+   checks its contrast. */
 :root{
   --bg:#f1eadf; --panel:#fffaf1; --ink:#2a201a; --mute:#6d5f54; --line:#dccfbd; --chip:#ece2d2;
   --accent:#a33a24; --accent-ink:#ffffff; --accent-soft:#f5ddd3; --brown:#8f5a2b; --water:#2f7fb5;
@@ -17,15 +19,30 @@
   --accent:#81a2be; --accent-ink:#1d1f21; --accent-soft:#2b3742; --brown:#de935f; --water:#8abeb7;
   --ok:#b5bd68; --warn:#de935f; --warn-soft:#3a2f27; --pinring:#ffffff;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45); color-scheme:dark } }
-:root[data-theme="light"]{
+:root[data-theme="brick"]{
   --bg:#f1eadf; --panel:#fffaf1; --ink:#2a201a; --mute:#6d5f54; --line:#dccfbd; --chip:#ece2d2;
   --accent:#a33a24; --accent-ink:#ffffff; --accent-soft:#f5ddd3; --brown:#8f5a2b; --water:#2f7fb5;
   --ok:#2e7d4f; --warn:#b3541e; --warn-soft:#f8eadf; --pinring:#ffffff;
   --shadow:0 1px 2px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.10); color-scheme:light }
-:root[data-theme="dark"]{
+:root[data-theme="tomorrow"]{
   --bg:#1d1f21; --panel:#282a2e; --ink:#c5c8c6; --mute:#a0a3a1; --line:#373b41; --chip:#32353a;
   --accent:#81a2be; --accent-ink:#1d1f21; --accent-soft:#2b3742; --brown:#de935f; --water:#8abeb7;
   --ok:#b5bd68; --warn:#de935f; --warn-soft:#3a2f27; --pinring:#ffffff;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45); color-scheme:dark }
+:root[data-theme="daylight"]{
+  --bg:#fffdf5; --panel:#ffffff; --ink:#000000; --mute:#3a3a3a; --line:#000000; --chip:#f3efe2;
+  --accent:#8a1c0a; --accent-ink:#ffffff; --accent-soft:#f9ddd6; --brown:#6e3f12; --water:#0b4f8a;
+  --ok:#0a5c2b; --warn:#8a2a00; --warn-soft:#fde9df; --pinring:#ffffff; --btnline:#000000; --btnw:2px; --chipline:#000000;
+  --shadow:0 1px 2px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.10); color-scheme:light }
+:root[data-theme="black"]{
+  --bg:#000000; --panel:#000000; --ink:#ffffff; --mute:#cfcfcf; --line:#ffffff; --chip:#1c1c1c;
+  --accent:#ffd400; --accent-ink:#000000; --accent-soft:#3a3000; --brown:#ffb070; --water:#7fd0ff;
+  --ok:#7dff9b; --warn:#ffb070; --warn-soft:#3a2200; --pinring:#ffffff; --btnline:#ffffff; --btnw:2px; --chipline:#ffffff;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45); color-scheme:dark }
+:root[data-theme="oled"]{
+  --bg:#000000; --panel:#000000; --ink:#c5c8c6; --mute:#a0a3a1; --line:#2c3035; --chip:#17191c;
+  --accent:#81a2be; --accent-ink:#000000; --accent-soft:#16222c; --brown:#de935f; --water:#8abeb7;
+  --ok:#b5bd68; --warn:#de935f; --warn-soft:#2a1f17; --pinring:#ffffff;
   --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.45); color-scheme:dark }
 :root[data-theme="morning"]{
   --bg:#1d1f21; --panel:#282a2e; --ink:#c5c8c6; --mute:#a0a3a1; --line:#373b41; --chip:#32353a;
@@ -90,14 +107,14 @@ h1,h2,h3{font-family:var(--fc);margin:0;text-wrap:balance}
 .field>span,.lbl{font-family:var(--fc);font-size:11.5px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--mute)}
 input[type=text],input[type=search],input[type=url],select,textarea{width:100%;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:7px 9px}
 textarea{resize:vertical;min-height:64px}
-.btn{background:var(--panel);border:1.5px solid color-mix(in srgb,var(--ink) 38%,transparent);box-shadow:0 1px 0 rgba(0,0,0,.14);border-radius:6px;padding:6px 10px;font-weight:600;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px;line-height:1.2}
+.btn{background:var(--panel);border:var(--btnw,1.5px) solid var(--btnline,color-mix(in srgb,var(--ink) 38%,transparent));box-shadow:0 1px 0 rgba(0,0,0,.14);border-radius:6px;padding:6px 10px;font-weight:600;text-decoration:none;color:var(--ink);display:inline-flex;align-items:center;gap:6px;line-height:1.2}
 .btn:hover{border-color:var(--ink)}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn.sm{padding:6px 10px;font-size:13px}
 .btn.on{background:var(--accent-soft);border-color:var(--accent)}
 .btn[disabled]{opacity:.5;cursor:default}
 .chips{display:flex;flex-wrap:wrap;gap:5px}
-.chip{background:var(--chip);border:1px solid transparent;border-radius:14px;padding:3px 9px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;line-height:1.25}
+.chip{background:var(--chip);border:1px solid var(--chipline,transparent);border-radius:14px;padding:3px 9px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;line-height:1.25}
 button.chip:hover{border-color:var(--mute)}
 /* a chip that is switched on is filled with the accent colour and ticked: the old pale tint could not be told from "off" on a dark screen */
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
