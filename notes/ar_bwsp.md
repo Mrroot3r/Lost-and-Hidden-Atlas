@@ -16,7 +16,7 @@ Places you read about and could not finish. One row each; delete the example row
 | Cleburne County Farm Cemetery and CCC Camp Heber remains | Heber Springs, AR (35.455556, -92.0375) | Poor-farm cemetery 1896–1943 with about ten fieldstone markers and a granite list monument; some CCC Camp Heber (#3782) features "remain to the northwest" (NRHP 05001066) | The site is inside a newer housing subdivision on private land; which CCC remains survive and whether they can be seen from a public road |
 | Dew Drop Inn | Mountain View, AR (35.869444, -92.120278) | The other surviving 1920s hotel in Mountain View (NRHP 85002231; named in the Commercial Hotel form) | Form not read; current state |
 | Van Buren County Road 2E Bridge | Scotland, AR (35.511389, -92.698056) | Three-span stone and concrete WPA bridge of 1940 on a tributary of Driver's Creek (NRHP 95000570) | Pin not checked on the aerial; parking |
-| Winkley Bridge | Heber Springs, AR | NRHP 84000020, a swinging bridge over the Little Red River | NPGallery text was empty (893 characters); whether anything is left |
+| Winkley Bridge | Heber Springs, AR | National Register listing 84000020 (Wikipedia list gives no coordinate) | The NPGallery text came back nearly empty (893 characters), so no source on what it is or whether it survives was read |
 | Titan II ICBM Launch Complex 374-7 | Southside, Van Buren County, AR | NRHP 98001434, address restricted | Who owns it and whether anything can be seen from a public road |
 
 ## Tips
