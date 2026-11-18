@@ -62,6 +62,7 @@ const { chromium } = require('playwright');
     ok('the whole country in view (zoom 4): no lines are drawn and none are fetched',n===0&&asked.length===0,n+' layers; '+(asked.join(' ')||'nothing asked'));
     s=await go(p,39.1,-94.58,7); ok('zoom 7 over Kansas City, where the Atlas has no lines: nothing is fetched',asked.length===0,asked.join(' ')||'nothing asked');
     s=await go(p,40.6,-79.5,6); n=await drawn(p); ok('zoom 6 over western Pennsylvania: the thinned picture is fetched and drawn',asked.join()==='lines/wide.json'&&n>0,n+' layers; '+asked.join(' '));
+    s=await go(p,41.41,-75.66,11); ok('zoom 11 at Scranton, 60 km from New York: Pennsylvania alone is fetched',s.got.pa===2&&!s.got.ny&&asked.join()==='lines/wide.json,lines/pa.json',asked.join(' '));
     await c.close(); }
   // 4. a place page, every line switch off. The place: one outside New York within 150 m of an old line, found here from the built files.
   const D=JSON.parse(/<script type="application\/json" id="d-sites">([\s\S]*?)<\/script>/.exec(await (await fetch(url)).text())[1]);

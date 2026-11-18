@@ -851,13 +851,15 @@ function linesFailed(){ if(!linesTold){ linesTold=true; banner('Old rail and can
 function loadLines(){ if(linesWait||LINES) return;
   linesWait=(AT?AT.fetch('data/lines.json'):fetch('data/lines.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(a=>{ LINES=prepLines(a); linesArrived(true); })
     .catch(()=>{ linesWait=null; linesFailed(); }); }
-/* the states with lines in a box, from the half-degree squares each state's lines touch */
+/* the states with lines in a box, from the quarter-degree squares each state's lines touch (LSQ squares to a degree, as
+   SQ in tools/lines_split.py) */
+const LSQ=4;
 let lineBox=null;                                              /* the box round every line there is */
 function lineStatesIn(s,w,n,e){ const out=new Set(); if(!LX) return out;
   if(!lineCells){ lineCells=new Map(); let a0=1e9,b0=1e9,a1=-1e9,b1=-1e9; Object.keys(LX.s).forEach(k=>{ const c=LX.s[k].c||[]; for(let i=0;i<c.length;i+=2){ const q=c[i]+','+c[i+1], a=lineCells.get(q); if(a) a.push(k); else lineCells.set(q,[k]);
-      if(c[i]<a0)a0=c[i]; if(c[i]>a1)a1=c[i]; if(c[i+1]<b0)b0=c[i+1]; if(c[i+1]>b1)b1=c[i+1]; } }); lineBox=a1>=a0?L.latLngBounds([a0/2,b0/2],[(a1+1)/2,(b1+1)/2]):null; }
+      if(c[i]<a0)a0=c[i]; if(c[i]>a1)a1=c[i]; if(c[i+1]<b0)b0=c[i+1]; if(c[i+1]>b1)b1=c[i+1]; } }); lineBox=a1>=a0?L.latLngBounds([a0/LSQ,b0/LSQ],[(a1+1)/LSQ,(b1+1)/LSQ]):null; }
   if(n===undefined) return out;                                /* called only to work out lineBox */
-  const i0=Math.floor(s*2), i1=Math.floor(n*2), j0=Math.floor(w*2), j1=Math.floor(e*2); if((i1-i0+1)*(j1-j0+1)>3000) return out;
+  const i0=Math.floor(s*LSQ), i1=Math.floor(n*LSQ), j0=Math.floor(w*LSQ), j1=Math.floor(e*LSQ); if((i1-i0+1)*(j1-j0+1)>12000) return out;
   for(let i=i0;i<=i1;i++) for(let j=j0;j<=j1;j++){ const a=lineCells.get(i+','+j); if(a) a.forEach(k=>out.add(k)); }
   return out; }
 function lineFetch(k){ const g=lineGot[k]; if(g===1||g===2||(g&&Date.now()-g<30000)) return; lineGot[k]=1;

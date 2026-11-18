@@ -10,8 +10,10 @@ to download all of it, states it will never look at included, so tools/make.py c
    the index, in the page data as "lx":  {"w": stamp of wide.json, "s": {state: {"h": stamp, "c": [squares]}}}
 
 A stamp is the first 8 characters of the file's MD5 and goes in the file's address, so the address changes only when the
-content does and a phone keeps the copy it has across builds. "c" lists the half-degree squares the state's lines touch,
-as pairs floor(lat*2), floor(lon*2): the app fetches a state when one of its squares is in or near the view.
+content does and a phone keeps the copy it has across builds. "c" lists the quarter-degree squares the state's lines
+touch, as pairs floor(lat*4), floor(lon*4): the app fetches a state when one of its squares is in or near the view.
+(Half-degree squares were tried first. A line filed under New York dips a few kilometres into Pennsylvania near Great
+Bend, which put New York in a square 55 km deep, and a phone looking at Scranton fetched all of New York for nothing.)
 
 Only the standard library is used, because GitHub runs this at every build.
 
@@ -19,6 +21,7 @@ Only the standard library is used, because GitHub runs this at every build.
 """
 import json,hashlib,math
 WIDE_TOL=0.004        # what the app's zoom 7-8 level thins to (LLEV in app.js); a wider view thins this again
+SQ=4                  # squares to a degree in the index; LSQ in app.js must say the same
 def stamp(txt): return hashlib.md5(txt.encode('utf-8')).hexdigest()[:8]
 def thin(part,tol):
     """Douglas-Peucker in degrees, the same as thinPart() in app.js."""
@@ -36,15 +39,15 @@ def thin(part,tol):
         if md>t2: keep[mi]=1; todo.append((a,mi)); todo.append((mi,b))
     return [part[i] for i in range(n) if keep[i]]
 def squares(feats):
-    """Every half-degree square a state's lines pass through. A long straight piece can cross a square without a point in
-    it, so each stretch between two points counts for every square of the box round it."""
+    """Every quarter-degree square a state's lines pass through. A long straight piece can cross a square without a point
+    in it, so each stretch between two points counts for every square of the box round it."""
     out=set()
     for f in feats:
         for p in f['c']:
             for i in range(len(p)):
                 a=p[i]; b=p[i-1] if i else a
-                for la in range(math.floor(min(a[0],b[0])*2),math.floor(max(a[0],b[0])*2)+1):
-                    for lo in range(math.floor(min(a[1],b[1])*2),math.floor(max(a[1],b[1])*2)+1): out.add((la,lo))
+                for la in range(math.floor(min(a[0],b[0])*SQ),math.floor(max(a[0],b[0])*SQ)+1):
+                    for lo in range(math.floor(min(a[1],b[1])*SQ),math.floor(max(a[1],b[1])*SQ)+1): out.add((la,lo))
     return sorted(out)
 def split(feats):
     """-> ({state: text of its file}, text of wide.json, the index). A feature with no "s" (a file from before the
