@@ -13,7 +13,8 @@ A map tool for finding abandoned sites and ruins across upstate New York and Mas
 | `index.html` | The page, with the place list built in |
 | `app.js`, `leaflet.js` | The app and the map library |
 | `sw.js` | Keeps the Atlas on the phone so it opens with no signal |
-| `data/lines.json` | Old railroads, trolley lines and canals, loaded after the page opens |
+| `data/lines.json` | Every old railroad, trolley line and canal in one file; the Android app reads it |
+| `data/lines/` | The same lines cut up by state, fetched by the page as the map goes there |
 | `data/leads.json` | Unchecked leads from OpenStreetMap, loaded when the Leads layer is switched on |
 | `topo/` | One old USGS survey map per place, loaded when that place is opened |
 | `source/` | The files the site is built from |

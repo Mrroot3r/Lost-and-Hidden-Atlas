@@ -49,6 +49,10 @@ V=os.environ.get('ATLAS_V') or datetime.datetime.now().strftime('%y%m%d%H%M')   
 import sys; sys.path.insert(0,R+'tools')
 from states import STATES
 data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':(os.environ.get('ATLAS_BUILT') or datetime.date.today().strftime('%B %-d, %Y')),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules}
+# The old rail and canal lines, cut up for the hosted copy: one file for each state, a thinned picture of them all, and
+# the index of both, which goes in the page data (tools/lines_split.py). The app uses the index only on the hosted copy.
+import lines_split
+LSTATE,LWIDE,data['lx']=lines_split.split(json.load(open(R+'build/lines.json',encoding='utf-8')))
 def js(o): return json.dumps(o,separators=(',',':'),ensure_ascii=False).replace('</','<\\/')
 css=open(R+'src/app.css').read()
 lcss=open(R+'cache/leaflet.min.css').read()
@@ -77,7 +81,10 @@ WEB=R+'dist/web/'
 for d in ('data','topo'):
     shutil.rmtree(WEB+d,ignore_errors=True); os.makedirs(WEB+d)
 for i in topo: shutil.copyfile(R+f'build/topo/{i}.webp',WEB+f'topo/{i}.webp')
-open(WEB+'data/lines.json','w').write(open(R+'build/lines.json').read())
+open(WEB+'data/lines.json','w').write(open(R+'build/lines.json').read())      # every line in one file: what the Android app reads, and what the next build starts from
+os.makedirs(WEB+'data/lines')
+for k,txt in LSTATE.items(): open(WEB+f'data/lines/{k}.json','w',encoding='utf-8').write(txt)
+open(WEB+'data/lines/wide.json','w',encoding='utf-8').write(LWIDE)
 open(WEB+'data/leads.json','w').write(open(R+'build/leads.json').read())
 if os.path.exists(R+'build/pockets.json'):       # historic pockets (tools/pockets.py); fetched only when the layer is turned on
     pj=json.load(open(R+'build/pockets.json',encoding='utf-8'))
@@ -104,4 +111,4 @@ open(WEB+'boot.js','w').write(open(R+'src/boot.js').read())
 open(WEB+'version.json','w').write(json.dumps({'v':V,'places':len(S),'built':data['built']}))
 open(WEB+'sw.js','w').write(open(R+'src/sw.js').read().replace('__V__',V))
 tot=sum(os.path.getsize(os.path.join(dp,f)) for dp,_,fs in os.walk(WEB) for f in fs)
-print('hosted copy: index',len(web)//1024,'KB, app',len(app)//1024,'KB, lines',os.path.getsize(WEB+'data/lines.json')//1024,'KB,',len(topo),'old maps; total',tot//1024,'KB; version',V)
+print('hosted copy: index',len(web)//1024,'KB, app',len(app)//1024,'KB, lines',os.path.getsize(WEB+'data/lines.json')//1024,'KB in',len(LSTATE),'state files,',len(topo),'old maps; total',tot//1024,'KB; version',V)

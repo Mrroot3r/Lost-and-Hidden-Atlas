@@ -1,6 +1,7 @@
 // How long a zoom step holds up the page with the overlays on. Map tiles are stubbed out, so only the Atlas's own drawing
 // is timed, and the CPU is slowed to stand in for a mid-range phone (GUIDE.md section 9, "Speed").
-//   node tools/zoom_prof.js [slowdown=4] [alb|bos|syr|kc] [all|none|lines|leads|xl|pockets]      (serve the built site first)
+//   node tools/zoom_prof.js [slowdown=4] [alb|bos|syr|kc|pit|scr] [all|none|lines|leads|xl|pockets]      (serve the built site first)
+//   (pit and scr are Pittsburgh and Scranton, where the old lines are thickest)
 // It zooms through 16 steps once (the first pass makes layers) and three times more, and prints the median of the later
 // passes for each zoom and the number of layers on the map. Run it before and after a change to what is put on the map.
 //   SITE=<address>   time another copy, such as the published one served from the clone's root
@@ -12,7 +13,7 @@
 const { chromium, devices } = require('playwright');
 (async()=>{
   const thr=+process.argv[2]||4, view=process.argv[3]||'alb', ov=process.argv[4]||'all';
-  const V={alb:[42.6526,-73.7562],bos:[42.36,-71.06],syr:[43.05,-76.15],kc:[39.1,-94.58]}[view]||[42.6526,-73.7562];
+  const V={alb:[42.6526,-73.7562],bos:[42.36,-71.06],syr:[43.05,-76.15],kc:[39.1,-94.58],pit:[40.44,-79.99],scr:[41.41,-75.66]}[view]||[42.6526,-73.7562];
   const b=await chromium.launch(); const c=await b.newContext({...devices['Pixel 7']}); const p=await c.newPage();
   const JPG=Buffer.from('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=','base64');
   await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>{ const u=r.request().url(); if(/\/(export|exportImage|tile)[\/?]|\.png|\.jpg/.test(u)) return r.fulfill({status:200,contentType:'image/jpeg',headers:{'access-control-allow-origin':'*'},body:JPG}); return r.fulfill({status:204,body:''}); });

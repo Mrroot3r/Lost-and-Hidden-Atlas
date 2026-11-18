@@ -12,7 +12,7 @@ if os.path.exists('cache/osm/leads_ma.json'):
     els=els+[e for e in json.load(open('cache/osm/leads_ma.json'))['elements'] if (e['type'],e['id']) not in _seen]
 # Whole states downloaded with tools/osm_layers.py (cache/osm/<key>_leads.json). Inside New York the part covered by the
 # first Overpass download (the box below) keeps that data; a state's layer data fills the rest of its outline.
-STATE_KEYS=['ny','mo','ks']
+STATE_KEYS=['ny','mo','ks','ct','ri','vt','nh','me','nj','pa']
 OLDBOX=(-75.35,41.45,-72.55,44.15)
 _ST=json.load(open('build/states.json'))
 def _inring(r,x,y):
