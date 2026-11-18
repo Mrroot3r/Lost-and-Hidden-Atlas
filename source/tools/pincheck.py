@@ -72,8 +72,8 @@ for i,s in todo:
     d=ImageDraw.Draw(im); c=PX//2; r=30/(2*HALF)*PX
     d.ellipse([c-r,c-r,c+r,c+r],outline='#ff2d95',width=3); d.line([c-8,c,c+8,c],fill='#ff2d95',width=2); d.line([c,c-8,c,c+8],fill='#ff2d95',width=2)
     d.rectangle([0,0,PX,34],fill='#000000'); d.text((5,3),f"{i}  [{s['prec']}/{s['st']}]" if not s.get('_th') else f"{i}: {s['_th']}"[:66],fill='#ffffff' if not s.get('_th') else '#8fd3ff'); d.text((5,18),f"{s['lat']},{s['lon']}  {src}",fill='#bbbbbb')
-    d.rectangle([0,PX-16,PX,PX],fill='#000000'); d.text((5,PX-14),('land: '+ld) if ld else 'land: not on mapped public land',fill='#7CFC98' if ld and not ld.endswith('(XA)') else '#ffb347')
-    tiles.append(im); print(i,'|',src,'| land:',ld or 'not on mapped public land')
+    d.rectangle([0,PX-16,PX,PX],fill='#000000'); d.text((5,PX-14),('land at the pin: '+ld) if ld else 'land at the pin: not on mapped public land',fill='#7CFC98' if ld and not ld.endswith('(XA)') else '#ffb347')
+    tiles.append(im); print(i,'|',src,'| land at the pin:',ld or 'not on mapped public land')
     if LIDAR:
         lim,note=lidar_tile(s,i); ltiles.append(lim); print(' ',note)
 os.makedirs('research',exist_ok=True); PER=12

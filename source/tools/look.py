@@ -10,6 +10,7 @@ sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 from ortho import ortho
 PX=560
 def merc(la,lo): return lo*20037508.34/180, math.log(math.tan((90+la)*math.pi/360))*20037508.34/math.pi
+if len(sys.argv)<3 or sys.argv[1] in('-h','--help'): sys.exit(__doc__)
 tiles=[]; FAILED=[]
 import time
 for a in sys.argv[2:]:
