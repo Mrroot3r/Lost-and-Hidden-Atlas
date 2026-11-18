@@ -1,0 +1,24 @@
+# conf_biei: Watervliet, Green Island and the Watervliet Shakers
+state: New York
+region: albco, conf
+date: 2026-11-18
+places: 10
+file: data_conf_biei.py
+
+## What this batch is
+Ten places in region `conf` (drawn at random by `choose.py --state ny`), south of the Waterford and downtown Cohoes ground that `conf_simf` worked earlier the same day, with the two Colonie places that carry the old Town of Watervliet's name filed under `albco` like the Pruyn House. Watervliet: the Arsenal seen from Broadway (pin on the road, not inside the post), St. Nicholas Ukrainian Catholic Church (1906–08, buff brick, onion domes, still a parish), the Ohio Street Methodist church (now St. Ann Maronite), the Meneely Bell Foundry site with its markers (gone; the municipal center stands on it) and the 1916 Tilley Ladders factory (apartments). Green Island: the Federal Dam and Troy Lock (1916). Cohoes: the Juncta marker with Old Champlain Lock 2 (a lead from `conf_simf`; the chamber shows plainly on a close leaf-off aerial) and the Cohoes Savings Bank (another of its leads). Colonie: the Watervliet Shakers' Church Family with the 1848 Meeting House and Ann Lee's grave, and the 1817 Reformed Dutch Church at Latham. Sources were read with `wiki_raw.py` and `page.py`: Wikipedia, the Arsenal's National Historic Landmark form (66000503, text layer read), the Shaker Heritage Society's visit and buildings pages, NPS (Tilley), HMdb markers, the Spindle City Historic Society's downtown tour and canal brochure, the American Canal Society's Champlain sheet, an Industrial Scenery blog post (November 2025) for what is left of Lock 2, the St. Nicholas parish history and November 2025 bulletin, The Evangelist, Clio and two army.mil articles (archived copies; army.mil answers 403). Not checked: nothing on the ground; who owns the ground round Lock 2; the present use of the Latham church (OpenStreetMap calls it "Chapel of Praise"), the Tilley building inside, the St. Ann church's interior and services, and whether the Lithgow murals survive in the Cohoes bank; Shaker admission fees and whether the Meeting House keeps its original benches; whether the Iron Building can be seen from outside the Arsenal; parking for the Juncta and the Meneely markers. The Meneely markers disagree on dates (1826 or 1829 to 1950, 1951 or 1954), and both are given. Red brick was settled only for St. Nicholas (buff brick, so `no`, from Wikipedia) and Lock 2 (stone, from the blog's photos); the rest are `?`.
+
+## Leads
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| St. Mark's Episcopal Church (update to the conf_simf row) | Green Island, NY (Wikipedia 42.74167, -73.69167) | Wikipedia: 1866–67 stone church at 69–75 Hudson Avenue. The village website gives the town offices as 69 Hudson Avenue, and OpenStreetMap maps the town hall at 69–73 Hudson Avenue, so the church may be the town hall now | No church-shaped building could be picked out on a close leaf-off aerial at the Wikipedia point; a source on its present use, and the right building |
+| Watervliet Shaker grist mill ruins | Colonie, NY (Church Family, near 42.74, -73.814) | Shaker Heritage Society: "the ruins of the Grist Mill" remain among the Church Family buildings | Where the ruins are; could be a pin of its own beside watervliet-shaker-church-family |
+| Beattie Machine Works | Cohoes, NY (Register list 42.7705, -73.7120) | NY governor's 2022 nominations list: 1896 slow-burn mill building of a textile-machinery maker; National Register 100008404 | Present use and owner; no source opened says what stands |
+| D&H Green Island branch bridges ("black bridge") | Green Island to Van Schaick and Peebles Islands, NY | Spindle City (preserve.org) history: early-1900s American Bridge Company spans still standing, one carrying cars to Peebles Island | Dates from a second source, and which spans can be walked or seen from a public way |
+
+## Tips
+- The Arsenal's NHL form (`npgallery.nps.gov/NRHP/GetAsset/NHLS/66000503_text`, note NHLS not NRHP) has a text layer and describes the walls and the Broadway fence; a good source for what can be seen from outside a closed post.
+- `nom.py` with a street address ("2410 4th Ave, Watervliet, NY") returned OpenStreetMap address points that sat on the right building every time in Watervliet; it also gives the building's mapped name ("Chapel of Praise"), which is how the Latham church's possible present use turned up.
+- army.mil pages answer 403 to `page.py`, which falls back to an archived copy without asking; give the copy's date.
+- `places_test.js` still fails only on `onesquethaw-valley` (as the adk_gvry note said); this batch changes nothing it reads.
+- `publish.sh` stopped once because `data_cat_qazp.py` merged while this session worked; `resync.sh` fixed it, and the batch time had to be taken again afterwards so it stayed the newest.

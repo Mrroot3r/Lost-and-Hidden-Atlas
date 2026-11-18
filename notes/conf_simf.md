@@ -11,11 +11,9 @@ Fifteen places in region `conf` (drawn at random by `choose.py --state ny`), wit
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Juncta and Old Champlain Lock 2 | Cohoes, NY (Lock 2 at 42.76365, -73.69898 from the ACS sheet; state marker at 42.7632, -73.6997) | ACS sheet: Lock 1 covered by road, Lock 2 "one wall visible"; NYSDOT marker for the Erie–Champlain junction on Saratoga Street | Who owns the wall and whether it can be seen from a public way |
 | Watervliet Arsenal and its Iron Building | Watervliet, NY (42.71833, -73.70861) | Wikipedia, Clio, ASCE: 1813 arsenal, National Historic Landmark; 1859 cast-iron storehouse, museum closed to the public in 2013 | Whether anything can be seen from outside the fence |
 | St. Mark's Episcopal Church | Green Island, NY (42.74167, -73.69167) | Wikipedia: 1866–67 Gothic Revival stone church with polychrome slate roof, 1883 brick rectory, NRHP 1978 | Whether it is still a church and still standing as described |
 | Rensselaer and Saratoga Railroad Green Island Shops | Green Island, NY (42.75056, -73.69278) | Wikipedia: 1871 car shop burned March 3, 2011 and was demolished; the roundhouse and octagonal water tower are not mentioned after that | Whether the roundhouse or water tower still stand |
-| Cohoes Savings Bank | 75 Remsen St, Cohoes, NY | Spindle City tour: 1905 Beaux Arts bank, 1950 interior by Marcus T. Reynolds's office with David Lithgow murals | Whether the murals survive and whether anyone may go in |
 | Hayward grist mill (barber shop) | 94 Remsen St, Cohoes, NY | Spindle City tour: 1854 grist mill; its small turbine is still in the basement | Owner and whether the turbine can be seen |
 
 ## Tips
