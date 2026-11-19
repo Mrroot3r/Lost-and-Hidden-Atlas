@@ -28,6 +28,7 @@ from lidar_dem import merc,state_of
 NY='https://orthos.its.ny.gov/arcgis/rest/services/wms/Latest/MapServer/export'
 MA='https://tiles.arcgis.com/tiles/hGdibHYSPO59RG1h/arcgis/rest/services/orthos2023/MapServer/tile/%d/%d/%d'
 ESRI='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/export'
+ESRI_TILES='https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/%d/%d/%d'
 # state key -> (label, 'export' or 'tiles', address, extra request parameters or deepest tile zoom)
 SRC={'ny':('New York leaf-off aerial','export',NY,None),
      'ma':('MassGIS leaf-off aerial, spring 2023','tiles',MA,20),
@@ -78,6 +79,7 @@ def ortho(la,lo,half,px):
         label,kind,url,arg=SRC[st]
         tries.append((label,(lambda: tiles(url,la,lo,half,px,arg)) if kind=='tiles' else (lambda: export(url,la,lo,half,px,arg))))
     tries.append((ESRI_LABEL,lambda: export(ESRI,la,lo,half,px)))
+    tries.append((ESRI_LABEL,lambda: tiles(ESRI_TILES,la,lo,half,px,19)))   # export answers 500 at close zoom over parts of rural Saskatchewan (sk_fwmi, Nov 2026); its tiles still come
     for label,f in tries:
         for k in range(2):
             try:
