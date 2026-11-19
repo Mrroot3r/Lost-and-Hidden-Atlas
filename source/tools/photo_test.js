@@ -25,6 +25,8 @@ const { chromium } = require('playwright');
     return {batchcomplete:'',query:{pages:{'1':pg}}}; };
   const commonsAnswer=()=>{ const m={};
     if(MODE==='banner') m.Artist={value:'<table><tr><td><img src="https://upload.wikimedia.org/test/banner.png"><big>This image was taken by <b><a href="//commons.wikimedia.org/wiki/User:Example" title="User:Example">Ann Example</a></b>. To see her whole portfolio, <a href="//commons.wikimedia.org/wiki/Category:Images">click here</a>. More words to make this long.</big></td></tr></table>'};
+    else if(MODE==='longcredit') m.Artist={value:'The Example County Historical Society and Museum of Local Industry, Photograph Collection, Box 14, Folder 3'};
+    else if(MODE==='emptycredit') m.Artist={value:'<span></span>'};
     else if(MODE!=='nocredit') m.Artist={value:'<a href="//commons.wikimedia.org/wiki/User:Example">Ann Example</a>'};
     if(MODE!=='nocredit') m.LicenseShortName={value:'CC BY-SA 4.0'};
     return {query:{pages:{'-1':{ns:6,title:'File:Some_building_1.jpg',imageinfo:[{url:'https://upload.wikimedia.org/x.jpg',descriptionurl:'https://commons.wikimedia.org/wiki/File:Some_building_1.jpg',extmetadata:m}]}}}}; };
@@ -43,8 +45,8 @@ const { chromium } = require('playwright');
   const pick=await p.evaluate(()=>{ const S=window.__atlasNM.sites(), w=s=>(s.links||[]).map(l=>l[1]||'').filter(u=>/en\.wikipedia\.org\/wiki\//.test(u));
     const wiki=S.filter(s=>w(s).some(u=>!/\/wiki\/(List_of|Lists_of|National_Register_of_Historic_Places_listings)/i.test(u)&&!/\/wiki\/[^\/]*:/.test(decodeURIComponent(u.split('/wiki/')[1]||''))));
     const none=S.filter(s=>!w(s).length&&!s.mine), list=S.filter(s=>w(s).length&&w(s).every(u=>/\/wiki\/List_of/i.test(u)));
-    return {wiki:wiki.filter(s=>s.town&&!s.name.toLowerCase().includes(s.town.split(',')[0].toLowerCase())).map(s=>s.id).slice(0,10),none:(none[0]||{}).id,list:(list[0]||{}).id,nwiki:wiki.length,all:S.length}; });
-  ok('there are places with a Wikipedia link to try',pick.wiki.length>=10&&pick.none,JSON.stringify({nwiki:pick.nwiki,all:pick.all,list:pick.list}));
+    return {wiki:wiki.filter(s=>s.town&&!s.name.toLowerCase().includes(s.town.split(',')[0].toLowerCase())).map(s=>s.id).slice(0,12),none:(none[0]||{}).id,list:(list[0]||{}).id,nwiki:wiki.length,all:S.length}; });
+  ok('there are places with a Wikipedia link to try',pick.wiki.length>=12&&pick.none,JSON.stringify({nwiki:pick.nwiki,all:pick.all,list:pick.list}));
   // 1
   MODE='good'; let r=await show(p,pick.wiki[0]);
   ok('a place whose article has coordinates and a free photo shows it',r.shown&&/Some_building_1\.jpg/.test(r.img||''),JSON.stringify(r));
@@ -54,12 +56,17 @@ const { chromium } = require('playwright');
   MODE='banner'; r=await show(p,pick.wiki[1]);
   ok('a credit that is a whole banner gives way to the photographer\'s name',r.shown&&/Photo: Ann Example · CC BY-SA 4\.0/.test(r.cap)&&/^From Wikipedia's article on /.test(r.cap)&&!/portfolio/.test(r.cap),r.cap);
   ok('the banner\'s own images are not fetched',asked.img<=1,JSON.stringify(asked));
+  MODE='longcredit'; r=await show(p,pick.wiki[9]);
+  ok('a long plain credit is cut short, not dropped',r.shown&&/Photo: The Example County Historical Society.{10,50}… · CC BY-SA 4\.0/.test(r.cap),r.cap);
+  const dim=await p.evaluate(()=>{ const i=document.querySelector('#v-detail .dphoto img'); return i?[i.getAttribute('width'),i.getAttribute('height')]:null; });
+  ok('the picture carries its size, so its box is the right height before it arrives',dim&&dim[0]==='900'&&dim[1]==='550',JSON.stringify(dim));
   // 3
+  MODE='emptycredit'; r=await show(p,pick.wiki[8]); ok('no photo when the credit is empty markup',!r.shown);
   MODE='nocoord'; r=await show(p,pick.wiki[2]); ok('no photo when the article has no coordinates',!r.shown&&asked.commons===0,JSON.stringify(asked));
   MODE='svg'; r=await show(p,pick.wiki[3]); ok('no photo when the picture is an .svg drawing',!r.shown&&asked.commons===0);
   MODE='map'; r=await show(p,pick.wiki[4]); ok('no photo when the picture is a location map',!r.shown&&asked.commons===0);
   MODE='far'; r=await show(p,pick.wiki[7]); ok('no photo when the article\'s coordinates are 5 km from the pin',!r.shown&&asked.commons===0);
-  MODE='town'; r=await show(p,pick.wiki[8]); ok('no photo when the article is the one on the town',!r.shown&&asked.commons===0,CUR.town);
+  MODE='town'; r=await show(p,pick.wiki[10]); ok('no photo when the article is the one on the town',!r.shown&&asked.commons===0,CUR.town);
   MODE='nocredit'; r=await show(p,pick.wiki[5]); ok('no photo when Commons gives no photographer or licence',!r.shown&&asked.commons===1);
   // 4
   MODE='good'; r=await show(p,pick.none); ok('a place with no Wikipedia link asks nothing',!r.box&&asked.wiki===0,JSON.stringify(asked));

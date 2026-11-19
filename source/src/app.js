@@ -78,7 +78,13 @@ function themeMigrate(){ if(!U.set) return; if(U.set.trk==='#e11d74') delete U.s
 function themeNow(){ const m=pref('theme'), dark=m==='dark'||(m!=='light'&&!!(DARKQ&&DARKQ.matches));
   let k=dark?pref('themeD'):pref('themeL'); if(themeKind(k)!==(dark?'d':'l')) k=dark?'tomorrow':'brick'; return k; }
 function applyTheme(){ themeMigrate(); const r=document.documentElement; r.setAttribute('data-theme',themeNow());
-  try{ const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content',getComputedStyle(r).getPropertyValue('--accent').trim()||'#a33a24'); }catch(e){} r.style.setProperty('--trk',pref('trk')); }
+  try{ const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute('content',getComputedStyle(r).getPropertyValue('--accent').trim()||'#a33a24'); }catch(e){} r.style.setProperty('--trk',pref('trk')); r.style.setProperty('--trk-ui',trkUI(r)); }
+/* The track colour is also used on the panels (the Near arrow, the recording dot). Where it would not show against the
+   panel, such as Black in a dark scheme, the text colour stands in. On the map the track keeps the colour chosen. */
+function relLum(c){ let m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(c||'').trim()); if(!m) return null; let h=m[1]; if(h.length===3) h=h.replace(/./g,'$&$&');
+  const v=[0,2,4].map(i=>parseInt(h.substr(i,2),16)/255).map(x=>x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4)); return 0.2126*v[0]+0.7152*v[1]+0.0722*v[2]; }
+function trkUI(r){ try{ const cs=getComputedStyle(r), t=pref('trk'), a=relLum(t), b=relLum(cs.getPropertyValue('--panel')); if(a==null||b==null) return t;
+    return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05)<2?(cs.getPropertyValue('--ink').trim()||t):t; }catch(e){ return pref('trk'); } }
 applyTheme();
 if(DARKQ&&DARKQ.addEventListener) DARKQ.addEventListener('change',applyTheme);      /* the phone went to night mode, or back */
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
@@ -162,8 +168,10 @@ function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+
 let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
-function match(s){
-  if(pref('hideGone')&&nothingToSee(s)&&!F.st.has(s.st)&&!(sel&&sel.id===s.id)) return false;      /* choosing the chip in Filters still shows them */
+/* hidden by "Hide places with nothing to see"? Not when its chip is chosen in Filters, not the place that is open, and not a stop on the trip */
+const goneHid=s=>pref('hideGone')&&nothingToSee(s)&&!F.st.has(s.st)&&!(sel&&sel.id===s.id)&&U.trip.indexOf(s.id)<0;
+function match(s){ return !goneHid(s)&&match0(s); }
+function match0(s){
   if(F.line&&!F.line.ids.has(s.id)) return false;
   if(F.q){ const h=hay(s); if(!qWords().every(w=>h.n.indexOf(w)>=0||h.t.indexOf(w)>=0||h.x.indexOf(w)>=0)) return false; }
   if(F.cat.size&&!F.cat.has(s.cat)) return false;
@@ -269,7 +277,8 @@ function startCard(must){ const pick=()=>{ openSettings(); setTimeout(()=>{ cons
       el('button',{class:'btn sm',type:'button',id:'sc-me',onclick:()=>{ if(!map){ banner('Your location needs the map, and the map has not loaded. Choose a place instead.',true,7000); return; } if(geo.id===null){ geo.wide=true; locate(); } }},'Use my location'),
       el('button',{class:'btn sm',type:'button',id:'sc-pick',onclick:pick},'Choose a place'),
       must?null:el('button',{class:'later',type:'button',id:'sc-no',onclick:()=>{ U.ui.noStart=1; save(); renderList(); }},'Not now'))); }
-function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' star':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
+/* the little shape beside a name, the same as the pin: a star for standing, a ring for nothing left, a diamond for a place of the reader's own */
+function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.mine?' mine':s.st==='standing'?' star':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
 function renderList(){
   listFrom=nearFrom();
   { const o=$('#sort').options[0], n=homeObj().name||'your start'; o.textContent=nearAt?'Nearest to you':!homePicked()?'Nearest first':'Nearest to '+(n.length>20?n.slice(0,19)+'…':n); }
@@ -280,7 +289,10 @@ function renderList(){
   $('#count').textContent=visible.length+' of '+sites().length+' places';
   { const fd=$('#f-done'); if(fd) fd.textContent='Show '+visible.length+(visible.length===1?' place':' places'); }
   const lc=$('#linechip'); lc.textContent=''; lc.hidden=!F.line; if(F.line){ lc.append(el('span',{class:'chip','aria-pressed':'true'},el('span',{class:'sw',style:'--c:'+LK[F.line.k][1]}),'Along '+F.line.label,el('button',{type:'button',class:'x','aria-label':'Stop following this line',onclick:()=>{setLine(null);refresh();}},'✕'))); }
-  if(!visible.length){ ul.append(el('li',{class:'empty pad'},'Nothing matches. Clear a filter or two.')); return; }
+  /* places that fit the search and the filters but are kept off by the setting: say so, or a search for one looks like a gap in the Atlas */
+  const hid=pref('hideGone')?sites().filter(s=>goneHid(s)&&match0(s)).length:0;
+  const hidRow=()=>el('li',{class:'pad hidnote'},el('span',{text:hid+(hid===1?' place':' places')+' with nothing to see '+(hid===1?'is':'are')+' hidden by your setting.'}),el('button',{class:'btn sm',type:'button',id:'hid-show',onclick:()=>{ setPref('hideGone',false); banner('Showing them again. Settings has the switch.',false,5000); }},'Show them'));
+  if(!visible.length){ ul.append(el('li',{class:'empty pad'},hid?'Nothing else matches.':'Nothing matches. Clear a filter or two.')); if(hid) ul.append(hidRow()); return; }
   /* a long list is shown in two steps: the first 120 rows now, the rest when asked for. The map shows every pin either way. */
   const key=visible.length+'|'+(visible[0]?visible[0].id:'')+'|'+F.q; if(key!==listKey){ listKey=key; listAll=false; }
   const frag=document.createDocumentFragment(), rows=listAll?visible:visible.slice(0,LISTCAP);
@@ -295,6 +307,7 @@ function renderList(){
   });
   ul.append(frag);
   if(rows.length<visible.length) ul.append(el('li',{class:'pad'},el('button',{class:'btn',type:'button',id:'list-more',onclick:()=>{ listAll=true; renderList(); }},'Show the other '+(visible.length-rows.length)+' places')));
+  else if(hid) ul.append(hidRow());
 }
 
 /* ---------- map ---------- */
@@ -721,7 +734,7 @@ function buildBar(){
   const mo=el('button',{class:'lmore',type:'button','aria-label':'More layers',title:'More layers',onclick:()=>sc.scrollBy({left:sc.clientWidth*0.7,behavior:'smooth'})},'›');
   const old=$('#lbar .lmore'); if(old) old.remove(); $('#lbar').append(mo);
   const fit=()=>{ mo.style.right=fx.offsetWidth+'px'; mo.hidden=sc.scrollLeft+sc.clientWidth>=sc.scrollWidth-4; };
-  sc.onscroll=fit; if(!buildBar.rs){ buildBar.rs=true; window.addEventListener('resize',()=>{ const m=$('#lbar .lmore'); if(m) m.style.right=$('#lfix').offsetWidth+'px'; }); } requestAnimationFrame(fit); setTimeout(fit,400);
+  sc.onscroll=fit; buildBar.fit=fit; if(!buildBar.rs){ buildBar.rs=true; window.addEventListener('resize',debounce(()=>{ if(buildBar.fit) buildBar.fit(); },120)); } requestAnimationFrame(fit); setTimeout(fit,400);
   syncBar(); }
 function syncBar(){ BAR.forEach(b=>{ const n=document.getElementById('lb-'+b[0]); if(n) n.setAttribute('aria-pressed',String(barState(b[0]))); }); if(!$('#sheet').hidden) buildSheet(); }
 let sheetMode='map';
@@ -1428,10 +1441,15 @@ function nmGoal(t,fit){ NM.goal=t||null; nmGoalDraw();
   if(t&&fit&&map){ const o=nmOrigin(); if(o&&hav(o.p[0],o.p[1],t.la,t.lo)<60) map.fitBounds(L.latLngBounds([o.p,[t.la,t.lo]]).pad(0.25),{maxZoom:17}); else map.setView([t.la,t.lo],Math.max(map.getZoom(),15)); }
   nmDraw(true); }
 function nmGoalDraw(){ if(!map) return; const t=NM.goal, o=t&&nmOrigin();
-  if(!t){ if(NM.line){ map.removeLayer(NM.line); NM.line=null; } if(NM.ring){ map.removeLayer(NM.ring); NM.ring=null; } return; }
-  if(!NM.ring) NM.ring=L.circleMarker([t.la,t.lo],{radius:13,color:pref('trk'),weight:3,fill:false,interactive:false}).addTo(map); else NM.ring.setLatLng([t.la,t.lo]);
-  if(o&&o.how!=='map'){ if(!NM.line) NM.line=L.polyline([o.p,[t.la,t.lo]],{color:pref('trk'),weight:2.5,dashArray:'7 7',interactive:false}).addTo(map); else NM.line.setLatLngs([o.p,[t.la,t.lo]]); }
-  else if(NM.line){ map.removeLayer(NM.line); NM.line=null; } }
+  const drop=k=>{ if(NM[k]){ map.removeLayer(NM[k]); NM[k]=null; } };
+  if(!t){ ['line','lineBg','ring','ringBg'].forEach(drop); return; }
+  /* each is drawn twice, white underneath, as the field-log track is: one colour alone is lost on some aerial or other */
+  if(!NM.ring){ NM.ringBg=L.circleMarker([t.la,t.lo],{radius:13,color:'#fff',opacity:0.85,weight:6,fill:false,interactive:false}).addTo(map); NM.ring=L.circleMarker([t.la,t.lo],{radius:13,color:pref('trk'),weight:3,fill:false,interactive:false}).addTo(map); }
+  else { NM.ringBg.setLatLng([t.la,t.lo]); NM.ring.setLatLng([t.la,t.lo]); }
+  if(o&&o.how!=='map'){ const ll=[o.p,[t.la,t.lo]];
+    if(!NM.line){ NM.lineBg=L.polyline(ll,{color:'#fff',opacity:0.7,weight:5.5,interactive:false}).addTo(map); NM.line=L.polyline(ll,{color:pref('trk'),weight:2.5,dashArray:'7 7',interactive:false}).addTo(map); }
+    else { NM.lineBg.setLatLngs(ll); NM.line.setLatLngs(ll); } }
+  else { drop('line'); drop('lineBg'); } }
 const nmArrow=(b,big)=>{ const s=el('span',{class:'nmarrow'+(big?' big':''),'data-b':String(Math.round(b)),'aria-hidden':'true'}); s.innerHTML='<svg viewBox="0 0 24 24" width="'+(big?54:22)+'" height="'+(big?54:22)+'"><path d="M12 2.5 18.5 20 12 16.2 5.5 20z" fill="currentColor"/></svg>'; nmRot(s); return s; };
 const nmTurn=b=>Math.round(NM.hd==null?b:(b-NM.hd+360)%360);
 /* Turn one arrow to where it should point. The angle is kept running on (361, 362 ... not 1, 2) and each change goes the short way round:
@@ -1884,11 +1902,12 @@ function resumeLog(){
 /* markers */
 const STARD='M12.00,1.60 L14.76,8.80 L22.46,9.20 L16.47,14.05 L18.47,21.50 L12.00,17.30 L5.53,21.50 L7.53,14.05 L1.54,9.20 L9.24,8.80Z';
 function pinIcon(s){
-  const c=['pin']; if(HOLLOW[s.st]) c.push('hollow'); if(s.st==='standing') c.push('sq'); if(s.now) c.push('now'); if(s.mine) c.push('mine');
+  const star=s.st==='standing'&&!s.mine;      /* a place of the reader's own stays a diamond: .pin.mine */
+  const c=['pin']; if(HOLLOW[s.st]) c.push('hollow'); if(star) c.push('sq'); if(s.now) c.push('now'); if(s.mine) c.push('mine');
   const my=U.status[s.id]; if(my) c.push('my-'+my); if(sel&&sel.id===s.id) c.push('sel');
   const col=(CAT[s.cat]||CAT.landmark)[1];
   /* a standing place is a star (an outline drawn under the fill, so it reads on any aerial); the rest are round */
-  if(s.st==='standing') return L.divIcon({className:'pinwrap',html:'<svg class="'+c.join(' ')+'" viewBox="0 0 24 24" style="--c:'+col+'"><path class="o" d="'+STARD+'"/><path class="f" d="'+STARD+'"/></svg>',iconSize:[22,22],iconAnchor:[11,11]});
+  if(star) return L.divIcon({className:'pinwrap',html:'<svg class="'+c.join(' ')+'" viewBox="0 0 24 24" style="--c:'+col+'">'+(s.now?'<path class="p" d="'+STARD+'"/>':'')+'<path class="o" d="'+STARD+'"/><path class="f" d="'+STARD+'"/></svg>',iconSize:[22,22],iconAnchor:[11,11]});      /* .p is the "changing now" pulse */
   return L.divIcon({className:'pinwrap',html:'<span class="'+c.join(' ')+'" style="--c:'+col+'"></span>',iconSize:[22,22],iconAnchor:[11,11]});
 }
 /* Zoomed out to town level or wider, pins that would sit on top of each other are replaced by one numbered disc.
@@ -2028,7 +2047,8 @@ function photoFits(s,title,co){ if(!co||!isFinite(co.lat)||!isFinite(co.lon)) re
   return phWords(title.replace(/\s*\(.*\)\s*$/,'')).some(w=>!town.has(w)&&mine.has(w)); }
 function photoBy(h){ const d=new DOMParser().parseFromString('<body>'+String(h||'')+'</body>','text/html').body; const t=(d.textContent||'').replace(/\s+/g,' ').trim();
   if(t&&t.length<=70) return t;
-  const a=[...d.querySelectorAll('a')].find(x=>/User:/.test(x.getAttribute('href')||'')&&(x.textContent||'').trim()); return a?a.textContent.replace(/\s+/g,' ').trim().slice(0,70):''; }
+  const a=[...d.querySelectorAll('a')].find(x=>/User:/.test(x.getAttribute('href')||'')&&(x.textContent||'').trim()); if(a) return a.textContent.replace(/\s+/g,' ').trim().slice(0,70);
+  return (!t||d.querySelector('table,img,figure'))?'':t.slice(0,68).replace(/\s+\S*$/,'')+'…'; }      /* a long plain credit (an archive's full name) is cut short; a banner with no name in it gives nothing */
 function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
   const t=wikiTitle(s); if(!t) return Promise.resolve(null);
   const q=(base,o)=>fetch(base+'?'+new URLSearchParams(Object.assign({action:'query',format:'json',origin:'*'},o))).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); });
@@ -2046,11 +2066,17 @@ function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
 function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false||!wikiTitle(s)) return null;
   const box=el('figure',{class:'dphoto',hidden:true});
   placePhoto(s).then(ph=>{ if(!ph||!box.isConnected) return;
-    const img=el('img',{src:ph.src,alt:'Photograph from the Wikipedia article '+ph.title,loading:'lazy',decoding:'async'});
+    const img=el('img',{src:ph.src,alt:'Photograph from the Wikipedia article '+ph.title,decoding:'async'}); if(ph.w>0&&ph.h>0){ img.width=ph.w; img.height=ph.h; }
     img.addEventListener('error',()=>{ box.hidden=true; });
     box.append(img,el('figcaption',null,'From Wikipedia\'s article on '+ph.title+'. Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where)));
     box.hidden=false; });
   return box; }
+/* The head of a place page cuts a long name to two lines when the phone is on its side. When that happens the whole name
+   is written at the top of the part that scrolls, so nothing is lost. Asked again when the window changes shape. */
+function nameFit(){ const v=$('#v-detail'), h=v&&v.querySelector('.dhead h2'), intro=v&&v.querySelector('.dintro'); if(!h||!intro) return;
+  const cut=h.scrollHeight>h.clientHeight+2, old=intro.querySelector('.fullname');
+  if(cut&&!old) intro.prepend(el('p',{class:'fullname',text:h.textContent})); else if(!cut&&old) old.remove(); }
+window.addEventListener('resize',debounce(()=>{ if(view==='detail') nameFit(); },150));
 function renderDetail(s){
   const v=$('#v-detail'); v.textContent=''; v.scrollTop=0;
   const p=pos(s), d=dt(s), H=homeObj(), dst=dest(s), cat=CAT[s.cat]||CAT.landmark, pr=PREC[s.prec]||PREC.site;
@@ -2076,6 +2102,7 @@ function renderDetail(s){
     el('p',{class:'sub2',text:[s.name2,s.town,s.years,s.bk==='y'?'Red brick':s.bk==='s'?'Some red brick':''].filter(Boolean).join(' · ')}),
     tags,
     photoBox(s)));
+  nameFit();
   /* getting there */
   const times=el('div',{class:'times'});
   if(nearFrom()){ const l=dtl(s); times.append(el('div',{class:'time home',id:'dt-live'},el('b',{text:'~'+fmtMin(l.min)}),'from where you are · '+miTxt(l.mi))); }
@@ -2230,7 +2257,7 @@ function shareLinks(kind,f){ const q=o=>Object.keys(o).filter(k=>o[k]).map(k=>en
   return {gh:gh,form:form}; }
 /* one link that sends a spot, coordinates already filled in: from a field-log note or a long press on the map */
 /* one quiet line under the two kinds of button, so it is plain which is which */
-const WHICH=()=>el('p',{class:'which',text:'My places stay on this phone. The public Atlas is the map everyone sees: what you send is checked before it goes on.'});
+const WHICH=()=>el('p',{class:'which',text:'My places stay on this device. The public Atlas is the map everyone sees: what you send is checked before it goes on.'});
 function spotLink(name,la,lo,text,label){ const L=shareLinks('lead',{place:name||'',where:(+la).toFixed(5)+', '+(+lo).toFixed(5),text:text||'',source:'I was there',access:''}); return ext(L.form||L.gh,label||'Send this spot to the public Atlas','btn sm spot-send'); }
 function shareBox(kind,f){ const L=shareLinks(kind,f), cp=el('button',{class:'btn sm',type:'button'},'Copy as text'); cp.addEventListener('click',()=>copy(shareText(kind,f),cp));
   return el('div',{class:'sharebox'},
@@ -2431,7 +2458,7 @@ function renderGuide(){
     el('span',null,el('span',{class:'dot star',style:'--c:#666'}),'Star: still standing'),
     el('span',null,el('span',{class:'dot',style:'--c:#666'}),'Solid circle: ruins or traces'),
     el('span',null,el('span',{class:'dot hollow',style:'--c:#666'}),'Ring: nothing left, a marker, or under water'),
-    el('span',null,el('span',{class:'dot',style:'--c:#666;border-radius:1px;transform:rotate(45deg)'}),'Diamond: a place you added'));
+    el('span',null,el('span',{class:'dot mine',style:'--c:#666'}),'Diamond: a place you added'));
   v.append(sec('How to find a ruin with this',true,[
     P('Every pin carries an honest rating. "Pin on the spot" means it sits on the structure or marker. "Pin within the site" means it is inside the footprint. "Pin approximate" means the right vicinity only, and the dashed ring on the map shows how far off it could be.'),
     el('ul',null,
@@ -2443,7 +2470,7 @@ function renderGuide(){
       el('li',{text:'On site, open the Log tab and start a field log. It draws where you walk and lets you drop timed notes, then exports the track (GPX) and a note list with times to match against your footage.'}),
       el('li',{text:'Found the real spot? Open My notes, choose "Move the pin," and drag it. Right-click (or long-press) anywhere on the map for coordinates and links.'}),
       el('li',{text:'Been to a place? Open it and tap "I was here": say what you found, how you got in, and mark the true spot from where you stand. Then tap "Send to the public Atlas" on the report and the map gets corrected for everyone.'}),
-      el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it to the Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later.'})),
+      el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it for the public Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later.'})),
     el('div',{id:'share-blank'},el('p',{class:'snote',style:'display:block;margin-top:8px',text:'Or send a place without a pin:'}),shareBox('lead',{place:'',where:'',text:'',source:'',access:''})),
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
   const ser=el('div',{class:'series'}); D.series.forEach(s=>{ const n=BASE.filter(x=>(x.tags||[]).indexOf(s.tag)>=0).length;
@@ -2511,7 +2538,7 @@ function renderGuide(){
     P('Every New York city, town and village must appoint a historian. They know where the ruins are and usually who owns them, so ask "what was here?" rather than "how do I get in?"'),
     fo,
     el('p',null,el('b',{text:'Sharing locations: '}),'name public-land sites openly, since that sends viewers somewhere legal. For fragile private sites, name the region and not the route, or hold the video until the owner is on side.')]));
-  v.append(sec('Add places with your own Claude',false,[P('The Atlas grows by research sessions: a Claude session reads the sources, looks at every pin on the aerial and sends its places in. If you have Claude with Claude Code, yours can do the same for any town or county you choose, on your own account. Nothing of it reaches the map until the owner of the Atlas has looked at it. To tell us about a single place, "+ Add" and then "Suggest it to the Atlas" is quicker.'),
+  v.append(sec('Add places with your own Claude',false,[P('The Atlas grows by research sessions: a Claude session reads the sources, looks at every pin on the aerial and sends its places in. If you have Claude with Claude Code, yours can do the same for any town or county you choose, on your own account. Nothing of it reaches the map until the owner of the Atlas has looked at it. To tell us about a single place, "+ Add" and then "Suggest it for the public Atlas" is quicker.'),
     el('div',{class:'row'},ext('https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/blob/main/CONTRIBUTING.md','How to add places with your own Claude','btn sm'))]));
   v.append(sec('Settings, backups and storage',false,[P('Backups, restoring, offline map storage and the app\'s own settings are under the gear: tap More under the map, then the gear next to Done.'),
     el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>openSettings()},'Open Settings')),P('Settings holds: colours, units and clock; how the map opens and your start place; Near me (how far to list, when to buzz); the field log; the episode kit; trimming a shared walk; backups; where the app gets its places; offline storage.'),

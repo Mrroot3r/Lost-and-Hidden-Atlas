@@ -55,6 +55,13 @@ const { chromium } = require('playwright');
       if(r.more){ await p.evaluate(()=>{ const sc=document.querySelector('#lscroll'); sc.scrollLeft=sc.scrollWidth; }); await p.waitForTimeout(250);
         ok(name+': and the arrow goes once the bar is scrolled to its end',await p.evaluate(()=>document.querySelector('#lbar .lmore').hidden));
         await p.evaluate(()=>{ document.querySelector('#lscroll').scrollLeft=0; }); } }
+    // the arrow is worked out again when the window changes size (a phone turned on its side, a desktop window dragged wider)
+    { const vp=p.viewportSize(); await p.evaluate(()=>{ document.querySelector('#lscroll').scrollLeft=0; }); await p.setViewportSize({width:1500,height:800}); await p.waitForTimeout(500);
+      const w=await p.evaluate(()=>{ const mo=document.querySelector('#lbar .lmore'), sc=document.querySelector('#lscroll'); return {hidden:mo.hidden,more:sc.scrollWidth>sc.clientWidth+4}; });
+      ok(name+': widened until every layer fits, the arrow goes',w.more||w.hidden,JSON.stringify(w));
+      await p.setViewportSize(vp); await p.waitForTimeout(500);
+      const n=await p.evaluate(()=>{ const mo=document.querySelector('#lbar .lmore'), sc=document.querySelector('#lscroll'); return {hidden:mo.hidden,more:sc.scrollWidth>sc.clientWidth+4}; });
+      ok(name+': narrowed again, it is back',!n.more||!n.hidden,JSON.stringify(n)); }
     // the age filter: "Standing, from before 1800" lists standing places whose years begin before 1800, and no others
     { await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
       await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(b=>b.textContent==='Standing, from before 1800').click(); }); await p.waitForTimeout(300);
@@ -73,6 +80,20 @@ const { chromium } = require('playwright');
       const sub=await p.evaluate(()=>(document.querySelector('#v-detail .sub2')||{}).textContent||'');
       ok(name+': a place page says Red brick or Some red brick',/red brick/i.test(sub),sub.slice(0,80)); }
     ok(name+': no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- a place of the reader's own is a diamond even when it is standing; a standing place that is changing now still pulses
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},custom:[{id:'my-test-1',mine:true,name:'Zz my own standing place',lat:42.6526,lon:-73.7562,cat:'landmark',st:'standing',prec:'exact',acc:'public',eff:'drive',town:'Albany',story:'x',links:[]}]})); });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(400);
+    const r=await p.evaluate(()=>{ const N=window.__atlasNM, m=window.__atlasMap, at=(la,lo)=>{ m.setView([la,lo],17,{animate:false}); N.syncMarkers(); let e=null; m.eachLayer(l=>{ if(l.getLatLng&&l.options.riseOnHover&&l.getLatLng().distanceTo([la,lo])<2) e=l.getElement().firstElementChild; }); return e; };
+      const mine=at(42.6526,-73.7562), o={mine:mine?mine.tagName.toLowerCase()+'.'+mine.getAttribute('class').split(' ').join('.'):null};
+      const now=N.sites().find(s=>s.now&&s.st==='standing'&&!s.mine); if(now){ const e=at(now.lat,now.lon); o.now=now.id; o.pulse=!!(e&&e.querySelector('path.p'))&&getComputedStyle(e.querySelector('path.p')).animationName; }
+      const calm=N.sites().find(s=>!s.now&&s.st==='standing'&&!s.mine), e2=at(calm.lat,calm.lon); o.calm=e2?e2.querySelectorAll('path').length:null; return o; });
+    ok('a place of your own that is standing is a diamond on the map, not a tilted star',r.mine==='span.pin.mine',r.mine);
+    await p.fill('#q','Zz my own'); await p.waitForTimeout(450);
+    ok('and a diamond in the list',await p.evaluate(()=>{ const d=document.querySelector('#list li button[data-id="my-test-1"] .dot'); return !!d&&d.classList.contains('mine')&&!d.classList.contains('star'); }));
+    if(r.now) ok('a standing place that is changing now is a star that pulses',r.pulse==='starpulse',r.now+': '+r.pulse);
+    ok('a standing place that is not changing has no pulse',r.calm===2,r.calm+' paths');
+    ok('own place and pulse: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the first visit: nothing saved, no start place
   { const mk=async(geo,seed)=>{ const c=await b.newContext(Object.assign({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true},geo?{geolocation:geo,permissions:['geolocation']}:{})); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
       await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
