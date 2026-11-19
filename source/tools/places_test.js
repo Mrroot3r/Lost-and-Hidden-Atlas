@@ -80,6 +80,24 @@ const { chromium } = require('playwright');
       const sub=await p.evaluate(()=>(document.querySelector('#v-detail .sub2')||{}).textContent||'');
       ok(name+': a place page says Red brick or Some red brick',/red brick/i.test(sub),sub.slice(0,80)); }
     ok(name+': no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- places that began as a reader's tip: a filter, a badge with the day, a word in the list, and no name anywhere
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(400);
+    const tips=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.filter(x=>x.tip).map(x=>[x.id,x.tip]));
+    ok('some places carry the day a reader sent them in',tips.length>=2&&tips.every(t=>/^20\d\d-\d\d-\d\d$/.test(t[1])),tips.length+' places');
+    await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+    await p.evaluate(()=>{ [...document.querySelectorAll('#filters .chip')].find(x=>x.textContent.trim()==='Sent in by readers').click(); }); await p.waitForTimeout(350);
+    const r=await p.evaluate(()=>({n:+document.querySelector('#count').textContent.split(' ')[0],vis:window.__atlasNM.visible().map(s=>s.id).sort().join(),fc:(document.querySelector('#fcount')||{}).textContent||''}));
+    ok('"Sent in by readers" in Filters lists those places and no others, and counts as one filter',r.n===tips.length&&r.vis===tips.map(t=>t[0]).sort().join()&&/1/.test(r.fc),r.n+' listed; filters on: '+r.fc);
+    await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+    ok('the list says "from a reader" on each',await p.evaluate(()=>[...document.querySelectorAll('#list li button[data-id]')].every(x=>/from a reader/.test(x.textContent))));
+    await p.evaluate(id=>{ location.hash='#'+id; },tips[0][0]); await p.waitForTimeout(600);
+    const bd=await p.evaluate(()=>{ const t=document.querySelector('#v-detail .tag.tipd'); return t?{text:t.textContent,title:t.getAttribute('title')}:null; });
+    ok('its page carries the badge "Sent in by a reader", with the day in words',!!bd&&bd.text==='Sent in by a reader'&&/ on [A-Z][a-z]+ \d{1,2}, 20\d\d\./.test(bd.title),bd&&bd.title.slice(0,70));
+    const other=await p.evaluate(()=>{ const s=window.__atlasNM.sites().find(x=>!x.tip&&!x.mine); location.hash='#'+s.id; return s.id; }); await p.waitForTimeout(600);
+    ok('a place a session found has no such badge',await p.evaluate(()=>!document.querySelector('#v-detail .tag.tipd')),other);
+    ok('reader tips: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- a place of the reader's own is a diamond even when it is standing; a standing place that is changing now still pulses
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},custom:[{id:'my-test-1',mine:true,name:'Zz my own standing place',lat:42.6526,lon:-73.7562,cat:'landmark',st:'standing',prec:'exact',acc:'public',eff:'drive',town:'Albany',story:'x',links:[]}]})); });

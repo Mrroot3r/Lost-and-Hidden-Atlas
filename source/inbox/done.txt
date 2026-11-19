@@ -2,3 +2,5 @@
 # (form-xxxxxxxxxx), then a few words on what was done. tools/inbox.py leaves these rows out. GitHub issues are not
 # listed here: they are closed by "Closes #N" in the pull request that dealt with them.
 form-f8fc798ad8  a test answer sent by the session that wired the form in, November 17, 2026; nothing to do
+form-b623f33876  lead "Building", Albany: added as 759-madison-avenue-albany (Historic Albany Foundation names it), November 19, 2026
+form-26e05d6e70  "Buried Brick walkway", Albany (sent as a visit report on the reader's own place): added as washington-park-buried-brick-walk, a lead, November 19, 2026

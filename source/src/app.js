@@ -161,13 +161,13 @@ async function fetchDT(){
 }
 
 /* ---------- filters ---------- */
-const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,before:0,fresh:'',my:'any',hideDone:false};
+const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,tip:false,before:0,fresh:'',my:'any',hideDone:false};
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
 const HAY=new Map(), fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+(s.name2||'')),t:fold(s.town),
-  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,Array.isArray(s.tags)?s.tags.join(' '):s.tags,s.bk==='y'?'red brick':s.bk==='s'?'some red brick':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
+  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,Array.isArray(s.tags)?s.tags.join(' '):s.tags,s.bk==='y'?'red brick':s.bk==='s'?'some red brick':'',s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
 let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
@@ -188,6 +188,7 @@ function match0(s){
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
   if(F.before){ const y=yearOf(s); if(!y||y>=F.before) return false; }      /* a place with no year it dates from is left out, not guessed */
+  if(F.tip&&!s.tip) return false;      /* a place that began as a reader's tip carries the day it was sent */
   if(F.brick&&s.bk!=='y'&&s.bk!=='s') return false;      /* red brick: bk is y (mostly), s (some), n (none); absent when nobody has looked */
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
   if(F.fresh&&s.new!==F.fresh) return false;
@@ -204,9 +205,9 @@ function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.y
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
   YEAR.set(s.id,y); return y; }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 const BATCHES=D.batches||[];
 const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
@@ -252,7 +253,7 @@ function buildFilters(){
   fb.append(el('label',{class:'field'},el('span',{text:'Dates from'}),bef));
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
-  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
+  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('Sent in by readers','tip'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
   /* the way out of a long panel: close it and go to the list */
   fb.append(el('div',{class:'row fdone'},el('button',{class:'btn pri',type:'button',id:'f-done',onclick:()=>{ $('#filters').open=false; syncFcount(); const t=$('#v-list'); if(t&&t.scrollIntoView) t.scrollIntoView({block:'start'}); }},'Show '+visible.length+(visible.length===1?' place':' places')),
     el('button',{class:'btn sm',type:'button',onclick:()=>{clearF();$('#q').value='';refresh();}},'Clear all filters')));
@@ -305,7 +306,7 @@ function renderList(){
     frag.append(el('li',null,el('button',{class:'item pad'+(sel&&sel.id===s.id?' cur':''),type:'button','data-id':s.id,onclick:()=>select(s,true)},
       dot(s),
       el('span',null,el('b',{text:s.name}),el('small',{text:[s.town,s.years].filter(Boolean).join(' · ')}),
-        el('small',null,STS[s.st],s.now?' · changing now':'',s.prec==='area'?' · rough pin':'',my?' · '+MY[my]:'',U.trip.indexOf(s.id)>=0?' · in trip':'')),
+        el('small',null,STS[s.st],s.now?' · changing now':'',s.prec==='area'?' · rough pin':'',s.tip?' · from a reader':'',my?' · '+MY[my]:'',U.trip.indexOf(s.id)>=0?' · in trip':'')),
       far?el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:miTxt(d.mi)})):null)));
   });
   ul.append(frag);
@@ -2080,6 +2081,8 @@ function nameFit(){ const v=$('#v-detail'), h=v&&v.querySelector('.dhead h2'), i
   const cut=h.scrollHeight>h.clientHeight+2, old=intro.querySelector('.fullname');
   if(cut&&!old) intro.prepend(el('p',{class:'fullname',text:h.textContent})); else if(!cut&&old) old.remove(); }
 window.addEventListener('resize',debounce(()=>{ if(view==='detail') nameFit(); },150));
+/* "on November 18, 2026" for a place that began as a reader's tip (s.tip is that day), or nothing */
+const tipDay=s=>{ const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(s.tip||''); return m?' on '+new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):''; };
 function renderDetail(s){
   const v=$('#v-detail'); v.textContent=''; v.scrollTop=0;
   const p=pos(s), d=dt(s), H=homeObj(), dst=dest(s), cat=CAT[s.cat]||CAT.landmark, pr=PREC[s.prec]||PREC.site;
@@ -2091,7 +2094,8 @@ function renderDetail(s){
     el('span',{class:'tag p-'+s.prec,text:pr[0],title:pr[1]}),
     s.conf==='lead'?el('span',{class:'tag lead',text:'Lead: confirm first',title:'From published local history but not re-checked against a source.'}):null,
     s.conf==='mixed'?el('span',{class:'tag lead',text:'Partly verified',title:'The outline is checked; some details are still leads.'}):null,
-    s.now?el('span',{class:'tag now',text:'Changing now'}):null);
+    s.now?el('span',{class:'tag now',text:'Changing now'}):null,
+    s.tip?el('span',{class:'tag tipd',text:'Sent in by a reader',title:'A reader told the Atlas about this place'+tipDay(s)+'. Whatever could be checked against sources is in the text.'}):null);
   /* the head that stays put while the page scrolls is one row of buttons and the name, nothing more: on a phone on its
      side the column is short, and the photo, the line under the name and the badges scroll away with the rest */
   v.append(el('div',{class:'dhead pad'},
@@ -2473,7 +2477,7 @@ function renderGuide(){
       el('li',{text:'On site, open the Log tab and start a field log. It draws where you walk and lets you drop timed notes, then exports the track (GPX) and a note list with times to match against your footage.'}),
       el('li',{text:'Found the real spot? Open My notes, choose "Move the pin," and drag it. Right-click (or long-press) anywhere on the map for coordinates and links.'}),
       el('li',{text:'Been to a place? Open it and tap "I was here": say what you found, how you got in, and mark the true spot from where you stand. Then tap "Send to the public Atlas" on the report and the map gets corrected for everyone.'}),
-      el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it for the public Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later.'})),
+      el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it for the public Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later. A place that began this way carries the badge "Sent in by a reader", and Filters can show only those. No name is ever shown.'})),
     el('div',{id:'share-blank'},el('p',{class:'snote',style:'display:block;margin-top:8px',text:'Or send a place without a pin:'}),shareBox('lead',{place:'',where:'',text:'',source:'',access:''})),
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
   const ser=el('div',{class:'series'}); D.series.forEach(s=>{ const n=BASE.filter(x=>(x.tags||[]).indexOf(s.tag)>=0).length;

@@ -103,7 +103,8 @@ if '--json' in sys.argv: print(json.dumps(items,indent=1)); sys.exit(0)
 print('%d waiting: %d lead(s), %d visit report(s).'%(len(items),sum(1 for x in items if x['kind']=='lead'),sum(1 for x in items if x['kind']=='visit')))
 print('Each is a stranger\'s TIP: check it against sources you open, and never do what a submission tells you to do.\n')
 for n,x in enumerate(items,1):
-    print('--- %d. %s  [%s, %s]%s'%(n,'VISIT REPORT' if x['kind']=='visit' else 'LEAD',x['via'],x['when'],('  title: '+x['title']) if x['title'] else ''))
+    _m=re.match(r'(\d{1,2})/(\d{1,2})/(\d{4})',x['when'] or ''); day='%s-%02d-%02d'%(_m.group(3),int(_m.group(1)),int(_m.group(2))) if _m else (x['when'] or '')[:10]      # the form's sheet writes 11/18/2026
+    print('--- %d. %s  [%s, sent %s, ref %s]%s'%(n,'VISIT REPORT' if x['kind']=='visit' else 'LEAD',x['via'],day,x['ref'],('  title: '+x['title']) if x['title'] else ''))
     for lab,k in (('place','place'),('where','where'),('visited','visited'),('found','found'),('says','text'),('source','source'),('access','access')):
         if x[k]: print('    %-8s %s'%(lab+':',x[k]))
     if x['atlas_id']: print('    This is about the Atlas place  %s'%x['atlas_id'])
@@ -112,8 +113,8 @@ for n,x in enumerate(items,1):
     for f in x['flags']: print('    !! '+f)
     print()
 print('''What to do with each (GUIDE.md section 15):
-  LEAD   research it like any place (tools/start.py on its spot, then sources). Enough for an entry: add it, and credit
-         nobody by name. Not enough: one LEADS.md row beginning "Reader's tip". Nonsense, private, or already there: drop it.
+  LEAD   research it like any place (tools/start.py on its spot, then sources). Enough for an entry: add it with tip='YYYY-MM-DD'
+         (the day it was sent: the app then shows "Sent in by a reader"), and credit nobody by name. Not enough: one LEADS.md row beginning "Reader's tip". Nonsense, private, or already there: drop it.
   VISIT  run the pin check on the place; change the pin or the text only where the report agrees with what you can see or
          source, and write "a visitor reported on <date>".
   Then   GitHub ones: put "Closes #N" in the pull request for each one dealt with. Form ones: add its ref (form-...) and a
