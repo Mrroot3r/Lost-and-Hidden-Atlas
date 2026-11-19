@@ -60,7 +60,7 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   // ---- a long press on the map: the two buttons say which is which
   await p.evaluate(()=>{ const m=window.__atlasMap; m.fire('contextmenu',{latlng:m.getCenter(),containerPoint:m.latLngToContainerPoint(m.getCenter()),originalEvent:{preventDefault(){}}}); }); await p.waitForTimeout(300);
   const pop=await p.evaluate(()=>{ const c=document.querySelector('.leaflet-popup-content'); return c?c.textContent:''; });
-  ok('long press: "+ Add to my places" and "Send this spot to the public Atlas", with a line saying which is which',/\+ Add to my places/.test(pop)&&/Send this spot to the public Atlas/.test(pop)&&/My places stay on this phone/.test(pop)&&!/Add a place here/.test(pop),pop.slice(0,160));
+  ok('long press: "+ Add to my places" and "Send this spot to the public Atlas", with a line saying which is which',/\+ Add to my places/.test(pop)&&/Send this spot to the public Atlas/.test(pop)&&/My places stay on this device/.test(pop)&&!/Add a place here/.test(pop),pop.slice(0,160));
   await p.evaluate(()=>window.__atlasMap.closePopup());
   ok('no script errors',errs.length===0,errs.slice(0,2).join(' | '));
   await b.close(); console.log(fails.length?fails.length+' FAILED':'visit test passed'); process.exit(fails.length?1:0);

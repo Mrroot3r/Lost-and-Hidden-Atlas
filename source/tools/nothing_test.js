@@ -55,6 +55,28 @@ const { chromium } = require('playwright');
   await p.evaluate(()=>{ [...document.querySelectorAll('#filters .chip')].find(b=>b.textContent.trim()==='Nothing visible').click(); }); await p.waitForTimeout(300);
   const ch=await p.evaluate(()=>({n:+document.querySelector('#count').textContent.split(' ')[0],gone:window.__atlasNM.visible().filter(s=>s.st==='gone').length}));
   ok('choosing "Nothing visible" in Filters still shows them',ch.gone===pick.n.gone&&ch.n===pick.n.gone,JSON.stringify(ch));
+  // 3b. the list says how many it is hiding, a search for a hidden place says so, and a stop on the trip is not hidden
+  await p.evaluate(()=>{ [...document.querySelectorAll('#filters .chip')].find(b=>b.textContent.trim()==='Nothing visible').click(); }); await p.waitForTimeout(300);      /* the chip off again */
+  await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); });
+  const gname=await p.evaluate(id=>window.__atlasNM.sites().find(x=>x.id===id).name,pick.gone);
+  await p.fill('#q',gname); await p.waitForTimeout(450);
+  const srch=await p.evaluate(id=>({row:!!document.querySelector('#list li button[data-id="'+id+'"]'),note:(document.querySelector('#list .hidnote')||{}).textContent||''}),pick.gone);
+  ok('searching for a hidden place by name: it is not listed, and the list says a place is hidden',!srch.row&&/with nothing to see (is|are) hidden/.test(srch.note),srch.note);
+  await p.fill('#q',''); await p.waitForTimeout(450);
+  await p.evaluate(()=>{ const m=document.querySelector('#list-more'); if(m) m.click(); }); await p.waitForTimeout(400);
+  const note=await p.evaluate(()=>(document.querySelector('#list .hidnote')||{}).textContent||'');
+  ok('the whole list ends by saying how many are hidden',note.indexOf((pick.n.gone+pick.n.marker)+' places with nothing to see are hidden')===0,note);
+  ({c,p}=await (async()=>{ await c.close(); const c2=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p2=await c2.newPage(); p2.on('pageerror',e=>errs.push(e.message));
+    await c2.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p2.addInitScript(id=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},set:{hideGone:true},trip:[id]})); },pick.gone);
+    await p2.goto(url); await p2.waitForFunction(()=>window.__atlasMap); await p2.waitForTimeout(400); return {c:c2,p:p2}; })());
+  const tr=await p.evaluate(id=>{ const v=window.__atlasNM.visible(); return {in:v.some(s=>s.id===id),others:v.filter(s=>(s.st==='gone'||s.st==='marker')&&s.id!==id).length}; },pick.gone);
+  ok('a stop on the trip stays on the map and in the list though it has nothing to see',tr.in&&tr.others===0,JSON.stringify(tr));
+  await p.evaluate(()=>{ const m=document.querySelector('#list-more'); if(m) m.click(); }); await p.waitForTimeout(400);
+  await p.click('#hid-show'); await p.waitForTimeout(400);
+  const shown=await p.evaluate(()=>({n:window.__atlasNM.visible().filter(s=>s.st==='gone'||s.st==='marker').length,set:JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).set.hideGone,note:!!document.querySelector('#list .hidnote')}));
+  ok('"Show them" switches the setting off and brings them back',shown.n===pick.n.gone+pick.n.marker&&shown.set===false&&!shown.note,JSON.stringify(shown));
+  await p.evaluate(()=>window.__atlasNM.setPref('hideGone',true)); await p.waitForTimeout(300);
   // 4. settings
   await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); }); await p.click('#lb-opt'); await p.waitForTimeout(250);
   await p.evaluate(()=>{ const g=[...document.querySelectorAll('#sheet button')].find(x=>/settings/i.test(x.getAttribute('aria-label')||x.textContent)); if(g) g.click(); }); await p.waitForTimeout(300);

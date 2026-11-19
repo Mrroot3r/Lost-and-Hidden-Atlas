@@ -62,6 +62,14 @@ const { chromium } = require('playwright');
   const sc=await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead'); return Math.round(v.getBoundingClientRect().bottom-h.getBoundingClientRect().bottom); });
   ok('scrolled, three quarters of the column is left to read',sc>=hd.view*0.75,sc+' px under the head of '+Math.round(hd.view));
   await p.screenshot({path:'/tmp/land_780_place_scrolled.png'});
+  { const long=await p.evaluate(()=>{ const S=window.__atlasNM.sites().slice().sort((x,y)=>y.name.length-x.name.length)[0]; location.hash='#'+S.id; return S.name; }); await p.waitForTimeout(700);
+    const fn=await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead h2'), f=v.querySelector('.dintro .fullname'); return {cut:h.scrollHeight>h.clientHeight+2,full:f?f.textContent:null,head:Math.round(v.querySelector('.dhead').getBoundingClientRect().height)}; });
+    ok('a name too long for two lines is cut in the head and given in full just under it',fn.cut&&fn.full===long&&fn.head<=110,JSON.stringify(fn).slice(0,160));
+    await p.screenshot({path:'/tmp/land_780_longname.png'});
+    await p.setViewportSize({width:390,height:844}); await p.waitForTimeout(500);
+    ok('upright, where the name is not cut, it is not written twice',await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead h2'); return h.scrollHeight<=h.clientHeight+2&&!v.querySelector('.dintro .fullname'); }));
+    await p.setViewportSize({width:780,height:360}); await p.waitForTimeout(500);
+    ok('and turned back on its side, the full name returns',await p.evaluate(()=>!!document.querySelector('#v-detail .dintro .fullname'))); }
   // the bars that float on the map sit under the layer bar, not on it
   await p.evaluate(()=>{ for(const id of ['addbar','recbar']) document.getElementById(id).hidden=false; }); await p.waitForTimeout(200);
   const bb=await R('#lbar'), ab=await R('#addbar'), rb=await R('#recbar');

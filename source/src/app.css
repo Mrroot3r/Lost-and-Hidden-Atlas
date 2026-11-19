@@ -124,6 +124,7 @@ button.chip[aria-pressed="true"]:hover{border-color:var(--ink)}
 .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--c,#888);box-shadow:0 0 0 1.5px var(--panel),0 0 0 2.5px rgba(0,0,0,.35)}
 .dot.hollow{background:var(--panel);box-shadow:inset 0 0 0 2.5px var(--c,#888),0 0 0 1px rgba(0,0,0,.3)}
 .dot.star{width:12px;height:12px;border-radius:0;box-shadow:none;clip-path:polygon(50% 2%,62% 36%,98% 37%,70% 58%,80% 95%,50% 75%,20% 95%,30% 58%,2% 37%,38% 36%)}
+.dot.mine{border-radius:1px;transform:rotate(45deg)}
 .stag{display:inline-flex;align-items:center;gap:5px}
 .stag .dot{margin:0}
 .pinkey{margin:8px 0 2px;font-size:12.5px}
@@ -174,6 +175,8 @@ details.filters[open]>summary::after{content:"\2212"}
 .dintro{padding-block:8px 12px;border-bottom:1px solid var(--line)}
 .dintro .sub2{color:var(--mute);margin:0}
 .dintro .dmeta{margin-top:8px}
+.dintro .fullname{margin:0 0 4px;font-weight:600;line-height:1.25}
+.hidnote{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding-block:14px;color:var(--mute);font-size:13.5px;text-align:center}
 .dtop{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
 .dtop .btn{white-space:nowrap}
 .dtop-r{display:flex;gap:6px;margin-left:auto}
@@ -249,13 +252,15 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .pin.sq.my-ok .o{stroke:rgba(26,150,65,.9);stroke-width:7}
 .pin.sq.my-asked .o{stroke:rgba(224,138,0,.9);stroke-width:7}
 .pin.sq.now{animation:none}
+.pin.sq .p{fill:none;stroke:rgb(240,120,30);stroke-linejoin:round;animation:starpulse 2.2s ease-out infinite}
+@keyframes starpulse{0%{stroke-width:5;stroke-opacity:.75}100%{stroke-width:17;stroke-opacity:0}}
 .zfar .pin.sq{width:15px;height:15px;margin:3.5px}
 .pin.mine{border-radius:2px;transform:rotate(45deg)}
 .pin.my-filmed,.pin.my-skip{opacity:.45}
 .pin.sel{outline:3px solid var(--accent);outline-offset:3px}
 .pin.now{animation:pulse 2.2s ease-out infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 0 0 rgba(240,120,30,.7)}100%{box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 0 12px rgba(240,120,30,0)}}
-@media (prefers-reduced-motion:reduce){.pin.now{animation:none;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 0 4px rgba(240,120,30,.6)}}
+@media (prefers-reduced-motion:reduce){.pin.now{animation:none;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 0 4px rgba(240,120,30,.6)} .pin.sq.now{box-shadow:none} .pin.sq .p{animation:none;stroke-width:9;stroke-opacity:.6}}
 .zfar .pin{width:10px;height:10px;margin:6px;border-width:1.5px}
 .zfar .pin.hollow{border-width:2.5px}
 .homepin{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--panel);font-family:var(--fc);font-weight:700;font-size:12px;border:2px solid var(--pinring);box-shadow:0 1px 3px rgba(0,0,0,.5)}
@@ -363,8 +368,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .gpsdot{width:18px;height:18px;border-radius:50%;background:#1f6feb;border:3px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1.5px rgba(0,0,0,.5),0 0 0 5px rgba(31,111,235,.25)}
 .gpsdot.stale{background:#8a9099;box-shadow:0 0 0 1.5px rgba(0,0,0,.5)}
 .notepin{width:22px;height:22px;border-radius:5px;background:var(--trk,#2563eb);border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.55);color:#fff;font:700 11px/18px system-ui,sans-serif;text-align:center}
-#recbar{left:calc(10px + env(safe-area-inset-left,0px));top:calc(74px + env(safe-area-inset-top,0px));padding:6px 8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:min(340px,calc(100% - 20px));border-color:var(--trk,#2563eb)}
-#recbar .recdot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--trk,#2563eb);animation:recblink 1.4s infinite}
+#recbar{left:calc(10px + env(safe-area-inset-left,0px));top:calc(74px + env(safe-area-inset-top,0px));padding:6px 8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:min(340px,calc(100% - 20px));border-color:var(--trk-ui,var(--trk,#2563eb))}
+#recbar .recdot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--trk-ui,var(--trk,#2563eb));animation:recblink 1.4s infinite}
 @keyframes recblink{50%{opacity:.25}}
 @media (prefers-reduced-motion:reduce){#recbar .recdot{animation:none}}
 #rec-t{font-size:12.5px}
@@ -375,7 +380,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .logitem summary{cursor:pointer;font-size:13px;color:var(--mute)}
 .lognotes{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:5px}
 .lognotes li{display:flex;gap:10px;font-size:14px;align-items:center;min-height:40px;padding:4px 8px;border-radius:8px;cursor:pointer}
-.lognotes li:active,.lognotes li.on{background:rgba(37,99,235,.16);background:color-mix(in srgb,var(--trk,#2563eb) 18%,transparent)}
+.lognotes li:active,.lognotes li.on{background:rgba(37,99,235,.16);background:color-mix(in srgb,var(--trk-ui,var(--trk,#2563eb)) 18%,transparent)}
 .lognotes li.nopin{opacity:.6}
 .lognotes .num{flex:none;min-width:22px;height:22px;border-radius:5px;background:var(--trk,#2563eb);color:#fff;font:700 11px/22px system-ui,sans-serif;text-align:center}
 .lognotes .mono{color:var(--mute);flex:none}
@@ -445,7 +450,7 @@ details>.phs{margin:8px 0 0}
 .nmitem{align-items:center}
 .nmitem small .sw{width:10px;margin-right:5px}
 .nmarrow{display:inline-flex;width:26px;height:26px;align-items:center;justify-content:center;color:var(--ink);flex:none;transition:transform .15s linear}
-.nmarrow.big{width:64px;height:64px;color:var(--trk,#2563eb)}
+.nmarrow.big{width:64px;height:64px;color:var(--trk-ui,var(--trk,#2563eb))}
 .nmitem .mins{font-size:13.5px;color:var(--ink)}
 .nmitem .mins i{color:var(--mute)}
 #near-goal:not([hidden]){display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;align-items:center;padding:10px 14px;border-block:1px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:2}
@@ -518,7 +523,7 @@ details>.phs{margin:8px 0 0}
   #sheet>header{padding:8px 14px} #sheet-b{padding:2px 14px 18px}
 }
 .dphoto{margin:10px 0 0}
-.dphoto img{display:block;width:100%;max-height:240px;object-fit:cover;border-radius:8px;background:var(--chip)}
+.dphoto img{display:block;width:100%;height:auto;max-height:240px;object-fit:cover;border-radius:8px;background:var(--chip)}
 .dphoto figcaption{margin-top:4px;font-size:11.5px;line-height:1.35;color:var(--mute)}
 .dphoto figcaption a{color:var(--mute)}
 /* a phone on its side: the column is short, so the head that stays put is as thin as it can be */
