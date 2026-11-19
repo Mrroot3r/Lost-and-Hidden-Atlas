@@ -44,6 +44,17 @@ const { chromium } = require('playwright');
     ok(name+': "Change start place" opens Settings at the start place',await vis('#set-home'));
     await p.selectOption('#set-home','bost'); await p.waitForTimeout(400);
     ok(name+': choosing a start city there changes the drive time',await p.evaluate(()=>/from Boston/.test(document.querySelector('.times .time').textContent)));
+    // standing places are stars on the map and in the list; the layer bar ends in an arrow, not a cut-off button
+    { const r=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent).sites, by={}; D.forEach(x=>{ by[x.id]=x; });
+        const pins=[...document.querySelectorAll('.leaflet-marker-pane .pin')], st=pins.filter(n=>n.classList.contains('sq')), bad=st.filter(n=>n.tagName.toLowerCase()!=='svg').length;
+        const rows=[...document.querySelectorAll('#list li button[data-id]')].slice(0,40), wrong=rows.filter(b=>(by[b.dataset.id]||{}).st==='standing'&&!b.querySelector('.dot.star')).length;
+        const mo=document.querySelector('#lbar .lmore'), sc=document.querySelector('#lscroll');
+        return {stars:st.length,bad,wrong,arrow:!!mo&&!mo.hidden,more:sc.scrollWidth>sc.clientWidth+4}; });
+      ok(name+': standing places are stars on the map and in the list',r.bad===0&&r.wrong===0,r.stars+' stars on the map');
+      if(r.more) ok(name+': the layer bar shows an arrow where more layers are off the edge',r.arrow);
+      if(r.more){ await p.evaluate(()=>{ const sc=document.querySelector('#lscroll'); sc.scrollLeft=sc.scrollWidth; }); await p.waitForTimeout(250);
+        ok(name+': and the arrow goes once the bar is scrolled to its end',await p.evaluate(()=>document.querySelector('#lbar .lmore').hidden));
+        await p.evaluate(()=>{ document.querySelector('#lscroll').scrollLeft=0; }); } }
     // the age filter: "Standing, from before 1800" lists standing places whose years begin before 1800, and no others
     { await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
       await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(b=>b.textContent==='Standing, from before 1800').click(); }); await p.waitForTimeout(300);

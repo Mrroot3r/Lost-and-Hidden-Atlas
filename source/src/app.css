@@ -123,7 +123,13 @@ button.chip:hover{border-color:var(--mute)}
 button.chip[aria-pressed="true"]:hover{border-color:var(--ink)}
 .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--c,#888);box-shadow:0 0 0 1.5px var(--panel),0 0 0 2.5px rgba(0,0,0,.35)}
 .dot.hollow{background:var(--panel);box-shadow:inset 0 0 0 2.5px var(--c,#888),0 0 0 1px rgba(0,0,0,.3)}
-.dot.sq{border-radius:2px}
+.dot.star{width:12px;height:12px;border-radius:0;box-shadow:none;clip-path:polygon(50% 2%,62% 36%,98% 37%,70% 58%,80% 95%,50% 75%,20% 95%,30% 58%,2% 37%,38% 36%)}
+.stag{display:inline-flex;align-items:center;gap:5px}
+.stag .dot{margin:0}
+.pinkey{margin:8px 0 2px;font-size:12.5px}
+.pinkey .lkhint{color:var(--mute)}
+.lmore{position:absolute;top:0;bottom:0;width:30px;border:0;padding:0 0 0 6px;font-size:26px;line-height:1;color:var(--ink);background:linear-gradient(90deg,transparent,var(--panel) 45%);z-index:2}
+.lmore[hidden]{display:none}
 .tag{font-family:var(--fc);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:1px 6px;background:var(--chip);color:var(--mute);white-space:nowrap}
 .tag.now{background:var(--warn-soft);color:var(--warn)}
 .tag.lead{background:var(--warn-soft);color:var(--warn)}
@@ -231,7 +237,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .pinwrap{background:none;border:0}
 .pin{display:block;width:16px;height:16px;margin:3px;border-radius:50%;background:var(--c,#888);border:2px solid var(--pinring);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.5)}
 .pin.hollow{background:#fff;border:3.5px solid var(--c,#888);box-shadow:0 0 0 1px rgba(0,0,0,.6),0 1px 3px rgba(0,0,0,.5)}
-.pin.sq{border-radius:3px}
+.pin.sq{width:22px;height:22px;margin:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
+.pin.sq .o{fill:none;stroke:rgba(0,0,0,.65);stroke-width:5;stroke-linejoin:round}
+.pin.sq .f{fill:var(--c);stroke:var(--pinring);stroke-width:2;stroke-linejoin:round}
+.pin.sq.sel{outline:none;filter:drop-shadow(0 0 2px var(--accent)) drop-shadow(0 0 3px var(--accent))}
+.pin.sq.my-ok .o{stroke:rgba(26,150,65,.9);stroke-width:7}
+.pin.sq.my-asked .o{stroke:rgba(224,138,0,.9);stroke-width:7}
+.pin.sq.now{animation:none}
+.zfar .pin.sq{width:15px;height:15px;margin:3.5px}
 .pin.mine{border-radius:2px;transform:rotate(45deg)}
 .pin.my-filmed,.pin.my-skip{opacity:.45}
 .pin.sel{outline:3px solid var(--accent);outline-offset:3px}
@@ -320,7 +333,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   #map{inset:0 0 var(--barh) 0}
   #swipe{bottom:var(--barh)} #swipe .side{top:10px}
   #lbar{top:auto;left:0;right:0;bottom:0;max-width:none;height:var(--barh);border-radius:0;border-width:1px 0 0;box-shadow:none}
-  #lbar .lscroll{flex:1;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);padding-right:18px}
+  #lbar .lscroll{flex:1;padding-right:30px}
   .lb{min-width:52px;height:53px}
   #lb-big{display:flex}
   #addbar{top:10px}

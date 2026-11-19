@@ -13,11 +13,11 @@ const topoImg=s=>{ if(!s||!s.tm) return null; if(HOSTED) return 'topo/'+s.id+'.w
 function topoSrc(s){ if(!s||!s.tm) return Promise.resolve(null); if(AT) return AT.topo(s.id,s.tm.v).catch(()=>null); return Promise.resolve(topoImg(s)); }
 function topoWarm(list){ if(!HOSTED) return; list.forEach(x=>{ if(AT){ topoSrc(x); return; } const u=topoImg(x); if(u) fetch(u).catch(()=>{}); }); }
 
-const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Rail, trolley & bridges','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],burial:['Burial grounds','#6b4fa0'],town:['Ghost & drowned towns','#2e9e4a'],civic:['Downtown losses','#c79a00'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Standing landmarks','#8a8f94'],lidar:['LiDAR finds, unverified','#00a88f']};
+const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Rail, trolley & bridges','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],burial:['Burial grounds','#6b4fa0'],town:['Ghost & drowned towns','#2e9e4a'],civic:['Downtown losses','#5c6bc0'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Standing landmarks','#f2b705'],lidar:['LiDAR finds, unverified','#00a88f']};
 const ST={ruins:'Ruins you can see',traces:'Traces: grades, piers, earthworks',standing:'Still standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STS={ruins:'Ruins',traces:'Traces',standing:'Standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STRANK={ruins:0,standing:1,traces:2,marker:3,gone:4,water:5};
-const PREC={exact:['Pin: exact','On the structure or marker itself, within about 30 m.',30],site:['Pin: on site','Inside the documented footprint, within about 150 m.',150],area:['Pin: approximate','Right vicinity, but the exact spot is not established. Scout it with the old map and LiDAR first.',500]};
+const PREC={exact:['Pin on the spot','On the structure or marker itself, within about 30 m.',30],site:['Pin within the site','Inside the documented footprint, within about 150 m.',150],area:['Pin approximate','Right vicinity, but the exact spot is not established. Scout it with the old map and LiDAR first.',500]};
 const ACC={public:'Public land or street',view:'View from the public way',ask:'Ask permission first',permit:'Permit required',boat:'On the water'};
 const EFF={drive:'Drive-up',walk:'Short walk',hike:'Hike',boat:'Boat or shore view'};
 const MY={'':'Not started',todo:'Want to scout',scouted:'Scouted online',asked:'Asked the owner',ok:'Have permission',visited:'Visited',filmed:'Filmed',skip:'Skip'};
@@ -269,7 +269,7 @@ function startCard(must){ const pick=()=>{ openSettings(); setTimeout(()=>{ cons
       el('button',{class:'btn sm',type:'button',id:'sc-me',onclick:()=>{ if(!map){ banner('Your location needs the map, and the map has not loaded. Choose a place instead.',true,7000); return; } if(geo.id===null){ geo.wide=true; locate(); } }},'Use my location'),
       el('button',{class:'btn sm',type:'button',id:'sc-pick',onclick:pick},'Choose a place'),
       must?null:el('button',{class:'later',type:'button',id:'sc-no',onclick:()=>{ U.ui.noStart=1; save(); renderList(); }},'Not now'))); }
-function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' sq':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
+function dot(s){ return el('span',{class:'dot'+(HOLLOW[s.st]?' hollow':'')+(s.st==='standing'?' star':''),style:'--c:'+((CAT[s.cat]||CAT.landmark)[1])}); }
 function renderList(){
   listFrom=nearFrom();
   { const o=$('#sort').options[0], n=homeObj().name||'your start'; o.textContent=nearAt?'Nearest to you':!homePicked()?'Nearest first':'Nearest to '+(n.length>20?n.slice(0,19)+'…':n); }
@@ -718,6 +718,10 @@ function buildBar(){
   fx.append(el('button',{class:'lb',type:'button',id:'lb-loc',title:'Show where I am','aria-label':'Show where I am','aria-pressed':String(geo.id!==null),onclick:()=>{ if(map) locate(); }},ico('loc'),el('span',{class:'lt',text:'Me'})));
   const big=$('#app').classList.contains('mapbig');
   fx.append(el('button',{class:'lb',type:'button',id:'lb-big',title:'Make the map fill the screen','aria-label':big?'Show the list':'Bigger map',onclick:()=>{ $('#app').classList.toggle('mapbig'); buildBar(); if(map) setTimeout(()=>map.invalidateSize(),60); }},ico(big?'list':'big'),el('span',{class:'lt',text:big?'List':'Full'})));
+  const mo=el('button',{class:'lmore',type:'button','aria-label':'More layers',title:'More layers',onclick:()=>sc.scrollBy({left:sc.clientWidth*0.7,behavior:'smooth'})},'›');
+  const old=$('#lbar .lmore'); if(old) old.remove(); $('#lbar').append(mo);
+  const fit=()=>{ mo.style.right=fx.offsetWidth+'px'; mo.hidden=sc.scrollLeft+sc.clientWidth>=sc.scrollWidth-4; };
+  sc.onscroll=fit; if(!buildBar.rs){ buildBar.rs=true; window.addEventListener('resize',()=>{ const m=$('#lbar .lmore'); if(m) m.style.right=$('#lfix').offsetWidth+'px'; }); } requestAnimationFrame(fit); setTimeout(fit,400);
   syncBar(); }
 function syncBar(){ BAR.forEach(b=>{ const n=document.getElementById('lb-'+b[0]); if(n) n.setAttribute('aria-pressed',String(barState(b[0]))); }); if(!$('#sheet').hidden) buildSheet(); }
 let sheetMode='map';
@@ -792,6 +796,7 @@ function buildSheet(){
   /* the sheet lists every switch and nothing else; the small print under each shows only when asked for */
   lb.append(el('button',{class:'btn sm',id:'sheet-tips',type:'button','aria-pressed':String(!!U.ui.tips),onclick:()=>{ U.ui.tips=!U.ui.tips; save(); buildSheet(); }},U.ui.tips?'Hide the explanations':'What do these do?'));
   const H=t=>el('h3',{text:t}), note=t=>el('small',{class:'snote',text:t});
+  lb.append(el('div',{class:'legend pinkey'},el('span',null,el('span',{class:'dot star',style:'--c:var(--mute)'}),'Standing'),el('span',null,el('span',{class:'dot',style:'--c:var(--mute)'}),'Ruins or traces'),el('span',null,el('span',{class:'dot hollow',style:'--c:var(--mute)'}),'Nothing left'),el('span',{class:'lkhint',text:'Colour: the kind of place'})));
   const ck=(id,on,label,sub,fn)=>el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!on,onchange:e=>fn(e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null));
   if(schematic){ lb.append(el('p',{style:'margin:8px 0 0',text:LOCAL?'Live imagery could not load, so the map is showing a built-in outline. Old-map overlays and every scouting link still work. Reload when you are back online.':'This online copy cannot load live imagery, so the map is a built-in outline. Old-map overlays and every scouting link still work. Open the Atlas file, or host it, for satellite, leaf-off, LiDAR, public land and owner lookups.'})); }
   else {
@@ -1876,10 +1881,14 @@ function resumeLog(){
   else { l.t1=lastT; delete U.rec; saveNow(); } }
 
 /* markers */
+const STARD='M12.00,1.60 L14.76,8.80 L22.46,9.20 L16.47,14.05 L18.47,21.50 L12.00,17.30 L5.53,21.50 L7.53,14.05 L1.54,9.20 L9.24,8.80Z';
 function pinIcon(s){
   const c=['pin']; if(HOLLOW[s.st]) c.push('hollow'); if(s.st==='standing') c.push('sq'); if(s.now) c.push('now'); if(s.mine) c.push('mine');
   const my=U.status[s.id]; if(my) c.push('my-'+my); if(sel&&sel.id===s.id) c.push('sel');
-  return L.divIcon({className:'pinwrap',html:'<span class="'+c.join(' ')+'" style="--c:'+((CAT[s.cat]||CAT.landmark)[1])+'"></span>',iconSize:[22,22],iconAnchor:[11,11]});
+  const col=(CAT[s.cat]||CAT.landmark)[1];
+  /* a standing place is a star (an outline drawn under the fill, so it reads on any aerial); the rest are round */
+  if(s.st==='standing') return L.divIcon({className:'pinwrap',html:'<svg class="'+c.join(' ')+'" viewBox="0 0 24 24" style="--c:'+col+'"><path class="o" d="'+STARD+'"/><path class="f" d="'+STARD+'"/></svg>',iconSize:[22,22],iconAnchor:[11,11]});
+  return L.divIcon({className:'pinwrap',html:'<span class="'+c.join(' ')+'" style="--c:'+col+'"></span>',iconSize:[22,22],iconAnchor:[11,11]});
 }
 /* Zoomed out to town level or wider, pins that would sit on top of each other are replaced by one numbered disc.
    A cell of the screen with four or more pins becomes a disc; the selected place always keeps its own pin. */
@@ -1998,7 +2007,7 @@ function renderDetail(s){
   /* head */
   const tags=el('div',{class:'dmeta'},
     el('span',{class:'chip'},dot(s),s.mine?'My place · '+cat[0]:cat[0]),
-    el('span',{class:'tag',text:STS[s.st],title:ST[s.st]}),
+    el('span',{class:'tag stag',title:ST[s.st]},dot(s),STS[s.st]),
     el('span',{class:'tag p-'+s.prec,text:pr[0],title:pr[1]}),
     s.conf==='lead'?el('span',{class:'tag lead',text:'Lead: confirm first',title:'From published local history but not re-checked against a source.'}):null,
     s.conf==='mixed'?el('span',{class:'tag lead',text:'Partly verified',title:'The outline is checked; some details are still leads.'}):null,
@@ -2362,12 +2371,12 @@ function renderGuide(){
   const P=t=>el('p',{text:t});
   const cats=el('div',{class:'legend'}); Object.keys(CAT).forEach(k=>cats.append(el('span',null,el('span',{class:'dot',style:'--c:'+CAT[k][1]}),CAT[k][0])));
   const shapes=el('div',{class:'legend',style:'margin-top:8px'},
-    el('span',null,el('span',{class:'dot',style:'--c:#666'}),'Solid: something to see'),
-    el('span',null,el('span',{class:'dot hollow',style:'--c:#666'}),'Hollow: nothing left'),
-    el('span',null,el('span',{class:'dot sq',style:'--c:#666'}),'Square: still standing'),
+    el('span',null,el('span',{class:'dot star',style:'--c:#666'}),'Star: still standing'),
+    el('span',null,el('span',{class:'dot',style:'--c:#666'}),'Solid circle: ruins or traces'),
+    el('span',null,el('span',{class:'dot hollow',style:'--c:#666'}),'Ring: nothing left, a marker, or under water'),
     el('span',null,el('span',{class:'dot',style:'--c:#666;border-radius:1px;transform:rotate(45deg)'}),'Diamond: a place you added'));
   v.append(sec('How to find a ruin with this',true,[
-    P('Every pin carries an honest rating. "Exact" means it sits on the structure or marker. "On site" means it is inside the footprint. "Approximate" means the right vicinity only, and the dashed ring on the map shows how far off it could be.'),
+    P('Every pin carries an honest rating. "Pin on the spot" means it sits on the structure or marker. "Pin within the site" means it is inside the footprint. "Pin approximate" means the right vicinity only, and the dashed ring on the map shows how far off it could be.'),
     el('ul',null,
       el('li',{text:'Pick a place, then tick "Lay the old USGS map over the pin." Sheets from the 1890s to 1930s draw the hotels, trolley spurs and villages that are gone.'}),
       el('li',{text:'Switch the map to Leaf-off aerial. New York flies in early spring, so foundations and cellar holes show through bare trees.'}),
