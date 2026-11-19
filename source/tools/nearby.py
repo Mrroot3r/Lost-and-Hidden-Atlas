@@ -4,7 +4,8 @@
 Prints 1. places already in the Atlas there (do not add them again);
        2. unchecked leads the Atlas already carries there: OpenStreetMap ruins and old sites, vanished places from the
           federal names file, old mines and quarries. A named lead is a ready-made starting point: it has a coordinate,
-          so all it needs is a source and an owner. (Leads exist only for the states that have those layers.)
+          so all it needs is a source and an owner. (All three kinds cover every state; the OpenStreetMap leads cover the
+          ten provinces too, the other two do not.)
        3. a reminder to read LEADS.md for the same towns.
 Run it from the workspace. It builds the place list itself if setup has not."""
 import sys,json,math,os,re
