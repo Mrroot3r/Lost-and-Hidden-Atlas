@@ -59,7 +59,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={quietGone:true,hideGone:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={wikiPhotos:true,quietGone:true,hideGone:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -755,6 +755,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     pick('theme','Colours',[['auto','Follow the phone: light by day, dark by night'],['light','Always light'],['dark','Always dark']]),
     pick('themeL','Light colours',THEMES.filter(t=>t[2]==='l')),
     pick('themeD','Dark colours',THEMES.filter(t=>t[2]==='d')),
+    tog('wikiPhotos','Photos from Wikipedia on place pages','Fetched from the place\'s Wikipedia article when you open it, with the photographer\'s credit. Off saves data on a weak signal.'),
     pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
     pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
     el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),
@@ -2000,6 +2001,56 @@ function select(s,fly){
 }
 function deselect(){ sel=null; drawSel(); showHist(); syncMarkers(); showView('list'); renderList(); try{ history.replaceState(null,'','#'); }catch(e){} }
 
+/* ---- a photo at the top of a place page ----
+   Taken when the page opens from the place's Wikipedia article: the picture Wikipedia itself chose for the article
+   (pageimages, free licences only), shown only when the article is about this place (photoFits: coordinates near the
+   pin, which also keeps out a person's portrait, and a shared word in the names), and only when the file's page (asked of
+   Wikipedia, which answers for Commons files too) gives the photographer and licence for the credit.
+   Drawings of maps, seals and flags (an .svg file, or a name that says so) are skipped. Setting: wikiPhotos. */
+const PHOTO=new Map();
+function wikiTitle(s){ for(const l of s.links||[]){ const u=Array.isArray(l)?l[1]:String(l); const m=/^https?:\/\/en\.(?:m\.)?wikipedia\.org\/wiki\/([^#?]+)/.exec(u||''); if(!m) continue;
+    let t; try{ t=decodeURIComponent(m[1]).replace(/_/g,' '); }catch(e){ continue; }
+    if(/^(list of|lists of|national register of historic places listings)/i.test(t)||t.includes(':')) continue;   /* a list's picture is of some other place */
+    return t; } return null; }
+/* the photographer's name out of Commons' Artist field, which is HTML and sometimes a whole banner: parsed with DOMParser,
+   which loads none of the images in it; a long banner gives way to its first link to a user page */
+/* is the article about this place? Many places link the article on their town, whose picture is a skyline. So the
+   article's coordinates must be within 1 km of the pin, and its title must share a word with the place's names that is
+   not a word of the town, the state or a common word of building names. */
+const PH_COMMON=new Set('the and of at on in new york north south east west upper lower old great little county city town village historic district site former saint street avenue road park building house hall church school mill works company station state national'.split(' '));
+const phWords=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/[^a-z0-9]+/).filter(w=>w.length>=3&&!PH_COMMON.has(w));
+function photoFits(s,title,co){ if(!co||!isFinite(co.lat)||!isFinite(co.lon)) return false;
+  if(L.latLng(s.lat,s.lon).distanceTo([co.lat,co.lon])>1000) return false;
+  const all=t=>' '+String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/&/g,' and ').split(/[^a-z0-9]+/).filter(Boolean).join(' ')+' ';
+  const tt=all(title.replace(/\s*\(.*\)\s*$/,''));
+  if(tt.trim().includes(' ')&&(all(s.name).includes(tt)||all(s.name2).includes(tt))) return true;   /* the whole title is in the name: Altamont station */
+  const town=new Set(phWords(s.town)), mine=new Set([...phWords(s.name),...phWords(s.name2)].filter(w=>!town.has(w)));
+  return phWords(title.replace(/\s*\(.*\)\s*$/,'')).some(w=>!town.has(w)&&mine.has(w)); }
+function photoBy(h){ const d=new DOMParser().parseFromString('<body>'+String(h||'')+'</body>','text/html').body; const t=(d.textContent||'').replace(/\s+/g,' ').trim();
+  if(t&&t.length<=70) return t;
+  const a=[...d.querySelectorAll('a')].find(x=>/User:/.test(x.getAttribute('href')||'')&&(x.textContent||'').trim()); return a?a.textContent.replace(/\s+/g,' ').trim().slice(0,70):''; }
+function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
+  const t=wikiTitle(s); if(!t) return Promise.resolve(null);
+  const q=(base,o)=>fetch(base+'?'+new URLSearchParams(Object.assign({action:'query',format:'json',origin:'*'},o))).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); });
+  const pr=q('https://en.wikipedia.org/w/api.php',{redirects:'1',prop:'pageimages|coordinates',piprop:'thumbnail|name',pithumbsize:'900',pilicense:'free',titles:t}).then(j=>{
+      const pg=Object.values((j.query||{}).pages||{})[0]||{};
+      if(!pg.coordinates||!pg.thumbnail||!pg.pageimage||!photoFits(s,pg.title||t,pg.coordinates[0])) return null;
+      if(/\.svg$/i.test(pg.pageimage)||/(^|[^a-z])(map|locator|location|seal|flag|logo|coat[ _]of[ _]arms|diagram|plan)([^a-z]|$)/i.test(pg.pageimage)) return null;
+      return q('https://en.wikipedia.org/w/api.php',{prop:'imageinfo',iiprop:'extmetadata|url',iiextmetadatafilter:'Artist|LicenseShortName',titles:'File:'+pg.pageimage}).then(c=>{   /* Wikipedia answers for Commons files too: one site to ask */
+        const f=Object.values((c.query||{}).pages||{})[0]||{}, ii=(f.imageinfo||[])[0], m=ii&&ii.extmetadata||{};
+        const who=photoBy((m.Artist||{}).value), lic=photoBy((m.LicenseShortName||{}).value);
+        if(!ii||!who||!lic) return null;           /* no credit, no picture */
+        return {src:pg.thumbnail.source,w:pg.thumbnail.width,h:pg.thumbnail.height,who:who,lic:lic,page:ii.descriptionurl||('https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(pg.pageimage)),where:/commons\.wikimedia\.org/.test(ii.descriptionurl||'commons.wikimedia.org')?'Wikimedia Commons':'Wikipedia',title:pg.title}; }); })
+    .catch(()=>{ PHOTO.delete(s.id); return null; });   /* a failure is asked again next time */
+  PHOTO.set(s.id,pr); return pr; }
+function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false||!wikiTitle(s)) return null;
+  const box=el('figure',{class:'dphoto',hidden:true});
+  placePhoto(s).then(ph=>{ if(!ph||!box.isConnected) return;
+    const img=el('img',{src:ph.src,alt:'Photograph from the Wikipedia article '+ph.title,loading:'lazy',decoding:'async'});
+    img.addEventListener('error',()=>{ box.hidden=true; });
+    box.append(img,el('figcaption',null,'From Wikipedia\'s article on '+ph.title+'. Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where)));
+    box.hidden=false; });
+  return box; }
 function renderDetail(s){
   const v=$('#v-detail'); v.textContent=''; v.scrollTop=0;
   const p=pos(s), d=dt(s), H=homeObj(), dst=dest(s), cat=CAT[s.cat]||CAT.landmark, pr=PREC[s.prec]||PREC.site;
@@ -2018,6 +2069,7 @@ function renderDetail(s){
       el('div',{class:'row',style:'gap:6px'},
         el('button',{class:'btn sm'+(inTrip?' on':''),type:'button',onclick:()=>{ const i=U.trip.indexOf(s.id); if(i>=0) U.trip.splice(i,1); else U.trip.push(s.id); save(); $('#trip-n').textContent=U.trip.length; renderDetail(s); }},inTrip?'✓ In trip':'+ Add to trip'),
         map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
+    photoBox(s),
     el('h2',{text:s.name}),
     el('p',{class:'sub2',text:[s.name2,s.town,s.years,s.bk==='y'?'Red brick':s.bk==='s'?'Some red brick':''].filter(Boolean).join(' · ')}),
     tags));
