@@ -29,7 +29,7 @@ N('buttolph-williams-house','Buttolph-Williams House','Wethersfield','cthv','lan
   'A Puritan-era house with diamond-pane windows, three centuries on.',
   'Owned by Connecticut Landmarks and run by the Webb-Deane-Stevens Museum, which sells the tickets (tours start there, 211 Main Street, a few hundred metres away). Wikipedia gives regular tours between May and October; the current days were not checked.',
   [W('Buttolph–Williams House'),L('Connecticut Landmarks: Buttolph-Williams House','https://www.ctlandmarks.org/properties/buttolph-williams-house/'),WDS],brick='no'),
-N('first-church-wethersfield-meetinghouse','First Church of Christ meetinghouse, Wethersfield','Wethersfield','cthv','civic','standing',41.7129,-72.652,'exact','view','drive','','1761',
+N('first-church-wethersfield-meetinghouse','First Church of Christ meetinghouse, Wethersfield','Wethersfield','cthv','worship','standing',41.7129,-72.652,'exact','view','drive','','1761',
   'A Georgian brick meetinghouse with a white steeple, built in 1761 for a congregation founded in 1635; its burying ground goes back to the 1600s. A plaque at the tower door says Washington worshipped here on May 20, 1781, during the Webb House conference. John Adams climbed the steeple in 1774 and called the view the finest he had ever seen.',
   'Red brick walls and the white steeple Adams climbed. The interior was much altered in 1838 and 1882 and put back to its original layout in 1971–73; the church has an Austin organ. The old burying ground is beside it. Interior not checked for visiting hours.',
   'John Adams went up this steeple and called it the best view in the world.',

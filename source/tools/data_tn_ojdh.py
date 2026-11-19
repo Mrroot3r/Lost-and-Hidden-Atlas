@@ -21,7 +21,7 @@ BATCH = {'key': 'tn_ojdh', 'label': 'Tennessee: Rugby, Brushy Mountain and Coal 
 
 PLACES = [
 # ---- Rugby (Morgan and Scott counties) ----
-N('christ-church-episcopal-rugby', 'Christ Church Episcopal, Rugby', 'Rugby', 'tn', 'civic', 'standing', 36.36019, -84.69961, 'exact', 'public', 'walk', '', '1887',
+N('christ-church-episcopal-rugby', 'Christ Church Episcopal, Rugby', 'Rugby', 'tn', 'worship', 'standing', 36.36019, -84.69961, 'exact', 'public', 'walk', '', '1887',
   'The English author Thomas Hughes founded Rugby in 1880 as a colony for the younger sons of the English gentry. Christ Church was chartered by the Episcopal bishop of Tennessee on the colony\'s opening day, October 5, 1880, and its building was finished and opened for services on October 16, 1887. Most of the colony failed, but the church stayed in use, and the 1972 Register form calls it an outstanding example of Carpenter Gothic.',
   'The 1972 Register form says the church looked inside and out as it did when built. It names a stained glass window in the apse, made in Germany in 1887 in memory of Hughes\'s mother Margaret and of the mother of the first rector, and a rosewood reed organ it calls thought to be the oldest still in use in the country. Inside on Historic Rugby\'s guided village tour; whether the glass and organ are as the form describes was not checked.',
   'A Victorian English colony\'s church on the Cumberland Plateau.',
@@ -54,7 +54,7 @@ N('sixteen-tunnel-sunbright', 'Sixteen Tunnel', 'Sunbright', 'tn', 'rail', 'stan
   'Two arched portals of coursed cut limestone with stone wing walls, at the ends of a cut through a narrow ridge, in woods about 0.2 mile east of US 27 near Scott Branch.',
   '', 'Private: the 2017 Register form says the abandoned right-of-way is owned by Norfolk Southern. Ask before going. The active main line runs close by to the east; stay off it. No public way in was found.',
   [NR('100001306', 'Sixteen Tunnel National Register form (2017)')], brick='?'),
-N('wartburg-presbyterian-church', 'Wartburg Presbyterian Church', 'Wartburg', 'tn', 'civic', 'standing', 36.102768, -84.596928, 'site', 'view', 'drive', '', '1883',
+N('wartburg-presbyterian-church', 'Wartburg Presbyterian Church', 'Wartburg', 'tn', 'worship', 'standing', 36.102768, -84.596928, 'site', 'view', 'drive', '', '1883',
   'Wartburg was settled by Swiss and German immigrants; this frame church of 1883 was the house of worship of the town\'s non-German minority. It is a front-gabled Folk Victorian building with a steeple. In 1979 the city leased part of the lot and built the town library beside it.',
   'The 2013 Register form describes a single room with plaster walls, beadboard wainscoting and tongue-and-groove floor and ceiling, original vestibule doors and hardware, chandeliers of 1937, and pews that replaced theatre seats in 1953. Interior visiting not checked.',
   '', 'An active church on the south edge of Wartburg, with a paved lot shared with the public library next door. See it from the street; when it is open to visitors was not checked.',
@@ -80,7 +80,7 @@ N('stonecipher-kelly-house', 'Stonecipher-Kelly House', 'Petros', 'tn', 'landmar
    ['Tennessee State Parks: Frozen Head', 'https://tnstateparks.com/parks/frozen-head']],
   th=[36.07371, -84.49413], thn='Gravel lot on the Frozen Head state land, north-west of the house', brick='?'),
 # ---- Coal Creek valley (Anderson County) ----
-N('briceville-community-church', 'Briceville Community Church', 'Briceville', 'tn', 'civic', 'standing', 36.1785, -84.18312, 'exact', 'view', 'drive', 'cemeteries', '1887',
+N('briceville-community-church', 'Briceville Community Church', 'Briceville', 'tn', 'worship', 'standing', 36.1785, -84.18312, 'exact', 'view', 'drive', 'cemeteries', '1887',
   'Volunteers built this Gothic Revival church in 1887 on a hill in the middle of the mining town. After the Coal Creek War began in 1891 with the seizure of a convict stockade in Briceville, the church served as a temporary jail. It held the memorial services after the Fraterville (1902) and Cross Mountain (1911) mine disasters, and victims of both lie in its cemetery. It was Methodist until 1995 and is now a community building.',
   'A weatherboarded church on a hill seen from most of the town, with the cemetery climbing the slope behind it. The grave of Eugene Ault, a Cross Mountain miner, carries the farewell message he wrote while trapped. Interior not checked.',
   'The miners\' church of the Coal Creek War.',
@@ -117,7 +117,7 @@ N('first-national-bank-huntsville-tn', 'First National Bank of Huntsville', 'Hun
   'A 32-by-22-foot block of rock-faced sandstone with projecting sandstone string courses on every side and a sandstone chimney. Current use not checked.',
   '', 'On the courthouse square. See it from the street; the 1985 form gives the owner as the First National Bank of Oneida.',
   [NR('85001510', 'First National Bank of Huntsville National Register form (1985)')], brick='no'),
-N('barton-chapel-robbins', 'Barton Chapel', 'Robbins', 'tn', 'civic', 'standing', 36.3517, -84.5886, 'site', 'view', 'drive', '', '1926',
+N('barton-chapel-robbins', 'Barton Chapel', 'Robbins', 'tn', 'worship', 'standing', 36.3517, -84.5886, 'site', 'view', 'drive', '', '1926',
   'A Congregational church built in 1926 in the small town of Robbins, a vernacular building with Gothic details. The 1984 Register form found it relatively unaltered.',
   'Brick laid in running bond, a steep roof of flat clay tiles with tile cresting, a large pointed leaded glass window in a stone arch over the entrance, and an open brick belfry with stone trim. The 1984 form describes exposed trusses, a pointed chancel arch, carved wooden pews and a heavy double batten door inside. Interior visiting not checked; the colour of the brick was not checked.',
   '', 'Faces west onto State Route 27, the main road through Robbins. Owned by the Barton Chapel Congregational United Church of Christ according to the 1984 form. See it from the road.',

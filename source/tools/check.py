@@ -11,10 +11,11 @@ T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_byte
 # Before a single place list is run: prove that each one is only data. A list that holds anything else stops the check here.
 import safe_data; safe_data.must(T)
 err=[]; warn=[]
-CAT='amuse hotel canal rail industry burial town civic fort water inst light landmark lidar'.split()
 ST='ruins traces standing marker gone water'.split(); PREC='exact site area'.split()
 ACC='public view ask permit boat'.split(); EFF='drive walk hike boat'.split(); CONF=('', 'verified','mixed','lead')
 app=open(os.path.join(REPO,'source','src','app.js'),encoding='utf-8').read()
+CAT=re.findall(r"(\w+):\['[^']+','#[0-9a-f]{6}'\]",re.search(r'const CAT=\{[^\n]*\};',app).group(0))      # the kinds of place: app.js holds the one list
+if len(CAT)<10: sys.exit('check.py could not read the kinds of place (const CAT) from app.js')
 from states import REG,HUBS,REG_STATE
 OUTL=json.load(open(os.path.join(REPO,'source','build','states.json'))) if os.path.exists(os.path.join(REPO,'source','build','states.json')) else {}
 def _in(r,x,y):
@@ -46,7 +47,7 @@ mk=open(os.path.join(T,'make.py'),encoding='utf-8').read()
 TAGS=set(re.findall(r"^ \['(\w+)',",mk,re.M))|{'now'}
 BOUNDS=[float(x) for x in re.search(r"MAXB=\[\[([\d.,\-\[\]]+)\]\]",app).group(1).replace('[','').replace(']','').split(',')]
 # ---- place lists ----
-ids={}
+ids={}; WAS={}      # WAS: old id -> the place that says it replaces it (was=)
 def seen(i,where):
     if i in ids: err.append(f"duplicate id '{i}' in {where} and {ids[i]}: add a town or state suffix to the new one")
     ids[i]=where
@@ -79,6 +80,13 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         i=p['id']; w=f'{name}:{i}'; seen(i,name)
         if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*',i): err.append(f'{w}: id must be lowercase words joined by hyphens')
         # red brick (GUIDE.md section 4): every place written since November 19, 2026 says yes, some, no, or ? for not checked
+        for _o in ([p['was']] if isinstance(p.get('was'),str) and p.get('was') else list(p.get('was') or [])):      # this entry replaces an older, thinner one for the same place
+            if not isinstance(_o,str) or not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*',_o) or _o==i: err.append(f"{w}: was='{_o}' must be the id of the older entry this one replaces")
+            elif _o in WAS: err.append(f"{w}: was='{_o}', but {WAS[_o]} already replaces it")
+            else: WAS[_o]=w
+        # the kind of place: a church filed as a civic building, or a road bridge as one, is the commonest slip (GUIDE.md section 4 says what each kind holds)
+        if p['cat'] in('civic','landmark','inst') and re.search(r'\b(church|meeting ?house|synagogue|cathedral|basilica|chapel)\b',p['name'],re.I) and not re.search(r'\b(park|street|centre|center|grange|academy|courthouse|museum of|hall, )\b',p['name'],re.I) and _ad[:10]>='2026-11-19': warn.append(f"{w}: the name reads as a place of worship but cat='{p['cat']}'. A church, meeting house, synagogue or chapel is cat='worship', standing or not; keep '{p['cat']}' only if the entry is really about something else")
+        if p['cat']=='civic' and re.search(r'\bbridge\b',p['name'],re.I) and _ad[:10]>='2026-11-19': warn.append(f"{w}: a road or covered bridge is cat='landmark' (a railway bridge is 'rail'), not 'civic'")
         _tip=p.get('tip') or ''      # a place that began as a reader's lead carries the day it was sent (GUIDE.md section 15)
         if _tip and not(re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',_tip) and _tip<=_ad[:10]): err.append(f"{w}: tip='{_tip}' must be the day the reader sent it, as YYYY-MM-DD, and not after the batch's own date")
         _bk=p.get('brick') or ''
@@ -204,6 +212,8 @@ for w in warn: print('warning:',w)
 for e in err: print('ERROR:',e)
 if stamps:
     stamps.sort(); print(f'newest batch: {stamps[-1][1]} ({stamps[-1][0]} UTC). A new batch must be the newest, or the app will not mark its places as new.')
+for _o,_w in WAS.items():      # an entry may replace a landmark pin (lm-...) or an id that is gone from every list; never a full entry that is still in one
+    if _o in ids: err.append(f"{_w}: was='{_o}', but that place is still in {ids[_o]}. was= is for a landmark pin (lm-...) or an entry that has been taken out")
 print(f'{len(ids)} place ids, {len(keys)} batches, {len(warn)} warnings, {len(err)} errors'+(' (sources only: the built site was not checked)' if SRC_ONLY else ''))
 print('(The built site shows about 39 more places than this count: the Albany and Troy landmark pins, ids starting lm-, are made by build_sites.py from the landmark list and are not in a place list. That is expected.)')
 sys.exit(1 if err else 0)

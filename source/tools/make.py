@@ -48,7 +48,7 @@ aerial=[
 V=os.environ.get('ATLAS_V') or datetime.datetime.now().strftime('%y%m%d%H%M')     # ATLAS_V: build under a given version, to see whether anything but the stamp changed
 import sys; sys.path.insert(0,R+'tools')
 from states import STATES
-data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':(os.environ.get('ATLAS_BUILT') or datetime.date.today().strftime('%B %-d, %Y')),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules}
+data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':(os.environ.get('ATLAS_BUILT') or datetime.date.today().strftime('%B %-d, %Y')),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules,'alias':(json.load(open(R+'build/alias.json')) if os.path.exists(R+'build/alias.json') else {})}
 # The old rail and canal lines, cut up for the hosted copy: one file for each state, a thinned picture of them all, and
 # the index of both, which goes in the page data (tools/lines_split.py). The app uses the index only on the hosted copy.
 import lines_split

@@ -106,7 +106,7 @@ N('lewis-and-clark-hotel-mandan','Lewis and Clark Hotel','Mandan','nd','hotel','
   '',
   'Private building at 404 West Main Street, in the Mandan Commercial Historic District. '+TOWN,
   [NR('83001938','Lewis and Clark Hotel'),W('Lewis and Clark Hotel')],brick='no'),
-N('st-johns-church-hebron','German Evangelical St. Johns Church','Hebron','nd','civic','standing',46.90361,-102.04667,'site','view','drive','','1908',
+N('st-johns-church-hebron','German Evangelical St. Johns Church','Hebron','nd','worship','standing',46.90361,-102.04667,'site','view','drive','','1908',
   'A Gothic Revival church built in 1908 for a German congregation from plans by Hancock Brothers of Fargo, by contractor Henry Bomgarten with stonework by Conrad Klick of Hebron, of brick from the Hebron Brick Company five blocks away. It is now St. John United Church of Christ.',
   'Walls of light brown pressed Hebron brick on a sandstone foundation, stepped buttresses capped in dark brown stone, and lancet and traceried stained-glass windows; the 2000 nomination also records its three bells of 1908 with German inscriptions and the pews of the nave. Whether visitors can go in was not checked.',
   '',

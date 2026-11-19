@@ -18,7 +18,7 @@ if not os.path.exists('build/sites.json'):                # a fresh workspace: m
     import subprocess; subprocess.run([sys.executable,os.path.join(os.path.dirname(os.path.abspath(__file__)),'build_sites.py')],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 S=[s for s in json.load(open('build/sites.json')) if d(s['lat'],s['lon'])<=km]
 print(f'== Already in the Atlas within {km:g} km: {len(S)}')
-for s in sorted(S,key=lambda s:d(s['lat'],s['lon'])): print(f"  {d(s['lat'],s['lon']):4.1f} km {comp(s['lat'],s['lon']):2}  {s['id']}  |  {s['name']}, {s['town']}  [{s['st']}/{s['acc']}]")
+for s in sorted(S,key=lambda s:d(s['lat'],s['lon'])): print(f"  {d(s['lat'],s['lon']):4.1f} km {comp(s['lat'],s['lon']):2}  {s['id']}  |  {s['name']}, {s['town']}  [{s['st']}/{s['acc']}]"+("   <- a thin landmark pin from the first catalogue. If you write a full entry for this same place, give yours was='"+s['id']+"' so it replaces the pin (GUIDE.md section 4); do not leave both" if s['id'].startswith('lm-') else ''))
 for f,title in (('leads','OpenStreetMap leads (mapped ruins and old sites)'),('vanished','Vanished places (federal names file)'),('mines','Old mines and quarries (USGS)')):
     p='build/%s.json'%f
     if not os.path.exists(p): continue

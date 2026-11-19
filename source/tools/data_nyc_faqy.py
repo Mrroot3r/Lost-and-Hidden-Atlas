@@ -47,7 +47,7 @@ N('cedarmere-roslyn-harbor','Cedarmere (William Cullen Bryant\'s home)','Roslyn 
   [W('Cedarmere-Clayton Estates'),L('Friends of Cedarmere: about and hours','https://www.friendsofcedarmere.org/about'),RLS('profiles/cedarmere','Cedarmere')],
   th=[40.80781,-73.64239],thn='Nassau County Museum of Art lot, Museum Drive',brick='?'),
 
-N('trinity-church-roslyn','Trinity Church Complex, Roslyn','Roslyn','nyc','civic','standing',40.80502,-73.64464,'exact','view','walk','','1906–',
+N('trinity-church-roslyn','Trinity Church Complex, Roslyn','Roslyn','nyc','worship','standing',40.80502,-73.64464,'exact','view','walk','','1906–',
   'An Episcopal church complex built in 1906 to designs by McKim, Mead & White, one of the firm\'s works for the estate owners of the North Shore. The Roslyn-Trinity Cooperative Day School, founded in 1951, is part of the complex, and a child care centre opened there in 2016. It was listed on the National and State Registers in 1986.',
   'The church and its buildings on Northern Boulevard (NY 25A) at the north edge of the village. Interior not checked.',
   'A McKim, Mead & White parish church for Gold Coast Roslyn.',
@@ -111,7 +111,7 @@ N('sagamore-hill-roosevelt','Sagamore Hill (Theodore Roosevelt\'s home)','Cove N
   [W('Sagamore Hill'),L('NPS: Sagamore Hill hours and seasons','https://www.nps.gov/sahi/planyourvisit/hours.htm')],
   th=[40.88671,-73.49862],thn='Sagamore Hill lot, Sagamore Hill Road',brick='?'),
 
-N('matinecock-friends-meetinghouse','Matinecock Friends Meetinghouse','Matinecock','nyc','civic','standing',40.86638,-73.59426,'exact','view','drive','','1725–',
+N('matinecock-friends-meetinghouse','Matinecock Friends Meetinghouse','Matinecock','nyc','worship','standing',40.86638,-73.59426,'exact','view','drive','','1725–',
   'A Quaker meeting house built in 1725 at Piping Rock and Duck Pond Roads, one of the oldest houses of worship on Long Island in continuous use. Friends Academy, the Quaker school founded in Locust Valley in 1876, still sends students and staff to meeting for worship here. The North Shore Historical Museum opened an exhibit on its 300 years in November 2025.',
   'A shingled meeting house two bays wide and four long, on the north-west corner of Piping Rock and Duck Pond Roads. Interior not checked.',
   'Three hundred years of Quaker meetings in one shingled room.',
@@ -119,7 +119,7 @@ N('matinecock-friends-meetinghouse','Matinecock Friends Meetinghouse','Matinecoc
   [W('Matinecock Friends Meetinghouse'),L('Long Island Press: 300 years of the Matinecock Meetinghouse (November 3, 2025)','https://www.longislandpress.com/2025/11/03/north-shore-historical-museum-unveils-exhibit-celebrating-300-years-of-the-matinecock-quaker-meetinghouse')],
   brick='no'),
 
-N('jericho-friends-meeting-house','Jericho Friends Meeting House and Elias Hicks\'s grave','Jericho','nyc','civic','standing',40.7949,-73.53654,'exact','view','drive','cemeteries','1788–',
+N('jericho-friends-meeting-house','Jericho Friends Meeting House and Elias Hicks\'s grave','Jericho','nyc','worship','standing',40.7949,-73.53654,'exact','view','drive','cemeteries','1788–',
   'A Quaker meeting house of 1788 with the Friends\' schoolhouse of 1793, a large shed of about 1875 and the Friends\' burying ground. The preacher Elias Hicks (1748–1830) helped build the meeting house and is buried in the cemetery. Listed on the Register in 2002.',
   'A two-storey timber-framed meeting house with a gable roof, clad in wood shingles, beside the old schoolhouse, the shed and the burying ground, at 6 Old Jericho Turnpike. Interior not checked.',
   'The meeting house Elias Hicks helped build, with his grave beside it.',

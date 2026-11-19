@@ -26,7 +26,7 @@ N('white-city','White City amusement park site','Shrewsbury','worc','amuse','gon
 N('goddard-launch','Goddard rocket launch site','Auburn','worc','civic','marker',42.21833,-71.81278,'site','ask','walk','','1926',
   'Robert Goddard launched the first liquid-fueled rocket here on March 16, 1926, on what was the Asa Ward farm. The spot is on the ninth fairway of Pakachoag Golf Course.',
   'Two markers; the obelisk on the launch spot is about 1,000 feet southeast of Upland Street.','','Markers can be visited while the golf course is open. 20 Upland Street.',[W('Goddard Rocket Launching Site')]),
-N('old-stone-church','Old Stone Church','West Boylston','worc','town','standing',42.37472,-71.78306,'exact','public','drive','drowned','1891–1902',
+N('old-stone-church','Old Stone Church','West Boylston','worc','worship','standing',42.37472,-71.78306,'exact','public','drive','drowned','1891–1902',
   'Built in 1891 and abandoned in 1902 when the Wachusett Reservoir took the valley. It was left standing at the water\'s edge as the reminder of the town that was moved.',
   'The roofed stone shell on its point in the reservoir.','The only building left of a drowned town centre.','Public reservoir land.',[W('Old Stone Church (West Boylston, Massachusetts)')]),
 N('wachusett-dam','Wachusett Dam and the drowned valley','Clinton','worc','water','standing',42.40361,-71.68778,'exact','public','walk','drowned','1897–1908',

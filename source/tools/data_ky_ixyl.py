@@ -38,7 +38,7 @@ N('shaker-landing-kentucky-river','Shaker Landing and the 1866 stable','Harrodsb
   [['Shaker Village: The River',SVP+'/the-river/'],['Shaker Village: building guide (PDF)',SVP+'/wp-content/uploads/2015/12/Shaker-Village-of-Pleasant-Hill.pdf']],
   brick='?'),
 
-N('old-mud-meeting-house','Old Mud Meeting House','Harrodsburg','ky','civic','standing',37.72403,-84.86308,'site','view','drive','','1800',
+N('old-mud-meeting-house','Old Mud Meeting House','Harrodsburg','ky','worship','standing',37.72403,-84.86308,'site','view','drive','','1800',
   'Low Dutch settlers who came from Pennsylvania in 1781 built this as the first Dutch Reformed church west of the Alleghenies, finished in 1800. The walls are wattle and daub, mud and straw packed into a hewn oak frame. Weatherboards went over them in 1849, and the Harrodsburg Historical Society has owned it since the late 1920s (the Society\'s trust says 1927, the state marker history says deeded August 27, 1928).',
   'A small weatherboarded meeting house with the early Dutch settlers\' graveyard beside it, which the Society also keeps. The original mud walls are under the 1849 siding; the ceiling was lowered and plastered. Interior not checked.',
   'A church with walls of mud and straw, built on the frontier in 1800.',

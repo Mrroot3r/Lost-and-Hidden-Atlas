@@ -71,7 +71,7 @@ N('windswept-carriage-house-black-point','Windswept carriage house ruins, Black 
   'State land: the Black Point Fishing Area, Department of Environmental Management (the Malcolm Grant Trail, named for the official who helped buy Black Point). Park in the Black Point lot across from 655 Ocean Road and walk the main trail south, about four miles of trails in all. Hours not checked. Watch for poison ivy and cliffs.',
   [RIWPS_BP,PJ_BP,A360_BP],conf='mixed',th=[41.39992,-71.46467],thn='Black Point Fishing Area lot, Ocean Road',brick='?'),
 # ---- North Kingstown: Wickford and Saunderstown ----
-N('old-narragansett-church','Old Narragansett Church','North Kingstown','risouth','civic','standing',41.5725,-71.44972,'site','view','walk','','1707–',
+N('old-narragansett-church','Old Narragansett Church','North Kingstown','risouth','worship','standing',41.5725,-71.44972,'site','view','walk','','1707–',
   'Built in 1707 about five miles from here for the Anglican parish of St. Paul\'s, and believed the oldest Episcopal church building in the Northeast. Where it first stood is given differently: Pendar Road (Wikipedia), Shermantown Road (Buildings of Rhode Island) and Tower Hill (a 2020s magazine). In 1800 it was hauled to Wickford. Gilbert Stuart was baptised in it in 1756. After the plaster barrel vault fell in from ice-dam damage in 2019 it was restored.',
   'A plain five-bay clapboard meeting house with round-arched windows, a segmental pediment over the double door and a plastered barrel-vault ceiling. Inside, the pulpit stands on the long wall; the gallery dates from 1723 and the pews from about 1800, many with names and drawings scratched in by parishioners, kept on purpose in the restoration. It has no electricity or heat; the parish holds services here in summer. Opening times for visitors not checked.',
   '',
@@ -101,7 +101,7 @@ N('plum-beach-lighthouse','Plum Beach Lighthouse','North Kingstown','risouth','l
   '',
   'Owned by the Friends of Plum Beach Lighthouse. Out on the shoal; a shore viewpoint was not checked.',
   [W('Plum Beach Light'),LHF_PB],brick='?'),
-N('six-principle-baptist-church','Six Principle Baptist Church (Old Baptist Meeting House)','North Kingstown','risouth','civic','standing',41.59278,-71.49139,'site','view','drive','cemeteries','c.1703–',
+N('six-principle-baptist-church','Six Principle Baptist Church (Old Baptist Meeting House)','North Kingstown','risouth','worship','standing',41.59278,-71.49139,'site','view','drive','cemeteries','c.1703–',
   'The land was deeded for a meeting house about 1703, and the congregation probably dates from after 1664. It is one of the last congregations of the Six Principle Baptists, an offshoot of the First Baptist Church in Providence. The meeting house was remade in Greek Revival style in 1842; its 1700s frame is believed to survive inside.',
   'The Greek Revival meeting house on Stony Lane and its old cemetery. Interior not checked.',
   '',

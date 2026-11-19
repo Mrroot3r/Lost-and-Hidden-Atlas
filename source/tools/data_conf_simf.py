@@ -98,7 +98,7 @@ N('ogden-mill-cohoes','Ogden Mill and the Olmstead Street row houses','Cohoes','
   'Private apartments and houses; view from Oneida, Olmstead and Sargent Streets. Street parking downtown.',
   [SCHS,L('Wikipedia: National Register listings in Albany County (Olmstead Street Historic District)','https://en.wikipedia.org/wiki/National_Register_of_Historic_Places_listings_in_Albany_County,_New_York')],
   brick='?'),
-N('st-johns-cohoes-library','Former St. John\'s Episcopal Church (Cohoes Public Library)','Cohoes','conf','civic','standing',42.77206,-73.69947,'exact','view','walk','','1895',
+N('st-johns-cohoes-library','Former St. John\'s Episcopal Church (Cohoes Public Library)','Cohoes','conf','worship','standing',42.77206,-73.69947,'exact','view','walk','','1895',
   'St. John\'s parish built a church by Richard Morris Upjohn at Canvass and Mohawk Streets in 1870–1871; it burned in September 1894 and the third St. John\'s was begun in June 1895. When the shrinking congregation could no longer keep it in the 1960s it moved to Vliet Boulevard, and the building became the Cohoes Public Library, praised as a model of re-use. In July 2021 part of a wall fell on the sidewalk and the city closed it; the library has been in the Senior Center since then.',
   'A church with a steeple whose stones began to fall from its walls in 2021. In May 2024 WAMC reported the city owned it, put repairs at over $3 million (about $700,000 of it for the steeple) and was seeking state money to bring the library back; what has happened since was not checked. Closed; interior not checked. Red brick: not checked.',
   'A library in a church, closed when its walls began to fall.',
