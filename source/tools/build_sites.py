@@ -86,6 +86,17 @@ for f in sorted(glob.glob('tools/bricks_*.py')):
 for s in sites:
     v=BRICKS.get(s['id'])
     if v and 'bk' not in s and v[0] in ('yes','some','no'): s['bk']=v[0][0]
+# Hours looked up after a place was written: tools/hours_*.py, each HOURS={id:(hours, day read 'YYYY-MM-DD', the page's address, opens)}
+# (tools/hours.py writes them). They win over the place's own hours=, carry their own date, and when 'opens' is true a place
+# that was only 'view' or 'public' becomes 'open'. hours '?' means looked for and not found: nothing is shown.
+HOURS={}
+for f in sorted(glob.glob('tools/hours_*.py')):
+    HOURS.update(importlib.import_module(os.path.basename(f)[:-3]).HOURS)
+for s in sites:
+    v=HOURS.get(s['id'])
+    if not v or v[0].strip() in ('','?'): continue
+    s['hrs']=v[0].strip(); s['hrd']=v[1][:7]; s['hru']=v[2]
+    if len(v)>3 and v[3] and s['acc'] in ('view','public'): s['acc']='open'
 # A full entry can take the place of an older, thinner one for the same place: was='lm-mabee-farm'. The old pin is dropped
 # here, and the app is told (build/alias.json, D.alias) so a reader's notes, status and trip stop move to the new id.
 ALIAS={}
