@@ -1,0 +1,143 @@
+# November 19, 2026: the iron towns of Moriah and Crown Point, with Westport, Wadhams and Elizabethtown, Essex County,
+# New York. Drawn at random by tools/choose.py --state ny (region adk, which offered Westport); start.py found four
+# Atlas places within 15 km of Westport and none in Port Henry, Mineville, Witherbee or Elizabethtown.
+# Sources were opened in this session: Lakes to Locks Passage's "Story of Iron in Crown Point & Moriah" tour pages
+# (passageport.org, sites 3, 11, 12, 13, 15, 17, 23, 24, 25, 26, 27, 28), read with tools/page.py; Wikipedia as raw text
+# (tools/wiki_raw.py); three National Register forms that NPGallery has as text (Lake View Grange 13000626, Crown Point
+# Green Historic District 15000231, Essex County Municipal Complex 16000224); the Town of Moriah's Iron Center page;
+# Protect the Adirondacks' Belfry Mountain page; an Adirondack Explorer article on the Hale House.
+# NPGallery returned its one-page placeholder for the Port Henry depot (95000593), the Wadhams church (88002750), the
+# Essex County Fairgrounds (05000993), Camp Dudley Road (93001136) and the Lewis church (04001457); the Westport
+# Historic District (100006513) and Wadhams Grange (100009879) came back empty. Those forms were not read.
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+BATCH={'key':'adk_utwe','label':'Iron towns of Moriah and Crown Point, with Westport and Elizabethtown','added':'2026-11-19 09:40'}
+PP='https://passageport.org/journey/the-story-of-iron-in-crown-point-moriah/'
+def S(n,slug,t): return L('Lakes to Locks Passage, Story of Iron, site '+n+': '+t,PP+slug+'/')
+NR=lambda ref,t: L('National Register form: '+t+' (PDF)','https://npgallery.nps.gov/NRHP/GetAsset/NRHP/'+ref+'_text')
+MORIAH=L('Town of Moriah: history and the Iron Center Museum','https://www.townofmoriahny.gov/?p=2100')
+PLACES=[
+# ---- Port Henry ----
+N('port-henry-dh-depot','Delaware & Hudson depot, Port Henry','Port Henry','adk','rail','standing',44.04237,-73.45883,'exact','public','drive','stations','1888',
+  'The Delaware and Hudson built this station in 1888 to designs by the architects Fuller & Wheeler. The Lakes to Locks Passage tour credits it to George R. Sherman of the iron company Witherbees, Sherman & Co., and describes it as Richardsonian Romanesque, with arched windows, shingled gables and an angled cupola. The D&H line reached Port Henry from Ticonderoga in 1871 and ran through from Albany to Montreal by 1875; the depot was built in the boom that followed. It is still an Amtrak stop, on the Adirondack, and the building is a senior citizens\' and community centre.',
+  'The station with its cupola beside the tracks; a 2022 Wikimedia photograph shows rock-faced brown stone walls, a round stone turret and green shingled gables. On the grounds stand a Canadian Pacific ore car and cars of the Lake Champlain & Moriah Railroad, the ore line that ran up to the mines from 1868. The tour says the stone block walls either side of Route 9N at Park Place carried that railroad\'s bridge. Interior not checked.',
+  'An ore boom\'s station, still taking passengers.',
+  'At 20 Park Place. An active Amtrak station and a senior centre: the tour says to park in its lot and look round. Amtrak trains use the track beside it; keep off the rails. Hours of the community centre not checked.',
+  [W('Port Henry station'),S('25','25-the-railroads-of-port-henry','The Railroads of Port Henry')],brick='no'),
+N('iron-center-museum-port-henry','Iron Center Museum and the Witherbees, Sherman & Co. office (Moriah Town Hall)','Port Henry','adk','civic','standing',44.04336,-73.45815,'exact','public','drive','','1875',
+  'Witherbees, Sherman & Co. built its first office here in 1875, in the French Second Empire style, above the lakeshore where its furnaces and docks were. The company and its forerunners mined Moriah\'s iron for most of a century; Republic Steel took over the mines in 1938-39 and closed them in 1971. The office is now the Moriah Town Hall, and the company\'s carriage house next door, also used as an ice house and an ore-testing laboratory, is the Iron Center Museum, which tells the story of the mines.',
+  'The Second Empire office at 38 Park Place and, east of it at 34 Park Place, the carriage house holding the museum, which the tour says has a scale model of the whole Mineville mining complex. Inside the town hall not checked.',
+  'The office that ran Moriah\'s iron, now its town hall.',
+  'The town hall is a public building. The Iron Center Museum: Lakes to Locks Passage gives mid-June to mid-October, Thursday to Saturday, noon to 3 pm, or by appointment; the Town of Moriah\'s own page says it runs on volunteers and asks visitors to call before coming, as it cannot promise the museum will be open. Phone numbers are on the town\'s page.',
+  [S('26','26-the-witherbees-sherman-company-buildings','The Witherbees, Sherman & Company Buildings'),MORIAH,
+   L('Lakes to Locks Passage: The Iron Center Museum','https://passageport.org/places-to-go/the-iron-center-museum/')],brick='?'),
+N('sherman-free-library-port-henry','Sherman Free Library','Port Henry','adk','civic','standing',44.04743,-73.46001,'exact','public','drive','','1887–88',
+  'George R. Sherman of the iron company built the library in 1887-88 for $7,700 in the Richardsonian Romanesque style, stocked it with 3,000 books and endowed it with $10,000; his widow Jane left it another $10,000. It was doubled in size in 1907 and is still the town\'s library.',
+  'The tour says the oak interior and brass light fixtures are intact, with portraits of Frank S. Witherbee and George R. Sherman and a bird\'s-eye map of Port Henry from the early 1900s. Its neighbour up Church Street is the Mount Moriah Presbyterian Church, also Sherman\'s.',
+  'A mine owner\'s gift, with its oak fittings still in place.',
+  'At 4 Church Street; a public library, open in its hours. Hours not checked (the library\'s web page returned almost no text).',
+  [S('24','24-port-henry','Port Henry'),W('Port Henry, New York')],brick='?'),
+N('mount-moriah-presbyterian-port-henry','Mount Moriah Presbyterian Church','Port Henry','adk','worship','standing',44.04781,-73.45994,'exact','view','drive','','1888',
+  'In 1888 this church took the place of the smaller First Presbyterian Church on the same site. Like the library down the street it is Richardsonian Romanesque and was given by George R. Sherman; the Lakes to Locks Passage tour puts its cost at $9,236.',
+  'The Romanesque church at 19 Church Street, a few doors above the Sherman Free Library. Interior not checked.',
+  '',
+  'A church; see it from Church Street. Service times and whether it opens to visitors not checked.',
+  [S('24','24-port-henry','Port Henry'),W('Port Henry, New York')],brick='?'),
+N('powerhouse-park-port-henry','Powerhouse Park: furnace and power-plant ground, Port Henry','Port Henry','adk','industry','traces',44.05187,-73.45209,'site','public','walk','','1822–1923',
+  'Major James Dalliba of Troy built an iron furnace here on the shore after the Champlain Canal opened in 1823 and renamed the place Port Henry. The Bay State Iron Company ran the furnaces from 1867 to 1883; Witherbees, Sherman took them over, found them uneconomic, and they stood idle after the Panic of 1893 and were dismantled in 1896. A coal-fired power plant with a 165-foot stack ran here from 1907 to 1923; the stack was dynamited in 1973 and its 40-inch concrete walls knocked down. The first sail ferry to Crown Point left from here in 1785.',
+  'Rough ground in the park is what is left of the power plant, and the lakeshore sands here are mine tailings. The tour says Tunnel Avenue has the remains of worker housing and, at its north end, of a stone casting house, the oldest iron-industry building in Moriah, which "may require some imagination". On Route 22 above the park are an old stone wall and the ruins of a white house on the site of Dalliba\'s home (from the road only; owner not checked).',
+  'Where Moriah\'s iron first met the lake.',
+  'Turn off Route 22 at the Powerhouse Park sign (Dock Street) and cross the tracks; the former ferry landing is now a DEC public boat launch with a parking lot. The park and the town beach and campground are along the shore. Park hours not checked. The railroad along the shore is in use.',
+  [S('23','23-powerhouse-park','Powerhouse Park')],
+  th=[44.05241,-73.45343],thn='Port Henry Boat Launch lot, Dock Street',brick='?'),
+# ---- Mineville and Witherbee ----
+N('mineville-memorial-hall','Witherbee Memorial Hall and the Witherbee, Sherman headquarters, Mineville','Mineville','adk','civic','standing',44.08889,-73.52815,'exact','view','drive','','1893 and 1907',
+  'Cousins Walter and Frank Witherbee built Memorial Hall in 1893 as a workingmen\'s club in memory of their fathers, Silas and Jonathan Witherbee; it is a big Shingle Style wood-frame building with a recessed balcony on paired Doric columns. On the hill above stands the company\'s 1907 neoclassical headquarters, built mostly of concrete block, which Republic Steel used from 1938; beside it are the white buildings of the company hospital and the fenced No. 21 mine, an open pit. In 1875 Mineville gave 8.8 percent of all the iron ore mined in the United States.',
+  'Memorial Hall is now VFW Post 5802 and has a six-lane bowling centre. Up Hospital Road, the old headquarters keeps traces of its temple front though most of its long concrete stair is gone; it is a private house now. The tour says a look between the trees shows the size of the No. 21 pit, which is fenced and posted. Behind Memorial Hall an overgrown gully marks another group of mines.',
+  'A company town\'s club, office and hospital, still in a row above the pits.',
+  'Memorial Hall belongs to the VFW post; see it from the road (hours for visitors not checked). The headquarters at 27 Hospital Road is a private house: view from the road only. The No. 21 mine is fenced and posted: keep out.',
+  [W('Witherbee Memorial Hall'),S('13','13-the-heart-of-mineville','The Heart of Mineville')],brick='no'),
+N('bridal-row-witherbee','Bridal Row and the tailings-concrete houses, Witherbee','Witherbee','adk','town','standing',44.08833,-73.53766,'site','view','drive','','1903–1910',
+  'Witherbee, Sherman & Co. built company housing from concrete blocks made with grey iron-ore tailings, waste from separating the ore. Between 1903 and 1910 it put up 88 such houses on Joyce Road, Wasson Street, West Street, Bridal Row and Belfry Hill Road, many still standing. The six identical single-family houses on Bridal Row, finished in 1906 at $1,350 each, were the first, built for newly married couples. The company laid out its housing by nationality and class, as its own engineer described in 1915.',
+  'Bridal Row is a short street of the six matching block houses, the most complete group of identical row houses in Mineville-Witherbee. West Street has concrete boarding houses for single miners and older wood-frame houses from the 1870s. All are lived in.',
+  'Houses built out of the mine\'s own waste.',
+  'Private homes on town streets: look from the road. From County Route 6 (Power House Road) turn onto Bridal Row; the tour continues by Route 6A to Wasson Street.',
+  [S('17','17-the-concrete-homes-of-bridal-row','The Concrete Homes of Bridal Row'),S('12','12-witherbee','Witherbee')],brick='no'),
+N('belfry-mountain-fire-tower','Belfry Mountain fire tower','Witherbee','adk','landmark','standing',44.09783,-73.54763,'site','public','hike','','1917',
+  'The Conservation Commission put a wooden tower on Belfry Mountain in 1912 and replaced it in 1917 with a 47-foot steel Aermotor tower. It was taken out of service in 1988 and closed by the DEC in early 1989. From the top you see the chain of tailings piles, one from each mine, running down the slope to Lake Champlain, and the High Peaks to the west.',
+  'The steel tower on the summit at 1,840 feet, with a picnic table at its foot. Communication towers stand beside it.',
+  'A fire tower whose view is a map of the mines.',
+  'State land (Protect the Adirondacks names it Hammond Pond Wild Forest). The trail starts at a gate and a small DEC sign on County Route 7C (Dalton Hill Road) south of Fisher Hill Road and follows a gravel service road about 0.35 to 0.45 mile to the tower; park along the road opposite the gate. Climbing the tower: not checked whether its cab is open.',
+  [W('Belfry Mountain'),S('15','15-belfry-mountain-historic-fire-tower','Belfry Mountain Historic Fire Tower'),
+   L('Protect the Adirondacks: Hike Belfry Mountain','https://www.protectadks.org/hike-belfry-mountain/')],brick='no'),
+N('colburn-blast-furnace','Colburn blast furnace ruins','Moriah','adk','industry','ruins',44.05558,-73.52882,'site','view','drive','','1848',
+  'A stone blast furnace built in 1848 west of Moriah Center, one of the few left to see in Essex County. With no water power at the site it was driven by a 40-horsepower steam engine fired with charcoal. It smelted ore from the Sanford Ore Bed in Mineville, two miles away, and was probably short-lived; who built it and how much iron it made are not known.',
+  'Once 40 feet tall, the furnace has fallen into heaps of stone and iron fastenings. The tour says it is about a tenth of a mile east of the North Hudson Road junction with Furnace Road and can be seen from the road.',
+  'A furnace stack that has fallen in on itself.',
+  'On private property: look from the road only. The tour says there is a small pull-off on the right at the North Hudson Road and Furnace Road junction.',
+  [S('11','11-colburn-blast-furnace','Colburn Blast Furnace')],conf='mixed',brick='no'),
+# ---- Crown Point ----
+N('monitor-bay-crown-point-iron','Hammond Wharf: the Crown Point Iron Company furnace site, Monitor Bay','Crown Point','adk','industry','traces',43.94740,-73.41344,'site','public','walk','','1872–1890s',
+  'The second Crown Point Iron Company built a 13-mile narrow-gauge railroad down from its mines at Hammondville and, in 1872, a pair of blast furnaces at Hammond Wharf able to make 45,000 tons of Bessemer pig iron a year. A slump in 1883 began its decline; the last Crown Point ore was mined in 1893, American Steel & Wire bought the property, and the furnaces were dismantled and the tracks sold for scrap.',
+  'The pier, now for fishing, was the loading dock. The shore is black clinker slag from nearly 20 years of smelting, and south of the pier a tree-grown bank of broken rock 20 to 30 feet high, several hundred yards long, is the rubble of the demolished works, best seen from the water when the leaves are off.',
+  'A steelworks reduced to a slag beach.',
+  'Monitor Bay Park, the Crown Point municipal campground, covers part of the furnace site. The tour sends visitors there; day-use rules and hours were not checked.',
+  [S('28','28-hammond-wharf-at-monitor-bay-park','Hammond Wharf at Monitor Bay Park')],conf='mixed',brick='?'),
+N('crown-point-green','Crown Point green (Hammond\'s Corners)','Crown Point','adk','town','standing',43.95199,-73.43296,'site','public','walk','','1820s–1830s',
+  'Hammond\'s Corners grew on Putnam Creek after Col. Job Howe hired Charles F. Hammond in 1822 to build a mill dam. Most buildings round the green date from the 1820s and 1830s and belonged to the Howe, Hammond and Penfield families who ran the town\'s lumber and iron. The Register district lists the brick Job Howe house (about 1826-27, on a foundation of stone taken from the Crown Point fort ruins), the brick First Congregational Church (built 1829-1834), the 1827 Old Brick Store and the 1837 Greek Revival Charles F. Hammond house, which became a chapel in 1883.',
+  'The 2.9-acre green with the 34-foot Westerly granite Soldiers\' Monument, put up by C.F. Hammond, in Veterans Memorial Park. The church at 9 Park Avenue has a soaring bell tower, a round stained glass window in the gable and tall arched windows of coloured and etched glass; its cemetery is beside it. The Old Brick Store, the oldest commercial building in the town, was still a store when the tour was written. The Hammond Chapel is at 2076 Creek Road and the Howe house at 29 Park Avenue. Interiors not checked.',
+  'An iron family\'s village green, almost as they left it.',
+  'The green is a public park; the tour says to park along it on Park Avenue. The houses are private: view from the street.',
+  [NR('15000231','Crown Point Green Historic District'),S('3','3-hammonds-corners-in-the-hamlet-of-crown-point','Hammond\'s Corners in the Hamlet of Crown Point')],brick='?'),
+# ---- Westport ----
+N('westport-depot','Westport depot (Depot Theatre)','Westport','adk','rail','standing',44.18743,-73.45169,'exact','public','drive','stations','1876',
+  'The Delaware and Hudson built the station in 1876, the year its line reached Westport, and enlarged it in 1891 and 1908. The railroad made Westport a summer resort and the place where travellers left the train for Lake Placid and Saranac Lake. The D&H sold the depot to the town for $1 in 1974; the Westport Historical Society restored the lobby from 1976, and the slate roof and ornamental fascia were repaired from 1998.',
+  'A 2009 Wikimedia photograph shows a clapboarded frame station with a belfry, slate-shingled roofs and an open-sided platform shelter with a spire. The station is still an Amtrak stop on the Adirondack and the home of the Depot Theatre, a professional summer theatre founded in 1979. Interior not checked.',
+  'A resort-era depot that sells theatre tickets as well as train tickets.',
+  'Town-owned; an Amtrak station with a low platform on the west side of the track. The Depot Theatre plays in summer: dates not checked. Keep off the tracks.',
+  [W('Westport station (New York)'),NR('13000626','Lake View Grange No. 970 (history of Westport)')],brick='no'),
+N('lake-view-grange-westport','Lake View Grange No. 970 (Westport Town Hall)','Westport','adk','civic','standing',44.18581,-73.43551,'exact','view','drive','','1928',
+  'The Westport grange was founded in 1903 and finished this hall in the fall of 1928, built by a member, the carpenter Vernon Gough. The grange gave up its charter in 1940. From about 1950 the hall was a roller-skating rink, kept going by the American Legion post that bought it in 1953; in 1971 the town and village bought it for offices and a youth centre.',
+  'A long frame hall clad in spruce clapboard, one storey on Champlain Avenue and three on the lake side, with a fanlit doorway. Inside, the upstairs meeting hall survives under a dropped ceiling, with its original coved ceiling and wood wainscot still in place behind and below it; the stage is gone (Register form).',
+  'A grange hall that became a roller rink and then the town hall.',
+  'Westport Town Hall, 22 Champlain Avenue (Route 22); a public office building, with a parking lot behind it off Marks Road. Office hours not checked.',
+  [NR('13000626','Lake View Grange No. 970')],brick='no'),
+N('wadhams-congregational-church','United Church of Christ of Wadhams (First Congregational and Presbyterian Society Church)','Wadhams','adk','worship','standing',44.23056,-73.45917,'site','view','drive','','1837',
+  'A plain Federal-style meeting house built in 1837 for the First Congregational and Presbyterian Society of Westport, in the hamlet of Wadhams. It is one storey with clapboard siding and a two-tier belfry with a dome on its west gable. The parish hall beside it was a dance hall and was moved here in 1901.',
+  'The white meeting house and its belfry on Main Street (County Route 10). Interior not checked.',
+  '',
+  'An active church: see it from the road. Service times not checked.',
+  [W('First Congregational and Presbyterian Society Church of Westport')],brick='no'),
+# ---- Elizabethtown ----
+N('essex-county-courthouse-elizabethtown','Old Essex County Courthouse, Elizabethtown','Elizabethtown','adk','civic','standing',44.21454,-73.59541,'exact','view','drive','','1824',
+  'The county\'s first courthouse here was a one-storey temple-fronted brick building of about 1824, raised to its present height in 1843 and given an office wing about 1880-81. On December 6, 1859, the body of John Brown lay in its courtroom overnight on the way to burial at his farm in North Elba, watched by four local men. In 1911 a temple-fronted brick clerk\'s office and a large brick jail with a sheriff\'s house were added; later blocks joined the buildings into one row of three porticoes, and a new courthouse stands to the east.',
+  'Three porticoed pavilions face Court Street (US 9) across a small park; the old 1824 courthouse is the middle one. The 1911 jail is behind. The Adirondack History Museum of the Essex County Historical Society is a short way along Court Street. Interiors not checked.',
+  'The courtroom where John Brown lay on his last journey home.',
+  'The seat of Essex County government at Court and Park Streets; open as a public building in office hours, which were not checked. A mapped lot is on Park Street.',
+  [NR('16000224','Essex County Municipal Complex')],th=[44.21459,-73.59651],thn='Lot on Park Street',brick='?'),
+N('hand-hale-elizabethtown','Hand and Hale houses and law offices','Elizabethtown','adk','landmark','standing',44.215,-73.5886,'site','view','drive','','1814–1870',
+  'Two lawyers\' families, the Hands and the Hales, lived side by side here. The Hand House is a formal Greek Revival house of 1849; the Hand law office was a small frame building from before 1830, enlarged with a brick addition in 1865. The Hale House was begun in 1814 and much altered between 1850 and 1870; the Hale law office is a one-storey building with a portico. Since 1980 the Hale property has belonged to the Elizabethtown Social Center.',
+  'An Adirondack Explorer article (about 2024) reported that the Northern Forest Center was to turn the Hale House and barn into affordable housing, and that the unused law office keeps its wood trim, built-in bookshelves and a large safe. Whether that work is done was not checked. Interiors not open.',
+  '',
+  'Private property: view from the street only.',
+  [W('Hand–Hale Historic District'),L('Adirondack Explorer: Robert Hale House to become housing','https://www.adirondackexplorer.org/?p=308195')],conf='mixed',brick='?'),
+]
+PIN_NOTES={
+ 'port-henry-dh-depot':'OpenStreetMap building "Port Henry Amtrak Station" (osmnear.py).',
+ 'iron-center-museum-port-henry':'Between OpenStreetMap\'s Moriah Town Hall (38 Park Place) and The Iron Center (34 Park Place), about 60 m apart.',
+ 'sherman-free-library-port-henry':'OpenStreetMap building of the Sherman Free Library, 4 Church Street.',
+ 'mount-moriah-presbyterian-port-henry':'OpenStreetMap building at 19 Church Street, the address nom.py gives for the church.',
+ 'powerhouse-park-port-henry':'ArcGIS geocoder point for Powerhouse Park; the trailhead is the mapped boat-launch lot.',
+ 'mineville-memorial-hall':'Moved 93 m north from the Wikipedia (Register) coordinate, which fell on open ground, onto the large building seen on the aerial; OpenStreetMap\'s VFW Post point is about 40 m from it.',
+ 'bridal-row-witherbee':'ArcGIS geocoder street point for Bridal Row.',
+ 'belfry-mountain-fire-tower':'Wikipedia coordinate for the summit of Belfry Mountain.',
+ 'colburn-blast-furnace':'Coordinate printed in the Lakes to Locks Passage tour for the furnace remains (44.055576, -73.5288151).',
+ 'monitor-bay-crown-point-iron':'Moved onto the base of the pier at Monitor Bay seen on the leaf-off aerial (look.py, pix.py); the geocoder\'s park point fell in an orchard 230 m north. The campground is just north-west of the pier.',
+ 'crown-point-green':'Wikipedia (Register list) coordinate for the historic district, on the green.',
+ 'westport-depot':'OpenStreetMap building tagged train_station, Westport.',
+ 'lake-view-grange-westport':'OpenStreetMap point for Westport Town Hall, 22 Champlain Avenue.',
+ 'wadhams-congregational-church':'Wikipedia (Register) coordinate for the church.',
+ 'essex-county-courthouse-elizabethtown':'Moved 69 m from the Register list coordinate, which fell on Court Street, onto the porticoed building group seen on the aerial.',
+ 'hand-hale-elizabethtown':'Wikipedia (Register list) coordinate for the district.',
+}
