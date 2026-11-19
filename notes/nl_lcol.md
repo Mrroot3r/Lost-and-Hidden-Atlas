@@ -1,0 +1,28 @@
+# nl_lcol: St. John's, Quidi Vidi and Cape Spear, Newfoundland
+state: Newfoundland and Labrador
+region: nl
+date: 2026-11-19
+places: 19
+file: data_nl_lcol.py
+
+## What this batch is
+Nineteen places in St. John's and round it, the first batch in Newfoundland and Labrador. Ruins: the Second World War gun emplacements at Fort Amherst (the 1770s fort shows nothing) and Fort Cape Spear, and the Quidi Vidi Battery (a 1967 reconstruction on the 1762 site, closed since 2011 and going to ruin; view only). Standing: Cabot Tower, Cape Spear Lighthouse (1836), Commissariat House, the Colonial Building, Government House, St. Thomas' (Garrison) Church, the Roman Catholic Basilica, the Anglican Cathedral, St. Patrick's Church, the Court House, Murray Premises, the Newman Wine Vaults, the Newfoundland Railway terminus (Railway Coastal Museum), Christ Church and Mallard Cottage in Quidi Vidi, and Ruby Church in the Goulds. Sources: the Canadian Register of Historic Places statement for each (historicplaces.ca with `page.py --all -n 60000`; ids from the `{{HPC row}}` templates of "List of historic places in St. John's, Newfoundland and Labrador"); Wikipedia through `wiki_raw.py`; Parks Canada's Cape Spear hours, lighthouse and Fort Cape Spear pages and the Signal Hill visitor-centre page; the Provincial Historic Sites pages on seethesites.ca (season, hours, fees, parking for the Colonial Building, Commissariat House and Newman Wine Vaults); ourcathedral.ca (Anglican Cathedral summer guides and services); rcsj.org (Basilica Mass times); Museums NL (railway museum). Red brick: no for the stone and wooden buildings whose Register statement names the material (Commissariat House's brick is yellow), `?` for the Basilica (400,000 Hamburg bricks, colour and where not stated), Murray Premises, the Newman vaults and Fort Amherst. **Not checked:** anything on the ground; Signal Hill and Cabot Tower hours (the Parks Canada hours page reset the connection); the railway museum's hours (its site answered 403); St. Thomas' services (site would not connect); Mallard Cottage's restaurant hours; St. Patrick's services; whether Government House's grounds are open; the present state of the Quidi Vidi Battery (rests on a 2019 radio report quoted by Wikipedia) and who now owns Ruby Church and Christ Church; parking at Fort Amherst. Pins that mark only an area: Ruby Church (Register point on the Goulds main road; the church was not picked out on the aerial). Pins moved: Cape Spear Lighthouse (OSM point was on grass; moved onto a hilltop building, prec site, which building is the 1836 one not settled), Fort Cape Spear (cape coordinate was in the sea; moved onto a round emplacement), the Court House (to the geocoder's 194 Water Street point). Mallard Cottage's Register coordinate is 2 km off in the wrong neighbourhood; the OSM building was used. There is no 1 m LiDAR and no public-land layer in Canada, so `--lidar` was not run and every `public` pin printed CHECK ACCESS; the access notes name Parks Canada where it applies.
+
+## Leads
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| Fort Townshend remains in The Rooms | St. John's, NL (47.5662, -52.7121, Register 14342) | Register: headquarters of the garrison 1779 to 1871; a few remains in situ in the basement of The Rooms, nothing else visible | Whether visitors can see the remains, and The Rooms' hours |
+| Fort William | St. John's, NL (47.5709, -52.7008, Register 13082) | A national historic site on the Register list | Register statement not read; likely nothing visible (site of the Fairmont hotel area, not checked) |
+| Queen's Battery, Signal Hill | St. John's, NL | Wikipedia's Signal Hill article: the Queen's Battery barracks restored to 1862 | Parks Canada page and a position |
+| Cupids Cove Plantation | Cupids, NL | seethesites.ca: John Guy's 1610 colony, cobblestone floors and foundations under excavation, boardwalk over the dig; provincial site, season May 22 to October 8, 2027 | Register statement, a pin, the Cupids Legacy Centre |
+| Heart's Content Cable Station | Heart's Content, NL | seethesites.ca: 1866 transatlantic cable landing; 1875 office and 1918 extension, 1960s equipment room, cable remnants in Cable Park | Register statement and a pin |
+| Anderson House and Martin McNamara House | St. John's, NL (Register 2242 and 2321) | Wikipedia's Mallard Cottage article names them with it as the best-preserved early houses in St. John's; Anderson House 1804–1805 | Register statements, use and access |
+| The St. John's military hospital and Queen Victoria Wing | St. John's, NL (47.5753, -52.6944, Register 2430 and 2431) | On the Register list | Statements not read |
+| Water Street Historic District | St. John's, NL (Register 7700) | National historic site on the Register list | Statement not read; a walk-through entry |
+
+## Tips
+- historicplaces.ca reset the connection on some requests (ids 3056 and 20775) and answered the same request a minute later; retry once before giving up.
+- In Newfoundland the Register list point can be far off: Mallard Cottage's is 2 km from the cottage. OSM (`nom.py`) had named buildings or points for most of St. John's.
+- The Provincial Historic Sites of Newfoundland and Labrador all have a page at `https://www.seethesites.ca/sites/<name>/` with season, hours, parking and fees; `plan-your-visit/` gives the season and fees for all. Quidi Vidi Battery is no longer on its list.
+- parks.canada.ca Signal Hill hours page reset the connection twice; the Cape Spear hours page read fine. destinationstjohns.com answers 403.
+- The pin check's `land:` line and `CHECK ACCESS` mean nothing in Canada (PAD-US is US only); go by the access note.
