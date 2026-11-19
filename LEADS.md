@@ -89,7 +89,6 @@ Places someone read about while researching but did not add, with what is missin
 | Estellville glassworks and Bethlehem Loading Company | Estell Manor, NJ | Recalled as ruins in a county park | A source and coordinates |
 | Hoosac Tunnel and Wilmington Railroad grade | Wilmington, VT | Wikipedia article has no coordinates | Which part is a public trail; a coordinate |
 | Forestdale iron furnace | Brandon, VT | Recalled as a state-owned furnace stack | A source and a coordinate |
-| Mauch Chunk Switchback Railway | Jim Thorpe, PA | Wikipedia article read only for its coordinate | What remains along the trail |
 | Laquin, and the Ghost Town Trail towns | Bradford and Indiana Counties, PA | Wikipedia articles exist | What remains at each |
 | Hastings and Swan Island (Perkins Township) | Maine | Recalled as an abandoned logging village and an abandoned island town | Sources and coordinates |
 | First Electric Park and the Heim bottling plant | East Bottoms, Kansas City, MO | First Electric Park ran 1899–1906 beside the Heim brewery; the city's Heim Electric Park now sits on its footprint, and J. Rieger & Co. distills in the old bottling plant (Clio, KC Public Library) | A pin check on the playground and the bottling plant; a source for anything left of the park itself |
