@@ -44,7 +44,7 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   await p.click('#sheet-x'); await p.goto(url+'#joliet-iron-works'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800);
   await p.click('.visit-item .visit-send'); await p.waitForTimeout(200);
   const sh=await p.evaluate(()=>{ const b=document.querySelector('.visit-item .sharebox'); if(!b) return null; const g=b.querySelector('a.share-gh'); return {gh:g?g.href:'',form:!!b.querySelector('a.share-form'),copy:[...b.querySelectorAll('button')].some(n=>/Copy as text/.test(n.textContent)),note:b.textContent}; });
-  ok('"Send to the Atlas" on a report opens a box with a GitHub link and a copy button',!!sh&&/issues\/new\?/.test(sh.gh)&&sh.copy,sh&&sh.gh.slice(0,90));
+  ok('"Send to the public Atlas" on a report opens a box with a GitHub link and a copy button',!!sh&&/issues\/new\?/.test(sh.gh)&&sh.copy,sh&&sh.gh.slice(0,90));
   const q=sh?new URL(sh.gh).searchParams:new URLSearchParams();
   ok('the link opens the visit form already filled in: place and id, date, what was found',q.get('template')==='visit.yml'&&/Joliet Iron Works/.test(q.get('place')||'')&&/\(joliet-iron-works\)/.test(q.get('place')||'')&&/^\d{4}-\d\d-\d\d$/.test(q.get('when')||'')&&q.get('found')==='Nothing there',[q.get('place'),q.get('when'),q.get('found')].join(' | '));
   ok('the box says nothing is sent until Submit, and that it is public',!!sh&&/nothing is sent until you press Submit/i.test(sh.note)&&/public/.test(sh.note));
@@ -57,6 +57,11 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   await p.goto(url+'#joliet-iron-works'); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800);
   p.once('dialog',d=>d.accept()); await p.click('.visit-item .visit-del'); await p.waitForTimeout(1300);
   u=await U(); ok('a report can be deleted',!(u.visits||{})['joliet-iron-works']||u.visits['joliet-iron-works'].length===0);
+  // ---- a long press on the map: the two buttons say which is which
+  await p.evaluate(()=>{ const m=window.__atlasMap; m.fire('contextmenu',{latlng:m.getCenter(),containerPoint:m.latLngToContainerPoint(m.getCenter()),originalEvent:{preventDefault(){}}}); }); await p.waitForTimeout(300);
+  const pop=await p.evaluate(()=>{ const c=document.querySelector('.leaflet-popup-content'); return c?c.textContent:''; });
+  ok('long press: "+ Add to my places" and "Send this spot to the public Atlas", with a line saying which is which',/\+ Add to my places/.test(pop)&&/Send this spot to the public Atlas/.test(pop)&&/My places stay on this phone/.test(pop)&&!/Add a place here/.test(pop),pop.slice(0,160));
+  await p.evaluate(()=>window.__atlasMap.closePopup());
   ok('no script errors',errs.length===0,errs.slice(0,2).join(' | '));
   await b.close(); console.log(fails.length?fails.length+' FAILED':'visit test passed'); process.exit(fails.length?1:0);
 })();

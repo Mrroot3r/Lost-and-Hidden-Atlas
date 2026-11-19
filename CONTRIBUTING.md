@@ -5,7 +5,7 @@ every pin on the aerial photo, writes the places up and sends them in. If you ha
 the same, on your own account, for your own town or anywhere it likes.
 
 If you only want to tell us about one place, you do not need any of this: open the Atlas, tap "+ Add", drop a pin, write
-a line, and tap "Suggest it to the Atlas".
+a line, and tap "Suggest it for the public Atlas".
 
 ## What you need
 
