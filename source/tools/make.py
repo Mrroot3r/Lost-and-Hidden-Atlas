@@ -97,8 +97,25 @@ if os.path.exists(R+'build/walls.json'):         # stone walls found on LiDAR (t
 if os.path.exists(R+'src/photos.json'):          # photo details gathered ahead of time (tools/photos.py): only for places that still exist
     _ph=json.load(open(R+'src/photos.json',encoding='utf-8')); _ids={s['id'] for s in S}
     open(WEB+'data/photos.json','w',encoding='utf-8').write(json.dumps({'asof':_ph.get('asof',''),'p':{k:v for k,v in _ph['p'].items() if k in _ids}},separators=(',',':'),ensure_ascii=False))
-for extra in ('vanished','mines'):       # optional lead layers (tools/vanished.py, tools/mines.py); fetched only when switched on
-    if os.path.exists(R+f'build/{extra}.json'): shutil.copyfile(R+f'build/{extra}.json',WEB+f'data/{extra}.json')
+# The optional lead layers (tools/vanished.py, tools/mines.py), fetched only when switched on. Each goes out in pieces:
+# data/<layer>/index.json (the kinds of point, and for each state its count, a stamp and its box) and one file per state,
+# data/<layer>/<state>-<stamp>.json, which the app fetches when the map is zoomed in there or the reader stands there.
+# data/<layer>.json, the whole layer in one file, is still written for copies of the Android app built before November 20, 2026,
+# which read nothing else; it holds only the eleven states it held then, so it grows no further. Drop it when those are gone.
+XL_OLD=('ny','ma','vt','ct','nh','nj','pa','ri','me','mo','ks')
+for extra in ('vanished','mines'):
+    if not os.path.exists(R+f'build/{extra}.json'): continue
+    _d=json.load(open(R+f'build/{extra}.json',encoding='utf-8')); _by={}
+    for _r in _d['p']: _by.setdefault(_r[-1],[]).append(_r)
+    os.makedirs(WEB+f'data/{extra}'); _s={}
+    for _k in sorted(_by):
+        _txt=json.dumps({'p':_by[_k]},separators=(',',':'),ensure_ascii=False); _h=hashlib.md5(_txt.encode('utf-8')).hexdigest()[:8]
+        open(WEB+f'data/{extra}/{_k}-{_h}.json','w',encoding='utf-8').write(_txt)
+        _la=[r[0] for r in _by[_k]]; _lo=[r[1] for r in _by[_k]]
+        _s[_k]={'n':len(_by[_k]),'h':_h,'b':[round(min(_la)-0.005,2),round(min(_lo)-0.005,2),round(max(_la)+0.005,2),round(max(_lo)+0.005,2)]}
+    open(WEB+f'data/{extra}/index.json','w',encoding='utf-8').write(json.dumps({'v':2,'t':_d['t'],'s':_s},separators=(',',':'),ensure_ascii=False))
+    _old=[r for r in _d['p'] if r[-1] in XL_OLD]
+    open(WEB+f'data/{extra}.json','w',encoding='utf-8').write(json.dumps({'v':_d.get('v',1),'t':_d['t'],'p':_old,'s':{k:v for k,v in _d['s'].items() if k in XL_OLD}},separators=(',',':'),ensure_ascii=False))
 open(WEB+'app.js','w').write(app)
 open(WEB+'leaflet.js','w').write(open(R+'cache/leaflet.min.js').read())
 web_scripts=('<script src="leaflet.js?v=1.9.4"></script>\n'
