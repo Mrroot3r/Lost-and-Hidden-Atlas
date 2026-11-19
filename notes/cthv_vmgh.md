@@ -1,0 +1,25 @@
+# cthv_vmgh: Farmington Valley and Bristol, Connecticut
+state: Connecticut
+region: cthv
+date: 2026-11-19
+places: 17
+file: data_cthv_vmgh.py
+
+## What this batch is
+Second pass over region `cthv` (drawn at random by `choose.py`), this time western Hartford County, which had nothing on the map within 12 km of Farmington. Seventeen places. Ruins and traces: the Farmington Canal aqueduct abutments and the feeder-canal junction (Farmington Land Trust and town open space), and the Suburban (Rainbow) trolley park of 1895–1905 in Unionville (town open space; an OpenStreetMap ruin point). Standing: the Pequabuck stone arch bridge (1832–33), the Stanley-Whitman House, Hill-Stead Museum, Farmington's 1771 First Church meetinghouse (Amistad), the Austin Williams house, the Tunxis Hose Firehouse, Avon Congregational Church (1819), the Pine Grove Schoolhouse, the Brown Tavern in Burlington, the Noah Webster and Sarah Whitman Hooker houses in West Hartford, the New Haven District Campground in Plainville, Lake Compounce with its Looff carousel and 1927 Wildcat coaster, the American Clock & Watch Museum and the Barnes Museum in Southington. Sources: Wikipedia with `wiki_raw.py` (Hartford County Register rows), HMdb marker texts (aqueduct, canal junction, Suburban Park), the Farmington Land Trust page, the Farmington Historical Society, CTvisit for Stanley-Whitman, Hill-Stead, the Barnes Museum and the Sarah Whitman Hooker house, the Noah Webster House and Clock & Watch Museum's own pages, the Avon Historical Society (2024 schoolhouse season), the NPS Amistad page and SAH Archipedia for the Farmington church, Amusement Today for Lake Compounce's 2026 season. Pins moved to ArcGIS geocoder points for Hill-Stead (Register point was in woods), the Farmington church, Noah Webster, Sarah Whitman Hooker, the clock museum and Stanley-Whitman. Not checked: anything on the ground; the aqueduct pin is an OpenStreetMap ruin point in woods on the west bank (the abutment itself was not seen on the aerial; the aqueduct gets `conf='mixed'` because Wikipedia gives six arches and CTMQ seven); what is left at Suburban Park (area pin); who owns the path over the Pequabuck Bridge (left `view`); service times at both churches; Lake Compounce's daily hours (its own site answered 403); the Sarah Whitman Hooker house's hours (its site would not connect) and the Brown Tavern's opening; the Pine Grove Schoolhouse's 2026 season; which building on the Burlington green is the Brown Tavern (site pin). Red brick: `no` where the sources give wood, brownstone or clapboard; `?` for the rest, including the Tunxis firehouse (brick, colour not stated) and Noah Webster's brick kitchen.
+
+## Leads
+Places you read about and could not finish. One row each; delete the example row. Leave the table header.
+
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| Memento Mori burying ground | Main Street (Route 10), Farmington, CT | Farmington's oldest burying ground, 1840s Egyptian Revival wooden gate copying Grove Street's; owned by the Farmington Village Green and Library Association, cared for by Stanley-Whitman House (Farmington Historical Society; Yale Peabody "Echoes of Egypt") | Its spot: OpenStreetMap's "Old Farmington Cemetery" (41.71745, -72.83248) showed only houses and trees on the aerial; the date of the oldest stones |
+| Nike HA-67 radar site | Rattlesnake Mountain, North Mountain Road off Loon Lake Road, Plainville/Farmington, CT | Nike Ajax site 1956–1961; radar platforms on the mountain, admin area on Nike Road, launch site on Hyde Road now owned by Stanley Access Technologies (coldwar-ct.com) | Owner of the radar ground and whether the Metacomet Trail passes it legally; a second source |
+| Hospital Rock | Woods between Farmington, Plainville and New Britain, CT (OpenStreetMap point 41.69196, -72.826) | Rock carved with names from a smallpox inoculation hospital; CTMQ says the Farmington Historical Society keeps its place quiet to protect it | Owner and a public way in; whether pinning it is wise |
+| Avon canal office | 12 West Main Street, Avon, CT | Wikipedia (New Haven and Northampton Canal) says a building that housed the canal's Avon offices survives there | A second source and a date |
+
+## Tips
+- Wikipedia's "Hill–Stead Museum" comes back from `wiki_raw.py` with no text at all (redirect followed, empty body); CTvisit's listing had the facts, hours and address.
+- `hillstead.org` and `lakecompounce.com` answer 403 to `page.py`; CTvisit listings (`ctvisit.com/listings/<name>`) read cleanly and give hours, fees and address for most Hartford County museums.
+- HMdb's nearby list round Farmington (`nearbylist.asp?...Latitude=41.72&Longitude=-72.85`) turned up the aqueduct, canal-junction and Suburban Park markers, each with a position and directions to parking; the Wikipedia Register list has none of the three.
+- In Farmington and West Hartford four of six Wikipedia/Register coordinates were 45 to 300 m off the building; the ArcGIS geocoder with a street number and ZIP put each on it.
