@@ -128,6 +128,11 @@ const { chromium } = require('playwright');
       ok('a place with hours on record shows them, word for word',r.has&&r.txt===wh.hrs,wh.id+': '+r.txt.slice(0,80));
       ok('and says which month they were read, since hours change',/^As read [A-Z][a-z]+ 20\d\d\.$/.test(r.when),r.when);
       ok('and still links to today’s',r.link==='Today’s hours in Google Maps'&&r.fits,r.link); }
+    { const lk=await p.evaluate(()=>{ const s=JSON.parse(document.getElementById('d-sites').textContent).sites.find(x=>x.hrs&&x.hrd&&x.hru); return s?{id:s.id,hrd:s.hrd,hru:s.hru}:null; });
+      if(lk){ await p.evaluate(id=>{ location.hash='#'+id; },lk.id); await p.waitForTimeout(550);
+        const g=await p.evaluate(()=>{ const h=[...document.querySelectorAll('#v-detail dl.kv dt')].find(x=>x.textContent==='Hours').nextElementSibling, a=h.querySelector('a.hsrc'); return {when:h.querySelector('small').textContent,src:a?a.href:'',txt:a?a.textContent:''}; });
+        const mon=new Date(+lk.hrd.slice(0,4),+lk.hrd.slice(5,7)-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+        ok('hours looked up later carry their own month and a link to the page they were read on',g.when==='As read '+mon+', '&&g.src.replace(/\/$/,'')===lk.hru.replace(/\/$/,'')&&g.txt==='on this page',lk.id+': '+g.when+g.txt); } }
     ok('recorded hours are short enough to be a row, not a paragraph',S.every(x=>x.hrs.length<=180),S.filter(x=>x.hrs.length>180).map(x=>x.id).join());
     const pv=S.find(x=>x.acc==='view'&&x.cat==='landmark'&&x.st==='standing'&&!x.hrs); r=await row(pv.id);
     ok('a private house seen from the street has no Hours row',!r.has&&/^Access,Effort/.test(r.order),pv.id+': '+r.order);

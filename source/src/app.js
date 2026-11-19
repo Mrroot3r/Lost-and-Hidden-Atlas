@@ -2118,11 +2118,11 @@ window.addEventListener('resize',debounce(()=>{ if(view==='detail') nameFit(); }
    hours change. A place that takes visitors also gets a search for it by name, where Google Maps shows today's hours; so does a standing
    place of worship that is only seen from the street, because its services are when it is open. Other places have no Hours row. */
 const takesVisitors=s=>s.acc==='open'||(s.cat==='worship'&&s.st==='standing'&&s.acc!=='ask'&&!s.mine);
-function hoursAsOf(s){ const b=s.new&&BATCHES.find(x=>x.key===s.new), m=b&&/^(\d{4})-(\d\d)/.exec(b.added||''); return m?new Date(+m[1],+m[2]-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}):''; }
+function hoursAsOf(s){ const b=s.new&&BATCHES.find(x=>x.key===s.new), m=/^(\d{4})-(\d\d)/.exec(s.hrd||'')||(b&&/^(\d{4})-(\d\d)/.exec(b.added||'')); return m?new Date(+m[1],+m[2]-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}):''; }
 function hoursDd(s){ if(!s.hrs&&!takesVisitors(s)) return null;
   const dd=el('dd',{class:'hrs'}), when=s.hrs?hoursAsOf(s):'';
   if(s.hrs) dd.append(el('span',{text:s.hrs}));
-  dd.append(el('div',null,when?el('small',{text:'As read '+when+'.'}):null,when?' ':'',ext('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([s.name,s.town,STATE[REG_STATE[s.reg]]].filter(Boolean).join(', ')),'Today\u2019s hours in Google Maps')));
+  dd.append(el('div',null,when?el('small',{text:'As read '+when+(s.hru?', ':'.')}):null,when&&s.hru?ext(s.hru,'on this page','hsrc'):null,when?' ':'',ext('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([s.name,s.town,STATE[REG_STATE[s.reg]]].filter(Boolean).join(', ')),'Today\u2019s hours in Google Maps')));
   return dd; }
 const tipDay=s=>{ const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(s.tip||''); return m?' on '+new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):''; };
 function renderDetail(s){

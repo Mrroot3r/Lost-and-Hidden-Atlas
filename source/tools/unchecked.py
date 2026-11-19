@@ -62,6 +62,6 @@ if a[:1]==['--sample']:
 if not prs: print('Nothing is waiting for a second look.'); sys.exit(0)
 print(len(prs),'pull request(s) merged without a second look, oldest first:')
 for i in prs:
-    fs=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/data_') or f['filename'].startswith('source/tools/bricks_')]
+    fs=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/data_') or f['filename'].startswith('source/tools/bricks_') or f['filename'].startswith('source/tools/hours_')]
     print('  #%d  %s  merged %s  %s'%(i['number'],i['title'][:70],(i.get('closed_at') or '')[:10],' '.join(fs)))
 print('Review one as GUIDE.md section 14 says (tools/review.py <number>), fix what is wrong in a new pull request, then:  python3 tools/unchecked.py --done <number>')
