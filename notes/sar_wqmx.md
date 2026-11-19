@@ -16,7 +16,6 @@ Not checked: anything on the ground. Pins that mark only an area, not the thing:
 | Royal Blockhouse | Moreau, NY (address restricted) | Wikipedia: site of a three-storey 1758 blockhouse of the Fort Edward complex, bought by the Archaeological Conservancy in 2011, Register 2012 | Whether the Conservancy allows visits; no position should be published without that |
 | Parkis Mills | Galway, NY (HMdb 313675, 43.03965, -74.01266) | First Galway grist mill, 1785; Parkis pancake flour; Saratoga County History Center: destroyed April 1980 | Whether a dam or foundation is left on the Glowegee Creek; probably marker only |
 | Christ Church and Courthouse Hill site, Ballston Center | Middle Line Road, Ballston (HMdb 127386 at 42.95347, -73.87652) | First Episcopal church in the county, 1792, moved to Ballston Spa 1817; the county's first courthouse was built nearby in 1795 (Saratoga Today) | Anything to see; markers only so far |
-| Day Old Town Hall | Day Center, NY (HMdb 180125, 43.30492, -74.01778) | WPA-built 1936–37, town hall 1937–96 | Present use and a second source |
 | Mead House | Galway, NY | Wikipedia: about 1825 Federal house with carriage barn, Register 2004 | Address restricted on the Register list; private house |
 
 ## Tips
