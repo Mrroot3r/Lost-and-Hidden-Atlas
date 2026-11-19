@@ -249,22 +249,35 @@ The base is already in place for every US state, the District of Columbia and th
 
 | State | Places so far | Leaf-off and LiDAR | Owner lookup | Law note in the app |
 |---|---|---|---|---|
-| New York | Capital Region outward; Western New York and Buffalo (25), Central New York (`data_cny.py`, 8 canal works, and `data_syracuse.py`, 11 places round Syracuse, November 2026); none yet in NYC or the northern regions. Amsterdam and the lower Mohawk had a first close pass in November 2026 (`data_amsterdam.py`, 10 places); Washington County (region `wash`) had its first close pass the same day (`data_washco.py`, 12 places: old Champlain Canal locks, Hudson Falls railroad piers, standing landmarks and two Batten Kill covered bridges), and a second batch on top of it (`data_washco2.py`, 6 places: the Feeder Canal at Hudson Falls and Glens Falls, the Denton Sanctuary canal bed and the Eagleville bridge); two more batches from that hour hold the Ticonderoga hull, the Anthony house, the Miller farm and Shelving Rock (`data_washco3.py`, 4) and the bridge piers at Hudson Crossing (`data_washco4.py`, 1) | State services | Some counties | Yes |
-| Massachusetts | Statewide first pass, Worcester County deeper; the Quabbin and North Quabbin (region `cmass`) had a first close pass in November 2026 (`data_quabbin.py`, 12 places: lost-town traces at Quabbin Gates 35 and 52 and on Webster Road, the Quabbin Park Cemetery, two buildings carried out of Prescott, the Keystone Bridge, Coldbrook Springs, and mill and farm ruins on Trustees land at Bear's Den, Doane's Falls and Swift River), and a second batch the same day (`data_quabbin2.py`, 3 places: the 1955 F-94 wreck in the Quabbin woods near Dana, the Hermit's Castle in Erving State Forest and the burned Wheelwright mill on the Ware River) | State services | Statewide | Yes |
+| New York | 588 places (November 19, 2026): Lake George & Adirondacks 55, Albany County 49, Albany 44, Catskills 41, Western New York & Finger Lakes 41, Mohawk Valley 40, Schenectady 39, Hudson Valley 36, Cohoes · Waterford · Watervliet 35, Rensselaer County 29, Upper Hudson & Washington Co. 27, Mohawk Valley west 26, Troy & Lansingburgh 21, Schoharie, Otsego & Delaware 20, North Country & St. Lawrence 18, Central New York 18, Mid-Hudson 17, New York City & Long Island 17, Saratoga 15. Batches since November 18 have notes: `notes/adk_gvry.md`, `notes/albco_kaom.md`, `notes/cat_qazp.md`, `notes/conf_biei.md`, `notes/conf_simf.md`, `notes/hud_sgld.md`, `notes/mohawk_qljt.md`, `notes/mohw_beqc.md`, `notes/nny_qgdb.md`, `notes/nyc_opzz.md`, `notes/renss_osux.md`, `notes/sch_gqli.md`, `notes/sch_ywhu.md`, `notes/wny_orln.md` | State services | Some counties | Yes |
+| Massachusetts | 139 places (November 19, 2026): Worcester & Blackstone Valley 48, South Shore, South Coast & Cape Cod 31, Quabbin & central Massachusetts 18, Pioneer Valley 15, Greater Boston & MetroWest 11, Berkshires 9, North Shore & Merrimack Valley 7. Batches since November 18 have notes: `notes/south_ljeg.md` | State services | Statewide | Yes |
 | Rhode Island | Three passes, 57 places | State services | No | Yes |
 | Vermont | A few in the south, two farther north | State services | No | No |
-| Connecticut | 36: five first examples, 15 in Litchfield County (region `ct`) and 16 in New Haven County (region `ctsw`, November 2026: see `notes/ctsw_iuny.md`) | State leaf-off tiles (CT ECO, spring 2023) and the state's 2023 LiDAR hillshade, lit from the northwest only | No | No |
-| New Hampshire | A first handful of woods ruins (the "Ruins in the woods" batch), and a first close pass in Strafford County, region `nhl` (`data_nhl_eqhp.py`, 17 places, November 2026: mill ruins at Wiswall Falls and on the Isinglass, the Doe Farm cellar hole, the fortified meetinghouse site on Dover Point, the Damm Garrison, and mills, meeting houses and pounds still standing) | State tiles (NH GRANIT, spring 2021-22) and the state's LiDAR, shaded on request | No | No |
-| New Jersey | The first handful from the "Ruins in the woods" batch, and a first close pass in Hunterdon County, region `njc` (`data_njc_mpsa.py`, 13 places, November 2026: the ironworks remains at High Bridge, the Ken Lockwood Gorge railroad bridge, the Clinton mills, Prallsville Mills, Green Sergeant's Covered Bridge, the Lambertville outlet lock, the Lumberville footbridge, the Flemington courthouse, two stone churches) | State leaf-off tiles (2020). LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
-| Maine | A first handful, all woods ruins on public or preserve land (the "Ruins in the woods" batch) | State spring mosaic from zoom 15 (where it has a hole, in the north woods, satellite shows instead) and the state's LiDAR, shaded on request | No | No |
-| Pennsylvania | The first handful from the "Ruins in the woods" batch, and a first close pass in Huntingdon County, region `pac` (`data_pac_eclm.py`, 15 places, November 2026: the Greenwood, Paradise, Monroe, Huntingdon, Barree and Etna iron furnaces, the Minersville coke ovens on State Game Lands 67, the East Broad Top at Rockhill Furnace and the Robertsdale coal town, Corbin suspension bridge, St. Mary's covered bridge, the 1850 railroad arch in Huntingdon and Whipple Dam) | State leaf-off (PEMA 2021-23) from zoom 14: slow, about a tile a second. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Connecticut | 97 places (November 19, 2026): Northwest Connecticut 34, New Haven & southwest Connecticut 31, Eastern Connecticut 16, Hartford & the Connecticut Valley 16. Batches since November 18 have notes: `notes/ct_fhib.md`, `notes/cte_jqlk.md`, `notes/cthv_qmok.md`, `notes/ctsw_iuny.md`, `notes/ctsw_ldel.md` | State leaf-off tiles (CT ECO, spring 2023) and the state's 2023 LiDAR hillshade, lit from the northwest only | No | No |
+| New Hampshire | 78 places (November 19, 2026): White Mountains & North Country 38, Southern New Hampshire 21, Lakes Region & Seacoast 19. Batches since November 18 have notes: `notes/nhs_hbgu.md`, `notes/nhw_bzpl.md`, `notes/nhw_cbfa.md` | State tiles (NH GRANIT, spring 2021-22) and the state's LiDAR, shaded on request | No | No |
+| New Jersey | 53 places (November 19, 2026): North Jersey 25, South Jersey & the Pine Barrens 15, Central Jersey 13. Batches since November 18 have notes: `notes/njn_ceha.md`, `notes/njs_himh.md` | State leaf-off tiles (2020). LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Maine | 39 places (November 19, 2026): Midcoast & central Maine 19, Southern Maine & Portland 18, Northern & Downeast Maine 2. Batches since November 18 have notes: `notes/mec_lqkw.md`, `notes/mes_vpdi.md` | State spring mosaic from zoom 15 (where it has a hole, in the north woods, satellite shows instead) and the state's LiDAR, shaded on request | No | No |
+| Pennsylvania | 65 places (November 19, 2026): Central Pennsylvania 20, Northeast Pennsylvania & the Poconos 17, Western Pennsylvania 15, Philadelphia & southeast Pennsylvania 13. Batches since November 18 have notes: `notes/pae_ievd.md`, `notes/pane_wipu.md`, `notes/paw_egal.md` | State leaf-off (PEMA 2021-23) from zoom 14: slow, about a tile a second. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
 | Missouri | Kansas City only (region `kcmo`, start city Kansas City), first batch November 2026 | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
 | Kansas | Kansas City, Kansas side (in `data_kc.py`, `data_kc2.py`); Douglas County (Lawrence, Baldwin City, Lecompton, Clinton Lake, Lone Star), first close pass November 2026 (`data_ks_kwud.py`, 14 places: Santa Fe Trail ruts and markers, the Black Jack battlefield, Bloomington under Clinton Lake, the Lone Star Lake CCC camp, territorial-era buildings). All in the one statewide region `ks` | State aerial of 2024 from zoom 14 (the trees were bare in the frames looked at; the service does not say leaf-off). LiDAR from USGS 3DEP at zoom 16 and deeper (USGS 3DEP LiDAR does show in the pin check) | No | No |
 | North Carolina | Brunswick Town (in "A first place in every state") and a first close pass round Old Salem and Winston-Salem, Forsyth County (`data_oldsalem.py`, 12 places, November 2026) | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
 | Utah | Old Irontown (in "A first place in every state") and a first close pass in the Tintic Mining District round Eureka, Juab County, with the Tintic mill at Genola and three Pony Express stations in the West Desert (`data_ut_tkty.py`, 15 places, November 2026). All in the one statewide region `ut` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
-| Hawaii | 17: the Kōloa sugar mill on Kauai (in "A first place in every state") and 16 on Oahu (November 2026: see `notes/hi_atut.md`). One statewide region, `hi` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Hawaii | 34 places (November 19, 2026): one statewide region, `hi`. Batches since November 18 have notes: `notes/hi_atut.md`, `notes/hi_upxn.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
 | Texas | 16: Terlingua ghost town (in "A first place in every state") and 15 in the Big Bend (November 2026: see `notes/tx_qdfw.md`). One statewide region, `tx` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
-| The other 36 states | One place each, in `data_states.py` ("A first place in every state"). Each has one statewide region whose code is the state's two letters (`ca`, `oh`) and one or two start cities | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Arkansas | 19 places (November 19, 2026): one statewide region, `ar`. Batches since November 18 have notes: `notes/ar_bwsp.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Delaware | 16 places (November 19, 2026): one statewide region, `de`. Batches since November 18 have notes: `notes/de_jiei.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Illinois | 20 places (November 19, 2026): one statewide region, `il`. Batches since November 18 have notes: `notes/il_jasy.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Kentucky | 15 places (November 19, 2026): one statewide region, `ky`. Batches since November 18 have notes: `notes/ky_ixyl.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Louisiana | 15 places (November 19, 2026): one statewide region, `la`. Batches since November 18 have notes: `notes/la_kaae.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Maryland | 17 places (November 19, 2026): one statewide region, `md`. Batches since November 18 have notes: `notes/md_vdxv.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Minnesota | 15 places (November 19, 2026): one statewide region, `mn`. Batches since November 18 have notes: `notes/mn_dzwh.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Montana | 14 places (November 19, 2026): one statewide region, `mt`. Batches since November 18 have notes: `notes/mt_nmtx.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| New Mexico | 16 places (November 19, 2026): one statewide region, `nm`. Batches since November 18 have notes: `notes/nm_lincoln_drpx.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| South Carolina | 16 places (November 19, 2026): one statewide region, `sc`. Batches since November 18 have notes: `notes/sc_vxwi.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| South Dakota | 17 places (November 19, 2026): one statewide region, `sd`. Batches since November 18 have notes: `notes/sd_xdeo.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Tennessee | 20 places (November 19, 2026): one statewide region, `tn`. Batches since November 18 have notes: `notes/tn_ojdh.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| Wisconsin | 20 places (November 19, 2026): one statewide region, `wi`. Batches since November 18 have notes: `notes/wi_axaz.md` | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
+| The other 23 states | One place each, in `data_states.py` ("A first place in every state"). Each has one statewide region whose code is the state's two letters (`ca`, `oh`) and one or two start cities | Satellite. LiDAR from USGS 3DEP at zoom 16 and deeper | No | No |
 | Ontario, Quebec, New Brunswick, Nova Scotia, Manitoba, Alberta, British Columbia | One place each, in the same batch. Region code is the province's two letters (`on`, `qc`) | Satellite and the world hillshade only. No USGS old maps and no public-land lookup in Canada | No | No |
 | District of Columbia, Prince Edward Island, Newfoundland and Labrador, Saskatchewan | None yet. Outline, region and start city are ready | Satellite; 3DEP LiDAR in the District of Columbia, the world hillshade in the provinces | No | No |
 
@@ -635,16 +648,146 @@ The tidy job (section 6) keeps here what sessions wrote under "Tips" in their no
 - National Park Service: besides a park's own history pages there is a second set of addresses, `https://www.nps.gov/places/<name>.htm`, with quick facts the history pages lack (trail length, parking, where the place is by road mileage). Guess the name from the place's name; `page.py` says 404 when the guess is wrong.
 - `page.py --all` on an nps.gov page returns everything on one line, beginning with about 600 characters of site menu. The article is what is left after cutting everything before "Contact Us." and everything after "Last updated:".
 - An HMdb marker page gives the marker's position in the text `page.py` keeps, as `41.xxxxx,-72.xxxxx' target=_blank>Touch`. The Sleeping Giant quarry crusher in Connecticut was pinned from that.
+- Register list and Wikipedia coordinates are often off the building, by 30 m to over 500 m, and land in woods, fields, rivers, roads or on the wrong house (sessions in Maine, Maryland, Wisconsin, New Hampshire, New York, South Carolina, Connecticut, Montana and New Mexico all found it). What landed on the building: the ArcGIS geocoder's PointAddress result for a street address with house number and ZIP (`tools/geo.py "641 Sudderth Drive, Ruidoso, NM"`), `nom.py`'s OpenStreetMap point, or `osmnear.py <lat> <lon> 600 buildings -g '<name>'`. Look at every Register point on the aerial.
+- The pin check's `--lidar` sheet shows what the aerial hides under trees or marsh: Fort Macomb in the Louisiana marsh, the Clifton Terrace stone terraces in Illinois, a buried roundhouse turntable in Watertown, the earthworks of Fort Fremont and Fort Howell in South Carolina. `look.py` at 1,500 m is too coarse to find a ruin under trees.
+- NPGallery forms: the text route `https://npgallery.nps.gov/NRHP/GetAsset/NRHP/<ref>_text` read well for Arkansas, Montana and South Carolina forms. For many older forms in New York it returns a one-page placeholder, which `page.py` now names as such: do not try other addresses for that form. Forms from the 2010s on usually have text. National Historic Landmark forms are under `NHLS` instead of `NRHP` (`.../GetAsset/NHLS/66000503_text`). A long form's description is past `page.py --all`'s 12,000 characters: add `-n 200000`. A 153-page form with OCR noise was best searched in the cached copy in `research/pages/` with a short Python search.
+- `check.py` refuses any email address in a data file, even a museum's public booking address: write "by email through its page".
+- HMdb nearby lists (a 5-mile radius round a few points) found most of a batch in several counties. The cached page in `research/pages/` gives marker number, title and position in one line each with `grep -o "m.asp?m=[0-9]*'>[^<]*</a> (<a href='[^']*destination=[0-9.,-]*"`. Check the state on a marker before reading it: a search for the Pembroke Friends Meetinghouse (Massachusetts) returned an HMdb marker in Pembroke, New Hampshire. Markers that share one position at a road junction (Militia Hill, Rocky Top, Tennessee) cannot pin a place.
+- A web search for a society, church or mill often leads first to a namesake in another state: the Winchester Historical Society in Massachusetts for Winsted's, "Hopewell Mills District" in Taunton for Glastonbury's, rokeby.org in Vermont for Barrytown's Rokeby, historicchristchurch.org in Alexandria for Duanesburg's Christ Church. Check the state before taking hours.
+- Some web searches return titles and links only, with no quoted text (Morris and Salem counties, New Jersey); hours cannot then be taken from search results.
+- In an unattended session the web fetch tool answered the first few requests and then timed out waiting for approval on every one: fetch the managing bodies' pages you need most first, in one batch.
+- A county's Register list may be split into parts ("northern", "southern", "eastern" Chester County; "northern New Castle County", "Wilmington" and "southern New Castle County"; the plain title then redirects to one part or has no rows). In Tennessee a small county's title redirects to the state list: grep `wiki_raw.py --rows` output for the town names. `--rows` also shows no "article:" for many rows that have one under exactly the row name: try the row name before giving up.
+- `brick.py look` works on a new batch's ids as soon as `build_sites.py` has run, before publishing. Wikimedia refuses pictures (HTTP 429) after about six in a row: wait a minute, and after two refusals for one place leave it unset.
+- Check every lot `parking.py` lists on the aerial: several were a point on a road or at a bridge end, a school or campus lot, or (Fort Mott) a path across a field.
+- The pin check's `land:` line can change between runs for the same spot (Mirror Lake dam, Arkansas: a federal unit on one run, "not on mapped public land" on the next, 23 m away).
+- After `publish.sh` stops because another batch merged and `resync.sh` has caught up, take the batch time again, so the batch stays the newest.
+- `osmnear.py <lat> <lon> 300 buildings` gives buildings' `ref` letters and names (Snug Harbor's lettered buildings), which put a pin on the right one of several.
+- Older Register forms give a place only as a UTM reference: `tools/utm.py 15 584500 3946200` converts it.
+
+### Arkansas
+- Arkansas nomination forms on NPGallery (`_text`) had text layers, including the 1985 Stone County multiple-resource forms; `page.py -g` on them gives building dates, materials and owners in one call.
+- encyclopediaofarkansas.net addresses guessed from a title answer 404 with no archived copy; take the exact address from a web search result first.
+- Older Arkansas forms give a UTM reference, not latitude and longitude (`tools/utm.py`); the Brewer School's Register list coordinate was about 200 m off, in a field.
 
 ### Connecticut
 - State park pages (CT DEEP) read well with `page.py --all`. The hours sit in a line that begins "Details Open Daily", which the `-g` filters miss: search the `--all` text for "Sunset".
 - New Haven County: the Madison Land Conservation Trust's pages and the regional council's trail brochures (`scrcog.org/wp-content/uploads/2026/04/<Name>.pdf`) both read cleanly and cover most town and land-trust trails in the county, with parking and ruins marked.
+- CT DEEP park pages are at `portal.ct.gov/deep/state-parks/parks/<name>`; for state forests the working address was `ctparks.com/parks/<name>` (the `/forests/` form answered 404). Old Furnace State Park's DEEP page gives no hours; the Killingly Conservation Commission's leaflet (`killinglyconservation.org/_files/ugd/f1f6b2_e011d001a1e243b7befc3159fb8071d3.pdf`) has a dated history of the furnace and the park address.
+- DEEP's "Seedling letterbox" clue pages (`portal.ct.gov/deep/forestry/letterboxing/...`) describe ruins along a forest trail step by step; they gave the only account of the cheese-box factory on the Henry Buck Trail.
+- Drawn by script or refusing `page.py`: millmuseum.org, huntingtonhomestead.org, glastonburyct.gov (403), ctmq.org (resets), ctrivermuseum.org (404, no archive). CTvisit's listings (ctvisit.com) read cleanly and give hours, fees and days for the same places; savecottonhollowmill.org and Patch carried Cotton Hollow.
+- HMdb's marker pages for the Dividend Pond Archaeological District, Rocky Hill, give each mill's story, what is left and a position; start at `https://www.hmdb.org/m.asp?m=301402`.
+- The ArcGIS geocoder put "Pine Street & Elm Street, Manchester, CT" in Manchester, England; give a house number and ZIP (`geo.py` now keeps a ", CT" address in Connecticut).
+- Register list coordinates in Old Saybrook (Lynde Point Light, the Shore Line power house) and Old Wethersfield fell 60 to 70 m off the buildings; the Solomon Rockwell House point in Winsted is in woods 50 m west of the house.
+- Near the Rapallo Viaduct, `parking.py` offers a school lot on Smith Street; DEEP names the Air Line trailhead as "Smith Street, near Flanders Road". Look before pinning.
+
+### Delaware
+- destateparks.com pages read well with `page.py` (`/History/FortDelaware`, `/History/FortDupont`, `/History/AuburnValley`, `/WhiteClayCreek`, `/Lums`); guessed addresses such as `/LumsPond` answer 404. New Castle County's own park pages (newcastlede.gov) answered 403.
 
 ### Hawaii
 - State park pages (`dlnr.hawaii.gov/dsp/parks/oahu/<slug>/`) read with `page.py`, but the `-g` summary cuts the winter hours: use `--all` and search for "Winter:". Every page ends with the same statewide closure notices, which match most patterns: cut the text off at "**IMPORTANT PARK NOTICES".
 - Oahu: the HMdb nearby list returned the same Pearl Harbor markers whatever the point; it was not useful for finding ruins there.
 - Oahu: National Register list coordinates were good for the heiau and the lighthouses but 400 m off for Keaīwa Heiau (the point is in forest on private watershed land) and 450 m off for Battery Randolph. Wikipedia's point for Heʻeia Fishpond lands on houses.
+- The Painted Church's old address (`thepaintedchurch.org`) now holds an unrelated Spanish-language blog: take no hours from it. `imiolachurch.com` did not answer, nor its archived copy.
+- The Kona Historical Society said in November 2026 it must raise $200,000 by December 31, 2026 to stay open: check its places' hours again in 2027.
+- `nom.py` found most heiau and churches in Kona by name, but not Huliheʻe Palace, Kahikolu Church or the Kohala courthouse; the ArcGIS geocoder's POI for "Kohala District Courthouse" was the South Kohala court in Waimea.
+- The closure notices at the bottom of the state park pages are the same on every page and name other parks (the Kealakekua page carried Lapakahi's reopening date): read them for the whole island.
+
+### Illinois
+- The greatriversgreenway.org page for the Chain of Rocks Bridge hours is 404 with no archived copy; `nps.gov/places/chain-of-rocks-bridge.htm` gives parking and "open daily".
+- A Mississippi bridge pin from OpenStreetMap can fall on the Missouri side: pin the Illinois bank end.
+- HMdb's nearby list round Elsah, Grafton and Alton gave the Elsah ice house ruin and the Clifton Terrace winery, which no Register list names.
+
+### Kentucky
+- parks.ky.gov is drawn by script (`page.py` gets 63 characters) and its static mirror answers 403; a local paper (the Harrodsburg Herald) carried the 2026 hours for Old Fort Harrod.
+- McDowell House's site (`mcdowellhouse.com/constitution-square`) carries Constitution Square's hours too; Perryville Battlefield's read cleanly from `perryvillebattlefield.org/html/directions_and_hours.html`.
+
+### Louisiana
+- `wiki_raw.py` found no article for Lincoln Beach (New Orleans); nola.gov and Axios New Orleans carried the facts. Its Register list point is inland of the levee; the beach is 400 m north on the lake side.
+- In the coastal marsh the LiDAR sheet is worth reading even for standing masonry: it showed Fort Macomb where the aerial showed only trees.
+- The first Wikipedia picture here was a drawing (Fort St. Philip), a map (Battery Bienvenue) or a postcard (the Mint): use `brick.py look --pic N` for a photograph.
+
+### Maine
+- The state park day-use fee page (`maine.gov/DACF/parks/park_passes_fees_rules/park_day_use_fees.shtml`) reads with `page.py --all` and gives fees for every state historic site at once.
+- The Maine Coastal Program's Coastal Public Access Guide PDFs (maine.gov/dmr, one for each stretch of coast, May 2026) read with `page.py` and give parking, dogs, fees and a coordinate for every shore park and fort.
+- Refusing `page.py`: lincolncountyhistory.org (403; Lincoln County News, lcnme.com, and the Wiscasset Newspaper carry the museum dates), historicnewengland.org (403, archives unreadable), bristolmaine.org park pages (404; thefishermensmuseum.org gives the Pemaquid park season), alfredshakermuseum.com (drawn by script).
+- Wikipedia coordinates in Lincoln County were often 30 to 200 m off (8 of 18 moved); the Perkins Tide Mill point in Kennebunkport is on a house 400 m from the property (the geocoder finds 8 Mill Lane).
+- On the Salmon Falls River at South Berwick the state outline runs about 240 m east of the river, so a pin on Hamilton House sits outside Maine's outline (`check.py` now warns instead of refusing).
+
+### Maryland
+- DNR park pages read well at `dnr.maryland.gov/publiclands/Pages/western/<name>.aspx`, but the guessed name is often wrong (Cunningham Falls is `Cunningham.aspx`): search for the exact address.
+- Frederick County Parks and Recreation (`recreater.com`) answered 404 or reset the connection.
+- NPS Monocacy pages are at `nps.gov/mono/learn/historyculture/<name>.htm` with an underscore (`thomas_farm.htm`, `gambrill_mill.htm`).
+- Several Wikipedia coordinates in Frederick County sat 50 to 550 m off (Catoctin Furnace's in woods south of the furnace); `osmnear.py ... buildings -g '<name>'` found the right building every time.
+
+### Massachusetts
+- duxburyhistory.org reads cleanly and gives season, tour days and parking for King Caesar House and the Bradford House. pilgrimjohnhowlandsociety.org answers 403.
+- The Plymouth Antiquarian Society's 2026 Liberty Trail brochure PDF (plymouthantiquarian.org) gives street addresses for Revolutionary sites, Parting Ways at 287 Plympton Road among them.
+
+### Minnesota
+- MNHS's Marine Mill hours page comes back with the "Hours" heading empty (drawn by script). washingtoncountymn.gov/3089/Tours answers 404; the courthouse's hours are at washingtoncountymn.gov/3472.
+
+### Montana
+- Historic Montana (`historicmt.org/items/show/<n>`) and the NPGallery text forms of the 1970s to 2000s read well; a 2020 listing (Glenn's Dam) came back with only 893 characters. discoveranaconda.com answers 403.
+- The Register list point for the Old Montana Prison is on a house across Main Street from the prison wall.
+
+### New Hampshire
+- State park addresses are now `nhstateparks.org/find-parks-trails/<name>` (`mt-washington-state-park`); the older `/visit/state-parks/...` form answers 404 except for Weeks State Park.
+- The White Mountain National Forest road status page (`fs.usda.gov/r09/whitemountain/alerts/forest-roads-status`) lists every forest road open or closed with a date (Sawyer River Road, the way to Livermore, is closed to vehicles).
+- `whitemountainhistory.org` reads in full with `page.py --all` and has a page on each abandoned logging town. The Nature Conservancy's preserve pages read in full too, with the trail map PDF and a directions coordinate in the cached HTML.
+- The Army Corps New England District pages (`nae.usace.army.mil`) answer 403; the Corps Lakes Gateway page (`corpslakes.erdc.dren.mil/visitors/projects.cfm?ID=...`) reads and lists a project's recreation areas. The Historical Society of Cheshire County's "Monadnock Moments" pages answer 404.
+- NH State Parks' Cheshire Rail Trail page gives a Troy parking coordinate (42.724676, -72.184249) that is in Massachusetts: do not copy it.
+- The state outline puts the whole Connecticut River in Vermont at Bedell Bridge and the Mount Orne bridge: pin a New Hampshire river place on the New Hampshire bank (`check.py` now warns within a kilometre instead of refusing).
+- Register list points in Grafton County fell in rivers twice (Piermont, Blair) and in a yard once (Orford).
+
+### New Jersey
+- Journey Through Jersey (`journeythroughjersey.com/sites/<name>`) reads well and gives hours for state parks and historic sites whose own `nj.gov/dep` pages give 7 characters.
+- nps.gov reads well: `nps.gov/morr/planyourvisit/hours.htm` gives every Morristown site's hours (`nps.gov/places/wick-house.htm` and `ford-mansion.htm` are 404). morrisparks.net and morriscountynj.gov answer 403.
+- `fws.gov/refuge/<name>/visit-us` answered 404; the refuge's main page (`fws.gov/refuge/supawna-meadows`) has hours and rules.
+- On the Delaware shore by Fort Mott and Finn's Point the New Jersey and Delaware outlines overlap; `check.py` used to refuse such pins as Delaware and now accepts a pin inside either.
+
+### New Mexico
+- nmhistoricsites.org gives `page.py` the same generic text for every address; Fort Stanton's hours came from fortstanton.org/information.
+- The Old Dowlin Mill's Register point is on Sudderth Drive about 280 m east of the mill; OpenStreetMap's "Old Mill" and the geocoder's point for 641 Sudderth agree.
+
+### New York
+- Mohawk Valley Museums (`mohawkvalleymuseums.us/museums/<name>/`) has address, phone and season hours for most churches, museums and societies in Herkimer and Montgomery counties.
+- The American Canal Society's sheets give a coordinate for every lock and aqueduct: the Enlarged Erie sheet's condition column drifts out of line from Lock 40 west (read eriecanal.org for those), and the Champlain sheet writes degrees with "E" for the degree sign (`42E46'48.92"N`); locks 1 to 9 matched OpenStreetMap ruin leads within about 10 m.
+- Schenectady County put up markers along the Empire State Trail in 2024–2025 (Lock 7, Lock 8, the Niskayuna station, the Kiwanis Park aqueduct, HMdb 272279), each with a history and an exact position.
+- Local Waterfront Revitalization Program PDFs (`docs.dos.ny.gov/opd-lwrp/...`) can hold a building-by-building historic inventory (Cape Vincent's tied the Duvillard Mill to the DEC Fisheries Station).
+- Orleans Hub (`orleanshub.com/?p=<n>`) reads in full with `page.py --all` and its local-history series is the best source for Orleans County (cut the menu at "legal/meeting notices"); orleanscountytourism.com reads with the www address only.
+- The Spindle City Historic Society's tour PDFs (`spindlecity.net/Brochures/...`) give dates and present uses building by building for Cohoes, and name which Erie lock walls can be seen.
+- The Historic House Trust (`historichousetrust.org/houses/<name>/`) gives owner, operator and hours for every city-owned house in New York City; NYC Parks addresses under `php1-84.nycgovparks.org` answer 401, the same path on `www.nycgovparks.org` reads. Fort Wadsworth's hours are at `nps.gov/gate/learn/historyculture/fort-wadsworth.htm`.
+- 44lakes.com (Fulton County tourism) has plain pages for both Johnstown-area museums and every county marker; johnstownnyhistsoc.org and fultoncountyhistoricalsociety.org return nothing usable.
+- The Guilderland Path Through History flyer (guilderlandschools.org) lists which town houses open and when. albanyhilltowns.com would not connect to `page.py` but the web fetch tool read it. altamontenterprise.com shows a paywall to some articles.
+- `schenectadyhistorical.org/site/mabee-farm-historic-site/` has the Mabee Farm's hours (the old schenectadyhistory.org address is 404); the Duanesburg parish is `christchurchduanesburg.org`.
+- Refusing `page.py`: dcha-ny.org, townofausableny.gov, army.mil (an archived copy is used), duanesburg.gov, hoosickhistory.com's home page. `dec.ny.gov/places/valcour-island-primitive-area` is 404; `dec.ny.gov/places/lake-champlain-islands-complex` has Valcour's rules. boldtcastle.com's hours page still showed 2018 dates.
+- The Valcour Island Heritage Trail guide (champlainvalleynhp.org) prints each waypoint just before its caption, not after.
+- Points off the building: the Poke-O-Moonshine fire tower's Register point is at the road by the trailhead; the Kent-Delord House's Wikipedia point is 450 m west (`nom.py` gives 17 Cumberland Avenue); the Apple Tavern's is in a field 900 m east (the geocoder knows "Appel Inn"); the Fulton County courthouse's OpenStreetMap name sits on the county office building at 223 West Main Street.
+- `parking.py` finds no lot at Montgomery Place's visitor centre (the lots it lists are Bard campus lots).
+
+### Pennsylvania
+- The state's leaf-off server is slow: 60 seconds to several minutes a tile, often timing out to Esri. Run `pincheck.py --lidar` in the background from the start, on named ids in groups of two or three, with no timeout; one session ran six copies of the workspace side by side.
+- SAH Archipedia (`sah-archipedia.org/node/<n>`) reads cleanly with `page.py --all`; its "Materials:" line settles red brick and gives current use.
+- The D&L heritage-corridor panels on the Lehigh Gorge Trail give exact positions for the lock ruins.
+- Chester County Parks pages did not turn up in search; ironandsteelheritage.org has short pages for most iron sites in the county. mychesco.com's park features read like composites: use them only for what other sources back up. eastpikeland.org answers 403, millpictures.com 409, no9mine.com 403.
+- oldeconomyvillage.org and the PHMC page give different weekday hours for Old Economy Village.
+
+### South Carolina
+- The state's own register site (`schpr.sc.gov`) answers 403; NPGallery's text forms read well. historicbeaufort.org answers 403 and heritagelib.org's old addresses 404.
+- Register list points were off at Sams Plantation (in marsh), Fort Howell (160 m away, by a road junction) and the Church of the Cross (on the shore); the LiDAR sheet showed the forts plainly.
+
+### South Dakota
+- South Dakota has no leads layers yet: the Register list rows are the whole starting list.
+- siouxfalls.gov answers 403; Experience Sioux Falls (`experiencesiouxfalls.com/fallspark`) and the Siouxland Heritage Museums pages (`siouxlandmuseums.com/?p=111`, `?p=130`) give history, hours, parking and fees. cityofgarretson.com shows a browser challenge.
+
+### Tennessee
+- tnstateparks.com park pages read fully with `page.py --all` (their `/history` sub-pages answer 404).
+- The ArcGIS geocoder found places `nom.py` did not ("Stonecipher/Kelly Home", "RM Brooks Store", "Leach Cemetery"): `tools/geo.py "<name>, Rugby, TN"`.
 
 ### Texas
 - Big Bend: OpenStreetMap is well mapped there. `nom.py` found most of the historic sites by name ("Dorgan house ruin", "Luna Jacal", "Homer Wilson Ranch", the "Old Sam Nail Ranch" water pump), and `osmnear.py ... buildings -g '.'` found the Hot Springs store, motel and house, tagged `building=ruins`.
 - Far West Texas: the pin check's LiDAR sheet (`--lidar`) worked there, and showed the Mariscal Mine works and the lines at Johnson's Ranch better than the aerial did.
+
+### Wisconsin
+- Register and Wikipedia points in rural Wisconsin landed in crop fields (First Capitol, Taliesin, Gratiot House, 130 to 250 m off); `nom.py` found the buildings. The Tower Hill shot tower's own point is just outside the park on the federal land map, so the pin check says CHECK ACCESS though the park owns it.
+- The Wisconsin Historical Society site pages (`pendarvis.wisconsinhistory.org`) read, but their "plan your visit" pages answer 404: the home page carries the season. taliesinpreservation.org answers 403 (American Players Theatre's "Area Guide Spotlight" posts describe the tours); badgermineandmuseum.com is drawn by script.

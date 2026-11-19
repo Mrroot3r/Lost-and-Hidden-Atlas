@@ -48,7 +48,7 @@ const { chromium } = require('playwright');
     { await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
       await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(b=>b.textContent==='Standing, from before 1800').click(); }); await p.waitForTimeout(300);
       const r=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), by={}; D.sites.forEach(x=>{ by[x.id]=x; });
-        const rows=[...document.querySelectorAll('#list li button[data-id]')].map(b=>by[b.dataset.id]); const yr=x=>Math.min(...(String(x.years).match(/(1[5-9]\d\d)(?!\d)/g)||['9999']).map(Number));
+        const rows=[...document.querySelectorAll('#list li button[data-id]')].map(b=>by[b.dataset.id]); const yr=x=>{ const t=String(x.years), c=/(\d\d)(st|nd|rd|th) century/i.exec(t); return Math.min(...(t.match(/(1[5-9]\d\d)(?!\d)/g)||['9999']).map(Number),c?(+c[1]-1)*100:9999); };      /* "18th century" is 1700, as yearOf() reads it */
         return {n:+document.querySelector('#count').textContent.split(' ')[0],rows:rows.length,bad:rows.filter(x=>x.st!=='standing'||yr(x)>=1800).map(x=>x.id+' '+x.years),sel:document.querySelector('#f-before').value,
           razed:D.sites.filter(x=>/^razed/.test(x.years||'')).length}; });
       ok(name+': "Standing, from before 1800" lists standing places from before 1800 and no others',r.n>20&&r.rows>0&&r.bad.length===0&&r.sel==='1800',r.n+' listed; wrong: '+(r.bad.slice(0,3).join(', ')||'none')); }
