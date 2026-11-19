@@ -24,6 +24,7 @@ What I care about most:
 - For a standing building, say in the "what to look for" text what original fabric survives (stained glass, woodwork, box pews, machinery, a painted sign) and whether the public can go in and when, from a source you opened. If no source says, write "interior not checked".
 - Red brick is one thing readers filter by, so every place you add records it, though it is no reason to choose one place over another:  brick='yes'  (red brick is the main thing you see),  'some'  (part of it: a chimney, an arch, brick over stone),  'no'  (none, or brick that is yellow, buff or painted), or  '?'  when no source and no picture you opened settles it. Never guess it from the kind of building.
 - Other sessions may be working at the same time. Name your data file and batch key after the place with four random letters on the end (data_cortland_qhzm.py), check the open pull requests that tools/start.py lists, and look at them once more just before you publish with  python3 tools/start.py --prs  (gh can print nothing at all in a scheduled session). If one has taken your ground, keep only what it lacks.
+- Your data file holds data and nothing else: import only  from data_b import N  and  from data_ma import W  (W('Article title') makes a Wikipedia link), no urllib, os or re, no loops or classes. tools/safe_data.py refuses anything more, and check.py says so before you publish (GUIDE.md section 4).
 - Finish with ONE pull request and stop. Do not merge it and do not push to main. A pull request that holds only place lists and notes merges by itself once GitHub's checks pass, and is marked "not double-checked" for a later review; anything else waits for me.
 - Nobody is there to approve anything. If the web page tool asks for approval, it will not get it, and later calls may be refused too: read pages with tools/page.py and tools/wiki_raw.py, and where those fail, take hours from what a web search result quotes and say so in the access note.
 - Work frugally. Read a page with the tools' -g filters before reading it whole, do not open the same file or page twice (the tools keep copies), and look at pins in sheets of twelve, not one at a time.
@@ -70,6 +71,7 @@ What I care about most:
 - Every tip you leave out is listed in the pull request with the reason.
 - Look at each lead row the tool says may already be on the map, and delete it only if that place was added.
 - You are the one session allowed to edit GUIDE.md and LEADS.md. Do not change PROMPTS.md, the app or any place entry.
+- Your data file holds data and nothing else: import only  from data_b import N  and  from data_ma import W  (W('Article title') makes a Wikipedia link), no urllib, os or re, no loops or classes. tools/safe_data.py refuses anything more, and check.py says so before you publish (GUIDE.md section 4).
 - Finish with ONE pull request and stop. Do not merge it and do not push to main. I merge.
 
 When you finish, tell me in plain English: how many leads you moved, where each tip you kept went, each tip you dropped and why, any tool you changed, and the link to the pull request.
