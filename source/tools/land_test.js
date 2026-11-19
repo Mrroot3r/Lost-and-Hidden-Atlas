@@ -1,7 +1,8 @@
 // A phone turned on its side: the menu on the left, the map on the right, nothing that scrolls along the bottom edge
 // (Android takes a swipe there as "go home" or "switch app").
 //   node tools/land_test.js http://localhost:8766/index.html      (serve the built site first, as for smoke.js)
-// Run it after changing the page layout in app.css (the grid, the layer bar, the Map options sheet) or the Full button.
+// Run it after changing the page layout in app.css (the grid, the layer bar, the Map options sheet), the Full button,
+// or the head of a place page (.dhead, which stays put while the page scrolls).
 // Screenshots go to /tmp/land_*.png.
 const { chromium } = require('playwright');
 (async()=>{
@@ -54,6 +55,13 @@ const { chromium } = require('playwright');
   await p.evaluate(()=>{ const li=[...document.querySelectorAll('#list li')].find(n=>!n.classList.contains('empty')); (li.querySelector('button,a,[role=button]')||li).click(); }); await p.waitForTimeout(600);
   await p.screenshot({path:'/tmp/land_780_place.png'});
   ok('a place page opens in the left column',await p.evaluate(()=>{ const v=document.querySelector('#v-detail'); const r=v.getBoundingClientRect(); return !v.hidden&&r.height>=innerHeight-80&&r.right<=document.querySelector('#stage').getBoundingClientRect().left+1; }));
+  const hd=await p.evaluate(()=>{ const h=document.querySelector('#v-detail .dhead'), v=document.querySelector('#v-detail'), bs=[...h.querySelectorAll('.dtop .btn')].map(b=>b.getBoundingClientRect());
+    return {h:h.getBoundingClientRect().height,view:v.getBoundingClientRect().height,rows:new Set(bs.map(r=>Math.round(r.top))).size,n:bs.length,right:Math.max(...bs.map(r=>r.right)),edge:v.getBoundingClientRect().right,inside:!!h.querySelector('.dphoto,.dmeta,.sub2')}; });
+  ok('the place page\'s fixed head is one row of buttons and the name, under a third of the column',hd.rows===1&&hd.right<=hd.edge&&hd.h<=hd.view/3&&!hd.inside,JSON.stringify(hd));
+  await p.evaluate(()=>{ document.querySelector('#v-detail').scrollTop=400; }); await p.waitForTimeout(150);
+  const sc=await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead'); return Math.round(v.getBoundingClientRect().bottom-h.getBoundingClientRect().bottom); });
+  ok('scrolled, three quarters of the column is left to read',sc>=hd.view*0.75,sc+' px under the head of '+Math.round(hd.view));
+  await p.screenshot({path:'/tmp/land_780_place_scrolled.png'});
   // the bars that float on the map sit under the layer bar, not on it
   await p.evaluate(()=>{ for(const id of ['addbar','recbar']) document.getElementById(id).hidden=false; }); await p.waitForTimeout(200);
   const bb=await R('#lbar'), ab=await R('#addbar'), rb=await R('#recbar');

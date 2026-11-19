@@ -2063,16 +2063,19 @@ function renderDetail(s){
     s.conf==='lead'?el('span',{class:'tag lead',text:'Lead: confirm first',title:'From published local history but not re-checked against a source.'}):null,
     s.conf==='mixed'?el('span',{class:'tag lead',text:'Partly verified',title:'The outline is checked; some details are still leads.'}):null,
     s.now?el('span',{class:'tag now',text:'Changing now'}):null);
+  /* the head that stays put while the page scrolls is one row of buttons and the name, nothing more: on a phone on its
+     side the column is short, and the photo, the line under the name and the badges scroll away with the rest */
   v.append(el('div',{class:'dhead pad'},
-    el('div',{class:'row',style:'justify-content:space-between'},
-      el('button',{class:'btn sm',type:'button',onclick:deselect},'← All places'),
-      el('div',{class:'row',style:'gap:6px'},
+    el('div',{class:'dtop'},
+      el('button',{class:'btn sm',type:'button',onclick:deselect,'aria-label':'Back to all places',title:'All places'},'← Back'),
+      el('div',{class:'dtop-r'},
         el('button',{class:'btn sm'+(inTrip?' on':''),type:'button',onclick:()=>{ const i=U.trip.indexOf(s.id); if(i>=0) U.trip.splice(i,1); else U.trip.push(s.id); save(); $('#trip-n').textContent=U.trip.length; renderDetail(s); }},inTrip?'✓ In trip':'+ Add to trip'),
         map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
-    photoBox(s),
-    el('h2',{text:s.name}),
+    el('h2',{text:s.name})),
+    el('div',{class:'dintro pad'},
     el('p',{class:'sub2',text:[s.name2,s.town,s.years,s.bk==='y'?'Red brick':s.bk==='s'?'Some red brick':''].filter(Boolean).join(' · ')}),
-    tags));
+    tags,
+    photoBox(s)));
   /* getting there */
   const times=el('div',{class:'times'});
   if(nearFrom()){ const l=dtl(s); times.append(el('div',{class:'time home',id:'dt-live'},el('b',{text:'~'+fmtMin(l.min)}),'from where you are · '+miTxt(l.mi))); }
