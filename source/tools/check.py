@@ -8,6 +8,8 @@ import sys,os,re,json,glob,importlib
 SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
 REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
+# Before a single place list is run: prove that each one is only data. A list that holds anything else stops the check here.
+import safe_data; safe_data.must(T)
 err=[]; warn=[]
 CAT='amuse hotel canal rail industry burial town civic fort water inst light landmark lidar'.split()
 ST='ruins traces standing marker gone water'.split(); PREC='exact site area'.split()
@@ -96,6 +98,10 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if any('TODO' in str(p.get(k) or '') for k in ('id','name','town','reg','years','story','look','hook','accn')) or 'TODO' in str(m.PIN_NOTES.get(i) or ''): err.append(f'{w}: a text still says TODO; finish the draft (LIDAR.md step 6)')
         if not m.PIN_NOTES.get(i): err.append(f'{w}: no pin note saying where the coordinate came from')
         if not p.get('links') and (p.get('conf') or '')!='lead': err.append(f"{w}: no source link (allowed only when conf='lead')")
+        for l in p.get('links') or []:      # a link is [label, address]; the address opens in the reader's browser, so it must be a web address and nothing else
+            if not(isinstance(l,(list,tuple)) and len(l)==2 and all(isinstance(x,str) for x in l) and l[0].strip()): err.append(f"{w}: a link must be [label, address], both text: {str(l)[:80]}"); continue
+            if not re.match(r'https?://[^\s<>"]+$',l[1]) and not re.match(r'https?://[^<>"\n\r\t]+$',l[1]): err.append(f"{w}: the link '{l[0][:40]}' is not a web address (it must begin http:// or https:// and hold no < > or quote marks): {l[1][:80]}")
+            elif ' ' in l[1]: warn.append(f"{w}: the link '{l[0][:40]}' has a space in its address; write %20")
         if p['acc'] in('ask','view','permit','boat') and not p.get('accn'): warn.append(f'{w}: access is {p["acc"]} but there is no access note')
 if not SRC_ONLY:
     # ---- built site matches the sources ----

@@ -2,7 +2,9 @@
 # Rebuild the whole site from the place lists. Run from anywhere; ATLAS is the workspace (see setup.sh).
 set -e
 cd "${ATLAS:-/home/claude/atlas}"
-python3 tools/build_sites.py | tail -1 | cut -c1-80   # merge the place lists into build/sites.json
+python3 tools/safe_data.py tools > /dev/null || { python3 tools/safe_data.py tools | tail -25; exit 1; }   # a place list is data and nothing else: read, not run
+out=$(python3 tools/build_sites.py) || { echo "$out" | tail -5; echo "all.sh: the place lists could not be merged, so nothing was built"; exit 1; }   # a pipe would hide its failure
+echo "$out" | tail -1 | cut -c1-80                    # merge the place lists into build/sites.json
 python3 tools/drive.py > /dev/null                    # drive times from each start city (needs network)
 python3 tools/padus.py                                # public-land status at each pin (cached)
 python3 tools/leads.py | cut -c1-80                   # leads layer, if the raw download is present

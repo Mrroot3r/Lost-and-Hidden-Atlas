@@ -6,8 +6,16 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # This job runs the pull request's own files (the place lists are Python), so it gets a token that can only read.
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Place lists are data and nothing else (read, not run)
+        run: |
+          python3 source/tools/safe_data.py source/tools
+          python3 source/tools/safe_data_test.py | tail -1
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -39,6 +47,7 @@ jobs:
     needs: check
     if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write

@@ -19,6 +19,7 @@ if a[0]=='--prs':          # only the open pull requests: the second look just b
     sys.exit(0)
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE)
 num=lambda s:re.fullmatch(r'-?\d+(\.\d+)?',s) is not None
+a=[re.sub(r'^km=','',x) for x in a]          # the usage line writes the distance as [km=15]: take "km=15" as well as "15"
 name=''; words=[]
 if len(a)>=2 and num(a[0]) and num(a[1]): la,lo=float(a[0]),float(a[1]); km=float(a[2]) if len(a)>2 else 15.0
 else:

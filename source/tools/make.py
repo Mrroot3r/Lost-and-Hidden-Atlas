@@ -53,7 +53,7 @@ data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':
 # the index of both, which goes in the page data (tools/lines_split.py). The app uses the index only on the hosted copy.
 import lines_split
 LSTATE,LWIDE,data['lx']=lines_split.split(json.load(open(R+'build/lines.json',encoding='utf-8')))
-def js(o): return json.dumps(o,separators=(',',':'),ensure_ascii=False).replace('</','<\\/')
+def js(o): return json.dumps(o,separators=(',',':'),ensure_ascii=False).replace('</','<\\/').replace('<!--','\\u003c!--')      # text in a place can never end the script element or open a comment in it
 css=open(R+'src/app.css').read()
 lcss=open(R+'cache/leaflet.min.css').read()
 lcss=re.sub(r'url\([^)]*\)','none',lcss)

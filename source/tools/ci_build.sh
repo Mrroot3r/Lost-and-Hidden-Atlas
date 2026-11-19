@@ -12,7 +12,8 @@ REPO="$(pwd)"; [ -f "$REPO/source/tools/setup.sh" ] || { echo "run this from the
 W="${ATLAS_CI_WORK:-${RUNNER_TEMP:-/tmp}/atlas-build}"
 rm -rf "$W"; bash source/tools/setup.sh "$W" | grep -v "^MISSING Playwright" || true
 export ATLAS="$W"; cd "$W"
-python3 tools/build_sites.py | tail -1 | cut -c1-80
+python3 tools/safe_data.py tools > /dev/null || { python3 tools/safe_data.py tools | tail -25; exit 1; }   # before any place list is run: each must be only data
+out=$(python3 tools/build_sites.py) || { echo "$out" | tail -5; exit 1; }; echo "$out" | tail -1 | cut -c1-80
 python3 tools/topo_all.py --missing || echo "WARNING: the old-map step failed; places added now have no old-map crop until the next build"
 # First under the version the repository already has: if nothing comes out different, there is nothing to publish.
 OLD=$(python3 -c "import json;j=json.load(open('$REPO/version.json'));print(j['v']+'|'+str(j.get('built','')))" 2>/dev/null || true)
