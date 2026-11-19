@@ -1,0 +1,176 @@
+# November 19, 2026: Georgia Piedmont east of Athens: Greene, Taliaferro, Oglethorpe, Oconee, Wilkes and Madison counties
+# (region drawn at random by tools/choose.py). Facts from the linked sources only, read in this session: Wikipedia through
+# tools/wiki_raw.py, National Register forms through tools/page.py (npgallery text layers), HMdb marker pages, Georgia State
+# Parks pages, the Forest Service and recreation.gov pages for Scull Shoals, and the other pages named in each entry.
+# exploregeorgia.org answered 403 to page.py; hours for places it describes were not checked.
+from data_b import N
+from data_ma import W
+
+BATCH={'key':'ga_plwt','label':'Georgia: Greensboro, Penfield, Crawfordville and the Oconee Piedmont','added':'2026-11-19 16:32'}
+
+HM='https://www.hmdb.org/m.asp?m='
+NP='https://npgallery.nps.gov/NRHP/GetAsset/NRHP/'
+
+PLACES=[
+N('scull-shoals-mill-village','Scull Shoals mill village ruins','Greensboro','ga','industry','ruins',33.73289,-83.28967,'site','public','walk','','1784–1897',
+  'A frontier settlement on the Oconee River that grew into a mill town: Georgia\'s first paper mill opened here about 1810–1811, then grist, cotton and textile mills. Fire destroyed the wooden mills in 1845 and they were rebuilt in brick; the 1887 flood buried the town and took the bridge, and silt from upstream cotton farms ended the water power. The mills were sold and the town abandoned in 1897; the federal government bought the land in 1935 and it is now in the Oconee National Forest.',
+  'The Forest Service\'s marker at the lot names the stops: the crumbling brick walls of the company store and warehouse (rebuilt in brick after the 1845 fire), the power plant site and the arched brick raceway bridge (damaged by a falling tree in 1999), the superintendent\'s granite root cellar, and chimney bases and wells where mill houses stood. The 1793 Fort Clark site was found by archaeologists in 1999. A blog visit describes the site as poorly maintained. Which ruin is where along the trail was not checked on the ground.',
+  'A Georgia mill town buried by its own cotton fields\' mud.',
+  'Oconee National Forest (U.S. Forest Service, Oconee Ranger District); recreation.gov describes a gentle hike along the ruins from the historic site. Reached by a single Forest Service road (Skull Shoals Road) off Georgia 15; park at the lot by the Forest Service marker. Hours and road conditions not checked: the Forest Service\'s own Scull Shoals page could not be found.',
+  [W('Scull Shoals, Georgia'),['HMdb: Frontier Fort, Mill Village, Ghost Town (Forest Service marker)',HM+'197804'],
+   ['Recreation.gov: Scull Shoals Historic Site','https://www.recreation.gov/camping/poi/240260'],
+   ['Vanishing Georgia: Scull Shoals','https://vanishinggeorgia.com/2015/11/18/scull-shoals-greene-county-2/'],
+   ['Forest Service: Oconee Ranger District','https://fs.usda.gov/r08/chattahoochee-oconee/recreation/oconee-ranger-district-0']],
+  conf='mixed',th=[33.73378,-83.28922],thn='Scull Shoals lot by the Forest Service marker (Boarding House Trail)',brick='?'),
+
+N('old-greene-county-gaol','Old Greene County Gaol','Greensboro','ga','civic','standing',33.57693,-83.18154,'site','view','walk','','c. 1807–1895',
+  'A two-storey granite jail built about 1807 behind the Greene County Courthouse, after the county court asked for a substantial jail. Its walls are about two feet thick, and a trap door in the upper floor served as the gallows. It was used until about 1895, when a newer jail was built.',
+  'The stone jail itself, called the oldest masonry jail in Georgia by a photography blog. The marker describes dark lower cells with only a grated door and small grated windows above. Interior and any tour times not checked.',
+  'Georgia\'s old stone gaol with its gallows trap door still in the floor.',
+  'In downtown Greensboro behind the courthouse, on East Greene Street; street parking. Who holds the key and when it opens not checked (the state tourism page that lists it could not be read).',
+  [['HMdb: Old Greene County "Gaol"',HM+'15807'],['Vanishing Georgia: Old Gaol, 1807','https://vanishinggeorgia.com/2020/03/17/old-gaol-1807-greensboro/']],
+  brick='no'),
+
+N('greene-county-courthouse-ga','Greene County Courthouse','Greensboro','ga','civic','standing',33.57667,-83.18222,'exact','view','drive','','1848–1849',
+  'A three-storey Greek Revival courthouse built in 1848–49; David Demarest of Athens was the master carpenter, with Atharates Atkinson of Madison named on the marker as well. The third storey was added by and for the local Masons, and two wings were added in 1938.',
+  'The Greek Revival front on North Main Street: red brick walls behind a white portico of four columns (Wikimedia Commons photograph). The old granite gaol stands behind it. Interior not checked.',
+  '',
+  'Working county courthouse at 113 North Main Street, Greensboro; street parking downtown. Office hours not checked.',
+  [W('Greene County Courthouse (Georgia)'),['HMdb: Greene County Courthouse',HM+'267623'],['Wikimedia Commons: courthouse photograph','https://commons.wikimedia.org/wiki/File:Greene_County_Georgia_Courthouse.jpg']],
+  brick='yes'),
+
+N('church-of-the-redeemer-greensboro','Episcopal Church of the Redeemer','Greensboro','ga','worship','standing',33.57841,-83.18211,'exact','view','walk','','1868–',
+  'An Episcopal parish organized in 1863 by Bishop Stephen Elliott, partly by families who had come inland from Charleston and Savannah to escape the war. The church was dedicated on June 14, 1868; the marker names J. O. Barnwell of Rome as designer and builder. Its first rector, Joshua Knowles, served 19 years and is buried with his wife in the garden.',
+  'A wooden Gothic Revival church in board-and-batten siding with a steep roof, which the Register form calls an unusually pure example of the style in a small Georgia town; the form dates major alterations to the 1960s. The Knowles graves are in the Remembrance Garden on the north side. Interior not checked; service times not checked.',
+  '',
+  'Active parish at 303 North Main Street at East North Street, Greensboro; street parking.',
+  [['HMdb: Episcopal Church of the Redeemer',HM+'184198'],['National Register form',NP+'87001440_text']],
+  brick='no'),
+
+N('springfield-baptist-greensboro','Springfield Baptist Church','Greensboro','ga','worship','standing',33.56887,-83.17797,'exact','view','walk','','1864–',
+  'Founded on January 27, 1864 by enslaved people who bought land from Nancy Bickers; Levi Thornton, himself enslaved, was the first pastor. It was the first Black Baptist church in Greensboro, formed from the First Baptist Church. The present brick church is dated 1907 by the Register form and Wikipedia, which says local sources hold it was built of bricks from the demolished white Methodist church; the marker says instead that the white congregations gave $200 toward the current building when Black members were dismissed in 1867. The marker gives the Register listing as 1978, Wikipedia 1987.',
+  'A pilastered brick Gothic Revival church with twin front towers, which the form calls typical of Black churches of the period. Interior not checked; service times not checked.',
+  '',
+  'Active church at 314 Canaan Circle at Foster Street, Greensboro; street parking.',
+  [W('Springfield Baptist Church (Greensboro, Georgia)'),['HMdb: Historic Springfield Baptist Church',HM+'38893'],['National Register form',NP+'87001451_text']],
+  conf='mixed',brick='?'),
+
+N('penfield-old-mercer','Penfield and Old Mercer Chapel','Penfield','ga','town','standing',33.66872,-83.17524,'site','view','walk','','1833–',
+  'Mercer University began here in 1833 as Mercer Institute, funded by a bequest of Josiah Penfield and named for Jesse Mercer. A village of academies, presses, a bank and stores grew round it until the university moved to Macon in 1871. The chapel went to the Penfield Baptist Church and the academy building became the village school; Jesse Mercer is buried in the Penfield Cemetery.',
+  'The Greek Revival chapel built by David Demarest (1846 in the Register form and a photography blog, 1845 in a Wikipedia caption), still used as Penfield Baptist Church: red brick walls, a white columned portico and a white cupola (Vanishing Georgia photograph). The 1976 form lists the 1853 brick Science Hall and the 1857 President\'s House as standing, a brick store behind the Female Academy, and the cemetery north of the village with a slave cemetery behind its wall; Wikipedia instead speaks of ruins of the science building, stores, bank and post office beside the chapel. Which is true today not checked on the ground.',
+  'Where Mercer University began, left behind when it moved to Macon.',
+  'A small village on Mercer Circle, seven miles north of Greensboro; a lot by the chapel. The chapel is an active church; service times not checked. The buildings round it are mostly private: look from the road.',
+  [W('Penfield, Georgia'),['HMdb: "Old Mercer"',HM+'24726'],['National Register form: Penfield Historic District',NP+'76000637_text'],
+   ['Vanishing Georgia: Old Mercer Chapel','https://vanishinggeorgia.com/2015/01/11/old-mercer-chapel-1846-penfield/']],
+  conf='mixed',th=[33.66902,-83.17571],thn='Lot on Mercer Circle by the chapel',brick='yes'),
+
+N('bethesda-baptist-union-point','Bethesda Baptist Church','Union Point','ga','worship','standing',33.65243,-83.01008,'exact','view','drive','','1815–1818',
+  'The congregation was organized in 1785 as Whatley\'s Mill Church, in what was then Wilkes County. Its members built the present church of locally made brick between 1815 and 1818, and Jesse Mercer led the dedication on December 20, 1818, when it took the name Bethesda. The Register form calls it one of the oldest church buildings in Georgia, and one of the oldest in brick, in use on the same spot ever since.',
+  'A two-storey Federal-style brick church about 40 by 60 feet, with flat jack arches over doors and windows and shuttered windows. Inside, per the 1998 form: one sanctuary with a raised pulpit at the west end and a wooden gallery on two rows of columns at the east; the brick floor was covered in 1850, the pews date from 1954. A cemetery of over an acre, a spring and a 1906 brick baptismal pool are on the grounds. Service times not checked.',
+  'A brick church raised by Baptists who brought their guns to service.',
+  'Active rural church at Bethesda Church Road and Mercer Durham Road, north of Union Point. Look from the churchyard and road; interior only when the church is open.',
+  [['HMdb: Bethesda Baptist Church',HM+'24724'],['National Register form',NP+'98000967_text']],
+  brick='?'),
+
+N('liberty-hall-crawfordville','Liberty Hall (Alexander H. Stephens home)','Crawfordville','ga','landmark','standing',33.55794,-82.89588,'exact','open','walk','','1872–1875',
+  'Home of Alexander H. Stephens, congressman, Confederate vice president and governor of Georgia, from 1839 until his death in 1883. He bought the estate in 1845 and in 1872–1875 pulled down the old house except two rear rooms and built the present one; Union cavalry arrested him here in 1865. It is a National Historic Landmark and part of A. H. Stephens State Park, which the Civilian Conservation Corps largely built from 1933.',
+  'A plain two-storey white frame house with a hip roof and full-width veranda, restored to its 1875 look and fully furnished, with Stephens\'s original walnut bedroom furniture and wheelchair (Wikipedia). Behind it are restored outbuildings: the quarters of the people Stephens enslaved, a wine cellar, smokehouse and washhouse. The park\'s Civil War museum holds one of the largest such collections in the state.',
+  '',
+  'Georgia State Parks, A. H. Stephens State Park, 456 Alexander Street, Crawfordville. Parking fee (ParkPass) required; separate historic site admission. Park open 7 a.m. to 10 p.m.; last tour 3:30 p.m. (gastateparks.org, read November 2026).',
+  [W('Liberty Hall (Crawfordville, Georgia)'),W('A. H. Stephens State Park'),['Georgia State Parks: A.H. Stephens','https://gastateparks.org/AHStephens'],
+   ['HMdb: Liberty Hall',HM+'46025']],
+  hours='Historic site Friday to Sunday 9 a.m. to 5 p.m.',brick='no'),
+
+N('taliaferro-county-courthouse','Taliaferro County Courthouse','Crawfordville','ga','civic','standing',33.55467,-82.89668,'exact','view','drive','','1901–1902',
+  'Built in 1901–02 to the design of Lewis F. Goodrich of Augusta, on the site of the county\'s first courthouse of 1828, which was pulled down for it. Wikipedia repeats a newspaper story that supporters demolished the old courthouse in the middle of the night. The clock had stopped working; a local historical society raised money and it was repaired in 2011.',
+  'A three-storey High Victorian courthouse of bright red brick facing east, with corner towers under pyramidal and ogee-shaped roofs and a four-storey clock tower with an octagonal domed cupola. Interior not checked.',
+  '',
+  'Working county courthouse in the middle of Crawfordville on Georgia 12; street parking. Office hours not checked.',
+  [W('Taliaferro County Courthouse'),['HMdb: Taliaferro County',HM+'15236']],
+  brick='yes'),
+
+N('crawfordville-baptist-church','Crawfordville Baptist Church','Crawfordville','ga','worship','standing',33.55817,-82.89498,'exact','view','walk','','1889–',
+  'Founded in 1802 as Bethel by Jesse Mercer and James Matthews on land given by William Janes, it was the first Protestant church in the Taliaferro area. The marker says it lent its building to other denominations while they organized, and that many fiery political speeches were made in it. The present building dates from 1889.',
+  'The 1889 church beside Liberty Hall on Memorial Drive. Its materials and interior not checked; service times not checked.',
+  '',
+  'Active church on Memorial Drive (Alexander Street), Crawfordville, next to A. H. Stephens State Park; street parking.',
+  [['HMdb: Crawfordville Baptist Church',HM+'15733']],
+  brick='?'),
+
+N('crawford-depot-ga','Crawford Depot','Crawford','ga','rail','standing',33.8825,-83.156111,'area','view','drive','stations','c. 1848–',
+  'A one-storey granite depot built by the Georgia Railroad about 1848, replacing a wooden first depot; local history says it was built from granite crossties the railroad had used. The Register form calls it the only surviving stone depot of the Georgia Railroad. It is 41 by 91 feet with walls two feet thick.',
+  'The stone depot alongside the tracks on U.S. 78. The 1977 form and Wikipedia say it was leased to the Oglethorpe County Chamber of Commerce; its use today not checked. Interior not checked.',
+  'The Georgia Railroad\'s one surviving stone depot.',
+  'Beside U.S. 78 in Crawford; the tracks beside it may be active: stay off them. Look from the street; whether it opens not checked.',
+  [W('Crawford station (Georgia)'),['National Register form',NP+'77000441_text']],
+  brick='no'),
+
+N('oglethorpe-county-jail-lexington','Historic Oglethorpe County Jail','Lexington','ga','civic','standing',33.86993,-83.11282,'site','view','walk','','1879–2007',
+  'An Italianate county jail finished in 1879, with arched windows, granite quoins and bracketed cornices, built of lumber, brick and granite from within a few miles. It held prisoners until May 2007. Historic Oglethorpe County and the county then removed most of the 20th-century additions to return it to its 19th-century look.',
+  'The restored jail on Main Street; the marker says many windows had been bricked in or turned into doors in the 20th century. Interior and whether it opens not checked.',
+  '',
+  'At 225 Main Street (U.S. 78), Lexington; street parking. Owned by the county with Historic Oglethorpe County (per the marker); look from the street.',
+  [['HMdb: Historic Oglethorpe County Jail',HM+'197822']],
+  brick='?'),
+
+N('elder-mill-covered-bridge','Elder Mill Covered Bridge','Watkinsville','ga','landmark','standing',33.80298,-83.36375,'exact','public','drive','','1897–',
+  'A 99-foot Town lattice covered bridge built in 1897 by Nathaniel Richardson over Calls Creek on the Watkinsville–Athens road, and moved here over Rose Creek in 1924. A grist mill of about 1900 nearby stopped in 1941.',
+  'The bridge, its lattice of planks pinned with wooden trunnels, still carrying traffic without steel beams under it (marker). Whether anything of the mill survives not checked.',
+  '',
+  'On Elder Mill Road, a public road, 0.3 mile north of Saxon Road, Oconee County; a small park at the north end of the bridge has room for a few cars (HMdb). Watch for traffic on the one-lane bridge.',
+  [['HMdb: Elder Mill Covered Bridge',HM+'14945']],
+  brick='no'),
+
+N('watson-mill-bridge','Watson Mill covered bridge','Comer','ga','landmark','standing',34.02690,-83.07473,'exact','public','walk','','1885–',
+  'Built in 1885 by Washington W. King, son of the bridge builder Horace King, who was born enslaved. At 229 feet across the South Fork of the Broad River it is the longest covered bridge in Georgia still on its original site. The bridge and mill ground are a Register historic district inside a state park.',
+  'A Town lattice truss held together with wooden pegs, with the river shoals just below. The Register district is named for the mill as well; what is left of the mill not checked.',
+  'Georgia\'s longest covered bridge, built by a freedman\'s son.',
+  'Georgia State Parks, Watson Mill Bridge State Park, near Comer. Parking fee (ParkPass) required; the bridge carries cars (9-foot clearance, 3-ton limit). Office daily 8 a.m. to 5 p.m. (gastateparks.org, read November 2026).',
+  [W('Watson Mill Bridge State Park'),['Georgia State Parks: Watson Mill Bridge','https://gastateparks.org/WatsonMillBridge']],
+  th=[34.02483,-83.07523],thn='Visitor center lot (state park)',hours='Park daily 7 a.m. to 10 p.m.',brick='no'),
+
+N('howards-covered-bridge','Howard\'s Covered Bridge','Smithonia','ga','landmark','standing',33.98605,-83.13314,'exact','view','drive','','1905–',
+  'A 168-foot Town lattice covered bridge over Big Clouds Creek, built in 1905 with convict labor and fastened with wooden trunnels. Its timber came in on the Smithonia and Dunlap Railroad, which joined James Monroe Smith\'s farm to the Georgia Railroad. It is named for a family that settled here in the late 1700s.',
+  'The bridge off the end of Chandler Silver Road, a gravel road; a 2023 blog calls it a bridge to nowhere, with no road at its far end. Its condition and whether you may walk it not checked.',
+  '',
+  'At the southern end of Chandler Silver Road at Cloud\'s Creek Road, about three miles southeast of Smithonia, Oglethorpe County. Owner not checked: look from the road end.',
+  [W("Howard's Covered Bridge"),['Covered Bridges: Howard\'s','https://coveredbridges.net/georgia-bridges/howards'],
+   ['A Life in Photography: The Bridge to Nowhere (2023)','https://alifeinphotography.blogspot.com/2023/06/the-bridge-to-nowhere.html']],
+  brick='no'),
+
+N('eagle-tavern-watkinsville','Eagle Tavern','Watkinsville','ga','hotel','standing',33.86394,-83.40938,'site','open','walk','','c. 1801–',
+  'One of the oldest buildings in Watkinsville, built about 1801 (possibly as early as 1794) as a tavern, stage stop and store when the town was the seat of the original Clarke County on the Creek and Cherokee frontier. Richard Richardson bought it in 1836 and enlarged it; it was a hotel until about 1930. Saved in 1934, it was given to the state in 1956, and the state removed the later additions and restored the oldest part as a museum, dedicated in 1966.',
+  'The restored plain-style oldest section: two rooms up and two down, one door into the tavern and one into the store, furnished as a museum of the stagecoach era (marker). The site may also have been Fort Edwards, a settlers\' refuge (Wikipedia). Interior per the 1966 marker; today\'s exhibits not checked.',
+  '',
+  'At 26 North Main Street (Georgia 15) at Third Street, Watkinsville; it is the county welcome center and museum. Hours not checked: no page of whoever runs it could be read.',
+  [W('Eagle Tavern (Watkinsville, Georgia)'),['HMdb: Eagle Tavern',HM+'14081']],
+  hours='?',brick='?'),
+
+N('kettle-creek-battlefield','Kettle Creek Battlefield','Washington','ga','fort','marker',33.69088,-82.88583,'site','public','walk','forts','1779',
+  'On February 14, 1779 Patriot militia under Andrew Pickens, John Dooly and Elijah Clarke surprised and scattered about 600 Loyalists camped at a bend of the flooded creek on their way to British-held Augusta; it was the first major Patriot victory in the Georgia backcountry. Seventy to eighty Loyalists and nine Patriots died, buried where they fell. Most of the battlefield is owned by Wilkes County, and in 2013 the Kettle Creek Battlefield Association bought 60 acres.',
+  'Markers and a monument on War Hill, cenotaph stones placed from 1958 to 1974, and white crosses marking 29 possible graves found in a 2016 archaeological study; the battlefield is treated as a cemetery and disturbing graves is a felony. No standing structure.',
+  '',
+  'War Hill Road, off Tyrone Road from Sandy Ridge Road, west of Washington (directions from HMdb). Wilkes County land; the association\'s site would not open, so hours and rules not checked.',
+  [W('Battle of Kettle Creek'),['HMdb: Battle of Kettle Creek',HM+'10684'],['HMdb: Revolutionary War Soldiers\' Burials',HM+'311516'],['HMdb: "Cenotaph"',HM+'311528']],
+  brick='no'),
+]
+
+PIN_NOTES={
+ 'scull-shoals-mill-village':'Moved 56 m south from the HMdb marker position onto the roofless rectangular walls that show on both the aerial and the LiDAR (the warehouse and store ruin, by the marker\'s description); round and square traces west of it on the LiDAR are other ruins. The lot point is from parking.py (OpenStreetMap) and is hidden by trees on the aerial.',
+ 'old-greene-county-gaol':'HMdb marker position on East Greene Street, behind the courthouse.',
+ 'greene-county-courthouse-ga':'Wikipedia and HMdb courthouse marker coordinate on North Main Street.',
+ 'church-of-the-redeemer-greensboro':'OpenStreetMap place-of-worship point (nom.py).',
+ 'springfield-baptist-greensboro':'OpenStreetMap place-of-worship point (nom.py); Wikipedia gives the same within 5 m.',
+ 'penfield-old-mercer':'OpenStreetMap point for Penfield Baptist Church (Old Mercer Chapel), nom.py.',
+ 'bethesda-baptist-union-point':'Register list coordinate fell on the parking lot; moved 54 m north onto the church building seen on the aerial.',
+ 'liberty-hall-crawfordville':'OpenStreetMap historic building point (nom.py); the HMdb marker is within 10 m.',
+ 'taliaferro-county-courthouse':'Register list coordinate on the lawn; moved 25 m north onto the courthouse in the middle of its square (aerial).',
+ 'crawfordville-baptist-church':'OpenStreetMap place-of-worship point (nom.py).',
+ 'crawford-depot-ga':'Register list coordinate, which lands on the U.S. 78 junction; the depot could not be picked out on the aerial, so prec=area.',
+ 'oglethorpe-county-jail-lexington':'HMdb marker position at 225 Main Street.',
+ 'elder-mill-covered-bridge':'HMdb marker position moved 25 m south onto the bridge over Rose Creek seen on the aerial and the LiDAR.',
+ 'watson-mill-bridge':'Wikipedia (Register) coordinate was 160 m east in woods; moved onto the covered bridge seen across the river on a wider aerial (look.py), matching the OpenStreetMap way named Watson Mill Bridge.',
+ 'howards-covered-bridge':'OpenStreetMap bridge feature (nom.py); the aerial shows only trees there, the LiDAR shows the creek crossing at the pin.',
+ 'eagle-tavern-watkinsville':'OpenStreetMap museum point (nom.py); it falls under a tree at Main and Third streets beside the building, so prec=site.',
+ 'kettle-creek-battlefield':'OpenStreetMap point for the Kettle Creek Battlefield Cemetery (nom.py), beside the HMdb markers on War Hill.',
+}
