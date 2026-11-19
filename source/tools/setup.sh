@@ -27,7 +27,22 @@ cp "$REPO"/leaflet.js "$W/cache/leaflet.min.js"
 cp "$REPO"/topo/*.webp "$W/build/topo/"
 cp "$REPO"/data/lines.json "$W/build/lines.json"
 cp "$REPO"/data/leads.json "$W/build/leads.json"
-for f in vanished mines; do [ -f "$REPO/data/$f.json" ] && cp "$REPO/data/$f.json" "$W/build/$f.json"; done   # optional lead layers, kept when their raw downloads are absent
+# The optional lead layers travel with the site in pieces: data/<layer>/index.json and one file per state named with its stamp.
+# Put together again here into build/<layer>.json, the whole layer, which tools/vanished.py, tools/mines.py and tools/start.py
+# read and tools/make.py cuts up again. (data/<layer>.json is NOT the whole layer: it is frozen at eleven states for old
+# copies of the Android app. It is used only when a repository has no pieces yet.)
+for f in vanished mines; do
+  if [ -f "$REPO/data/$f/index.json" ]; then python3 - "$REPO/data/$f" "$W/build/$f.json" <<'PYEOF'
+import json,os,sys
+d,out=sys.argv[1],sys.argv[2]; ix=json.load(open(os.path.join(d,'index.json'),encoding='utf-8')); p=[]; s={}
+for k,o in ix['s'].items():
+    f=os.path.join(d,'%s-%s.json'%(k,o['h']))
+    if not os.path.exists(f): sys.exit('setup.sh: %s is listed in %s/index.json but the file is missing'%(os.path.basename(f),d))
+    rows=json.load(open(f,encoding='utf-8'))['p']; p+=rows; s[k]=len(rows)
+json.dump({'v':1,'t':ix['t'],'p':p,'s':s},open(out,'w',encoding='utf-8'),separators=(',',':'),ensure_ascii=False)
+PYEOF
+  elif [ -f "$REPO/data/$f.json" ]; then cp "$REPO/data/$f.json" "$W/build/$f.json"; fi
+done
 # historic pockets: the built layer travels with the site, so a workspace without the raw downloads keeps every state
 if [ -f "$REPO/data/pockets.json" ]; then
   cp "$REPO"/data/pockets.json "$W/build/pockets.json"

@@ -112,6 +112,7 @@ for extra in ('vanished','mines'):
         _txt=json.dumps({'p':_by[_k]},separators=(',',':'),ensure_ascii=False); _h=hashlib.md5(_txt.encode('utf-8')).hexdigest()[:8]
         open(WEB+f'data/{extra}/{_k}-{_h}.json','w',encoding='utf-8').write(_txt)
         _la=[r[0] for r in _by[_k]]; _lo=[r[1] for r in _by[_k]]
+        if min(_lo)<0<max(_lo): _lo=[x for x in _lo if x<0]      # Alaska's last islands lie past 180 degrees: left out of the box, or it would wrap the world
         _s[_k]={'n':len(_by[_k]),'h':_h,'b':[round(min(_la)-0.005,2),round(min(_lo)-0.005,2),round(max(_la)+0.005,2),round(max(_lo)+0.005,2)]}
     open(WEB+f'data/{extra}/index.json','w',encoding='utf-8').write(json.dumps({'v':2,'t':_d['t'],'s':_s},separators=(',',':'),ensure_ascii=False))
     _old=[r for r in _d['p'] if r[-1] in XL_OLD]

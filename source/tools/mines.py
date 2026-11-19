@@ -16,7 +16,8 @@ Rows: [lat, lon, type, name, MRDS deposit id, commodity, 'P' past producer | 'S'
 The record for a point is at https://mrdata.usgs.gov/mrds/show-mrds.php?dep_id=<id>."""
 import zipfile,csv,io,json,os,re,sys
 from collections import Counter
-STATES={'New York':'ny','Massachusetts':'ma','Vermont':'vt','Connecticut':'ct','New Hampshire':'nh','New Jersey':'nj','Pennsylvania':'pa','Rhode Island':'ri','Maine':'me','Missouri':'mo','Kansas':'ks'}
+STATES={'New York':'ny','Massachusetts':'ma','Vermont':'vt','Connecticut':'ct','New Hampshire':'nh','New Jersey':'nj','Pennsylvania':'pa','Rhode Island':'ri','Maine':'me','Missouri':'mo','Kansas':'ks',      # the first eleven
+        'Alaska':'ak','Alabama':'al','Arkansas':'ar','Arizona':'az','California':'ca','Colorado':'co','District of Columbia':'dc','Delaware':'de','Florida':'fl','Georgia':'ga','Hawaii':'hi','Iowa':'ia','Idaho':'id','Illinois':'il','Indiana':'in','Kentucky':'ky','Louisiana':'la','Maryland':'md','Michigan':'mi','Minnesota':'mn','Mississippi':'ms','Montana':'mt','North Carolina':'nc','North Dakota':'nd','Nebraska':'ne','New Mexico':'nm','Nevada':'nv','Ohio':'oh','Oklahoma':'ok','Oregon':'or','South Carolina':'sc','South Dakota':'sd','Tennessee':'tn','Texas':'tx','Utah':'ut','Virginia':'va','Washington':'wa','Wisconsin':'wi','West Virginia':'wv','Wyoming':'wy'}      # every other state and the District of Columbia, November 19, 2026
 TYPES=['Old iron mine','Old quarry','Old clay pit','Old mine or prospect']
 QUARRY=re.compile(r'stone|limestone|granite|marble|slate|sandstone|dolomite|dimension|trap|quartzite|cement|lime\b|gypsum',re.I)
 SRC='cache/mrds/mrds-csv.zip'

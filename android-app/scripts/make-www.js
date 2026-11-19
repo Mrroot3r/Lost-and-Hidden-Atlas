@@ -16,9 +16,12 @@ fs.mkdirSync(path.join(out, 'data'), { recursive: true });
 for (const f of need.slice(1)) fs.copyFileSync(path.join(site, f), path.join(out, f));
 for (const f of ['data/pockets.json']) if (fs.existsSync(path.join(site, f))) fs.copyFileSync(path.join(site, f), path.join(out, f));   // optional layer
 // vanished places and old mines: an index and one file per state, each named with a stamp of its content (data/vanished/, data/mines/).
-// All of them are built in, so the layers work with no signal; a state added to the site later is fetched by boot.js when needed.
+// Every state is 15 MB, so only the index and the Northeast's states are built in and work with no signal from the first day;
+// any other state is fetched by boot.js the first time the map is zoomed in there, and kept on the phone after that.
+const XL_BUILT_IN = ['ny', 'ma', 'vt', 'ct', 'nh', 'nj', 'pa', 'ri', 'me'];
 for (const d of ['vanished', 'mines']) { const src = path.join(site, 'data', d);
-  if (fs.existsSync(src)) { fs.mkdirSync(path.join(out, 'data', d), { recursive: true }); for (const f of fs.readdirSync(src)) if (f.endsWith('.json')) fs.copyFileSync(path.join(src, f), path.join(out, 'data', d, f)); } }
+  if (fs.existsSync(src)) { fs.mkdirSync(path.join(out, 'data', d), { recursive: true });
+    for (const f of fs.readdirSync(src)) if (f === 'index.json' || XL_BUILT_IN.indexOf(f.split('-')[0]) >= 0) fs.copyFileSync(path.join(src, f), path.join(out, 'data', d, f)); } }
 // one detail file per state for the historic pockets; a state added to the site after this app was built is fetched by boot.js when needed
 const pock = path.join(site, 'data', 'pock');
 if (fs.existsSync(pock)) { fs.mkdirSync(path.join(out, 'data', 'pock'), { recursive: true }); for (const f of fs.readdirSync(pock)) if (f.endsWith('.json')) fs.copyFileSync(path.join(pock, f), path.join(out, 'data', 'pock', f)); }
