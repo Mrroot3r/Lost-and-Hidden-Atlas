@@ -132,6 +132,32 @@ const { chromium, devices } = require('playwright');
     await p4.click('#lb-opt'); await p4.waitForTimeout(250); await p4.evaluate(()=>{ const g=[...document.querySelectorAll('#sheet button')].find(x=>/settings/i.test(x.getAttribute('aria-label')||x.textContent)); if(g) g.click(); }); await p4.waitForTimeout(300);
     ok('the choice is under the gear',await p4.evaluate(()=>{ const n=document.querySelector('#set-dbl'); return !!n&&n.value==='3'&&n.options.length===4; }));
     await c4.close(); }
+  // ---- Compare: the button steps off -> the way used last -> the other way -> off, says which is showing, and all of it is kept
+  { const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); }catch(e){} });
+    await p.goto(process.argv[2]||'http://localhost:8766/index.html'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600);
+    const st=()=>p.evaluate(()=>{ const m=window.__atlasMap, pane=m.getPane('cmp'), sw=document.querySelector('#swipe'), fd=document.querySelector('#fade'), bt=document.querySelector('#lb-cmp');
+      const u=JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'); let lay=0; m.eachLayer(l=>{ if(l.options&&l.options.pane==='cmp') lay++; });
+      return {label:bt.querySelector('.lt').textContent,pressed:bt.getAttribute('aria-pressed'),swipe:!sw.hidden,fade:!fd.hidden,op:pane.style.opacity,clip:!!pane.style.clip,lay:lay,kept:(u.ui||{}).cmp||null,fl:fd.textContent,slider:document.querySelector('#fade-op').value}; });
+    const tap=async wait=>{ await p.evaluate(()=>document.querySelector('#lb-cmp').click()); await p.waitForTimeout(wait||1700); };
+    let s=await st(); ok('compare: off to begin with, and the button says Compare',s.label==='Compare'&&s.pressed==='false'&&!s.swipe&&!s.fade&&s.lay===0,JSON.stringify(s).slice(0,120));
+    await tap(); s=await st(); ok('first tap: Swipe, with the divider, and the button says so',s.label==='Swipe'&&s.pressed==='true'&&s.swipe&&!s.fade&&s.clip&&s.lay===1,s.label);
+    await tap(); s=await st(); ok('second tap: Overlay, the second layer see-through over the map, with a slider on the map',s.label==='Overlay'&&s.pressed==='true'&&!s.swipe&&s.fade&&!s.clip&&Math.abs(+s.op-0.6)<0.01&&s.lay===1&&s.fl.trim().length>3,s.label+' '+s.op+' "'+s.fl+'"');
+    ok('the slider sits on the map and inside the screen',await p.evaluate(()=>{ const r=document.querySelector('#fade').getBoundingClientRect(), m=document.querySelector('#map').getBoundingClientRect(); return r.left>=0&&r.right<=innerWidth&&r.top>=m.top&&r.bottom<=m.bottom&&r.height>20; }));
+    await p.evaluate(()=>{ const i=document.querySelector('#fade-op'); i.value='0.35'; i.dispatchEvent(new Event('input',{bubbles:true})); }); await p.waitForTimeout(500); s=await st();
+    ok('sliding it fades the layer on top',Math.abs(+s.op-0.35)<0.01,s.op);
+    ok('what was chosen is kept: on, Overlay, the layer and the strength',!!s.kept&&s.kept.on===true&&s.kept.mode==='fade'&&Math.abs(s.kept.op-0.35)<0.01&&!!s.kept.key,JSON.stringify(s.kept));
+    await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900); s=await st();
+    ok('opened again, it is still Overlay at that strength',s.label==='Overlay'&&s.fade&&!s.swipe&&Math.abs(+s.op-0.35)<0.01&&s.slider==='0.35'&&s.lay===1,s.label+' '+s.op);
+    await tap(250); s=await st(); ok('a tap from Overlay goes to Swipe',s.label==='Swipe'&&s.swipe&&!s.fade,s.label);
+    await tap(300); s=await st(); ok('and the next, made at once, switches compare off',s.label==='Compare'&&!s.swipe&&!s.fade&&s.lay===0&&s.pressed==='false',s.label);
+    ok('passing through Swipe on the way to off did not make it the way to remember',!!s.kept&&s.kept.on===false&&s.kept.mode==='fade',JSON.stringify(s.kept));
+    await tap(); s=await st(); ok('switched on again it comes back as Overlay',s.label==='Overlay'&&s.fade,s.label);
+    await tap(); await tap(); s=await st(); ok('staying on Swipe a while and then switching off makes Swipe the way to remember',s.label==='Compare'&&s.kept.mode==='swipe'&&s.kept.on===false,JSON.stringify(s.kept));
+    await p.evaluate(()=>document.querySelector('#lb-opt').click()); await p.waitForTimeout(400);
+    ok('Map options offers the same two ways by the same names',await p.evaluate(()=>{ const on=document.querySelector('#cmp-on'); if(on&&!on.checked) on.click(); const m=document.querySelector('#cmp-mode'); return !!m&&[...m.options].map(o=>o.textContent).join()==='Swipe,Overlay'; }));
+    ok('compare: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- Black as the track colour in a dark scheme: on the panels the text colour stands in, or the Near arrow and the recording dot could not be seen
   const c3=await b.newContext(Object.assign({},devices['Pixel 7'])); const p3=await c3.newPage();
   await p3.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},set:{trk:'#111827',theme:'dark',themeD:'tomorrow'}})); });

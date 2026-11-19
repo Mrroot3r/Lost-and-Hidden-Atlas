@@ -98,6 +98,42 @@ const { chromium } = require('playwright');
     const other=await p.evaluate(()=>{ const s=window.__atlasNM.sites().find(x=>!x.tip&&!x.mine); location.hash='#'+s.id; return s.id; }); await p.waitForTimeout(600);
     ok('a place a session found has no such badge',await p.evaluate(()=>!document.querySelector('#v-detail .tag.tipd')),other);
     ok('reader tips: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- Favourites: the reader's own short list. A favourite is marked on its page, wears a ring on the map, is listed by one
+  //      filter, is kept when the page is opened again, and is never folded into a grey group disc however far out the map is.
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); }catch(e){} });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(500);
+    // two places in the thick of Albany, where pins are grouped when the map is zoomed out
+    const two=await p.evaluate(()=>window.__atlasNM.sites().filter(s=>!s.mine&&s.st==='standing'&&Math.abs(s.lat-42.652)<0.012&&Math.abs(s.lon+73.755)<0.012).slice(0,2).map(s=>({id:s.id,lat:s.lat,lon:s.lon})));
+    ok('two places in downtown Albany to try',two.length===2,two.map(x=>x.id).join());
+    const seen=async()=>{ await p.waitForTimeout(700); return p.evaluate(ids=>{ const NM=window.__atlasNM, m=window.__atlasMap, on=[]; m.eachLayer(l=>{ if(l.getLatLng&&l.options&&l.options.icon&&l._icon){ const n=l._icon.querySelector('.pin'); if(n) on.push({fav:n.classList.contains('fav'),la:l.getLatLng().lat,lo:l.getLatLng().lng}); } });
+        const hit=x=>on.find(o=>Math.abs(o.la-x.lat)<1e-5&&Math.abs(o.lo-x.lon)<1e-5); return {a:hit(ids[0])||null,b:hit(ids[1])||null,discs:document.querySelectorAll('.clus').length,favs:on.filter(o=>o.fav).length,zoom:m.getZoom()}; },two); };
+    await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); let v=await seen();
+    ok('zoomed out, neither has a pin of its own: both are inside a group disc',!v.a&&!v.b&&v.discs>0,JSON.stringify(v));
+    await p.evaluate(id=>{ location.hash='#'+id; },two[0].id); await p.waitForTimeout(600);
+    const btn=()=>p.evaluate(()=>{ const n=document.querySelector('#d-fav'); return n?{t:n.textContent,p:n.getAttribute('aria-pressed'),l:n.getAttribute('aria-label'),row:Math.abs(n.getBoundingClientRect().top-document.querySelector('.dtop .btn').getBoundingClientRect().top)<6,fits:n.getBoundingClientRect().right<=innerWidth&&document.querySelector('.dtop').scrollWidth<=document.querySelector('.dtop').clientWidth+1}:null; });
+    let bt=await btn(); ok('a place page has a favourite button in its top row, empty heart, and the row still fits a phone',!!bt&&bt.t==='♡'&&bt.p==='false'&&bt.l==='Add to my favourites'&&bt.row&&bt.fits,JSON.stringify(bt));
+    await p.click('#d-fav'); await p.waitForTimeout(500); bt=await btn();
+    ok('tapped, it is a full heart and says how to undo it',!!bt&&bt.t==='♥'&&bt.p==='true'&&bt.l==='Remove from my favourites',JSON.stringify(bt));
+    await p.click('.dtop .btn'); await p.waitForTimeout(400);     // Back
+    await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
+    ok('zoomed out again, the favourite has its own pin, ringed; its neighbour is still in the disc',!!v.a&&v.a.fav&&!v.b&&v.discs>0&&v.favs===1,JSON.stringify(v));
+    await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],5,{animate:false}),two[0]); v=await seen();
+    ok('and at the scale of half a continent it is still there',!!v.a&&v.a.fav,'zoom '+v.zoom);
+    await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(250);
+    ok('Filters has "My favourites" among the shortcuts and under Only show',await p.evaluate(()=>[...document.querySelectorAll('#presets .chip')].some(x=>x.textContent.trim()==='My favourites')&&[...document.querySelectorAll('#fbody .fgrp .chip')].some(x=>x.textContent.trim()==='My favourites')));
+    await p.evaluate(()=>{ [...document.querySelectorAll('#fbody .fgrp .chip')].find(x=>x.textContent.trim()==='My favourites').click(); }); await p.waitForTimeout(400);
+    let r=await p.evaluate(()=>({ids:window.__atlasNM.visible().map(s=>s.id).join(),fc:(document.querySelector('#fcount')||{}).textContent||'',row:(document.querySelector('#list li')||{}).textContent||''}));
+    ok('it lists the favourite and nothing else, counts as one filter, and the row says so',r.ids===two[0].id&&r.fc==='1'&&/favourite/.test(r.row),r.ids+' | '+r.fc);
+    await p.evaluate(()=>{ [...document.querySelectorAll('#fbody .fgrp .chip')].find(x=>x.textContent.trim()==='My favourites').click(); const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(300);
+    await p.reload(); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(600);
+    await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
+    ok('the page opened again: it is still a favourite, still on the map zoomed out',!!v.a&&v.a.fav&&await p.evaluate(id=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).fav.join()===id,two[0].id));
+    await p.evaluate(id=>{ location.hash='#'+id; },two[0].id); await p.waitForTimeout(600); await p.click('#d-fav'); await p.waitForTimeout(500); await p.click('.dtop .btn'); await p.waitForTimeout(300);
+    await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
+    ok('taken off the list, it goes back into the disc',(!v.a||!v.a.fav)&&v.favs===0&&await p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).fav.length===0),JSON.stringify(v));
+    ok('favourites: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- Access "Open to visitors", and the Hours row under it (November 2026): a museum, an inn or a church that opens is not
   //      "Public land or street"; the page says the hours research read and how old they are, and links to today's.
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));

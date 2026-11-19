@@ -241,6 +241,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 #swipe .grip{position:absolute;top:50%;left:-19px;width:36px;height:36px;margin-top:-18px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--fm);font-size:13px;pointer-events:auto;cursor:ew-resize;touch-action:none;box-shadow:var(--shadow)}
 #swipe .side{position:absolute;top:calc(48px + env(safe-area-inset-top,0px));font-family:var(--fc);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:2px 6px;white-space:nowrap}
 #swipe .side.l{right:8px}#swipe .side.r{left:8px}
+#fade{left:50%;transform:translateX(-50%);bottom:calc(78px + env(safe-area-inset-bottom,0px));padding:6px 12px;display:flex;gap:10px;align-items:center;font-family:var(--fc);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;max-width:calc(100% - 24px)}
+#fade[hidden]{display:none}
+#fade input{width:min(150px,34vw);accent-color:var(--accent);margin:0}
 @media (max-width:820px),(orientation:landscape) and (min-width:560px) and (max-height:540px){#readout{display:none} .leaflet-control-zoom{display:none}}
 
 /* pins */
@@ -258,6 +261,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @keyframes starpulse{0%{stroke-width:5;stroke-opacity:.75}100%{stroke-width:17;stroke-opacity:0}}
 .zfar .pin.sq{width:15px;height:15px;margin:3.5px}
 .pin.mine{border-radius:2px;transform:rotate(45deg)}
+/* a favourite: a thick white ring with a dark edge, and a little bigger, so it stands out at any zoom on any map */
+.pin.fav{box-shadow:0 0 0 3px #fff,0 0 0 4.5px rgba(0,0,0,.8),0 2px 5px rgba(0,0,0,.6)}
+.pin.sq.fav{box-shadow:none;transform:scale(1.25);filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 1.5px #000)}
+.pin.sq.fav .o{stroke:#fff;stroke-width:8}
+.pin.sq.fav.sel{filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 3px var(--accent))}
+.btn.favb{min-width:36px;padding-inline:8px;font-size:16px;line-height:1}.btn.favb.on{color:#e11d48}
 .pin.my-filmed,.pin.my-skip{opacity:.45}
 .pin.sel{outline:3px solid var(--accent);outline-offset:3px}
 .pin.now{animation:pulse 2.2s ease-out infinite}
@@ -349,7 +358,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
   .lb{min-width:52px;height:53px}
   #lb-big{display:flex}
   #addbar{top:10px}
-  #banner{bottom:calc(var(--barh) + 30px)}
+  #banner{bottom:calc(var(--barh) + 30px)} #fade{bottom:calc(var(--barh) + 76px)}
   .leaflet-bottom.leaflet-left{bottom:0}
   .brand{display:none} .top{padding-block:0} .tabs{margin-top:0}
   .tabs button{padding:12px 4px 9px;font-size:14.5px}
