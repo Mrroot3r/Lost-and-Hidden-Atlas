@@ -30,7 +30,9 @@ const { chromium } = require('playwright');
     else if(MODE!=='nocredit') m.Artist={value:'<a href="//commons.wikimedia.org/wiki/User:Example">Ann Example</a>'};
     if(MODE!=='nocredit') m.LicenseShortName={value:'CC BY-SA 4.0'};
     return {query:{pages:{'-1':{ns:6,title:'File:Some_building_1.jpg',imageinfo:[{url:'https://upload.wikimedia.org/x.jpg',descriptionurl:'https://commons.wikimedia.org/wiki/File:Some_building_1.jpg',extmetadata:m}]}}}}; };
+  let STORED={};      // what data/photos.json holds for this page: nothing, unless a test says otherwise
   const open=async set=>{ const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); p.on('pageerror',e=>errs.push(e.message));
+    await c.route(u=>/\/data\/photos\.json/.test(u.pathname),r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({asof:'2026-11-19',p:STORED})}));
     await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>{ const u=new URL(r.request().url());
       if(u.host==='en.wikipedia.org'&&u.pathname==='/w/api.php'&&u.searchParams.get('prop')==='imageinfo'){ asked.commons++; return r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(commonsAnswer())}); }
       if(u.host==='en.wikipedia.org'&&u.pathname==='/w/api.php'){ asked.wiki++; if(MODE==='fail') return r.fulfill({status:500,body:''}); return r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(wikiAnswer(u.searchParams.get('titles')))}); }
@@ -83,6 +85,21 @@ const { chromium } = require('playwright');
   await p.evaluate(()=>{ const g=[...document.querySelectorAll('#sheet button')].find(x=>/settings/i.test(x.getAttribute('aria-label')||x.textContent)); if(g) g.click(); }); await p.waitForTimeout(300);
   const st=await p.evaluate(()=>/Photos from Wikipedia on place pages/.test(document.querySelector('#sheet').textContent));
   ok('the setting is under the gear',st);
+  // photo details stored ahead of time (tools/photos.py): shown at once, with their room kept, and Wikipedia is asked nothing
+  await c.close();
+  STORED={}; STORED[pick.wiki[0]]=['https://upload.wikimedia.org/stored/900px-Stored.jpg',900,600,'Sam Stored','CC BY 4.0','https://commons.wikimedia.org/wiki/File:Stored.jpg','Stored Article']; STORED[pick.wiki[1]]=0;
+  ({c,p}=await open()); MODE='good';
+  await p.waitForFunction(()=>true); await p.waitForTimeout(3200);          // the file is fetched a moment after the page opens
+  r=await show(p,pick.wiki[0]);
+  ok('a place whose photo details are stored shows the picture with its credit',r.shown&&r.img==='https://upload.wikimedia.org/stored/900px-Stored.jpg'&&/Stored Article/.test(r.cap)&&/Sam Stored · CC BY 4\.0/.test(r.cap)&&/commons\.wikimedia\.org\/wiki\/File:Stored\.jpg/.test(r.link),r.cap.slice(0,90));
+  ok('and Wikipedia is asked nothing for it',asked.wiki===0&&asked.commons===0,JSON.stringify(asked));
+  ok('its room is kept from the first frame: the picture carries its size',await p.evaluate(()=>{ const i=document.querySelector('#v-detail .dphoto img'); return !!i&&i.getAttribute('width')==='900'&&i.getAttribute('height')==='600'; }));
+  { const sync=await p.evaluate(id=>{ location.hash='#'; location.hash='#'+id; return new Promise(res=>{ const t0=performance.now(); const tick=()=>{ const f=document.querySelector('#v-detail .dphoto'); if(f&&!f.hidden&&f.querySelector('img')) return res(true); if(performance.now()-t0>600) return res(false); requestAnimationFrame(tick); }; setTimeout(tick,0); }); },pick.wiki[0]);
+    ok('opened again, the picture is there as the page is drawn',sync); }
+  r=await show(p,pick.wiki[1]);
+  ok('a place stored as "nothing usable" shows no picture and asks nothing',!r.shown&&asked.wiki===0,JSON.stringify(asked));
+  r=await show(p,pick.wiki[2]);
+  ok('a place the stored file does not hold is still looked up as before',r.shown&&asked.wiki===1&&asked.commons===1,JSON.stringify(asked));
   await c.close(); await b.close();
   ok('no page errors',!errs.length,errs.slice(0,3).join(' | '));
   console.log(fails.length?fails.length+' FAILED':'photo_test passed'); process.exit(fails.length?1:0);

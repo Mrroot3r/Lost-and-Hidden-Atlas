@@ -2085,7 +2085,16 @@ function photoBy(h){ const d=new DOMParser().parseFromString('<body>'+String(h||
   if(t&&t.length<=70) return t;
   const a=[...d.querySelectorAll('a')].find(x=>/User:/.test(x.getAttribute('href')||'')&&(x.textContent||'').trim()); if(a) return a.textContent.replace(/\s+/g,' ').trim().slice(0,70);
   return (!t||d.querySelector('table,img,figure'))?'':t.slice(0,68).replace(/\s+\S*$/,'')+'…'; }      /* a long plain credit (an archive's full name) is cut short; a banner with no name in it gives nothing */
+/* Most places' photo details are gathered ahead of time (tools/photos.py -> data/photos.json): the picture's address and size and
+   whose it is, or 0 for "looked, nothing usable". The file is fetched once, in a quiet moment after the page opens, and then a
+   place page shows its picture at once, with its room already kept, and asks Wikipedia nothing. A place the file does not
+   hold (written since it was made) is asked for as before. */
+let PHX=null, phxWait=null;
+function phxLoad(){ if(!phxWait) phxWait=(AT?AT.fetch('data/photos.json'):fetch('data/photos.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); }).then(j=>{ PHX=(j&&j.p)||{}; }).catch(()=>{ PHX={}; }); return phxWait; }
+const phxOf=s=>{ const v=PHX&&PHX[s.id]; return Array.isArray(v)?{src:v[0],w:v[1],h:v[2],who:v[3],lic:v[4],page:v[5],where:/commons\.wikimedia\.org/.test(v[5])?'Wikimedia Commons':'Wikipedia',title:v[6]}:v===0?0:undefined; };
 function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
+  if(!PHX){ return phxLoad().then(()=>placePhoto(s)); }
+  { const k=phxOf(s); if(k!==undefined) return Promise.resolve(k||null); }
   const t=wikiTitle(s); if(!t) return Promise.resolve(null);
   const q=(base,o)=>fetch(base+'?'+new URLSearchParams(Object.assign({action:'query',format:'json',origin:'*'},o))).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); });
   const pr=q('https://en.wikipedia.org/w/api.php',{redirects:'1',prop:'pageimages|coordinates',piprop:'thumbnail|name',pithumbsize:'900',pilicense:'free',titles:t}).then(j=>{
@@ -2101,11 +2110,14 @@ function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
   PHOTO.set(s.id,pr); return pr; }
 function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false||!wikiTitle(s)) return null;
   const box=el('figure',{class:'dphoto',hidden:true});
-  placePhoto(s).then(ph=>{ if(!ph||!box.isConnected) return;
-    const img=el('img',{src:ph.src,alt:'Photograph from the Wikipedia article '+ph.title,decoding:'async'}); if(ph.w>0&&ph.h>0){ img.width=ph.w; img.height=ph.h; }
+  const fill=ph=>{ const img=el('img',{src:ph.src,alt:'Photograph from the Wikipedia article '+ph.title,decoding:'async'}); if(ph.w>0&&ph.h>0){ img.width=ph.w; img.height=ph.h; }
     img.addEventListener('error',()=>{ box.hidden=true; });
     box.append(img,el('figcaption',null,'From Wikipedia\'s article on '+ph.title+'. Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where)));
-    box.hidden=false; });
+    box.hidden=false; };
+  const known=phxOf(s);
+  if(known===0) return null;                 /* looked up ahead of time: nothing usable */
+  if(known){ fill(known); return box; }      /* known ahead of time: in the page from the first frame, so nothing moves */
+  placePhoto(s).then(ph=>{ if(!ph||!box.isConnected) return; fill(ph); });
   return box; }
 /* The head of a place page cuts a long name to two lines when the phone is on its side. When that happens the whole name
    is written at the top of the part that scrolls, so nothing is lost. Asked again when the window changes shape. */
@@ -2639,6 +2651,7 @@ buildHome(); buildFilters(); renderList(); $('#trip-n').textContent=U.trip.lengt
 if(pref('open')!=='last'&&LD[pref('open')]) U.ui.base=pref('open');
 if(window.L){ initMap(); buildBar(); resumeLog(); pushPrefs(); }
 else { $('#map').append(el('div',{class:'pad',style:'padding-block:40px;max-width:46ch;margin:auto',text:'The map library could not load, most likely because this device is offline. The list, place pages and links still work. Reload when you are back online.'})); $('#lbar').hidden=true; }
+setTimeout(()=>{ if(pref('wikiPhotos')&&navigator.onLine!==false) phxLoad(); },2500);      /* photo details, once things are quiet */
 if(HOSTED&&!AT&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* the phone's Back button, in the app: close whatever is open; returning false lets Android put the app in the background */
 window.atlasBack=()=>{

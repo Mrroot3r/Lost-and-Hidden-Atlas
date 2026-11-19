@@ -94,6 +94,9 @@ if os.path.exists(R+'build/pockets.json'):       # historic pockets (tools/pocke
     for k in pj.get('s',{}): shutil.copyfile(R+f'build/pock/{k}.json',WEB+f'data/pock/{k}.json')   # one state's markers and listings, fetched when the map is zoomed in there
 if os.path.exists(R+'build/walls.json'):         # stone walls found on LiDAR (tools/walls.py); the index when the layer is switched on, a cell when zoomed in there
     shutil.copyfile(R+'build/walls.json',WEB+'data/walls.json'); shutil.copytree(R+'build/walls',WEB+'data/walls')
+if os.path.exists(R+'src/photos.json'):          # photo details gathered ahead of time (tools/photos.py): only for places that still exist
+    _ph=json.load(open(R+'src/photos.json',encoding='utf-8')); _ids={s['id'] for s in S}
+    open(WEB+'data/photos.json','w',encoding='utf-8').write(json.dumps({'asof':_ph.get('asof',''),'p':{k:v for k,v in _ph['p'].items() if k in _ids}},separators=(',',':'),ensure_ascii=False))
 for extra in ('vanished','mines'):       # optional lead layers (tools/vanished.py, tools/mines.py); fetched only when switched on
     if os.path.exists(R+f'build/{extra}.json'): shutil.copyfile(R+f'build/{extra}.json',WEB+f'data/{extra}.json')
 open(WEB+'app.js','w').write(app)
