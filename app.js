@@ -64,7 +64,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={wikiPhotos:true,quietGone:true,hideGone:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -649,6 +649,12 @@ function initMap(){
   map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
   map.on('move zoom zoomend moveend resize viewreset',clipCmp);
   map.on('click',onMapClick);
+  /* A double tap. Leaflet's own goes in one step, which is slow work with one thumb, most of all with the map full screen:
+     on open map it goes in as many steps as Settings says (three unless changed; Shift and a double click goes out); on a
+     pin it goes to street level; on a numbered disc it goes at least that many steps toward the disc (dblPin, dblGroup below). */
+  map.doubleClickZoom.disable();
+  map.on('dblclick',e=>{ if(adding||pickingHome) return; const n=Math.max(1,Math.min(4,+pref('dbl')||3)), out=!!(e.originalEvent&&e.originalEvent.shiftKey);
+    map.setZoomAround(e.containerPoint,Math.max(map.getMinZoom(),Math.min(map.getMaxZoom(),map.getZoom()+(out?-n:n)))); });
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
@@ -791,6 +797,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     H('Map'),
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
+    pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
     tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
@@ -1915,6 +1922,15 @@ function resumeLog(){
   if(map&&navigator.geolocation&&Date.now()/1000-lastT<1800){ rec=l; locate(); keepAwake(); drawRec(); syncRec(); setTimeout(()=>banner('Picked your field log back up where it stopped.',false,6000),1200); }
   else { l.t1=lastT; delete U.rec; saveNow(); } }
 
+/* a double tap on a pin: to street level, or one step closer when already there; on a numbered disc: at least the usual steps, toward the disc */
+const DBLZ=17;
+function dblPin(ll){ map.setView(ll,Math.min(map.getMaxZoom(),Math.max(DBLZ,map.getZoom()+1))); }
+/* The first tap of a double tap on a disc has already begun its own zoom (a single tap opens the group), so the steps are
+   counted from where the map stood before that tap; otherwise the result would turn on how fast the two taps came. */
+let dblFrom={t:0,z:0};
+function dblGroup(b,ll){ const n=Math.max(1,Math.min(4,+pref('dbl')||3)), z0=Date.now()-dblFrom.t<800?dblFrom.z:map.getZoom(), fit=map.getBoundsZoom(b.pad(0.25));      /* a tight group: until its pins fill the view; a loose one: the usual steps, toward the disc */
+  const go=()=>{ if(fit>=z0+n) map.fitBounds(b.pad(0.25),{maxZoom:DBLZ}); else map.setView(ll,Math.min(map.getMaxZoom(),z0+n)); };
+  if(map._animatingZoom) map.once('zoomend',()=>setTimeout(go,0)); else go(); }      /* the first tap's zoom is still running: a view set now would be undone when it lands */
 /* markers */
 const STARD='M12.00,1.60 L14.76,8.80 L22.46,9.20 L16.47,14.05 L18.47,21.50 L12.00,17.30 L5.53,21.50 L7.53,14.05 L1.54,9.20 L9.24,8.80Z';
 function pinIcon(s){
@@ -1955,6 +1971,7 @@ function syncMarkers(){
     if(!m){ m=L.marker([p.lat,p.lon],{icon:ic,keyboard:false,riseOnHover:true}); m._sig=sig;
       const tip=el('span',{text:s.name}); m.bindTooltip(tip,{direction:'top',offset:[0,-9]});
       m.on('click',()=>{ if(adding||pickingHome) return; select(byId(s.id)||s,false); });
+      m.on('dblclick',()=>{ if(adding||pickingHome) return; dblPin(m.getLatLng()); });
       m.on('dragend',()=>{ const q=m.getLatLng(); U.moved[s.id]=[+q.lat.toFixed(6),+q.lng.toFixed(6)]; save(); m.dragging.disable(); banner('Pin moved. It is saved in this browser.',false,3500); refresh(); });
       pinPool.set(s.id,m); }
     else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
@@ -1969,7 +1986,8 @@ function syncMarkers(){
     plan.groups.forEach(c=>{ const n=c.ids.length, d=n<10?30:n<40?36:42;
       const m=L.marker([c.la/n,c.lo/n],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'clus',html:String(n),iconSize:[d,d],iconAnchor:[d/2,d/2]})});
       m.bindTooltip(n+' places. Tap to zoom in',{direction:'top',offset:[0,-d/2]});
-      m.on('click',()=>{ if(adding||pickingHome) return; map.fitBounds(L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25),{maxZoom:Math.max(map.getZoom()+2,CLUSZ+1)}); });
+      m.on('click',()=>{ if(adding||pickingHome) return; dblFrom={t:Date.now(),z:map.getZoom()}; map.fitBounds(L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25),{maxZoom:Math.max(map.getZoom()+2,CLUSZ+1)}); });
+      m.on('dblclick',()=>{ if(adding||pickingHome) return; dblGroup(L.latLngBounds([c.a,c.c],[c.b,c.d]),m.getLatLng()); });
       m.addTo(clusLayer); });
     clusLayer.addTo(map); }
 }
