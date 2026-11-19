@@ -1,6 +1,6 @@
 # November 2026: Massachusetts, Worcester County first. Facts from the linked Wikipedia articles unless a note says otherwise.
 from data_b import N
-def W(t): return ['Wikipedia: '+t,'https://en.wikipedia.org/wiki/'+t.replace(' ','_')]
+def W(t): return ['Wikipedia: '+t,'https://en.wikipedia.org/wiki/'+t.replace('%','%25').replace(' ','_').replace('"','%22').replace('?','%3F')]      # a title is not yet an address: quote marks and ? would break it
 WK='Pin is the coordinate given in the Wikipedia article; not checked against imagery.'
 GEO='Pin is from an address lookup of the named place; treat it as the front door, not the ruin.'
 NC=' Not confirmed from a source this round.'

@@ -18,6 +18,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45          # a build takes about five minutes; one that hangs would hold up every later merge
     steps:
       - uses: actions/checkout@v4
         with:

@@ -8,8 +8,7 @@
 # Foundation's Tahoe page. Tahoe National Forest's own pages for Kyburz Flat and the Sierra Buttes lookout were not found
 # (404): those hours are not checked. Interiors were not visited by any source opened unless the entry says so.
 from data_b import N
-from urllib.parse import quote
-def W(t): return ['Wikipedia: '+t,'https://en.wikipedia.org/wiki/'+quote(t.replace(' ','_'))]
+from data_ma import W
 BATCH={'key':'ca_wjev','label':'California: Downieville, Sierra City and the Henness Pass Road','added':'2026-11-19 05:26'}
 
 def HM(n,label):

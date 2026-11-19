@@ -1,5 +1,7 @@
 import json,sys,re
 sys.path.insert(0,'tools')
+# Before a single place list is run: prove that each one is only data (tools/safe_data.py says why this matters).
+import safe_data; safe_data.must('tools')
 from data_a import A
 from data_b import B
 from data_c import FR,EXTRA_C
