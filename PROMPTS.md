@@ -71,7 +71,6 @@ What I care about most:
 - Every tip you leave out is listed in the pull request with the reason.
 - Look at each lead row the tool says may already be on the map, and delete it only if that place was added.
 - You are the one session allowed to edit GUIDE.md and LEADS.md. Do not change PROMPTS.md, the app or any place entry.
-- Your data file holds data and nothing else: import only  from data_b import N  and  from data_ma import W  (W('Article title') makes a Wikipedia link), no urllib, os or re, no loops or classes. tools/safe_data.py refuses anything more, and check.py says so before you publish (GUIDE.md section 4).
 - Finish with ONE pull request and stop. Do not merge it and do not push to main. I merge.
 
 When you finish, tell me in plain English: how many leads you moved, where each tip you kept went, each tip you dropped and why, any tool you changed, and the link to the pull request.
