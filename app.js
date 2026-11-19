@@ -2081,9 +2081,11 @@ function photoFits(s,title,co){ if(!co||!isFinite(co.lat)||!isFinite(co.lon)) re
   if(tt.trim().includes(' ')&&(all(s.name).includes(tt)||all(s.name2).includes(tt))) return true;   /* the whole title is in the name: Altamont station */
   const town=new Set(phWords(s.town)), mine=new Set([...phWords(s.name),...phWords(s.name2)].filter(w=>!town.has(w)));
   return phWords(title.replace(/\s*\(.*\)\s*$/,'')).some(w=>!town.has(w)&&mine.has(w)); }
-function photoBy(h){ const d=new DOMParser().parseFromString('<body>'+String(h||'')+'</body>','text/html').body; const t=(d.textContent||'').replace(/\s+/g,' ').trim();
+/* a credit sometimes carries the photographer's e-mail address: the name is credit enough */
+const noMail=t=>String(t||'').replace(/[\s,;:·|\/-]*[(<\[]?\s*(?:mailto:)?[\w.+-]+@[\w-]+(?:\.[\w-]+)+\s*[)>\]]?/g,'').replace(/\s+/g,' ').replace(/^[\s,;:·|\/-]+|[\s,;:·|\/-]+$/g,'');
+function photoBy(h){ const d=new DOMParser().parseFromString('<body>'+String(h||'')+'</body>','text/html').body; const t=noMail((d.textContent||'').replace(/\s+/g,' ').trim());
   if(t&&t.length<=70) return t;
-  const a=[...d.querySelectorAll('a')].find(x=>/User:/.test(x.getAttribute('href')||'')&&(x.textContent||'').trim()); if(a) return a.textContent.replace(/\s+/g,' ').trim().slice(0,70);
+  const a=[...d.querySelectorAll('a')].find(x=>/User:/.test(x.getAttribute('href')||'')&&noMail(x.textContent)); if(a) return noMail(a.textContent).slice(0,70);
   return (!t||d.querySelector('table,img,figure'))?'':t.slice(0,68).replace(/\s+\S*$/,'')+'…'; }      /* a long plain credit (an archive's full name) is cut short; a banner with no name in it gives nothing */
 /* Most places' photo details are gathered ahead of time (tools/photos.py -> data/photos.json): the picture's address and size and
    whose it is, or 0 for "looked, nothing usable". The file is fetched once, in a quiet moment after the page opens, and then a
