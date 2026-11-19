@@ -6,13 +6,29 @@ tools/osm_layers.py, for when only a metropolitan area is wanted and the state's
         west south east north, then the state keys the box touches. Add --skip-mines to leave out mapped mine
         entrances: round Kansas City nearly all of them are the doors of working underground business parks. Writes cache/osm/<key>_leads.json for each key
         (the same download in each; tools/leads.py keeps only the points inside that state's outline).
-Then list the keys in STATE_KEYS at the top of tools/leads.py and run it, then all.sh.
+   python3 tools/osm_leads_box.py --skip-mines --state tx hi md
+        a whole state or province at a time, each with the box of its own outline (build/states.json). A key whose
+        file is already in cache/osm is skipped; delete the file to download it again. A state takes from five seconds
+        to a minute and a half, Ontario seven minutes. This is how every state outside the first ten was done.
+Then list the keys in STATE_KEYS at the top of tools/leads.py (every state and province is there already) and run it,
+then all.sh.
 
 It asks the copies of OpenStreetMap that Esri hosts as feature layers (updated daily), as osm_layers.py does, so it
 works when Overpass cannot be reached. Data is OpenStreetMap, (c) OpenStreetMap contributors, ODbL.
 The box used for Kansas City in November 2026 is the one above: about 60 miles each way from downtown."""
 import sys,os,json,time,urllib.request,urllib.parse
-SKIP='--skip-mines' in sys.argv; ARGS=[a for a in sys.argv[1:] if a!='--skip-mines']
+SKIP='--skip-mines' in sys.argv; STATE='--state' in sys.argv; ARGS=[a for a in sys.argv[1:] if a not in('--skip-mines','--state')]
+if STATE:                       # one run of this script for each key, with that state's own box
+    import subprocess
+    if not ARGS: sys.exit(__doc__)
+    ST=json.load(open('build/states.json'))
+    for k in ARGS:
+        if k not in ST: print(k,'is not a state or province key (tools/states.py)'); continue
+        if os.path.exists(f'cache/osm/{k}_leads.json'): print(k,'is already in cache/osm (delete the file to download it again)'); continue
+        xs=[x for r in ST[k] for x in r[0::2] if x<0]; ys=[y for r in ST[k] for y in r[1::2]]      # x<0: Alaska's outline crosses the date line
+        t=time.time(); r=subprocess.run([sys.executable,os.path.abspath(__file__)]+(['--skip-mines'] if SKIP else [])+[f'{min(xs)-0.02:.3f}',f'{min(ys)-0.02:.3f}',f'{max(xs)+0.02:.3f}',f'{max(ys)+0.02:.3f}',k],capture_output=True,text=True)
+        print(k,f'{time.time()-t:.0f}s',(r.stdout.strip().split('\n') or [''])[-1],r.stderr.strip()[-200:],flush=True)
+    sys.exit(0)
 if len(ARGS)<5: sys.exit(__doc__)
 W,S,E,N=[float(x) for x in ARGS[:4]]; KEYS=ARGS[4:]
 R='https://services6.arcgis.com/Do88DoK2xjTUCXd1/arcgis/rest/services/'; UA={'User-Agent':'lost-hidden-atlas-research/1.0'}
@@ -56,6 +72,7 @@ for f in b:
     if c: leads.append({'type':'way','id':str(a.get('osm_id2') or a.get('OBJECTID')),'center':{'lat':c['y'],'lon':c['x']},'tags':tags(a,('name','historic','ruins','abandoned','disused','building','man_made','railway'))})
 if SKIP:
     n0=len(leads); leads=[e for e in leads if e['tags'].get('man_made') not in ('adit','mineshaft') and e['tags'].get('historic') not in ('mine','mine_shaft','adit')]
-    print('left out',n0-len(leads),'mine entrances'); n1=min(n1,len(leads))
+    print('left out',n0-len(leads),'mine entrances')
+n1=sum(1 for e in leads if e['type']=='node')
 for k in KEYS:
     json.dump({'elements':leads},open(f'cache/osm/{k}_leads.json','w'),separators=(',',':')); print('wrote',f'cache/osm/{k}_leads.json',n1,'points +',len(leads)-n1,'buildings')

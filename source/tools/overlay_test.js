@@ -70,6 +70,12 @@ const { chromium } = require('playwright');
   for(const z of [11,9,8,6]){ await go(42.75,-73.9,z); s=await snap(); t=await tap();
     ok('zoom '+z+': the lines are a handful of layers and a tap still opens a box',s.lines>0&&s.lines<90&&t.length>5&&!/^no /.test(t),s.lines+' layers; '+t); }
   await go(42.75,-73.9,12); s=await snap(); ok('everything switched on at zoom 12: hundreds of layers, not thousands',s.layers<900,s.layers+' layers');
+  // ---- leads cover the whole continent since November 2026, so a view of half a country draws none of them (LEADZ)
+  await go(29.5,-98.5,9); s=await snap(); ok('lead dots: Texas has them, and those in view are drawn',s.leadsDataIn>5&&s.leadsIn===s.leadsDataIn,s.leadsIn+' of '+s.leadsDataIn+' round San Antonio');
+  await go(39.5,-98,4); s=await snap(); ok('lead dots: a view of the whole country draws none',s.leads===0&&s.leadsDataIn>1000,s.leads+' on the map, '+s.leadsDataIn+' in view');
+  await go(39.5,-98,5); s=await snap(); ok('lead dots: none at zoom 5 either',s.leads===0&&s.leadsDataIn>300,s.leads+' on the map, '+s.leadsDataIn+' in view');
+  await go(41.5,-75,6); s=await snap(); ok('lead dots: back at zoom 6, and no more than the Northeast held before',s.leadsIn===s.leadsDataIn&&s.leadsIn>500&&s.leads<3000,s.leadsIn+' of '+s.leadsDataIn+' in view, '+s.leads+' on the map');
+  await go(42.75,-73.9,12);
   // ---- vanished places and old mines come one state at a time: an index, then a state's own file when the map is zoomed in
   //      over it or the reader stands in it. Nobody looking at Albany downloads Missouri.
   { const c2=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c2.newPage(); const got=[]; q.on('pageerror',e=>errs.push(e.message));
