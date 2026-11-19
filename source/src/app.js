@@ -62,7 +62,7 @@ const debounce=(f,ms)=>{ let t; return function(){ const a=arguments; clearTimeo
 
 /* ---------- your saved data (this browser only) ---------- */
 const LS='lost-hidden-atlas-v1';
-const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:true,canal:true,rail:false}}});
+const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:true,canal:true,rail:false}}});
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
@@ -102,7 +102,7 @@ const sites=()=>BASE.concat(U.custom);
 const ALIAS=D.alias||{};
 function aliasMigrate(){ let ch=false; Object.keys(ALIAS).forEach(o=>{ const n=ALIAS[o];
     ['status','notes','moved','visits'].forEach(k=>{ const m=U[k]; if(m&&Object.prototype.hasOwnProperty.call(m,o)){ if(!Object.prototype.hasOwnProperty.call(m,n)) m[n]=m[o]; delete m[o]; ch=true; } });
-    if(Array.isArray(U.trip)){ const i=U.trip.indexOf(o); if(i>=0){ if(U.trip.indexOf(n)<0) U.trip[i]=n; else U.trip.splice(i,1); ch=true; } }
+    ['trip','fav'].forEach(k=>{ if(Array.isArray(U[k])){ const i=U[k].indexOf(o); if(i>=0){ if(U[k].indexOf(n)<0) U[k][i]=n; else U[k].splice(i,1); ch=true; } } });
     (U.logs||[]).forEach(l=>(l.notes||[]).forEach(x=>{ if(x.pl===o){ x.pl=n; ch=true; } })); });
   if(ch) save(); }
 aliasMigrate();
@@ -174,7 +174,12 @@ async function fetchDT(){
 }
 
 /* ---------- filters ---------- */
-const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,tip:false,before:0,fresh:'',my:'any',hideDone:false};
+/* Favourites: the reader's own short list of the places they care most about (U.fav, ids in the order added; kept in this
+   browser like the trip). A favourite's pin wears a white ring, is never folded into a grey group disc however far out the
+   map is, and is never hidden as "nothing to see". Filters has "My favourites" to list them. */
+const isFav=id=>Array.isArray(U.fav)&&U.fav.indexOf(id)>=0;
+function favToggle(s){ if(!Array.isArray(U.fav)) U.fav=[]; const i=U.fav.indexOf(s.id); if(i>=0) U.fav.splice(i,1); else U.fav.push(s.id); save(); refresh(); return i<0; }
+const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,tip:false,before:0,fresh:'',my:'any',hideDone:false};
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
@@ -185,7 +190,7 @@ let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
 /* hidden by "Hide places with nothing to see"? Not when its chip is chosen in Filters, not the place that is open, and not a stop on the trip */
-const goneHid=s=>pref('hideGone')&&nothingToSee(s)&&!F.st.has(s.st)&&!(sel&&sel.id===s.id)&&U.trip.indexOf(s.id)<0;
+const goneHid=s=>pref('hideGone')&&nothingToSee(s)&&!F.st.has(s.st)&&!(sel&&sel.id===s.id)&&U.trip.indexOf(s.id)<0&&!isFav(s.id);
 function match(s){ return !goneHid(s)&&match0(s); }
 function match0(s){
   if(F.line&&!F.line.ids.has(s.id)) return false;
@@ -201,6 +206,7 @@ function match0(s){
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
   if(F.before){ const y=yearOf(s); if(!y||y>=F.before) return false; }      /* a place with no year it dates from is left out, not guessed */
+  if(F.fav&&!isFav(s.id)) return false;
   if(F.tip&&!s.tip) return false;      /* a place that began as a reader's tip carries the day it was sent */
   if(F.brick&&s.bk!=='y'&&s.bk!=='s') return false;      /* red brick: bk is y (mostly), s (some), n (none); absent when nobody has looked */
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
@@ -218,12 +224,13 @@ function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.y
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
   YEAR.set(s.id,y); return y; }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.fav=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 const BATCHES=D.batches||[];
 const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
+  ['My favourites',()=>{ F.fav=true; }],
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
   ['Standing, from before 1800',()=>{ F.st.add('standing'); F.before=1800; }],
   ['Red brick',()=>{ F.brick=true; }],
@@ -267,7 +274,7 @@ function buildFilters(){
   fb.append(el('label',{class:'field'},el('span',{text:'Dates from'}),bef));
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
-  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('Sent in by readers','tip'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
+  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('My favourites','fav'),tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('Sent in by readers','tip'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
   /* the way out of a long panel: close it and go to the list */
   fb.append(el('div',{class:'row fdone'},el('button',{class:'btn pri',type:'button',id:'f-done',onclick:()=>{ $('#filters').open=false; syncFcount(); const t=$('#v-list'); if(t&&t.scrollIntoView) t.scrollIntoView({block:'start'}); }},'Show '+visible.length+(visible.length===1?' place':' places')),
     el('button',{class:'btn sm',type:'button',onclick:()=>{clearF();$('#q').value='';refresh();}},'Clear all filters')));
@@ -320,7 +327,7 @@ function renderList(){
     frag.append(el('li',null,el('button',{class:'item pad'+(sel&&sel.id===s.id?' cur':''),type:'button','data-id':s.id,onclick:()=>select(s,true)},
       dot(s),
       el('span',null,el('b',{text:s.name}),el('small',{text:[s.town,s.years].filter(Boolean).join(' · ')}),
-        el('small',null,STS[s.st],s.now?' · changing now':'',s.prec==='area'?' · rough pin':'',s.tip?' · from a reader':'',my?' · '+MY[my]:'',U.trip.indexOf(s.id)>=0?' · in trip':'')),
+        el('small',null,STS[s.st],s.now?' · changing now':'',s.prec==='area'?' · rough pin':'',s.tip?' · from a reader':'',isFav(s.id)?' · \u2665 favourite':'',my?' · '+MY[my]:'',U.trip.indexOf(s.id)>=0?' · in trip':'')),
       far?el('span',{class:'mins'},(d.est?'~':'')+fmtMin(d.min),el('i',{text:miTxt(d.mi)})):null)));
   });
   ul.append(frag);
@@ -416,7 +423,10 @@ const LD={
   topo:{n:'USGS topo, current',d:'Contours, streams and trails',mk:p=>new CachedXYZ('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:16,attribution:'USGS The National Map'})},
   oldtopo:{n:'USGS topo, 1940s–80s',d:'Scanned paper quads. Purple marks later photo-revisions',mk:p=>L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer/tile/{z}/{y}/{x}',{pane:p,maxZoom:20,maxNativeZoom:15,attribution:'USGS, National Geographic, i-cubed'})}
 };
-let cmp={on:false,key:'lidar',mode:'swipe',x:0.5,op:0.6};
+/* Compare: a second layer over the map, either behind a divider you drag ('swipe') or lying over it, see-through ('fade',
+   called Overlay on the page). What was chosen is kept (U.ui.cmp): on or off, which way, which layer, how strong. */
+let cmp=Object.assign({on:false,key:'lidar',mode:'swipe',x:0.5,op:0.6},(U.ui&&U.ui.cmp)||{}); cmp.x=0.5; if(cmp.mode!=='fade') cmp.mode='swipe'; cmp.op=Math.min(1,Math.max(0.1,+cmp.op||0.6));
+function cmpSave(){ U.ui.cmp={on:!!cmp.on,key:cmp.key,mode:cmp.mode,op:cmp.op}; save(); }
 
 /* tile cache: keeps every slow state-server tile in this browser */
 const TTL=30*864e5, AUTOMAX=150*1048576;
@@ -647,7 +657,7 @@ function initMap(){
   map.createPane('hist').style.zIndex=350;
   map.on('moveend',()=>{ if(U.ui.land) drawLand(); if(view==='near'&&NM.org==='map') nmDraw(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
   if(!LD[U.ui.base]) U.ui.base='streets';
-  setBase(U.ui.base,true);
+  setBase(U.ui.base,true); if(cmp.on){ cmp.lap=0; setCmp(); }      /* a comparison left on is on again, the way it was */
   map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
   map.on('move zoom zoomend moveend resize viewreset',clipCmp);
   map.on('click',onMapClick);
@@ -681,11 +691,12 @@ function setBase(key,first){
 }
 function setCmp(){
   if(cmpLayer){ map.removeLayer(cmpLayer); cmpLayer=null; }
-  const sw=$('#swipe'); const pane=map.getPane('cmp');
-  if(!cmp.on||schematic){ sw.hidden=true; pane.style.clip=''; pane.style.opacity=''; return; }
+  const sw=$('#swipe'), fd=$('#fade'); const pane=map.getPane('cmp');
+  if(!cmp.on||schematic){ sw.hidden=true; fd.hidden=true; pane.style.clip=''; pane.style.opacity=''; return; }
+  if(!LD[cmp.key]||cmp.key===U.ui.base) cmp.key=U.ui.base==='lidar'?'leaf':'lidar';      /* a layer is not compared with itself */
   cmpLayer=LD[cmp.key].mk('cmp').addTo(map);
-  if(cmp.mode==='swipe'){ pane.style.opacity=''; sw.hidden=false; $('#swipe-l').textContent=LD[U.ui.base].n; $('#swipe-r').textContent=LD[cmp.key].n; placeSwipe(); }
-  else { sw.hidden=true; pane.style.clip=''; pane.style.opacity=cmp.op; }
+  if(cmp.mode==='swipe'){ fd.hidden=true; pane.style.opacity=''; sw.hidden=false; $('#swipe-l').textContent=LD[U.ui.base].n; $('#swipe-r').textContent=LD[cmp.key].n; placeSwipe(); }
+  else { sw.hidden=true; pane.style.clip=''; pane.style.opacity=cmp.op; fd.hidden=false; $('#fade-l').textContent=LD[cmp.key].n; $('#fade-op').value=String(cmp.op); }
   onZoom();
 }
 function clipCmp(){ if(!map) return; const pane=map.getPane('cmp'); if(!cmp.on||cmp.mode!=='swipe'){ return; }
@@ -698,6 +709,8 @@ function setupSwipe(){
   g.addEventListener('pointermove',e=>{ if(!drag) return; const r=stage.getBoundingClientRect(); cmp.x=Math.min(0.97,Math.max(0.03,(e.clientX-r.left)/r.width)); placeSwipe(); });
   const up=()=>{drag=false;}; g.addEventListener('pointerup',up); g.addEventListener('pointercancel',up);
   g.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft'){cmp.x=Math.max(0.03,cmp.x-0.03);placeSwipe();} if(e.key==='ArrowRight'){cmp.x=Math.min(0.97,cmp.x+0.03);placeSwipe();} });
+  /* Overlay's own slider, on the map, so the strength is set without opening Map options */
+  $('#fade-op').addEventListener('input',e=>{ cmp.op=Math.min(1,Math.max(0.1,+e.target.value||0.6)); if(map&&cmp.on&&cmp.mode==='fade') map.getPane('cmp').style.opacity=cmp.op; cmpSave(); const o=document.getElementById('cmp-op'); if(o) o.value=String(cmp.op); });
 }
 /* layer bar: one row of icon buttons, plus an options sheet with a Done button that is always in reach */
 const ICON={
@@ -723,7 +736,7 @@ const ICON={
 function ico(k){ const s=document.createElement('span'); s.className='ic'; s.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>'; return s; }
 const BAR=[['streets','Streets','Street map'],['leaf','Leaf-off','Leaf-off aerial: spring flights with bare trees'],['lidar','LiDAR','LiDAR terrain: bare ground with the trees stripped off'],['sat','Satellite','Satellite imagery'],['topo','Topo','Current USGS topo map'],['oldtopo','Old topo','USGS paper maps, 1940s to 1980s'],
   ['rails','Old rails','Old railroad and trolley lines'],['canal','Canals','Canals, old and current'],['hist','Old map','Lay the old survey sheet over the selected place'],['land','Public land','Shade public and protected land by access'],['lots','Lot lines','Property lines (New York and Massachusetts, zoom in close)'],['leads','Leads','Unchecked ruins, mines and kilns from OpenStreetMap'],
-  ['cmp','Compare','Swipe between two layers'],['who','Owner?','Tap the map to see whose land it is']];
+  ['cmp','Compare','Compare two layers: tap for a divider to drag, again to lay one over the other, again to stop'],['who','Owner?','Tap the map to see whose land it is']];
 let asking=false, lotLayer=null;
 function barState(k){
   if(LD[k]) return !schematic&&U.ui.base===k;
@@ -742,9 +755,17 @@ function barTap(k){
   else if(k==='land'){ U.ui.land=!U.ui.land; save(); drawLand(); if(U.ui.land) banner(map.getZoom()<11?'Public land is on. Zoom in to see it.':'Green is open to the public, amber is restricted, red is closed. Purple has no access on record.',false,7000); }
   else if(k==='lots'){ U.ui.lots=!U.ui.lots; save(); drawLots(); if(U.ui.lots) banner(map.getZoom()<15?'Lot lines are on. Zoom in close to see them. New York and Massachusetts.':'Orange lines are property lines. Tap Owner? and then a lot to see who owns it.',false,7000); }
   else if(k==='leads'){ U.ui.leads=!U.ui.leads; save(); drawLeads(); if(U.ui.leads) banner('Yellow dots are unchecked ruins, mines, kilns and quarries from OpenStreetMap. Tap one.',false,7000); }
-  else if(k==='cmp'){ cmp.on=!cmp.on; if(cmp.on){ cmp.key=U.ui.base==='lidar'?'leaf':'lidar'; cmp.mode='swipe'; cmp.x=0.5; } setCmp(); }
+  else if(k==='cmp'){ cmpTap(); }
   else if(k==='who'){ setAsking(!asking); }
   syncBar(); }
+/* The Compare button goes round three stops: off, the way used last time, the other way, off. Passing through the second way
+   on the way to off (a tap within a second and a half) does not make it the way to remember. */
+function cmpTap(){ const other=m=>m==='swipe'?'fade':'swipe', now=Date.now();
+  if(!cmp.on){ cmp.on=true; cmp.lap=0; cmp.x=0.5; }
+  else if(!cmp.lap){ cmp.lap=1; cmp.home=cmp.mode; cmp.mode=other(cmp.mode); cmp.since=now; }
+  else { cmp.on=false; cmp.lap=0; if(now-(cmp.since||0)<1500&&cmp.home) cmp.mode=cmp.home; }
+  setCmp(); cmpSave();
+  if(cmp.on&&cmp.mode==='swipe'&&!cmp.lap) banner('Swipe: drag the divider. Tap again to lay '+LD[cmp.key].n+' over the map instead.',false,4500); else banner(''); }      /* nothing is said over Overlay: its slider sits where the words would */
 function setAsking(on){ asking=on; adding=false; pickingHome=false; $('#add-here').hidden=true; stage.classList.toggle('adding',on); $('#addbar').hidden=!on; if(on) $('#addbar span').textContent='Tap the map to see whose land it is.'; syncBar(); }
 function buildBar(){
   const sc=$('#lscroll'), fx=$('#lfix'); sc.textContent=''; fx.textContent='';
@@ -760,7 +781,8 @@ function buildBar(){
   const fit=()=>{ mo.style.right=fx.offsetWidth+'px'; mo.hidden=sc.scrollLeft+sc.clientWidth>=sc.scrollWidth-4; };
   sc.onscroll=fit; buildBar.fit=fit; if(!buildBar.rs){ buildBar.rs=true; window.addEventListener('resize',debounce(()=>{ if(buildBar.fit) buildBar.fit(); },120)); } requestAnimationFrame(fit); setTimeout(fit,400);
   syncBar(); }
-function syncBar(){ BAR.forEach(b=>{ const n=document.getElementById('lb-'+b[0]); if(n) n.setAttribute('aria-pressed',String(barState(b[0]))); }); if(!$('#sheet').hidden) buildSheet(); }
+function syncBar(){ BAR.forEach(b=>{ const n=document.getElementById('lb-'+b[0]); if(n) n.setAttribute('aria-pressed',String(barState(b[0]))); });
+  { const n=document.querySelector('#lb-cmp .lt'); if(n) n.textContent=!cmp.on?'Compare':cmp.mode==='swipe'?'Swipe':'Overlay'; }      /* the button says which way is showing */ if(!$('#sheet').hidden) buildSheet(); }
 let sheetMode='map';
 function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawScale.c); drawScale.c=L.control.scale({position:'bottomleft',imperial:!KM(),metric:KM()}).addTo(map); }
 /* send the recorder's settings to the phone; it reads them when a recording starts and when a mark is dropped */
@@ -846,12 +868,12 @@ function buildSheet(){
     const s=el('select',{id:'lidar-light','aria-label':'Light direction',onchange:e=>{ U.ui.light=e.target.value; save(); if(U.ui.base==='lidar') setBase('lidar'); if(cmp.on&&cmp.key==='lidar') setCmp(); }},Object.keys(LIGHT).map(v=>el('option',{value:v,text:LIGHT[v][0]})));
     s.value=U.ui.light; lb.append(el('div',{class:'lsub'},s),note('Changing the light makes faint walls and grades pop. It applies once you zoom in close, everywhere except Massachusetts, Vermont and Connecticut, which draw their LiDAR with a fixed light. Outside New York and New England the 1-metre LiDAR comes from the USGS at the last few zoom levels and takes a few seconds a tile; a coarser picture shows first.'));
     lb.append(H('Compare two layers'));
-    lb.append(ck('cmp-on',cmp.on,'Show a second layer over the map','Drag the divider, or fade one over the other',v=>{ cmp.on=v; setCmp(); syncBar(); }));
+    lb.append(ck('cmp-on',cmp.on,'Show a second layer over the map','Drag a divider (Swipe), or lay one over the other (Overlay). The Compare button on the bar steps through both',v=>{ cmp.on=v; cmp.lap=0; setCmp(); cmpSave(); syncBar(); }));
     if(cmp.on){
-      const ks=el('select',{id:'cmp-key','aria-label':'Second layer',onchange:e=>{cmp.key=e.target.value;setCmp();}},Object.keys(LD).map(k=>el('option',{value:k,text:LD[k].n}))); ks.value=cmp.key;
-      const ms=el('select',{id:'cmp-mode','aria-label':'Compare mode',onchange:e=>{cmp.mode=e.target.value;setCmp();buildSheet();}},el('option',{value:'swipe',text:'Swipe'}),el('option',{value:'fade',text:'Fade'})); ms.value=cmp.mode;
+      const ks=el('select',{id:'cmp-key','aria-label':'Second layer',onchange:e=>{cmp.key=e.target.value;setCmp();cmpSave();}},Object.keys(LD).map(k=>el('option',{value:k,text:LD[k].n}))); ks.value=cmp.key;
+      const ms=el('select',{id:'cmp-mode','aria-label':'Compare mode',onchange:e=>{cmp.mode=e.target.value;cmp.lap=0;setCmp();cmpSave();syncBar();}},el('option',{value:'swipe',text:'Swipe'}),el('option',{value:'fade',text:'Overlay'})); ms.value=cmp.mode;
       lb.append(el('div',{class:'lsub'},ks,ms));
-      if(cmp.mode==='fade') lb.append(el('div',{class:'lsub'},el('input',{type:'range',id:'cmp-op',min:'0',max:'1',step:'0.05',value:String(cmp.op),'aria-label':'Second layer strength',oninput:e=>{cmp.op=+e.target.value;map.getPane('cmp').style.opacity=cmp.op;}})));
+      if(cmp.mode==='fade') lb.append(el('div',{class:'lsub'},el('input',{type:'range',id:'cmp-op',min:'0.1',max:'1',step:'0.05',value:String(cmp.op),'aria-label':'Second layer strength',oninput:e=>{cmp.op=Math.min(1,Math.max(0.1,+e.target.value||0.6));map.getPane('cmp').style.opacity=cmp.op;$('#fade-op').value=String(cmp.op);cmpSave();}})));
     }
   }
   lb.append(H('Old survey map'));
@@ -1938,7 +1960,7 @@ const STARD='M12.00,1.60 L14.76,8.80 L22.46,9.20 L16.47,14.05 L18.47,21.50 L12.0
 function pinIcon(s){
   const star=s.st==='standing'&&!s.mine;      /* a place of the reader's own stays a diamond: .pin.mine */
   const c=['pin']; if(HOLLOW[s.st]) c.push('hollow'); if(star) c.push('sq'); if(s.now) c.push('now'); if(s.mine) c.push('mine');
-  const my=U.status[s.id]; if(my) c.push('my-'+my); if(sel&&sel.id===s.id) c.push('sel');
+  const my=U.status[s.id]; if(my) c.push('my-'+my); if(isFav(s.id)) c.push('fav'); if(sel&&sel.id===s.id) c.push('sel');
   const col=(CAT[s.cat]||CAT.landmark)[1];
   /* a standing place is a star (an outline drawn under the fill, so it reads on any aerial); the rest are round */
   if(star) return L.divIcon({className:'pinwrap',html:'<svg class="'+c.join(' ')+'" viewBox="0 0 24 24" style="--c:'+col+'">'+(s.now?'<path class="p" d="'+STARD+'"/>':'')+'<path class="o" d="'+STARD+'"/><path class="f" d="'+STARD+'"/></svg>',iconSize:[22,22],iconAnchor:[11,11]});      /* .p is the "changing now" pulse */
@@ -1949,11 +1971,12 @@ function pinIcon(s){
 const CLUSZ=9, CLUSPX=58, CLUSMIN=4;
 function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return null;
   const z=map.getZoom(), cells=new Map();
-  sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
+  sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
     let c=cells.get(k); if(!c){ c={ids:[],la:0,lo:0,a:90,b:-90,c:180,d:-180}; cells.set(k,c); }
     c.ids.push(s.id); c.la+=p.lat; c.lo+=p.lon; if(p.lat<c.a)c.a=p.lat; if(p.lat>c.b)c.b=p.lat; if(p.lon<c.c)c.c=p.lon; if(p.lon>c.d)c.d=p.lon; });
   const single=new Set(), groups=[]; cells.forEach(c=>{ if(c.ids.length<CLUSMIN) c.ids.forEach(i=>single.add(i)); else groups.push(c); });
-  if(sel) single.add(sel.id); return {single:single,groups:groups}; }
+  if(sel) single.add(sel.id); (U.fav||[]).forEach(i=>{ if(show.has(i)) single.add(i); });      /* a favourite stands alone at every zoom */
+  return {single:single,groups:groups}; }
 /* Pins are on the map only in and around the view, a screen's width beyond each edge. With every place on the map,
    each zoom step moved 800 pins and took a mid-range phone about 80 ms; it took 16 ms with none. A pin that has been made
    is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
@@ -1978,7 +2001,7 @@ function syncMarkers(){
       pinPool.set(s.id,m); }
     else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
     if(!markers.has(s.id)){ m.addTo(map); markers.set(s.id,m); }
-    const zo=sel&&sel.id===s.id?1000:(s.cat==='landmark'?-200:0); if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
+    const zo=sel&&sel.id===s.id?1000:isFav(s.id)?600:(s.cat==='landmark'?-200:0); if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
   });
   /* the grouped pins are made again only when the groups change, not each time the map is nudged */
   const sig=plan?map.getZoom()+'|'+plan.groups.map(c=>c.ids.length+':'+c.la.toFixed(3)+':'+c.lo.toFixed(3)).join():'';
@@ -2158,6 +2181,7 @@ function renderDetail(s){
     el('div',{class:'dtop'},
       el('button',{class:'btn sm',type:'button',onclick:deselect,'aria-label':'Back to all places',title:'All places'},'← Back'),
       el('div',{class:'dtop-r'},
+        el('button',{class:'btn sm favb'+(isFav(s.id)?' on':''),type:'button',id:'d-fav','aria-pressed':String(isFav(s.id)),'aria-label':isFav(s.id)?'Remove from my favourites':'Add to my favourites',title:isFav(s.id)?'In my favourites: tap to remove':'Add to my favourites: its pin stays on the map at every zoom',onclick:()=>{ const on=favToggle(s); banner(on?'Added to your favourites. Its pin now shows at every zoom; Filters has "My favourites".':'Removed from your favourites.',false,on?5000:2500); renderDetail(s); }},isFav(s.id)?'\u2665':'\u2661'),
         el('button',{class:'btn sm'+(inTrip?' on':''),type:'button',onclick:()=>{ const i=U.trip.indexOf(s.id); if(i>=0) U.trip.splice(i,1); else U.trip.push(s.id); save(); $('#trip-n').textContent=U.trip.length; renderDetail(s); }},inTrip?'✓ In trip':'+ Add to trip'),
         map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
     el('h2',{text:s.name})),
@@ -2197,7 +2221,7 @@ function renderDetail(s){
   sc.append(el('p',{style:'font-size:12.5px;color:var(--mute)',text:pr[1]+' The dashed ring on the map shows that margin.'}));
   if(s.pn) sc.append(el('p',{class:'pn',text:s.pn}));
   if(map&&!schematic){
-    const look=(base,ck,zoom,hist)=>()=>{ U.ui.hist=!!hist; if(base==='streets'&&navigator.onLine===false) base='topo'; setBase(base); cmp.on=!!ck; if(ck){cmp.key=ck;cmp.mode='swipe';cmp.x=0.5;} setCmp(); syncBar(); showHist(); const hc=document.getElementById('d-hist'); if(hc) hc.checked=!!hist; map.flyTo([p.lat,p.lon],zoom,{duration:0.7}); };
+    const look=(base,ck,zoom,hist)=>()=>{ U.ui.hist=!!hist; if(base==='streets'&&navigator.onLine===false) base='topo'; setBase(base); cmp.on=!!ck; cmp.lap=0; if(ck){cmp.key=ck;cmp.mode='swipe';cmp.x=0.5;} setCmp(); syncBar(); showHist(); const hc=document.getElementById('d-hist'); if(hc) hc.checked=!!hist; map.flyTo([p.lat,p.lon],zoom,{duration:0.7}); };
     sc.append(el('div',{class:'row',style:'margin-bottom:8px'},
       s.tm?el('button',{class:'btn sm',type:'button',onclick:look('streets',null,15,true)},s.tm.y+' map'):null,
       el('button',{class:'btn sm',type:'button',onclick:look('leaf',null,18,false)},'Leaf-off aerial'),
@@ -2258,7 +2282,7 @@ function renderDetail(s){
 }
 function delBtn(s){ const b=el('button',{class:'btn sm',type:'button'},'Delete'); let armed=false;
   b.addEventListener('click',()=>{ if(!armed){ armed=true; b.textContent='Really delete?'; setTimeout(()=>{armed=false;b.textContent='Delete';},4000); return; }
-    U.custom=U.custom.filter(x=>x.id!==s.id); delete U.status[s.id]; delete U.notes[s.id]; delete U.moved[s.id]; U.trip=U.trip.filter(i=>i!==s.id); save(); sel=null; drawSel(); showView('list'); refresh(); });
+    U.custom=U.custom.filter(x=>x.id!==s.id); if(Array.isArray(U.fav)) U.fav=U.fav.filter(i=>i!==s.id); delete U.status[s.id]; delete U.notes[s.id]; delete U.moved[s.id]; U.trip=U.trip.filter(i=>i!==s.id); save(); sel=null; drawSel(); showView('list'); refresh(); });
   return b; }
 
 /* add / edit your own place */
