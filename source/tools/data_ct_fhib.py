@@ -22,7 +22,7 @@ N('peoples-forest-nature-museum','Peoples State Forest Nature Museum','Barkhamst
   'The CCC built a museum, then walked away from it for fifty years.',
   'On Greenwoods Road in Peoples State Forest (CT DEEP). The forest is open daily, 8 a.m. to sunset, per the DEEP park page. The museum is open Memorial Day through Labor Day weekend, admission free, per the museum\'s site (days of the week not given there; Wikipedia says Friday to Monday). Phone (860) 379-2469. Mapped lots on Greenwoods Road and East River Road.',
   [W('Peoples State Forest Nature Museum'),L('Peoples State Forest Nature Museum','https://psfnaturemuseum.org'),PSF],conf='mixed',
-  th=[41.92288,-72.9954],thn='Lot on Greenwoods Road, Peoples State Forest',brick='no'),
+  th=[41.92288,-72.9954],thn='Lot on Greenwoods Road, Peoples State Forest',brick='no',hours='Forest: daily 8 a.m. to sunset. Museum: Memorial Day through Labor Day weekend (Wikipedia says Friday to Monday)'),
 N('american-legion-ccc-shelter','American Legion Forest CCC shelter and Camp White','Barkhamsted','ct','civic','standing',41.9404,-73.0148,'site','public','walk','','1933–1941',
   'The Civilian Conservation Corps ran Camp White in American Legion State Forest from 1933 (DEEP\'s forestry page says 1934) to 1941; the crews built roads, firebreaks, trails and four log shelters. This three-sided log shelter is the only one of the four left, and one of two CCC shelters to survive in Connecticut. It stands on loop three of the youth group camping area, which is the old camp site.',
   'A low three-sided log shelter on stone piers, with a roof short in front and long at the back (now of modern material, first wood shingles). DEEP says remnants of Camp White can still be seen in and around the youth group camping area, and that the stone steps on the Henry Buck Trail were laid by the CCC.',
@@ -78,7 +78,7 @@ N('solomon-rockwell-house','Solomon Rockwell House','Winchester','ct','civic','s
   'A fine Greek Revival house with a two-storey columned temple front, a string of ells and a small carriage barn. Inside: 19th-century things from Winsted\'s factories and the Civil War, and the town\'s fire museum.',
   'An ironmaster\'s temple-front house, now the town\'s attic.',
   'At 225 Prospect Street (Wikipedia gives 226), at Lake Street, Winsted; Winchester Historical Society. Open by appointment (Wikipedia); a Lakeville Journal article (its date not checked) gave Sundays 1 to 4 p.m. through October, or by appointment. The society\'s own page was not found, so current hours were not checked.',
-  [W('Solomon Rockwell House'),L('Lakeville Journal: Historical Society rich with artifacts','https://lakevillejournal.com/historical-society-rich-artifacts-days-gone')],conf='mixed',brick='no'),
+  [W('Solomon Rockwell House'),L('Lakeville Journal: Historical Society rich with artifacts','https://lakevillejournal.com/historical-society-rich-artifacts-days-gone')],conf='mixed',brick='no',hours='By appointment; a newspaper article gave Sundays 1 to 4 p.m. through October'),
 # ---- Colebrook and Norfolk ----
 N('colebrook-store','Colebrook Store','Colebrook','ct','town','standing',41.98944,-73.09667,'exact','view','drive','','1812',
   'Built in 1812 by William Swift, a local carpenter who mostly made bedsteads, and run as the village general store ever since (Wikipedia). It stands in Colebrook Center, a village that has changed little since about 1860.',

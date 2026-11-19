@@ -22,7 +22,7 @@ N('vermont-granite-museum','Jones Brothers Granite Shed (Vermont Granite Museum)
   'The long shed itself, now the Vermont Granite Museum, with exhibits on quarrying and stone carving and walking trails on the grounds. The Barre and Chelsea locomotive No. 14 is on the site (HMdb marker). Open to the public in season.',
   '',
   'Vermont Granite Museum, 7 Jones Brothers Way off US 302. Its page gives Tuesday to Saturday, 10 a.m. to 4 p.m., in the museum season (May 1 to October 31); admission charged (seniors and veterans $12; children 4 and under free). Accessible parking by the entrance.',
-  [W('Vermont Granite Museum'),['Vermont Granite Museum: visit','https://www.vtgranitemuseum.org/?p=80'],HM(261351,'Jones Brothers Granite Shed'),HM(281180,'Barre & Chelsea #14')],brick='no'),
+  [W('Vermont Granite Museum'),['Vermont Granite Museum: visit','https://www.vtgranitemuseum.org/?p=80'],HM(261351,'Jones Brothers Granite Shed'),HM(281180,'Barre & Chelsea #14')],brick='no',hours='May 1 to October 31: Tuesday to Saturday, 10 a.m. to 4 p.m.'),
 N('hope-cemetery-barre','Hope Cemetery','Barre','vtc','burial','standing',44.21117,-72.49975,'site','public','drive','cemeteries','1895–',
   'Barre bought 53 acres of farmland for the cemetery in 1895, laid out by Edward P. Adams, just as stone carvers from Italy and elsewhere were arriving for the granite boom. Silicosis from granite dust and the 1918-19 flu killed many of them, and many carvers designed their own stones: one estimate is that three quarters of the memorials were designed by the people under them. It has grown to 65 acres and more than 10,000 memorials.',
   'Carved granite memorials of every shape, many of them portraits and sculpture by Barre\'s own carvers. The HMdb lists a 1918 Spanish flu memorial and a veterans memorial here.',
@@ -65,7 +65,7 @@ N('east-village-meetinghouse','Old Brick Church (East Village Meetinghouse)','Ea
   'A brick Greek Revival church on a cut granite foundation, with a square tower and an eight-sided steeple. Inside are the original slip pews and the original pulpit, moved to the rear wall in the early 1900s.',
   '',
   'An active church, 55 VT Route 14 at US 2. Its page gives Sunday worship at 10 a.m.; visitors see the inside at services.',
-  [W('East Village Meetinghouse'),['Old Brick Church','http://www.oldbrickchurch.com/']],brick='yes'),
+  [W('East Village Meetinghouse'),['Old Brick Church','http://www.oldbrickchurch.com/']],brick='yes',hours='Sunday worship at 10 a.m.; visitors see the inside at services'),
 # ---- Calais ----
 N('kent-tavern-calais','Kent Tavern, Kents Corner','Calais','vtc','hotel','standing',44.36870,-72.48539,'site','view','drive','','1833–1837',
   'Abdiel Kent built this brick tavern between 1833 and 1837 at the crossroads his family had settled; it was a stagecoach stop on the Montpelier-to-Canada road from 1837 to 1846, and he and his brother Ira ran a store in its wooden wing until 1860. A. Atwater Kent, the radio maker, bought it in 1930 to restore as a museum; the Vermont Historical Society ran it as the Kent Tavern Museum from 1953 to 1988, and the state took it over in 1991.',

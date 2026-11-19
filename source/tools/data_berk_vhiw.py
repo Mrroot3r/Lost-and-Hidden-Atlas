@@ -53,7 +53,7 @@ N('chesterwood-stockbridge','Chesterwood','Stockbridge','berk','civic','standing
   look='The studio, the restored Colonial Revival house, a 19th-century barn now a gallery, the gardens with a Bacon fountain, and a woodland walk French laid out.',
   accn='National Trust for Historic Preservation, 4 Williamsville Road. Its page (read November 2026): May 15 to October 31, 2026, open daily except Tuesday, 10 am to 5 pm; December 4 to 20, 2026, Friday to Sunday 11 am to 4 pm. Admission charged; the house and studio by guided tour, which often sells out. Parking area on the grounds.',
   links=[W('Chesterwood (Massachusetts)'),L('Chesterwood: Hours and Admission','https://www.chesterwood.org/visit')],
-  brick='?'),
+  brick='?',hours='May 15 to October 31, 2026: daily except Tuesday, 10 a.m. to 5 p.m. December 4 to 20, 2026: Friday to Sunday 11 a.m. to 4 p.m.'),
 N('old-covered-bridge-sheffield','Old Covered Bridge (Upper Sheffield Covered Bridge)','Sheffield','berk','landmark','standing',42.12395,-73.35456,'exact','public','walk','','1837 or 1854; rebuilt 1996',
   'A Town lattice-truss covered bridge over the Housatonic, once called the oldest covered bridge in Massachusetts. Wikipedia dates it to 1837, while the town\'s marker says it was ordered built in 1854. It was closed to traffic in 1974 (the marker; Wikipedia gives 1970), restored in 1981 by Milton Graton, burned by arsonists in 1994, and rebuilt to the restoration drawings, finished in 1996.',
   look='What stands is the 1996 replica: a 93-foot board-sided bridge with two lattice trusses on granite and Sheffield marble abutments, one of them 19th-century. Open to people on foot. The marker stands by the bridge.',

@@ -65,7 +65,7 @@ N('duvillard-mill','Duvillard Mill (DEC Fisheries Aquarium)','Cape Vincent','nny
   '',
   'NYS Department of Environmental Conservation, Cape Vincent Fisheries Station, 541 East Broadway. Aquarium open daily 9 a.m. to 4 p.m., Memorial Day weekend to the end of September, free; picnic area, fishing from the dock (DEC page, read November 18, 2026). Parking at the station (the DEC page names a Fisheries Station parking area; it was not found on the map).',
   [W('Duvillard Mill'),L('NYS DEC: Cape Vincent Fisheries Station public facilities','https://dec.ny.gov/things-to-do/freshwater-fishing/fisheries-management-research/lake-ontario/cape-vincent-fisheries-station-public-facilities'),L('Cape Vincent waterfront plan, section II (NYS Dept. of State)','https://docs.dos.ny.gov/opd-lwrp/LWRP/Cape%20Vincent_V/Original/CapeVincentSII.pdf')],
-  brick='no'),
+  brick='no',hours='Aquarium: daily 9 a.m. to 4 p.m., Memorial Day weekend to the end of September'),
 N('stone-mills-union-church','Stone Mills Union Church and museum','Stone Mills','nny','worship','standing',44.11444,-75.97417,'exact','open','drive','','1837',
   'A church of dressed gray limestone built in 1837 at the crossroads hamlet of Stone Mills, with a pedimented front pavilion and a small belfry. Since 1968 it has been the headquarters of the Stone Mill Museum of the Northern New York Agricultural Historical Society, which has added a sawmill, granary, school house, a cheese factory and display buildings of farm machinery round it.',
   'The 1837 limestone church and the museum grounds on Route 180, with farm machinery and the moved rural buildings. The Irwin Brothers Store, also the society\'s, stands about 250 m south. Interior fabric not checked. Red brick: no; limestone.',

@@ -98,7 +98,7 @@ N('old-german-meeting-house','Old German Meeting House and cemetery','Waldoboro'
   'The meeting house of Maine\'s German settlers, moved across a river in winter.',
   '235 Bremen Road (Route 32). In summer 2026 it was open 1 to 4 p.m. on set days in July and August, weather permitting, with an annual service in August; an OPEN flag by the door means it is open. The society\'s site lists the dates. The cemetery can be walked at other times.',
   [W('German Church and Cemetery'),['The Old German Meeting House: services and hours','https://theoldgermanmeetinghouse.com/services']],
-  brick='no'),
+  brick='no',hours='Summer 2026: 1 to 4 p.m. on set days in July and August, weather permitting; an OPEN flag by the door means it is open'),
 N('alna-meetinghouse','Alna Meetinghouse','Alna','mec','worship','standing',44.0875,-69.6175,'site','view','drive','',
   '1789',
   'Built in 1789 for what was then the North Precinct of Pownalborough, which became New Milford in 1794 and Alna in 1811. It was used for worship until 1876 and is one of the oldest churches in Maine.',

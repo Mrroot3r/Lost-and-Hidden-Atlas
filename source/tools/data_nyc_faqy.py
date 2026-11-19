@@ -45,7 +45,7 @@ N('cedarmere-roslyn-harbor','Cedarmere (William Cullen Bryant\'s home)','Roslyn 
   'A poet\'s retreat with a mill that never ground anything.',
   'Nassau County Department of Parks, Recreation and Museums, with the Friends of Cedarmere. Grounds open year-round; house tours of the first floor only, Thursdays at 2 pm and 3 pm (Friends of Cedarmere page, read November 19, 2026). 225 Bryant Avenue. The nearest mapped lot is the Nassau County Museum of Art\'s on Museum Drive, about 500 m south-east; parking at Cedarmere itself not checked.',
   [W('Cedarmere-Clayton Estates'),L('Friends of Cedarmere: about and hours','https://www.friendsofcedarmere.org/about'),RLS('profiles/cedarmere','Cedarmere')],
-  th=[40.80781,-73.64239],thn='Nassau County Museum of Art lot, Museum Drive',brick='?'),
+  th=[40.80781,-73.64239],thn='Nassau County Museum of Art lot, Museum Drive',brick='?',hours='Grounds all year. House tours (first floor only): Thursdays at 2 p.m. and 3 p.m.'),
 
 N('trinity-church-roslyn','Trinity Church Complex, Roslyn','Roslyn','nyc','worship','standing',40.80502,-73.64464,'exact','view','walk','','1906–',
   'An Episcopal church complex built in 1906 to designs by McKim, Mead & White, one of the firm\'s works for the estate owners of the North Shore. The Roslyn-Trinity Cooperative Day School, founded in 1951, is part of the complex, and a child care centre opened there in 2016. It was listed on the National and State Registers in 1986.',
@@ -76,7 +76,7 @@ N('castle-gould-hempstead-house','Castle Gould and Hempstead House, Sands Point 
   'A railroad heir\'s stable block grander than his house.',
   'Sands Point Preserve, Nassau County, run with the Sands Point Preserve Conservancy, 127 Middle Neck Road. Open Wednesday to Sunday, closed Monday and Tuesday; in winter (November 5, 2025 to March 29, 2026) 9 am to 5 pm, and later in spring, summer and fall; closed Thanksgiving and Christmas Eve to New Year\'s Day. Admission $15 a car or $4 on foot; dogs on leash; no bicycles, swimming or drones. The south end of the estate is private (Conservancy hours page, read November 19, 2026). Lot beside Castle Gould.',
   [W('Hempstead House'),L('Sands Point Preserve: hours and admission','https://www.sandspointpreserveconservancy.org/?p=6519')],
-  th=[40.86155,-73.69857],thn='Castle Gould lot (mapped lot on an unpaved oval by the castle)',brick='?'),
+  th=[40.86155,-73.69857],thn='Castle Gould lot (mapped lot on an unpaved oval by the castle)',brick='?',hours='Wednesday to Sunday; closed Monday and Tuesday. Winter (November 5, 2025 to March 29, 2026): 9 a.m. to 5 p.m.; later in spring, summer and fall'),
 
 N('raynham-hall-oyster-bay','Raynham Hall','Oyster Bay','nyc','landmark','standing',40.87228,-73.53168,'exact','open','walk','','1738–',
   'Samuel Townsend bought a two-up, two-down house here in 1738 and enlarged it to an eight-room saltbox. In the Revolution it was the headquarters of John Graves Simcoe\'s Loyalist Queen\'s Rangers, while Townsend\'s son Robert worked in Manhattan as a spy in Washington\'s Culper Ring. A grandson renamed it Raynham Hall and remodelled it in Victorian style in 1851. The family deeded it to the local DAR in 1941; it passed to the Town of Oyster Bay, which keeps it as a museum.',
@@ -84,7 +84,7 @@ N('raynham-hall-oyster-bay','Raynham Hall','Oyster Bay','nyc','landmark','standi
   'A Patriot spy\'s family home with Loyalist officers living in it.',
   'Owned by the Town of Oyster Bay, run by the Friends of Raynham Hall Museum, 20 West Main Street. Self-guided tours Tuesday, Thursday and Saturday hourly 1 to 4 pm; guided tours Wednesday, Friday and Sunday at 1 and 3 pm; closed Monday (museum tours page, read November 19, 2026). Admission charged ($10 for students and seniors per the Village of Upper Brookville page; full price not checked). Town Parking Field O-2 is beside the house.',
   [W('Raynham Hall Museum'),L('Raynham Hall Museum: tours and tickets','https://raynhamhallmuseum.org/?p=9385'),L('Village of Upper Brookville: Raynham Hall','https://upperbrookville.gov/raynham-hall-museum/')],
-  th=[40.8718,-73.53169],thn='Parking Field O-2, West Main Street',brick='?'),
+  th=[40.8718,-73.53169],thn='Parking Field O-2, West Main Street',brick='?',hours='Self-guided: Tuesday, Thursday and Saturday, hourly 1 to 4 p.m. Guided tours: Wednesday, Friday and Sunday at 1 and 3 p.m. Closed Monday'),
 
 N('oyster-bay-station-turntable','Oyster Bay station and turntable (Oyster Bay Railroad Museum)','Oyster Bay','nyc','rail','standing',40.87502,-73.5316,'exact','open','walk','stations','1889–',
   'The Victorian depot opened on June 24, 1889 as the end of the line from Locust Valley. In 1891 a 1,000 ft wharf let whole passenger cars go onto a ferry to Connecticut on a short-lived New York to Boston route, and that September locomotive No. 113 blew up while idling at the station. Theodore Roosevelt commuted through it, and in 1902 Bradford Lee Gilbert enlarged it for the crowds expected at the Summer White House. The old depot and the turntable were listed on the Register separately in 2005; the Town of Oyster Bay owns the depot and the Oyster Bay Railroad Museum has restored it.',
@@ -101,7 +101,7 @@ N('planting-fields-main-house','Planting Fields Main House (Coe Hall)','Upper Br
   'Planting Fields Arboretum State Historic Park (NYS Parks with the Planting Fields Foundation). Park open daily 9 am to 5 pm, closed December 25; parking $8 a car, collected on weekends and holidays in April, daily from early May to Labor Day and on fall weekends to mid-November; greenhouses 10 am to 4 pm, closed Tuesdays; Main House by tour (the foundation\'s visitor centre is open Friday to Sunday 11 am to 4 pm) (foundation and NYS Parks pages, read November 19, 2026). West Parking is about 240 m south-east.',
   [W('Planting Fields Arboretum State Historic Park'),L('Planting Fields Foundation: hours and admission','https://plantingfields.org/hoursandadmission/'),
    L('NYS Parks: Planting Fields','https://parks.ny.gov/historic-sites/plantingfields/details.aspx')],
-  th=[40.86404,-73.555],thn='Planting Fields West Parking',brick='no'),
+  th=[40.86404,-73.555],thn='Planting Fields West Parking',brick='no',hours="Park daily 9 a.m. to 5 p.m., closed December 25. Main House by tour; the foundation's visitor centre is open Friday to Sunday 11 a.m. to 4 p.m."),
 
 N('sagamore-hill-roosevelt','Sagamore Hill (Theodore Roosevelt\'s home)','Cove Neck','nyc','landmark','standing',40.88558,-73.50107,'exact','open','walk','','1885–',
   'Theodore Roosevelt had Lamb & Rich design this Shingle-style Queen Anne house in 1884; it was built in 1885 and was his home until he died in 1919. It was the "Summer White House" for the seven summers of 1902 to 1908. Congress made it a national historic site in 1962. The museum is in Old Orchard, the 1938 house of his son Theodore Jr.; the visitor centre burned on Christmas Eve 2018.',
@@ -109,7 +109,7 @@ N('sagamore-hill-roosevelt','Sagamore Hill (Theodore Roosevelt\'s home)','Cove N
   'The Summer White House, still furnished as Roosevelt left it.',
   'Sagamore Hill National Historic Site (National Park Service). Grounds open daily, sunrise to 30 minutes after sunset, free. The house by advance reservation only. Old Orchard Museum Thursday 1 to 4:30 pm and Friday to Sunday noon to 4:30 pm. Closed Thanksgiving, December 25 and January 1 (NPS hours page, read November 19, 2026). Lot on Sagamore Hill Road about 180 m east.',
   [W('Sagamore Hill'),L('NPS: Sagamore Hill hours and seasons','https://www.nps.gov/sahi/planyourvisit/hours.htm')],
-  th=[40.88671,-73.49862],thn='Sagamore Hill lot, Sagamore Hill Road',brick='?'),
+  th=[40.88671,-73.49862],thn='Sagamore Hill lot, Sagamore Hill Road',brick='?',hours='Grounds daily, sunrise to 30 minutes after sunset. House by advance reservation. Old Orchard Museum: Thursday 1 to 4:30 p.m., Friday to Sunday noon to 4:30 p.m.'),
 
 N('matinecock-friends-meetinghouse','Matinecock Friends Meetinghouse','Matinecock','nyc','worship','standing',40.86638,-73.59426,'exact','view','drive','','1725–',
   'A Quaker meeting house built in 1725 at Piping Rock and Duck Pond Roads, one of the oldest houses of worship on Long Island in continuous use. Friends Academy, the Quaker school founded in Locust Valley in 1876, still sends students and staff to meeting for worship here. The North Shore Historical Museum opened an exhibit on its 300 years in November 2025.',
@@ -131,7 +131,7 @@ N('westbury-house-old-westbury-gardens','Westbury House, Old Westbury Gardens','
   'Westbury House and its gardens, including the walled garden. John Singer Sargent\'s portrait of Mrs. Henry Phipps and her grandson Winston (1906–07) hangs in the dining room. The ground floor rooms seen in Love Story are on the house tour.',
   'A Gold Coast house left as the Phipps family lived in it.',
   'Old Westbury Gardens (a nonprofit), 71 Old Westbury Road, which is the only entrance. The gardens and Westbury House are open weekends only in November, 10 am to 5 pm, last entry 3 pm for non-members, closed Thanksgiving week and weekdays in November; tickets required; dogs only on set dog weekends (its plan-your-visit page, read November 19, 2026). Wikipedia gives the main tour season as April to October. Parking at the entrance; the lot was not checked on the aerial.',
-  [W('Old Westbury Gardens'),L('Old Westbury Gardens: plan your visit','https://www.oldwestburygardens.org/?p=4879')],brick='?'),
+  [W('Old Westbury Gardens'),L('Old Westbury Gardens: plan your visit','https://www.oldwestburygardens.org/?p=4879')],brick='?',hours='November: weekends only, 10 a.m. to 5 p.m., last entry 3 p.m. for non-members; closed Thanksgiving week'),
 
 N('fort-totten-willets-point','Fort Totten (Fort at Willets Point)','Bayside','nyc','fort','ruins',40.79536,-73.7796,'site','public','walk','forts','1862–1974',
   'The Army began a granite fort at Willets Point in 1862, under the Third System, to guard the East River approach to New York with Fort Schuyler across the water. Work stopped after the Civil War, when masonry forts were seen to be obsolete, and the fort was never finished. The post was the Army\'s Engineer School from 1869 to 1901, was renamed Fort Totten in 1898, got Endicott-era gun and mortar batteries from 1897, and was disarmed by 1935. It closed as a regular Army post in 1974; most of it is now a New York City park and a city historic district.',

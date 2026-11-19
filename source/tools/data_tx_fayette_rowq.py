@@ -123,7 +123,7 @@ N('burton-farmers-gin','Burton Farmers Gin (Texas Cotton Gin Museum)','Burton','
   'A corrugated-metal gin house with its machinery, driven by a 1925 Bessemer engine that the museum says is the largest of its age still running in the United States; a guided tour of the gin follows a talk and a 20-minute film. The 38th Cotton Gin Festival is set for April 17, 2027.',
   'A 1914 cotton gin that still runs, powered by a 1925 engine.',
   'Run by the Texas Cotton Gin Museum, which keeps the gin (its page); who holds the title was not checked. 307 North Main Street (Highway 125), Burton, in Washington County. Open Tuesday to Saturday, 10 a.m. to 4 p.m. (museum page, November 2026); admission not checked; groups book by email through its page. Parking at the museum not checked on the aerial.',
-  [L('Texas Cotton Gin Museum (hours, tours)','https://www.cottonginmuseum.org/'),HM('Burton Farmers Gin',111945)],brick='no'),
+  [L('Texas Cotton Gin Museum (hours, tours)','https://www.cottonginmuseum.org/'),HM('Burton Farmers Gin',111945)],brick='no',hours='Tuesday to Saturday, 10 a.m. to 4 p.m.'),
 ]
 BATCH={'key':'tx_fayette_rowq','label':'Texas: Fayette County','added':'2026-11-19 09:30'}
 PLACES=R

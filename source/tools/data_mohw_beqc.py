@@ -26,7 +26,7 @@ N('indian-castle-church','Indian Castle Church','Danube','mohw','worship','stand
   'Sir William Johnson\'s 1769 church for the Mohawk, on land the Brants gave.',
   'Run by the church\'s own society (visit 109 Dillenbeck Road, Little Falls; 315-823-2099). Open Memorial Day to Labor Day, Monday to Sunday 9 a.m. to 6 p.m., per its Mohawk Valley Museums page, read November 18, 2026. On NY 5S near Danube. No mapped parking lot; where to park was not checked.',
   [W('Indian Castle Church'),MVM('Indian Castle Church','https://mohawkvalleymuseums.us/museums/indian-castle-church/')],
-  brick='no'),
+  brick='no',hours='Memorial Day to Labor Day: Monday to Sunday 9 a.m. to 6 p.m.'),
 N('herkimer-1834-jail','Herkimer County Jail (the 1834 Jail)','Herkimer','mohw','civic','standing',43.02833,-74.99,'site','view','drive','','1834–1835',
   'The county jail of 1834–35 (Wikipedia gives both years), a two-story building of ashlar limestone with dressed quoins, a Federal doorway and an oval window in the gable. Chester Gillette was held here during his 1906 trial for the drowning of Grace Brown at Big Moose Lake, the case behind Dreiser\'s An American Tragedy; Roxalana Druse is the other prisoner its exhibits remember.',
   'The stone jail at 327 North Main Street, beside the courthouse and the county historical society. Inside, tours show Chester Gillette\'s cell (news report of a Diamond Days tour). Interior otherwise not checked.',

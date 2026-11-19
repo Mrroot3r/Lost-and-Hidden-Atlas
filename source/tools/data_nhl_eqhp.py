@@ -51,7 +51,7 @@ N('damm-garrison-dover','William Damm Garrison, Woodman Museum','Dover','nhl','f
   'The last of Dover\'s garrison houses, moved downtown on rollers.',
   'Woodman Museum, 182 Central Avenue. Open April to November, Wednesday to Sunday 10am–5pm, with admission (adults $18 on the museum\'s page in November 2026). Parking not checked.',
   [W('Woodman Institute Museum'),['Woodman Museum','https://woodmanmuseum.org/'],
-   ['Dover Public Library: Woodman Institute','https://www.dover.nh.gov/government/city-operations/library/research-learn/historical-images/buildings/buildings-h-z/woodman-institute.html']]),
+   ['Dover Public Library: Woodman Institute','https://www.dover.nh.gov/government/city-operations/library/research-learn/historical-images/buildings/buildings-h-z/woodman-institute.html']],hours='April to November: Wednesday to Sunday 10 a.m. to 5 p.m.'),
 N('cocheco-mills-dover','Cocheco Mills','Dover','nhl','industry','standing',43.19556,-70.87306,'site','view','drive','',
   '1823–',
   'Cotton cloth was made at this bend of the Cochecho River from at least 1823, when the Dover Manufacturing Company replaced the sawmills and gristmills. The buildings standing now went up between the 1880s and the early 1900s. In December 1828 more than half the mill girls walked out in protest at the rules, fines and company scrip.',

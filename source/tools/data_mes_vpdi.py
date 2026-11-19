@@ -111,7 +111,7 @@ N('hamilton-house-south-berwick','Hamilton House and Vaughan Woods','South Berwi
   '',
   'House: Historic New England, 40 Vaughan\'s Lane; its pages would not open, so tour days and fees are not checked. The national protected-areas map marks the house\'s own lot as closed to the public, so go up to the house and its garden only when Historic New England has them open. Grounds: Vaughan Woods Memorial State Park, Oldfields Road, open 9 a.m. to sunset Memorial Day to Labor Day with a self-service fee; off season park outside the gate without blocking it and walk in. Leashed dogs; lot of about two dozen spaces.',
   [W('Hamilton House (South Berwick, Maine)'),W('Vaughan Woods State Park'),['Maine State Parks: Vaughan Woods Memorial State Park','https://www.maine.gov/vaughanwoods'],['Maine Coastal Public Access Guide (May 2026)',ACC]],
-  conf='mixed',brick='some',th=[43.21201,-70.81235],thn='Vaughan Woods State Park lot'),
+  conf='mixed',brick='some',th=[43.21201,-70.81235],thn='Vaughan Woods State Park lot',hours="Vaughan Woods grounds: 9 a.m. to sunset, Memorial Day to Labor Day. The house's tour days were not checked"),
 N('counting-house-south-berwick','Portsmouth Company Counting House','South Berwick','mes','industry','standing',43.22699,-70.81086,'exact','open','drive','',
   'c.1832–1850',
   'The Portsmouth Company, incorporated in 1831 and run for years by the Hale family of Portsmouth, built a large cotton mill on the Salmon Falls River here. Its counting house is the only company building left. Tradition dates it to 1832, but the building itself points to about 1850.',
