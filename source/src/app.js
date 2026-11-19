@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -789,6 +789,7 @@ function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawSca
 function pushPrefs(){ if(NATIVE) AT.call('configure',{units:pref('units'),step:STEP(),every:({fine:1000,normal:2000,coarse:5000})[pref('detail')]||2000,buzz:!!pref('buzz')}).catch(()=>{}); }
 function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme(); drawScale(); pushPrefs();
   if(k==='cluster') syncMarkers();
+  if(k==='nativeLeads'){ if(v&&LEADS) leadsMore(); drawLeads(); NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(view==='near') nmDraw(true); }
   if(k==='hideGone'||k==='quietGone'||k==='buzzVanished'){ NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(k==='hideGone') refresh(); if(view==='near') nmDraw(true); }
   if(k==='trk'){ if(rec) drawRec(); if(NM.ring) NM.ring.setStyle({color:v}); if(NM.line) NM.line.setStyle({color:v}); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
   if(k==='units'){ const nv=$('#v-near'); if(nv) nv.textContent=''; if(view==='near') renderNear(); nmPush(true); }
@@ -823,6 +824,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
     pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
+    tog('nativeLeads','Show Native American sites among the leads','Mounds, pueblos, rock art, heiau and other sites mapped on OpenStreetMap, and old sites on reservation land: turquoise dots when Unchecked leads is on, and rows in the Near tab. Off unless you switch it on here. Many are sacred, protected by law or closed: go only where whoever looks after the place invites visitors.'),
     tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
     el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here, and the Places list puts the nearest first. While your location is switched on, the list counts from where you are instead. Until you choose a start place, the Atlas uses the start city nearest to where you are or last were.'})),
@@ -1153,15 +1155,25 @@ let LEADS=null, leadGrp=null;
    half a country held thousands of dots and each zoom step took over half a second on a phone. At LEADZ and closer the
    most a view holds is about what the Northeast alone held before. */
 const LEADZ=6;
+/* Native American sites and leads on reservation land are their own category, kept in a second file (tools/leads.py), which
+   data/leads.json names in x.native. The Atlas asks for it only when a reader has switched "nativeLeads" on under the gear
+   and leads are in use; its rows carry a fifth value, 1, and are drawn (turquoise), listed in Near and tapped like any lead
+   while the switch is on. Switched off, which is how it starts, none of it is fetched, drawn or listed. */
+function leadRows(){ return LEADS.xp&&pref('nativeLeads')?(LEADS.all||(LEADS.all=LEADS.p.concat(LEADS.xp))):LEADS.p; }
+function leadsMore(){ const x=LEADS&&LEADS.x&&LEADS.x.native; if(!x||!pref('nativeLeads')||LEADS.xp||leadsMore.wait||Date.now()-(leadsMore.fail||0)<30000) return;
+  const p='data/leads/native-'+x.h+'.json';
+  leadsMore.wait=(AT?AT.fetch(p):fetch(p+'?v='+x.h)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(j=>{ const ix=j.t.map(n=>{ let i=LEADS.t.indexOf(n); if(i<0) i=LEADS.t.push(n)-1; return i; }); LEADS.xp=j.p.map(q=>[q[0],q[1],ix[q[2]],q[3],1]); leadsMore.wait=null; drawLeads(); nmLoaded(); })
+    .catch(()=>{ leadsMore.wait=null; leadsMore.fail=Date.now(); if(!leadsMore.said){ leadsMore.said=true; banner('The Native American sites could not load. Check your signal.',true,6000); } }); }
 function drawLeads(){
   if(!map) return;
   if(!U.ui.leads){ if(leadGrp) map.removeLayer(leadGrp.grp); return; }
   if(!LEADS){ leadsLoad(); if(!LEADS) return; }
   if(!leadGrp){ leadGrp=viewDots(); map.on('moveend',()=>{ if(U.ui.leads&&LEADS) leadSync(); }); }
-  leadSync(); leadGrp.grp.addTo(map); }
+  leadsMore(); leadSync(); leadGrp.grp.addTo(map); }
 function leadSync(){ const b=map.getBounds().pad(0.25), s=b.getSouth(), n=b.getNorth(), w=b.getWest(), e=b.getEast();
-  viewSync(leadGrp,map.getZoom()<LEADZ?[]:LEADS.p.filter(p=>p[0]>=s&&p[0]<=n&&p[1]>=w&&p[1]<=e),p=>{
-    const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false});
+  viewSync(leadGrp,map.getZoom()<LEADZ?[]:leadRows().filter(p=>p[0]>=s&&p[0]<=n&&p[1]>=w&&p[1]<=e),p=>{
+    const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:p[4]?'#0d3b36':'#3a2f00',weight:1.3,fillColor:p[4]?'#3cc8b4':'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false});
     m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } leadPopup(p); }); return m; }); }
 /* ---------- two more lead layers, drawn only where the map is looking ----------
    data/vanished.json (tools/vanished.py): places the federal names file of 2021 marks "(historical)".
@@ -1351,6 +1363,7 @@ function pockLine(o){ const k=o.k, a=[Math.round(o.mi)+' mi'], reg=k[4]+k[6]; if
 function leadPopup(p){
   const pt={lat:p[0],lon:p[1]}, kind=LEADS.t[p[2]];
   const box=el('div',{class:'ctx'},el('b',{text:p[3]||kind}),el('span',{style:'color:#5b6660',text:(p[3]?kind+' · ':'')+'unchecked lead from OpenStreetMap'}));
+  if(p[4]) box.append(el('span',{style:'color:#5b6660',text:'From the category you switched on in Settings: Native American sites and reservation land. Many such places are sacred, protected by law or closed. Go only where whoever looks after it invites visitors, and leave everything as it lies.'}));
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); openForm({lat:p[0],lon:p[1],name:p[3]||'',story:'Lead from OpenStreetMap ('+kind.toLowerCase()+'). Not checked yet.'}); }},'+ Add to my places'));
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(pt)},'Whose land is it?'));
   scoutLinks(pt).slice(0,2).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
@@ -1480,14 +1493,14 @@ const dirTxt=b=>['N','NE','E','SE','S','SW','W','NW'][Math.round(b/45)%8];
 const nmDist=mi=>{ if(KM()){ const m=mi*1609.344; return m<950?Math.max(10,Math.round(m/10)*10)+' m':(m/1000).toFixed(m<20000?1:0)+' km'; } const f=mi*5280; return f<1000?Math.max(10,Math.round(f/10)*10)+' ft':mi.toFixed(mi<1?2:mi<10?1:0)+' mi'; };
 /* fetch whichever lead files the chosen kinds need; each tells nmLoaded() when it arrives */
 function leadsLoad(quiet){ if(LEADS) return; const n=document.getElementById('d-leads');
-  if(n){ try{ LEADS=JSON.parse(n.textContent); }catch(e){ LEADS={t:[],p:[]}; } return; }
-  if(!leadsLoad.wait) leadsLoad.wait=(AT?AT.fetch('data/leads.json'):fetch('data/leads.json'+VQ)).then(r=>r.json()).then(j=>{ LEADS=j; drawLeads(); nmLoaded(); }).catch(()=>{ leadsLoad.wait=null; if(!quiet||U.ui.leads) banner('Leads could not load. Check your signal and tap Leads again.',true,6000); }); }
+  if(n){ try{ LEADS=JSON.parse(n.textContent); }catch(e){ LEADS={t:[],p:[]}; } leadsMore(); return; }
+  if(!leadsLoad.wait) leadsLoad.wait=(AT?AT.fetch('data/leads.json'):fetch('data/leads.json'+VQ)).then(r=>r.json()).then(j=>{ LEADS=j; leadsMore(); drawLeads(); nmLoaded(); }).catch(()=>{ leadsLoad.wait=null; if(!quiet||U.ui.leads) banner('Leads could not load. Check your signal and tap Leads again.',true,6000); }); }
 function nmEnsure(force){ const t=Date.now(); if(!force&&t-(NM.ens||0)<60000) return; NM.ens=t; const S=nmSet(); if(S.k.l) leadsLoad(true); if(S.k.v) xlLoad('vanished',true); if(S.k.m) xlLoad('mines',true); if(S.k.c) pockLoad(true); }
 function nmLoaded(){ NM.ver++; NM.cand=null; clearTimeout(NM.lt); NM.lt=setTimeout(()=>nmPush(false),1200); nmDraw(true); }
 /* every target of the chosen kinds within rmi miles of c */
 function nmCollect(c,rmi){ const S=nmSet(), out=[], add=(id,k,la,lo,n,t,o)=>{ if(hav(c[0],c[1],la,lo)<=rmi) out.push({id:id,k:k,la:la,lo:lo,n:n,t:t,o:o}); };
   if(S.k.p) sites().forEach(s=>{ if(pref('hideGone')&&nothingToSee(s)) return; const q=pos(s), my=U.status[s.id]; add('p:'+s.id,'p',q.lat,q.lon,s.name,[s.cat==='lidar'?'LiDAR find, not verified':STS[s.st],s.town,my?MY[my]:''].filter(Boolean).join(' · '),s); });
-  if(S.k.l&&LEADS) LEADS.p.forEach(p=>add('l:'+p[0]+','+p[1],'l',p[0],p[1],p[3]||LEADS.t[p[2]],(p[3]?LEADS.t[p[2]]+' · ':'')+'unchecked lead',p));
+  if(S.k.l&&LEADS) leadRows().forEach(p=>add('l:'+p[0]+','+p[1],'l',p[0],p[1],p[3]||LEADS.t[p[2]],(p[3]?LEADS.t[p[2]]+' · ':'')+'unchecked lead',p));
   [['v','vanished'],['m','mines']].forEach(q=>{ const X=XL[q[1]]; if(!S.k[q[0]]||!X.idx) return; const dla=rmi/69+0.002, dlo=rmi/(69*Math.cos(rad(c[0])))+0.002;
     xlNeed(q[1],c[0]-dla,c[1]-dlo,c[0]+dla,c[1]+dlo);      /* the state the reader stands in, and a neighbour within reach; when it comes, nmLoaded() counts again */
     for(let i=Math.floor((c[0]-dla)*20);i<=Math.floor((c[0]+dla)*20);i++) for(let j=Math.floor((c[1]-dlo)*20);j<=Math.floor((c[1]+dlo)*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(q[1],x)) add(q[0]+':'+x[4],q[0],x[0],x[1],x[3]||X.data.t[x[2]],xlLine(q[1],x)+' · unchecked lead',x); }); });

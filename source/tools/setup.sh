@@ -27,6 +27,19 @@ cp "$REPO"/leaflet.js "$W/cache/leaflet.min.js"
 cp "$REPO"/topo/*.webp "$W/build/topo/"
 cp "$REPO"/data/lines.json "$W/build/lines.json"
 cp "$REPO"/data/leads.json "$W/build/leads.json"
+# The leads' second file (Native American sites and leads on reservation land, which a reader must switch on): on the site it
+# is data/leads/native-<stamp>.json, the stamp being in data/leads.json; tools/leads.py and tools/make.py know it as
+# build/leads_native.json.
+rm -f "$W/build/leads_native.json"
+python3 - "$REPO/data" "$W/build/leads_native.json" <<'PYEOF'
+import json,os,sys,shutil
+d,out=sys.argv[1],sys.argv[2]
+x=(json.load(open(os.path.join(d,'leads.json'),encoding='utf-8')).get('x') or {}).get('native')
+if x:
+    f=os.path.join(d,'leads','native-%s.json'%x['h'])
+    if not os.path.exists(f): sys.exit('setup.sh: data/leads.json names leads/native-%s.json but the file is missing'%x['h'])
+    shutil.copyfile(f,out)
+PYEOF
 # The optional lead layers travel with the site in pieces: data/<layer>/index.json and one file per state named with its stamp.
 # Put together again here into build/<layer>.json, the whole layer, which tools/vanished.py, tools/mines.py and tools/start.py
 # read and tools/make.py cuts up again. (data/<layer>.json is NOT the whole layer: it is frozen at eleven states for old

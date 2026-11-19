@@ -35,5 +35,8 @@ for f,title in (('leads','OpenStreetMap leads (mapped ruins and old sites)'),('v
     for x in P:
         if not str(x[3]).strip(): un[L['t'][x[2]]]=un.get(L['t'][x[2]],0)+1
     if un: print('  without a name: '+', '.join(f'{v} {k.lower()}' for k,v in un.items()))
+    if f=='leads' and os.path.exists('build/leads_native.json'):      # the switched-off category: counted, not listed
+        nat=[x for x in json.load(open('build/leads_native.json'))['p'] if d(x[0],x[1])<=km]
+        if nat: print(f'  and {len(nat)} more in the category a reader must switch on (Native American sites, leads on reservation land), not listed here. One belongs in the Atlas only where whoever manages it invites visitors and says so on its own page (GUIDE.md section 8).')
     for x in sorted([x for x in P if not str(x[3]).strip()],key=lambda x:d(x[0],x[1]))[:25]: print(f"  {d(x[0],x[1]):4.1f} km {comp(x[0],x[1]):2}  (no name)  |  {L['t'][x[2]]}  |  {x[0]}, {x[1]}   <- look at it: python3 tools/look.py out.jpg lead,{x[0]},{x[1]},150")
 print('== Also read LEADS.md for these towns (grep the town names), and try its rows before hunting for new names.')
