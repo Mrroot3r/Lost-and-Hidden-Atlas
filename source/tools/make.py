@@ -86,6 +86,13 @@ os.makedirs(WEB+'data/lines')
 for k,txt in LSTATE.items(): open(WEB+f'data/lines/{k}.json','w',encoding='utf-8').write(txt)
 open(WEB+'data/lines/wide.json','w',encoding='utf-8').write(LWIDE)
 open(WEB+'data/leads.json','w').write(open(R+'build/leads.json').read())
+# The leads' second file: Native American sites and leads on reservation land, which the app fetches only for a reader who
+# switches them on under the gear (tools/leads.py). Its name carries the stamp that data/leads.json gives in x.native.h.
+_lx=(json.load(open(R+'build/leads.json',encoding='utf-8')).get('x') or {}).get('native')
+if _lx:
+    _nb=open(R+'build/leads_native.json','rb').read()
+    if hashlib.md5(_nb).hexdigest()[:8]!=_lx['h'] or len(json.loads(_nb)['p'])!=_lx['n']: sys.exit('make.py: build/leads_native.json does not match what build/leads.json says of it: run  python3 tools/leads.py  (or setup.sh again)')
+    os.makedirs(WEB+'data/leads'); open(WEB+'data/leads/native-%s.json'%_lx['h'],'wb').write(_nb)
 if os.path.exists(R+'build/pockets.json'):       # historic pockets (tools/pockets.py); fetched only when the layer is turned on
     pj=json.load(open(R+'build/pockets.json',encoding='utf-8'))
     for part in ('m','r','d'): pj.setdefault(part,[])     # empty, for an Android app built before the detail moved to one file per state

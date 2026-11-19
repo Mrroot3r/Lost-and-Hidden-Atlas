@@ -53,6 +53,7 @@ if [ -n "$LAYERS" ] && [ -z "$FULL" ]; then
     [ -d "$W/dist/web/data/$f" ] && { rm -rf "data/$f"; mkdir -p "data/$f"; cp "$W"/dist/web/data/$f/*.json "data/$f/"; }
   done
   [ -d "$W/dist/web/data/pock" ] && cp "$W"/dist/web/data/pock/*.json data/pock/
+  [ -d "$W/dist/web/data/leads" ] && { rm -rf data/leads; mkdir -p data/leads; cp "$W"/dist/web/data/leads/*.json data/leads/; }      # the leads' second file, named with its stamp
 fi
 mkdir -p source/src source/tools source/build
 rm -f source/tools/*.py source/tools/*.sh source/tools/*.js source/tools/*.java

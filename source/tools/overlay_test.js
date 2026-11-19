@@ -76,6 +76,42 @@ const { chromium } = require('playwright');
   await go(39.5,-98,5); s=await snap(); ok('lead dots: none at zoom 5 either',s.leads===0&&s.leadsDataIn>300,s.leads+' on the map, '+s.leadsDataIn+' in view');
   await go(41.5,-75,6); s=await snap(); ok('lead dots: back at zoom 6, and no more than the Northeast held before',s.leadsIn===s.leadsDataIn&&s.leadsIn>500&&s.leads<3000,s.leadsIn+' of '+s.leadsDataIn+' in view, '+s.leads+' on the map');
   await go(42.75,-73.9,12);
+  // ---- Native American sites and leads on reservation land are their own category: a second file that nobody is sent
+  //      until they switch it on under the gear (Settings, "nativeLeads"). Off, nothing of it is fetched, drawn or listed.
+  { const c3=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c3.newPage(); const got=[]; q.on('pageerror',e=>errs.push(e.message));
+    await c3.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    q.on('request',r=>{ if(/\/data\/leads\//.test(r.url())) got.push(r.url().replace(/^.*\/data\//,'').replace(/\?.*$/,'')); });
+    const MV=[37.18,-108.49];      /* Mesa Verde: hundreds of mapped sites, and no ordinary lead for miles */
+    await q.addInitScript(a=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},ui:{base:'streets',view:[a[0],a[1],12],hist:false,leads:true}})); }catch(e){} },MV);
+    await q.goto(url); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(2600);
+    const NAMES=/^(Archaeological site|Native American site|Probably a Native American site|.+ on reservation land)$/;
+    const LJ=await q.evaluate(()=>fetch('data/leads.json').then(r=>r.json()));
+    const x=LJ.x&&LJ.x.native;
+    ok('the leads file holds none of that category, and says where the rest is',!LJ.t.some(n=>/native|reservation/i.test(n))&&!!x&&x.n>1500&&/^[0-9a-f]{8}$/.test(x.h||''),JSON.stringify(x||null)+' '+LJ.t.filter(n=>/native|reservation/i.test(n)).join(','));
+    const NJ=x?await q.evaluate(h=>fetch('data/leads/native-'+h+'.json').then(r=>r.ok?r.json():null).catch(()=>null),x.h):null;
+    ok('the second file holds only that category, as many rows as the leads file says',!!NJ&&NJ.p.length===x.n&&NJ.t.length>0&&NJ.t.every(n=>NAMES.test(n))&&NJ.p.every(r=>r.length===4&&r[2]<NJ.t.length),NJ?NJ.p.length+' rows; '+NJ.t.join(', '):'no file');
+    const inMV=NJ?NJ.p.filter(r=>Math.abs(r[0]-MV[0])<0.03&&Math.abs(r[1]-MV[1])<0.03).length:0;
+    const teal=()=>q.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.getRadius&&l.options.fillColor==='#3cc8b4') n++; }); return n; });
+    const yellow=()=>q.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.getRadius&&l.options.fillColor==='#ffd500') n++; }); return n; });
+    const near=()=>q.evaluate(a=>window.__atlasNM.nmCollect(a,3).filter(t=>t.k==='l').length,MV);
+    got.length=0; await q.evaluate(a=>window.__atlasMap.setView([a[0],a[1]+0.01],12,{animate:false}),MV); await q.waitForTimeout(900);
+    ok('switched off (as it is to begin with): Mesa Verde shows none of its dots and the file is not fetched',inMV>20&&await teal()===0&&got.length===0,inMV+' in the file there, '+await teal()+' drawn, fetched: '+got.join(' '));
+    ok('and the Near tab does not list them',await near()===0,await near()+' leads within 3 miles');
+    await q.click('#lb-opt'); await q.click('#sheet-set'); await q.waitForTimeout(300);
+    const box=await q.evaluate(()=>{ const n=document.querySelector('#set-nativeLeads'); return n?{checked:n.checked,text:n.closest('label').textContent}:null; });
+    ok('the switch is under the gear, off, and says what it is',!!box&&box.checked===false&&/Native American/.test(box.text)&&/sacred|closed/.test(box.text),box?box.text.slice(0,90):'no switch');
+    if(box) await q.evaluate(()=>document.querySelector('#set-nativeLeads').click()); await q.waitForTimeout(1500); await q.click('#sheet-x').catch(()=>{}); await q.waitForTimeout(300);
+    ok('switched on: the second file is fetched once',got.length===1&&/^leads\/native-[0-9a-f]{8}\.json$/.test(got[0]),got.join(' '));
+    const t1=await teal();
+    ok('its dots are drawn in their own colour, and the ordinary leads are not recoloured',t1>20&&t1<=inMV*4,t1+' turquoise, '+await yellow()+' yellow');
+    const pop=await q.evaluate(()=>{ const m=window.__atlasMap, b=m.getBounds(); let hit=null; m.eachLayer(l=>{ if(!hit&&l.options&&l.getRadius&&l.options.fillColor==='#3cc8b4'&&b.contains(l.getLatLng())) hit=l; }); if(!hit) return ''; hit.fire('click',{latlng:hit.getLatLng()}); const e=m._popup&&m._popup.getElement(); return e?e.textContent:''; });
+    ok('a tap on one says what it is and to go only where visitors are invited',/Archaeological site|Native American site/.test(pop)&&/invites visitors/.test(pop),pop.slice(0,140));
+    ok('the Near tab lists them now',await near()>0,await near()+' leads within 3 miles');
+    await q.reload(); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(2800);
+    ok('the choice is remembered: after a reload the dots are back',await teal()>20,await teal()+' turquoise');
+    await q.evaluate(()=>window.__atlasNM.setPref('nativeLeads',false)); await q.waitForTimeout(600);
+    ok('switched off again: the dots go and Near forgets them',await teal()===0&&await near()===0,await teal()+' drawn, '+await near()+' near');
+    await c3.close(); }
   // ---- vanished places and old mines come one state at a time: an index, then a state's own file when the map is zoomed in
   //      over it or the reader stands in it. Nobody looking at Albany downloads Missouri.
   { const c2=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c2.newPage(); const got=[]; q.on('pageerror',e=>errs.push(e.message));
