@@ -16,7 +16,7 @@ The first places in Prince Edward Island: 8 in Charlottetown (Province House, St
 | Emerald Junction railway station | 1929 Nodd Road, Emerald, PE (46.3613, -63.5485) | Register 20442: CNR standard station of 1923–24 on the Confederation Trail, community-owned since 1980 | Its present use and whether it opens; not read past the 1990s in the statement |
 | Strathgartney Homestead (National Historic Site) | Bonshaw, PE (46.2009, -63.3547 NHS list) | On the NHS list | historicplaces.ca 7764 reset the connection three times |
 | Old Princetown Road | New London area, PE (46.409, -63.4871) | A Register-listed old road (10672) | The Register page never opened |
-| Glenaladale House, Victoria (Main Street) streetscape, Uigg school and church, St. Augustine's church Rustico, Covehead and North Rustico lights | Queens County list rows | On the Queens County list with Register ids | Not read this session; Victoria's Main Street has a dozen Register buildings that could make a `town` entry |
+| Victoria (Main Street) streetscape, Uigg school, Covehead light | Queens County list rows | On the Queens County list with Register ids | Not read this session; Victoria's Main Street has a dozen Register buildings that could make a `town` entry |
 
 ## Tips
 - historicplaces.ca resets the connection (`ConnectionResetError 104`) when asked quickly; `page.py` then gives up. A loop with an 8-second sleep between pages and up to three tries read all but two of 31 statements.
