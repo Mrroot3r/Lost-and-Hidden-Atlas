@@ -754,7 +754,7 @@ function barTap(k){
     if(sel&&view==='detail'){ const c=document.getElementById('d-hist'); if(c) c.checked=!!U.ui.hist; } }
   else if(k==='land'){ U.ui.land=!U.ui.land; save(); drawLand(); if(U.ui.land) banner(map.getZoom()<11?'Public land is on. Zoom in to see it.':'Green is open to the public, amber is restricted, red is closed. Purple has no access on record.',false,7000); }
   else if(k==='lots'){ U.ui.lots=!U.ui.lots; save(); drawLots(); if(U.ui.lots) banner(map.getZoom()<15?'Lot lines are on. Zoom in close to see them. New York and Massachusetts.':'Orange lines are property lines. Tap Owner? and then a lot to see who owns it.',false,7000); }
-  else if(k==='leads'){ U.ui.leads=!U.ui.leads; save(); drawLeads(); if(U.ui.leads) banner('Yellow dots are unchecked ruins, mines, kilns and quarries from OpenStreetMap. Tap one.',false,7000); }
+  else if(k==='leads'){ U.ui.leads=!U.ui.leads; save(); drawLeads(); if(U.ui.leads) banner(map.getZoom()<LEADZ?'Leads are on. Zoom in to see them: yellow dots, unchecked ruins and old sites from OpenStreetMap.':'Yellow dots are unchecked ruins, mines, kilns and quarries from OpenStreetMap. Tap one.',false,7000); }
   else if(k==='cmp'){ cmpTap(); }
   else if(k==='who'){ setAsking(!asking); }
   syncBar(); }
@@ -891,7 +891,7 @@ function buildSheet(){
     lb.append(note('Tap Owner? on the bar, then tap the map, to see the public-land unit and the parcel owner at that spot. Long-press the map for the same thing. Massachusetts is covered statewide; in New York not every county shares owner names.'));
   }
   lb.append(H('Leads'));
-  lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Ruins, mines, kilns, quarries and old farms mapped by OpenStreetMap volunteers. Nobody has checked them for the Atlas',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); }));
+  lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Ruins, mines, kilns, quarries and old farms mapped by OpenStreetMap volunteers. Nobody has checked them for the Atlas',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); if(v&&map&&map.getZoom()<LEADZ) banner('Zoom in to see them: they show from about state level.',false,5000); }));
   lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone. Orange dots, from town level in. Nine Northeast states, Missouri and Kansas',v=>{ xlSet('vanished',v); buildSheet(); }));
   if(xlOn('vanished')) lb.append(ck('xl-schools',U.ui.xl&&U.ui.xl.schools,'Old school sites too','Mostly one-room schoolhouses. There are thousands, so they are off unless you ask',v=>xlSet('schools',v)));
   lb.append(ck('xl-mines',xlOn('mines'),'Old mines and quarries','Iron mines, quarries, clay pits and prospects from the U.S. Geological Survey. Grey dots, from town level in. Positions are rough',v=>xlSet('mines',v)));
@@ -1149,6 +1149,10 @@ function viewSync(V,want,make){ const w=new Set(want); let added=0;
   want.forEach(x=>{ if(V.on.has(x)) return; let m=V.mk.get(x); if(!m){ m=make(x); V.mk.set(x,m); } V.grp.addLayer(m); V.on.add(x); added++; });
   return added; }
 let LEADS=null, leadGrp=null;
+/* Lead dots show from zoom LEADZ in. Since November 2026 the leads cover the whole continent (7,400 of them): a view of
+   half a country held thousands of dots and each zoom step took over half a second on a phone. At LEADZ and closer the
+   most a view holds is about what the Northeast alone held before. */
+const LEADZ=6;
 function drawLeads(){
   if(!map) return;
   if(!U.ui.leads){ if(leadGrp) map.removeLayer(leadGrp.grp); return; }
@@ -1156,7 +1160,7 @@ function drawLeads(){
   if(!leadGrp){ leadGrp=viewDots(); map.on('moveend',()=>{ if(U.ui.leads&&LEADS) leadSync(); }); }
   leadSync(); leadGrp.grp.addTo(map); }
 function leadSync(){ const b=map.getBounds().pad(0.25), s=b.getSouth(), n=b.getNorth(), w=b.getWest(), e=b.getEast();
-  viewSync(leadGrp,LEADS.p.filter(p=>p[0]>=s&&p[0]<=n&&p[1]>=w&&p[1]<=e),p=>{
+  viewSync(leadGrp,map.getZoom()<LEADZ?[]:LEADS.p.filter(p=>p[0]>=s&&p[0]<=n&&p[1]>=w&&p[1]<=e),p=>{
     const m=L.circleMarker([p[0],p[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3a2f00',weight:1.3,fillColor:'#ffd500',fillOpacity:0.95,bubblingMouseEvents:false});
     m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } leadPopup(p); }); return m; }); }
 /* ---------- two more lead layers, drawn only where the map is looking ----------
