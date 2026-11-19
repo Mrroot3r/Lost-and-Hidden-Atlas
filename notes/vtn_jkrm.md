@@ -1,0 +1,26 @@
+# vtn_jkrm: Franklin and Grand Isle counties, Vermont
+state: Vermont
+region: vtn
+date: 2026-11-19
+places: 21
+file: data_vtn_jkrm.py
+
+## What this batch is
+Twenty-one standing places in Franklin and Grand Isle counties, Vermont (region vtn drawn at random by `choose.py`; the earlier vtn batch covered Addison County, so this one went north to ground the Atlas had nothing in). Champlain Islands: the 1783 Hyde log cabin, the 1824 stone Grand Isle County courthouse at North Hero, James Ritchie's 1843 stone Methodist church and South Stone School House on Isle La Motte, Fisk Quarry, Saint Anne's Shrine on the site of Fort Sainte Anne (1666), the 1829 South Hero Inn and the Rutland Railroad pump house at Alburgh. Inland: the Highgate Falls lenticular iron bridge and St. John's brick church on the Highgate Falls green, the Central Vermont Railroad headquarters and Hathaway's 1793 tavern in St. Albans, four Jewett covered bridges (Longley, Comstock and Hutchins in Montgomery, Hopkins in Enosburgh), the East Fairfield covered bridge, the Enosburg Opera House, Brigham Academy, Fletcher Union Church and the Chester Arthur state historic site. Facts are from Wikipedia read with `wiki_raw.py` (both county Register lists with `--rows`), one HMdb marker, Gribble Nation and Seven Days pages, and the managers' pages read with `page.py` (Vermont State Historic Sites, Lake Champlain Land Trust, Isle La Motte Historical Society, Vermont Historical Society). Not checked: the Hyde cabin's hours (only Wikipedia's "weekends May to October"), Saint Anne's hours (its site is drawn by script; Wikipedia's hours used), the Stone School's hours beyond the society's call for Saturday docents in July and August, the Chester Arthur 2027 season, whether Hutchins Bridge Road is a town road (marked view), parking at most places, and every interior marked so. The Fisk Quarry's "oldest quarry in Vermont, quarried from the late 1700s, stone in the Capitol" rests on one Seven Days article (conf mixed). Pins moved with `pix.py`: the Alburgh pump house (geocoder put it on a road junction; moved to the small building at the lake end of Lake Street, which matches Wikipedia's photograph of a lake-shore brick building but is read from the aerial), Fisk Quarry (onto the water-filled pit), the Highgate bridge (onto the truss) and St. John's (onto the building beside the burying ground east of the green; read from the aerial only). Red brick from the Wikipedia photographs for the pump house, the railroad headquarters and Brigham Academy; St. John's is brick by its article but the only picture is a 1940 black-and-white, so left '?'; Saint Anne's left '?'.
+
+## Leads
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| Maple Street Covered Bridge | Fairfax, VT (44.66359, -73.0104) | 1865 Town lattice by Kingsbury and Stone, a rare two-lane covered bridge; washed off its abutments in 1927 and may have been put back reversed (Wikipedia) | Not added for want of time; town street, should be easy |
+| Fuller and West Hill covered bridges | Montgomery, VT (44.90333, -72.63972; 44.86722, -72.64806) | Two more Jewett bridges (Fuller 1890; West Hill date unknown, rebuilt by Alpine Construction) (Wikipedia) | Not added for want of time; West Hill's approach road status |
+| Swanton Covered Railroad Bridge site | Swanton, VT (44.9161, -73.1278 per the Register list; Wikipedia's article gives 44.93417, -73.04833, which is the Highgate bridge) | 1895/1898 three-span railroad covered bridge burned 1987; Wikipedia says the old West Milton Bridge trusses now stand on its piers as part of a trail (marked citation needed) | A source for the trail bridge and the stone piers, and the right coordinate |
+| Isle La Motte stone buildings | Isle La Motte, VT | Ritchie is credited with at least six more stone buildings on the island; the Ira Hill House (1822) is on the Register (Wikipedia) | Which are visible from public roads; the historical society runs stone-house tours (Front Porch Forum event) |
+| Goodsell Ridge Preserve | Isle La Motte, VT (69 Pine St) | 85-acre fossil-reef preserve on old farm fields, visitor centre in a barn open some summer days (Lake Champlain Land Trust) | Whether any old farm building or quarry there is worth a place of its own |
+| Missisquoi River Bridge | Richford, VT / Sutton, QC (45.01361, -72.58778) | 1929 Parker through truss on the border, by Pittsburgh-Des Moines Steel (Wikipedia) | Whether one can stop and look without crossing the border |
+
+## Tips
+- The Wikipedia coordinate for the Chester Arthur site (44.81445, -72.9324) is about 6 km from the site; the ArcGIS PointAddress for 4588 Chester Arthur Road fits the state's directions.
+- `saintannesshrine.org` is drawn by script and `page.py` gets 330 characters; Wikipedia's article quotes the shrine's hours.
+- Web search results in this session came back with titles and links only, no quoted text, so hours could not be taken from them.
+- The ArcGIS geocoder's POI search found "Saint John's Episcopal Church" in Highgate when `nom.py` and `osmnear.py` found nothing; worth trying for churches.
+- A `pincheck.py --lidar` run on 21 pins took about four minutes, longer than one shell call allows; run it in the background and read the log.
