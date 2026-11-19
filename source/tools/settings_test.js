@@ -109,6 +109,29 @@ const { chromium, devices } = require('playwright');
   await p2.goto(process.argv[2]||'http://localhost:8766/index.html'); await p2.waitForFunction(()=>window.__atlasMap); await p2.waitForTimeout(300);
   const mig=await p2.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--trk').trim()); await c2.close();
   ok('a track colour saved as the old pink comes back as the blue default',mig==='#2563eb',mig);
+  // ---- a double tap: three steps in on open map (as many as Settings says), street level on a pin, and at least three steps toward a numbered disc
+  { const c4=await b.newContext(Object.assign({},devices['Pixel 7'])); const p4=await c4.newPage(); p4.on('pageerror',e=>errs.push(e.message));
+    await p4.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1}})); });
+    await p4.goto(process.argv[2]||'http://localhost:8766/index.html'); await p4.waitForFunction(()=>window.__atlasNM); await p4.waitForTimeout(300);
+    const dbl=(opt)=>p4.evaluate(async opt=>{ const m=window.__atlasMap; m.setView([42.9,-75.2],opt.z,{animate:false}); await new Promise(r=>setTimeout(r,150));
+      const pt=m.latLngToContainerPoint(m.getCenter()); m.fire('dblclick',{latlng:m.getCenter(),containerPoint:pt,layerPoint:m.containerPointToLayerPoint(pt),originalEvent:{shiftKey:!!opt.shift}}); await new Promise(r=>setTimeout(r,900)); return m.getZoom(); },opt);
+    ok('a double tap on open map goes in three steps',(await dbl({z:8}))===11);
+    ok('Shift and a double click goes out three',(await dbl({z:12,shift:true}))===9);
+    ok('and it stops at the closest zoom the map has',(await dbl({z:19}))===20);
+    ok('Leaflet\'s own one-step double tap is switched off',await p4.evaluate(()=>!window.__atlasMap.doubleClickZoom.enabled()));
+    await p4.evaluate(()=>window.__atlasNM.setPref('dbl',1)); ok('set to one step in Settings, it goes one step',(await dbl({z:8}))===9);
+    await p4.evaluate(()=>window.__atlasNM.setPref('dbl',3));
+    const pin=await p4.evaluate(async()=>{ const N=window.__atlasNM, m=window.__atlasMap, s=N.sites().find(x=>x.st==='standing'&&!x.mine); m.setView([s.lat,s.lon],13,{animate:false}); N.syncMarkers(); await new Promise(r=>setTimeout(r,200));
+      let mk=null; m.eachLayer(l=>{ if(l.getLatLng&&l.options.riseOnHover&&l.getLatLng().distanceTo([s.lat,s.lon])<2) mk=l; }); if(!mk) return null; mk.fire('click',{latlng:mk.getLatLng()}); await new Promise(r=>setTimeout(r,120)); mk.fire('dblclick',{latlng:mk.getLatLng()}); await new Promise(r=>setTimeout(r,1200));
+      return {z:m.getZoom(),off:Math.round(m.getCenter().distanceTo([s.lat,s.lon])),open:(document.querySelector('#v-detail h2')||{}).textContent===s.name}; });
+    ok('a double tap on a pin opens its page and goes to street level, on the pin',!!pin&&pin.z===17&&pin.off<30&&pin.open,JSON.stringify(pin));
+    const grp=await p4.evaluate(async()=>{ const N=window.__atlasNM, m=window.__atlasMap; m.setView([42.652,-73.755],9,{animate:false}); N.syncMarkers(); await new Promise(r=>setTimeout(r,300));      /* Albany from far enough out to be one tight disc */
+      const discs=[]; m.eachLayer(l=>{ if(l.options&&l.options.icon&&l.options.icon.options.className==='clus') discs.push(l); }); if(!discs.length) return null;
+      const d=discs.sort((x,y)=>x.getLatLng().distanceTo([42.652,-73.755])-y.getLatLng().distanceTo([42.652,-73.755]))[0], n=+d.options.icon.options.html; d.fire('click',{latlng:d.getLatLng()}); await new Promise(r=>setTimeout(r,120)); d.fire('dblclick',{latlng:d.getLatLng()}); await new Promise(r=>setTimeout(r,1100)); return {n,z:m.getZoom()}; });      /* as a real double tap arrives: a tap, then the double tap */
+    ok('a double tap on a numbered disc goes three steps in from where the map stood, toward the disc (a single tap goes two)',!!grp&&grp.z===12,JSON.stringify(grp));
+    await p4.click('#lb-opt'); await p4.waitForTimeout(250); await p4.evaluate(()=>{ const g=[...document.querySelectorAll('#sheet button')].find(x=>/settings/i.test(x.getAttribute('aria-label')||x.textContent)); if(g) g.click(); }); await p4.waitForTimeout(300);
+    ok('the choice is under the gear',await p4.evaluate(()=>{ const n=document.querySelector('#set-dbl'); return !!n&&n.value==='3'&&n.options.length===4; }));
+    await c4.close(); }
   // ---- Black as the track colour in a dark scheme: on the panels the text colour stands in, or the Near arrow and the recording dot could not be seen
   const c3=await b.newContext(Object.assign({},devices['Pixel 7'])); const p3=await c3.newPage();
   await p3.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},set:{trk:'#111827',theme:'dark',themeD:'tomorrow'}})); });
