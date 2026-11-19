@@ -13,7 +13,6 @@ Fourteen places, region `conf` drawn at random by `choose.py --state ny`, with t
 |---|---|---|---|
 | Cohoes Waterworks pump house | Cohoes, NY (near the falls, Harmony Mills district) | Spindle City Harmony Mills tour (2023): pump house begun 1857, still working, built on a lock of the original Erie Canal | Where it is (not found in OpenStreetMap by name) and whether it can be seen from a public way |
 | Harmony Mills Office and Sunday School | Cohoes, NY (Harmony Mills district) | Spindle City tour and the NHL nomination: 1854 company office with a millworkers' library upstairs | Exact building; mentioned inside the harmony-mills-cohoes entry for now |
-| William Moore House (former YWCA) | 135 Mohawk St, Cohoes, NY | Spindle City downtown tour: red brick Second Empire house of about 1874 with its iron fence, YWCA from 1892 through the 1980s, now a design studio | A second source; a pin check |
 | Church Hill Historic District | Halfmoon, NY | Saratoga County Register list: listed (100006512), no coordinates; the Wikipedia title tried does not exist | Any source on what is there and a coordinate |
 
 ## Tips
