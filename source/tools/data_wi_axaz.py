@@ -22,7 +22,7 @@ LF_NR=W('National Register of Historic Places listings in Lafayette County, Wisc
 
 PLACES=[
 # ---- Mineral Point ----
-N('pendarvis-mineral-point','Pendarvis','Mineral Point','wi','town','standing',42.8636,-90.17314,'site','public','walk','','c.1841–1850s',
+N('pendarvis-mineral-point','Pendarvis','Mineral Point','wi','town','standing',42.8636,-90.17314,'site','open','walk','','c.1841–1850s',
   'A row of small stone and timber cottages on Shake Rag Street, built by Cornish miners who came in the 1830s and 1840s to dig lead in the hill opposite. When the old cottages were being pulled down in the 1920s and 1930s, Robert Neal and Edgar Hellum began saving them during the Depression; their first, a one-storey stone cabin, gave the site its name, and they ran a restaurant in it. The Wisconsin Historical Society owns the site and runs it as a museum of the lead-mining years.',
   'Pendarvis House has limestone walls 18 to 20 inches thick. Polperro has a stone ground floor and wooden upper floors. The Rowhouse is three stone houses joined into one: the first built about 1841, the second about 1844–45, the middle one about 1852. The buildings are shown on guided tours in season; the 2026 season has ended and the site says it reopens in May 2027 (opening days and hours not checked).',
   'The cottages that a restaurant saved.',
@@ -34,7 +34,7 @@ N('merry-christmas-mine-hill','Merry Christmas Mine Hill','Mineral Point','wi','
   'The hill that named the Badger State.',
   'Owned by the Wisconsin Historical Society as part of Pendarvis (the trail guide). The trail guide gives the trails as open all year, sunrise to sunset (guide dated 2019; not checked against a newer page). The trail starts by the Pendarvis visitor-centre parking lot on Shake Rag Street (the parking point given here is the nearest mapped lot, not confirmed as that one). Keep to the trails; the shafts were filled except the ones shown.',
   [W('Mineral Point Hill'),MINEHILL,IA_NR],th=[42.8647,-90.17103],thn='Shake Rag Street lot (trail start)',brick='no'),
-N('mineral-point-depot','Mineral Point railroad depot','Mineral Point','wi','rail','standing',42.85686,-90.17692,'exact','public','drive','stations','1856–1984',
+N('mineral-point-depot','Mineral Point railroad depot','Mineral Point','wi','rail','standing',42.85686,-90.17692,'exact','open','drive','stations','1856–1984',
   'Built in 1856 of local materials for the Mineral Point Railroad, and in use until 1984; it is called the oldest surviving railroad depot in Wisconsin. The Mineral Point Railroad Society, formed in 2000, restored it over six years and opened it as a museum on September 2, 2004.',
   'The depot building itself, with exhibits on the railroad company, the Milwaukee Road, the Mineral Point Zinc Works and its own railway, tools, agents and telegraphers. What original fabric survives inside is not described in the sources read (interior not checked).',
   'Wisconsin\'s oldest depot, back from the dead.',
@@ -42,7 +42,7 @@ N('mineral-point-depot','Mineral Point railroad depot','Mineral Point','wi','rai
   [L('Mineral Point Chamber: Railroad Depot Museum','https://www.mineralpoint.com/list/member/mineral-point-railroad-depot-museum-95'),L('Travel Wisconsin: Mineral Point Railroad Museum','https://www.travelwisconsin.com/museums-history/mineral-point-railroad-museum-196436')],
   th=[42.85732,-90.17665],thn='Old Darlington Road lot',brick='?'),
 # ---- Dodgeville ----
-N('iowa-county-courthouse-dodgeville','Iowa County Courthouse','Dodgeville','wi','civic','standing',42.961503,-90.130894,'exact','public','walk','','1859',
+N('iowa-county-courthouse-dodgeville','Iowa County Courthouse','Dodgeville','wi','civic','standing',42.961503,-90.130894,'exact','open','walk','','1859',
   'Built in 1859 after a vote moved the county seat from Mineral Point; the state Supreme Court annulled that vote while the walls were going up, and only a second vote in April 1861 settled it. Cornish stonemasons laid it. It is the oldest courthouse still in use in Wisconsin and holds the circuit court and county offices.',
   'Greek Revival temple front of buff Galena limestone, the blocks fitted with very little mortar, and an eight-sided domed cupola. The portico is a 1937 rebuilding of the original. Additions of 1894 (west) and 1927 (north). A working courthouse: the county clerk\'s office is on the first floor; what survives of the original interior is not described in the sources read.',
   'Wisconsin\'s oldest working courthouse, laid by Cornish masons.',
@@ -105,7 +105,7 @@ N('taliesin-spring-green','Taliesin','Spring Green','wi','landmark','standing',4
   'Taliesin Preservation. Visit only on a tour from the Frank Lloyd Wright Visitor Center, 5607 County Road C (American Players Theatre\'s 2026 guide). Tour season, times and prices not checked: taliesinpreservation.org refused this session\'s reader.',
   [W('Taliesin (studio)'),L('American Players Theatre: Taliesin Preservation (2026)','https://www.americanplayers.org/news/area-guide-spotlight-taliesin-preservation-2026'),IA_NR],th=[43.14302,-90.06034],thn='Frank Lloyd Wright Visitor Center',brick='?'),
 # ---- Lafayette County ----
-N('first-capitol-belmont','First Capitol','Belmont','wi','civic','standing',42.76845,-90.36269,'site','public','drive','','1836',
+N('first-capitol-belmont','First Capitol','Belmont','wi','civic','standing',42.76845,-90.36269,'site','open','drive','','1836',
   'In 1836 the speculator John Atchison laid out a town at Belmont and put up buildings to win the capital of the new Wisconsin Territory. The legislature met here for one session of 46 days and then chose Madison. When the railroad passed it by, most of the town moved three miles south-east in 1867. Women\'s clubs restored the council house from 1910 to 1924; the lodging house, moved away and used as Chief Justice Charles Dunn\'s home, came back and was restored in 1956.',
   'Two frame buildings of 1836: the council house where the legislators met and the lodging house. Museum rooms inside; interior fabric not described in the sources read.',
   'A capital for 46 days.',
@@ -129,7 +129,7 @@ N('gratiot-house-shullsburg','Gratiot House','Shullsburg','wi','town','standing'
   'All that is left of a frontier settlement.',
   'Owner not checked; treat as private and view from the road only.',
   [W('Gratiot House'),LF_NR],brick='no'),
-N('badger-mine-shullsburg','Badger Mine and Museum','Shullsburg','wi','industry','standing',42.57025,-90.23614,'site','public','walk','','1827',
+N('badger-mine-shullsburg','Badger Mine and Museum','Shullsburg','wi','industry','standing',42.57025,-90.23614,'site','open','walk','','1827',
   'A lead mine dug by hand in 1827 at Shullsburg, one of the old lead-mining towns, shown to visitors on guided tours from a museum in Badger Park. A local paper marked the museum\'s 50th birthday on a Memorial Day opening (the article\'s year not checked).',
   'Guided tours go down 51 steps into the hand-dug mine, and through the museum above.',
   'Walk down into an 1827 lead mine.',

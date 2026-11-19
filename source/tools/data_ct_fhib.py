@@ -16,7 +16,7 @@ LBOX=L('CT DEEP Forestry: letterbox clues for American Legion State Forest','htt
 
 PLACES=[
 # ---- Barkhamsted: the two state forests on the West Branch ----
-N('peoples-forest-nature-museum','Peoples State Forest Nature Museum','Barkhamsted','ct','civic','standing',41.92528,-72.99722,'site','public','drive','','1934–35',
+N('peoples-forest-nature-museum','Peoples State Forest Nature Museum','Barkhamsted','ct','civic','standing',41.92528,-72.99722,'site','open','drive','','1934–35',
   'A rubblestone museum built in 1934–35 by a Civilian Conservation Corps crew from Camp White, across the river, and dedicated by Governor Wilbur Cross in 1935. When it first closed is given two ways: in 1942, when the CCC was disbanded (the museum\'s own history), or in the early 1950s (Wikipedia). It stood unused for decades and reopened in 1992, first as "The Stone Museum"; it took back its old name in 2007.',
   'A one-storey fieldstone building with a bell-cast shingled roof and a fieldstone chimney and fireplace. Inside: a bluestone floor, walls panelled in American chestnut cut after the blight killed the trees, and exposed queen-post roof trusses with wrought-iron straps. The displays are mounted Connecticut animals and birds, forest and local history, and a diorama of Camp White made by a former CCC man.',
   'The CCC built a museum, then walked away from it for fifty years.',
@@ -73,7 +73,7 @@ N('winchester-soldiers-monument','Winchester Soldiers\' Monument','Winchester','
   'A castle on a hill for Winsted\'s Civil War soldiers.',
   'In the park at the south end of Crown Street, Winsted, with a parking area on Crown Street behind a low stone wall. Who runs the park and its hours were not checked; the federal public-land map does not show it.',
   [W('Winchester Soldiers\' Monument')],brick='no'),
-N('solomon-rockwell-house','Solomon Rockwell House','Winchester','ct','civic','standing',41.92414,-73.0783,'exact','public','drive','','mid-1700s–1813',
+N('solomon-rockwell-house','Solomon Rockwell House','Winchester','ct','civic','standing',41.92414,-73.0783,'exact','open','drive','','mid-1700s–1813',
   'Built in 1813 for Solomon Rockwell, who owned two iron forges in town, to a design by William Swift, the carpenter who built the Colebrook Store. An older house of the mid-18th century survives as one of its ells. The Winchester Historical Society has owned it since the 1920s and runs it as a museum.',
   'A fine Greek Revival house with a two-storey columned temple front, a string of ells and a small carriage barn. Inside: 19th-century things from Winsted\'s factories and the Civil War, and the town\'s fire museum.',
   'An ironmaster\'s temple-front house, now the town\'s attic.',

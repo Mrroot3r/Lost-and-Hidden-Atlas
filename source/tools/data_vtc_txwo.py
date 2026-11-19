@@ -33,7 +33,7 @@ N('red-covered-bridge-morristown','Red Covered Bridge','Morristown','vtc','landm
   '',
   'A town road bridge, free, in a rural area just north of the junction of Cole Hill Road, Sterling Valley Road and Moren Loop. No mapped lot: pull off the road with care.',
   [W('Red Covered Bridge (Morristown, Vermont)')],brick='no'),
-N('noyes-house-museum','Noyes House Museum','Morrisville','vtc','civic','standing',44.56128,-72.60115,'exact','public','drive','','1797–',
+N('noyes-house-museum','Noyes House Museum','Morrisville','vtc','civic','standing',44.56128,-72.60115,'exact','open','drive','','1797–',
   'John Safford built the house in 1797 above the Lamoille River; his son Jedediah, who bought it in 1810, added a brick Federal-style wing and built an English barn in the 1820s. It was the first place settled in what became Morrisville village. The Morristown Historical Society runs it as a museum of 19th-century life in the town.',
   'Seventeen rooms and a carriage barn of furniture, quilts, costumes, tools, military objects, toys and Toby mugs; the collection includes an 18th-century Native dugout canoe and a large set of hairwork. The house and barn themselves are the oldest things in the village.',
   '',

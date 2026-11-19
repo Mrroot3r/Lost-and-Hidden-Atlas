@@ -51,6 +51,7 @@ for b in B+C:
     if b.get('th'): s['th']=b['th']; s['thn']=b.get('thn','')
     if b.get('brick') in ('yes','some','no'): s['bk']=b['brick'][0]      # red brick: y, s or n; left out when nobody has looked
     if b.get('tip'): s['tip']=b['tip']                                   # the day a reader sent it in; left out for every other place
+    if (b.get('hours') or '').strip() not in ('','?'): s['hrs']=b['hours'].strip()   # when it is open, as a source gave it; '?' means looked for and not found
     sites.append(s)
 # landmarks
 LREG={'Albany':'alb','Menands':'albco','Normanskill Farm':'alb','Rensselaer':'renss','Troy':'troy','Cohoes':'conf','Waterford':'conf','Schenectady':'sch','Rotterdam Junction':'mohawk','Scotia':'mohawk','Colonie':'albco','Fort Hunter':'mohawk','Schoharie':'mohawk','Saratoga Springs':'sar','Mount McGregor':'sar','Catskill':'hud','Hudson':'hud','Coxsackie':'hud','Hudson River':'hud','Woodstock':'cat','Saugerties':'cat','Ticonderoga':'adk','Raquette Lake':'adk'}
@@ -63,6 +64,8 @@ for i,r in enumerate(L):
     v=r['visit'].lower()
     acc='public'
     if 'exterior' in v or 'private' in v or 'from the road' in v: acc='view'
+    # a museum, a house shown by tour, a working theatre: you go in, at set times (GUIDE.md section 4, the access types)
+    if acc=='public' and re.search(r'^museum|house museum|museum and grounds|\btours?\b|working theat|concert hall|check (?:hours|season)',v): acc='open'
     if 'call ahead' in v: acc='ask'
     sites.append(dict(id='lm-'+slug(r['name'])[:40],name=r['name'],name2='',town=r['town'],reg=LREG.get(r['town'],'alb'),cat='landmark',st='standing',lat=lat,lon=lon,
         prec='site' if i in (11,12,23) else 'exact',acc=acc,eff='drive',tags=[],years=r['built'],conf='reference',

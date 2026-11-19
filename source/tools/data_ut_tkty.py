@@ -38,7 +38,7 @@ N('eureka-historic-district-ut','Eureka Main Street and the historic district','
    L('HMdb: B.P.O.E. Block, Elk Lodge #711','https://www.hmdb.org/m.asp?m=75428'),L('HMdb: Juab County Courthouse','https://www.hmdb.org/m.asp?m=75431'),
    L('National Register nomination: Eureka Historic District (1979, NPGallery)','https://npgallery.nps.gov/NRHP/GetAsset/NRHP/79002514_text'),DN24,
    L('WorldAtlas: 6 old-timey mining towns in Utah','https://www.worldatlas.com/cities/6-old-timey-mining-towns-in-utah.html')]),
-N('tintic-mining-museum-eureka','Tintic Mining Museum (Union Pacific depot and City Hall)','Eureka','ut','rail','standing',39.95443,-112.11993,'site','public','walk','stations','1899, 1926',
+N('tintic-mining-museum-eureka','Tintic Mining Museum (Union Pacific depot and City Hall)','Eureka','ut','rail','standing',39.95443,-112.11993,'site','open','walk','stations','1899, 1926',
   'The Union Pacific built this wood-frame depot in Eureka in 1926. In 1954 it was moved out to the Dragon Mine at Silver City, and the 1979 Register form says it was to be moved back to Eureka in 1978; it now holds the Tintic Mining Museum. Next door, City Hall was built in 1899 for the court, mayor, sheriff and fire department, and part of its upper floor holds more of the museum.',
   'Ore specimens from the district\'s mines, mine models, an assay office and a mock mine office inside. Behind the museum is the historical society\'s yard of mine cages, ore buckets and machinery. The old jail stands behind City Hall.',
   '',

@@ -21,7 +21,7 @@ DVLOT=[39.56071,-120.82727]
 DVLOTN='Small lot on Main Street, Downieville'
 
 PLACES=[
-N('downieville-museum-old-slate-store','Downieville Museum (the Old Slate Store)','Downieville','ca','civic','standing',39.560514,-120.827312,'site','public','walk','','1852',
+N('downieville-museum-old-slate-store','Downieville Museum (the Old Slate Store)','Downieville','ca','civic','standing',39.560514,-120.827312,'site','open','walk','','1852',
   'One of the first buildings in Downieville, put up in 1852 as a stone store, the Old Slate Store. The marker says it was first a Chinese store with gambling and opium in the back, and later the J.M.B. Meroux building; its rock walls carried it through the fires that burned most of the town. The Meroux family gave it to the town, and it has been a museum since 1932.',
   'Walls built wholly of flat rocks laid in horizontal courses (marker). Inside, a crowded collection of gold-rush relics begun by Sheriff George C. Bynon; the roof and wooden interior were restored for the 1932 opening. In front, at 330 Main Street, a one-sixth scale model of an arrastra, an ore-grinding mill, built by the Downieville High School shop class in 1954 (marker).',
   'The stone store that outlasted Downieville\'s fires, a museum since 1932.',
@@ -82,7 +82,7 @@ N('jersey-bridge-downieville','Jersey Bridge','Downieville','ca','landmark','sta
   'A one-lane 1938 truss that still carries a state highway through Downieville.',
   'Publicly owned by a local body (nomination). Highway 49 crosses it, with a walkway on its east side; it is in the middle of town. '+DVTOWN,
   [NR('12000401','Jersey Bridge'),WDV,HM(282479,'Josefa Segovia')],th=DVLOT,thn=DVLOTN,brick='no'),
-N('kentucky-mine-sierra-city','Kentucky Mine and stamp mill','Sierra City','ca','industry','standing',39.57262,-120.62258,'site','public','walk','','1928–1933 (the mill)',
+N('kentucky-mine-sierra-city','Kentucky Mine and stamp mill','Sierra City','ca','industry','standing',39.57262,-120.62258,'site','open','walk','','1928–1933 (the mill)',
   'A hard-rock gold mine just outside Sierra City, now a county park run by the Sierra County Historical Society with a museum, the mine portal and a ten-stamp mill. The Sierran (2019) says the mill was built from 1928 to 1933 by Emil Loeffler and his son Adolph out of older 19th-century stamp mills round Sierra City, the 1890s Phoenix Mill among them. Mine and mill are both driven by Pelton water wheels.',
   'The mine adit, a wooden ore trestle about 35 feet high leading to a six-level heavy-timber mill, and the stamps, which are run on each guided tour; a replica miner\'s cabin, mining machinery and a museum (The Sierran; historical society). The tour goes into the mine and the mill.',
   'A gold mine and ten-stamp mill that still drops its stamps twice a day in summer.',

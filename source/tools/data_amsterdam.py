@@ -50,7 +50,7 @@ N('guy-park-manor','Guy Park Manor','Amsterdam','mohawk','civic','standing',42.9
   '',
   'Guy Park State Historic Site, owned by the State of New York. Whether the grounds or the house are open, and the hours, were not checked: look from the street or the canal side until you know.',
   [W('Guy Park'),L('HMdb: Manor House on the Mohawk','https://www.hmdb.org/m.asp?m=152505')],conf='mixed'),
-N('old-fort-johnson','Old Fort Johnson','Fort Johnson','mohawk','fort','standing',42.95721,-74.2406,'exact','public','drive','forts','about 1749–',
+N('old-fort-johnson','Old Fort Johnson','Fort Johnson','mohawk','fort','standing',42.95721,-74.2406,'exact','open','drive','forts','about 1749–',
   'A two-storey limestone house that Sir William Johnson built about 1749 and surrounded with fortifications. It was his home, office and trading post until he moved to Johnson Hall in 1763. His son Sir John kept it until 1776, when the local Committee of Safety confiscated it. It stayed in private hands until 1906, when the Montgomery County Historical Society opened it as a museum, and it was named a National Historic Landmark in 1972.',
   'The stone house at the corner of Routes 5 and 67, with a low stone retaining wall along the front and east side. Nothing of the fortifications is described as surviving: the museum says John Johnson removed the last of them about 1772.',
   '',

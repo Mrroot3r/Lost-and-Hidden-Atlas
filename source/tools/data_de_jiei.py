@@ -73,7 +73,7 @@ N('delaware-city-canal-lock','Eastern lock of the Chesapeake and Delaware Canal'
    ['SAH Archipedia: Delaware Tide Lock','https://sah-archipedia.org/node/10525'],['Delaware City: history','https://delawarecity.com/history']],
   th=[39.57844,-75.58881],thn='Lot on Clinton Street, Delaware City',brick='no'),
 
-N('hagley-powder-yards','Hagley powder yards','Wilmington','de','industry','standing',39.78056,-75.575,'area','public','walk','','1802–1921',
+N('hagley-powder-yards','Hagley powder yards','Wilmington','de','industry','standing',39.78056,-75.575,'area','open','walk','','1802–1921',
   'E. I. du Pont founded black powder mills on the Brandywine in 1802 and the works became the largest black powder factory in the world. They closed in 1921. The Hagley Museum opened on the site in 1957.',
   'Restored stone powder mills along the creek, a 19th-century machine shop, a workers\' community and the first du Pont house. A narrated bus runs the Powder Yard Trail and is the only way to the house.',
   '',

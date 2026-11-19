@@ -17,13 +17,13 @@ HMDB=L('HMdb.org: Dividend Pond Archaeological District markers','https://www.hm
 
 PLACES=[
 # ---- Old Wethersfield ----
-N('webb-deane-stevens-wethersfield','Webb, Deane and Stevens houses','Wethersfield','cthv','landmark','standing',41.71204,-72.65315,'exact','public','drive','','1752–1773',
+N('webb-deane-stevens-wethersfield','Webb, Deane and Stevens houses','Wethersfield','cthv','landmark','standing',41.71204,-72.65315,'exact','open','drive','','1752–1773',
   'Three neighbouring houses on Main Street run as one museum. The Joseph Webb House of 1752 is where George Washington lodged in May 1781 and met the French commander Rochambeau for five days to plan the campaign that ended at Yorktown. Wallace Nutting bought it in 1916 and opened it as one of his "Colonial Picture Houses"; the Colonial Dames have owned it since 1919. Next door is the house Silas Deane, the first American envoy to France, had built between 1769 and 1773.',
   'The Webb House interior has been put back to an 18th-century look, with Nutting\'s murals and Colonial Revival touches kept and shown as part of its story; a Colonial Revival garden and a 19th-century barn are behind it. The Deane House keeps its original woodwork: pilasters, fully panelled fireplace walls and a fancy stair balustrade. Seen on a guided tour.',
   'The house where Washington and Rochambeau planned Yorktown.',
   'Webb-Deane-Stevens Museum, 211 Main Street. The museum\'s own page gives hours of 10 a.m. to 4 p.m., Wednesday to Sunday, with guided tours at 11, 1 and 3 (read November 2026); admission not checked. Street parking in Old Wethersfield not checked.',
   [W('Joseph Webb House'),W('Silas Deane House'),WDS],brick='?'),
-N('buttolph-williams-house','Buttolph-Williams House','Wethersfield','cthv','landmark','standing',41.71078,-72.65041,'exact','public','drive','','1711',
+N('buttolph-williams-house','Buttolph-Williams House','Wethersfield','cthv','landmark','standing',41.71078,-72.65041,'exact','open','drive','','1711',
   'A small timber-frame house of 1711 on Broad Street, one of the oldest in Wethersfield; it was once dated to the 1690s, until newer research put it at 1711. A National Historic Landmark since 1968 as an unusually well-kept early colonial house. It was opened to the public in 1951 and is owned by Connecticut Landmarks.',
   'Two and a half storeys, three bays wide, with a steep roof, a big central chimney, diamond-paned casement windows (reconstructed to their first size and places) and a slight false overhang on the upper storey. The siding is a 20th-century reproduction of split boards. Inside, restored rooms with furnishings of about 1700. Seen by tour only.',
   'A Puritan-era house with diamond-pane windows, three centuries on.',
@@ -61,7 +61,7 @@ N('cotton-hollow-mill-walls','Cotton Hollow mill walls','Glastonbury','cthv','in
   'Cotton Hollow Preserve, Town of Glastonbury open space. The town\'s own page refused this session (HTTP 403), so hours and parking are not checked; the pin is the preserve, not the walls.',
   [L('Save Cotton Hollow Mill coalition','https://www.savecottonhollowmill.org'),L('Patch: help preserve the Cotton Hollow Mill','https://patch.com/connecticut/glastonbury/town-glastonbury-help-preserve-cotton-hollow-mill')],brick='no'),
 # ---- Hartford ----
-N('old-state-house-hartford','Old State House','Hartford','cthv','civic','standing',41.76611,-72.67278,'exact','public','drive','','1796',
+N('old-state-house-hartford','Old State House','Hartford','cthv','civic','standing',41.76611,-72.67278,'exact','open','drive','','1796',
   'Finished in 1796 and thought to be Charles Bulfinch\'s first public building. It was Connecticut\'s capitol until the present one was built, and has since been changed more than once: the original stone spiral stair behind the north arch is gone.',
   'Upper storeys of red brick in Flemish bond under a wooden cornice. Inside, the Senate is restored to its Federal look, the Representatives\' chamber is Victorian and the halls and courtroom are Colonial Revival. On the third floor, a recreation of Joseph Steward\'s 1798 museum of natural history and curiosities.',
   'Bulfinch\'s first public building, with a 1798 cabinet of curiosities upstairs.',
@@ -87,7 +87,7 @@ N('cheney-brothers-silk-mills','Cheney Brothers silk mills','Manchester','cthv',
   'Public streets; the mills are seen from Pine and Elm Streets and are not open as a museum. Cheney Homestead hours not checked.',
   [W('Cheney Brothers Historic District'),L('Manchester Historical Society','https://www.manchesterhistory.org/')],brick='yes'),
 # ---- Simsbury and East Granby ----
-N('heublein-tower','Heublein Tower','Simsbury','cthv','landmark','standing',41.8259,-72.7985,'exact','public','hike','','1914',
+N('heublein-tower','Heublein Tower','Simsbury','cthv','landmark','standing',41.8259,-72.7985,'exact','open','hike','','1914',
   'Gilbert Heublein, the food and drink maker behind A.1. sauce and Smirnoff, promised his fiancée a castle on Talcott Mountain and built this 165-foot tower in 1914 as a summer home, modelled on buildings of his native Bavaria. It has a steel frame anchored in the ridge and held the first home elevator in Connecticut. The Hartford Times bought it in 1943 and used it for parties for nearly 20 years; the state bought the 557 acres in 1966 and opened the park in 1974.',
   'Six flights up to an observation floor with views to Hartford and over the Farmington Valley. The tower is a historic home and museum. Original interior fittings not checked.',
   'A vodka magnate\'s Bavarian castle-tower on a ridge.',

@@ -27,14 +27,14 @@ N('elsah-ice-house-ruin','Elsah ice house ruin','Elsah','il','industry','ruins',
   'Seen from Mill Street, a public street, by the marker; owner not checked, so stay on the street. A small mapped lot on Mill Street is a few metres north.',
   [HM(216141,'The Ice House (Elsah)')],conf='mixed',brick='no'),
 
-N('principia-college-maybeck','Principia College: the Maybeck campus','Elsah','il','inst','standing',38.9503,-90.3503,'area','view','drive','','1930s–',
+N('principia-college-maybeck','Principia College: the Maybeck campus','Elsah','il','inst','standing',38.9503,-90.3503,'area','open','drive','','1930s–',
   'Principia, a college for Christian Scientists founded by Mary Kimball Morgan, moved to the bluffs above Elsah in the 1930s. Bernard Maybeck, the California architect, designed the new campus, giving each of the first dormitories a different style and building method and trying them out first on a small test building the students still call the Mistake House; he also designed the chapel. Part of the campus became a National Historic Landmark district in 1993.',
   'The Maybeck chapel, the dormitories such as Buck House, and the Mistake House, on a self-guided driving tour with signs: the gatehouse gives out a map with the route marked (Great Rivers & Routes). Maybeck architectural tours can be arranged with the college. Which interiors visitors may enter on their own was not checked.',
   'An Arts and Crafts architect\'s campus on a Mississippi bluff.',
   'Private college with a staffed entrance. Its campus page says the campus is open to the public for visits and tours Monday to Saturday, 10 a.m. to sunset; guided tours through the President\'s office, (618) 374-5148. Check in at the gatehouse. Pin is the middle of the Register district from the Wikipedia list, not a building.',
   [W('Principia College'),L('Principia College: campus and location','https://www.principiacollege.edu/about/campus-and-location'),L(GRR+': exploring Principia College','https://www.riversandroutes.com/blog/top-reasons-to-explore-principia-college/')],brick='?'),
 
-N('pere-marquette-lodge','Pere Marquette State Park Lodge','Grafton','il','hotel','standing',38.97176,-90.54115,'exact','public','drive','','1930s–',
+N('pere-marquette-lodge','Pere Marquette State Park Lodge','Grafton','il','hotel','standing',38.97176,-90.54115,'exact','open','drive','','1930s–',
   'The Civilian Conservation Corps built the lodge of Pere Marquette State Park, at the meeting of the Illinois and Mississippi rivers, in the 1930s. It was enlarged in 1985 and is still a working lodge run within the state park. The lodge and its cabins were listed on the National Register in 1985.',
   'The CCC\'s native limestone and heavy timbers in the original part, and in the Great Room a 50-foot vaulted roof and a stone fireplace said to weigh 700 tons (Illinois DNR). Stone guest cabins stand nearby. The lobby is open to lodge visitors; opening hours of the public rooms were not checked.',
   'A 700-ton CCC fireplace.',
@@ -55,7 +55,7 @@ N('grafton-historic-district','Grafton Main Street, ice house and stone wharf','
   'Public streets and riverfront; the houses are private. Street parking and a mapped lot on Water Street by the river. Pin is the middle of the district from the Wikipedia list; the ice house and wharf were not located on the aerial.',
   [W('Grafton Historic District (Grafton, Illinois)'),HM(210702,'Grafton'),L(GRR+': a walk through Grafton\'s past','https://www.riversandroutes.com/blog/take-a-walk-through-graftons-past/')],th=[38.96925,-90.43922],thn='Water Street lot',brick='?'),
 
-N('ruebel-hotel-grafton','Ruebel Hotel','Grafton','il','hotel','standing',38.96972,-90.43222,'site','public','drive','','1913–',
+N('ruebel-hotel-grafton','Ruebel Hotel','Grafton','il','hotel','standing',38.96972,-90.43222,'site','open','drive','','1913–',
   'The first Ruebel Hotel was built in 1879 and burned in 1912; this one went up in its place in 1913, with a saloon and a restaurant, and was counted one of the best in Jersey County. It is the only hotel left of Grafton\'s old ones and still takes guests.',
   'A two-storey red brick Commercial-style front (Wikipedia photograph) of decorative brickwork: corbelled brick at the cornice and raised brick panels over arched second-floor windows. Interior not checked.',
   '',
@@ -76,7 +76,7 @@ N('alton-prison-ruins','Alton Penitentiary and Military Prison wall','Alton','il
   'Kept by the State of Illinois as a historic site (Wikipedia), on William Street just north of West Broadway (Route 100). Hours not checked. A mapped lot is on William Street beside it.',
   [W('Alton Military Prison'),HM(211807,'After the War'),HM(144762,'Ruins of First State Prison in Illinois'),HM(211622,'The First Illinois State Penitentiary'),L('Looking for Lincoln: Alton Prison','https://www.lookingforlincoln.org/explore/sites/326')],conf='mixed',th=[38.89165,-90.19030],thn='William Street lot',brick='no'),
 
-N('mcpike-mansion','McPike Mansion (Mount Lookout)','Alton','il','landmark','standing',38.90583,-90.18333,'area','view','drive','','1869–',
+N('mcpike-mansion','McPike Mansion (Mount Lookout)','Alton','il','landmark','standing',38.90583,-90.18333,'area','open','drive','','1869–',
   'Henry Guest McPike, mayor of Alton, box maker and prize-winning grape grower, began this house in 1869 on Mount Lookout, one of the highest points in town; Lucas Pfeiffenberger was the architect. A later owner rented out rooms until his death (Wikipedia gives 1945 or 1951). Empty for years after, it was stripped by vandals of its banisters and fittings and nearly cleared for a shopping centre; it was listed on the Register in 1980. Its present owners are restoring it with money from historic and ghost tours.',
   'The red brick house with its mansard roof and columned porch (Wikipedia photograph, 2017) on Alby Street, still under restoration, and the McPike crypt in the grounds, shown on group tours. Not open outside scheduled events.',
   'A stripped mansion paid for by its ghosts.',
@@ -118,7 +118,7 @@ N('old-chain-of-rocks-bridge','Old Chain of Rocks Bridge','Madison','il','landma
   'Open to walkers and cyclists daily (National Park Service); hours not checked on the managers\' own page, which did not open. Free parking at the Illinois end on Chouteau Island at the end of Chain of Rocks Road, and on the Missouri side at a park opened in 2024. Pin is where the bridge leaves the Illinois bank on Chouteau Island; the bend is out over the river to the west, about 1 km away.',
   [W('Chain of Rocks Bridge'),L('National Park Service: Chain of Rocks Bridge','https://www.nps.gov/places/chain-of-rocks-bridge.htm')],conf='mixed',th=[38.75702,-90.16463],thn='Illinois bridge entrance lot',brick='no'),
 
-N('stephenson-house-edwardsville','1820 Colonel Benjamin Stephenson House','Edwardsville','il','landmark','standing',38.80722,-89.95222,'exact','public','drive','','1820–',
+N('stephenson-house-edwardsville','1820 Colonel Benjamin Stephenson House','Edwardsville','il','landmark','standing',38.80722,-89.95222,'exact','open','drive','','1820–',
   'Benjamin Stephenson, an early Illinois politician, built this Federal house in 1820 as his home, office and political headquarters, and died soon after. Fifteen owners followed, adding an ell in 1845; the last private one was a fraternity. The city bought it in 1999 and restored it to its 1820s look at a cost of over a million dollars; it opened as a house museum in 2006.',
   'Walls three bricks thick, inside and out, made on the site by people Stephenson enslaved (Wikipedia). Furnished rooms of the 1820s shown on guided tours.',
   'Bricks made on the spot in 1820.',
@@ -132,7 +132,7 @@ N('leclaire-nelson-factory','LeClaire: N. O. Nelson\'s cooperative village and f
   'The N. O. Nelson Campus of Lewis and Clark Community College, 600 Troy Road; the grounds are a working campus, the buildings open in college hours (not checked). The village houses are private. Street parking and campus lots.',
   [W('LeClaire Historic District'),L('Historic LeClaire: the Nelson Manufacturing Complex','https://historic-leclaire.org/new-page-2'),L('Madison Historical (SIUE): Leclaire','https://madison-historical.siue.edu/encyclopedia/leclaire/')],conf='mixed',brick='yes'),
 
-N('kamp-store-kampsville','Kamp Store','Kampsville','il','town','standing',39.29833,-90.61028,'exact','public','drive','','1902–',
+N('kamp-store-kampsville','Kamp Store','Kampsville','il','town','standing',39.29833,-90.61028,'exact','open','drive','','1902–',
   'Joseph Kamp, son of Kampsville\'s founder, opened this general store in 1902 and ran it until he died in 1952, selling everything from household goods to cars and farm machinery brought up by barge from St. Louis. It was a grocery into the 1970s and then a carpet store. The Center for American Archeology bought it in 1991 for its visitor centre and museum.',
   'A two-storey wooden store with a false front trimmed in pressed metal, at Oak Street and Broadway.',
   '',

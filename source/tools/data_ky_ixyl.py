@@ -21,7 +21,7 @@ N('old-fort-harrod-state-park','Old Fort Harrod State Park','Harrodsburg','ky','
    ["America's State Parks: Old Fort Harrod",'https://www.americasstateparks.org/state-park/old-fort-harrod-state-park/']],
   conf='mixed',th=[37.76191,-84.84694],thn='Park lot off Fort Harrod Street (state park land)',brick='?'),
 
-N('shaker-village-pleasant-hill','Shaker Village of Pleasant Hill','Harrodsburg','ky','town','standing',37.81849,-84.73781,'site','public','walk','','1805–1910',
+N('shaker-village-pleasant-hill','Shaker Village of Pleasant Hill','Harrodsburg','ky','town','standing',37.81849,-84.73781,'site','open','walk','','1805–1910',
   'A Shaker community lived here from 1805 to 1910, at its peak nearly 500 people farming more than 4,000 acres. By 1825 it had large stone and brick dwellings, shops and stone sidewalks. Restoration began in 1961, and the whole village is a National Historic Landmark district.',
   'Original Shaker buildings, dated by the village\'s own guide: the Meeting House (1820), the Centre Family Dwelling (1824–1834), a 21,000-square-foot house with 14 bedrooms and a meeting room, restored and reopened for guided tours, the Trustees\' Office (1839) with Micajah Burnett\'s twin spiral staircases rising three floors, the East Family Dwelling (1817), the brick Tanyard (1824) and the West Lot timber-frame stable (1830), the only surviving Shaker-built barn. Stone fences run round the fields. Exhibits and tours Tuesday to Sunday, 10 a.m. to 5 p.m.',
   'A whole Shaker town, stone and brick, still standing above the Kentucky River.',
@@ -57,7 +57,7 @@ N('morgan-row-harrodsburg','Morgan Row','Harrodsburg','ky','civic','standing',37
    ['Kentucky Historical Society marker: Morgan Row 1807','https://history.ky.gov/markers/morgan-row-1807']],
   brick='?'),
 
-N('beaumont-inn-harrodsburg','Beaumont Inn (Daughters\' College)','Harrodsburg','ky','hotel','standing',37.75261,-84.84274,'site','public','drive','hotels','1845–',
+N('beaumont-inn-harrodsburg','Beaumont Inn (Daughters\' College)','Harrodsburg','ky','hotel','standing',37.75261,-84.84274,'site','open','drive','hotels','1845–',
   'A three-story brick Federal-style building of about 1845, built to house some 100 girls. It was the campus of the Greenville Institute, Daughters\' College and Beaumont College. Two former students bought it in 1917 and Annie Bell Goddard made it an inn in 1918; her descendants still run it.',
   'The 1845 main building, an inn with 31 rooms and a restaurant known for country ham and fried chicken since Duncan Hines praised it in 1949. Interior fabric not checked.',
   'A girls\' college of 1845 that has been an inn since 1918.',
@@ -80,7 +80,7 @@ N('constitution-square-danville','Constitution Square','Danville','ky','civic','
   [W('Constitution Square Historic Site'),['McDowell House: Constitution Square','https://mcdowellhouse.com/constitution-square']],
   brick='?'),
 
-N('mcdowell-house-danville','McDowell House','Danville','ky','civic','standing',37.6451,-84.77101,'exact','public','walk','','1792–',
+N('mcdowell-house-danville','McDowell House','Danville','ky','civic','standing',37.6451,-84.77101,'exact','open','walk','','1792–',
   'Dr. Ephraim McDowell lived and worked here. On Christmas morning 1809 he removed an ovarian tumor from Jane Todd Crawford without anaesthetic, the first successful operation of its kind; she lived another 32 years. Doctors bought the house in 1935 and opened it as a museum.',
   'A brick ell of 1792–1795, the clapboard front of 1803–1804 and a small brick office of 1820, with an apothecary and two gardens. Guided tours of the house, apothecary and gardens Tuesday to Saturday at set times; book ahead.',
   'The house where abdominal surgery began.',

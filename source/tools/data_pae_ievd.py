@@ -24,7 +24,7 @@ WCU_HIB=L('West Chester University: Hibernia County Park natural resource plan (
 MYC_HIB=L('MyChesCo: Hibernia County Park','https://www.mychesco.com/a/lifestyle/outdoor-recreation/hibernia-county-park-where-chester-county-still-hears-the-fiddles/')
 PLACES=[
 # ---- Iron ----
-N('hopewell-furnace-elverson','Hopewell Furnace','Elverson','pae','industry','standing',40.20538,-75.77407,'exact','public','walk','','1771–1883',
+N('hopewell-furnace-elverson','Hopewell Furnace','Elverson','pae','industry','standing',40.20538,-75.77407,'exact','open','walk','','1771–1883',
   'An iron plantation built round a charcoal-fired, cold-blast furnace. Ironmaster Mark Bird founded it about 1771; it did best between 1820 and 1840, had a short revival in the Civil War, and blew out for the last time on 15 June 1883, beaten by anthracite-fired mills. It became one of the first historic sites in the National Park System in 1938, and the furnace, water wheel, blast machinery, cast house, blacksmith shop, barn and tenant houses were rebuilt and restored by 1952.',
   'The furnace group (stack, water wheel, blast machinery, cast house, charcoal house), the ironmaster\'s house, the company store, the blacksmith shop, a barn and workers\' houses: 14 restored buildings in 848 mostly wooded acres. Which buildings are open inside on a given day was not checked. The park\'s trails join those of French Creek State Park, which surrounds it on three sides.',
   'The furnace that outlived the charcoal-iron age by half a century.',
@@ -56,7 +56,7 @@ N('washington-hall-yellow-springs','Washington Hall hospital ruins, Yellow Sprin
   'Kept by Historic Yellow Springs, Inc., 1685 Art School Road, Chester Springs (who owns each piece of the land was not checked; the federal land map does not hold it). Grounds open dawn to dusk every day; office Monday to Friday 9 am to 4 pm. Parking in front of the Lincoln building and in the paved lot by the Washington building. Hours from the Historic Yellow Springs pages, read November 2026.',
   [HYS_RUINS,HYS_VISIT,W('Yellow Springs, Chester County, Pennsylvania')],th=[40.10063,-75.61915],thn='Historic Yellow Springs lot',brick='?'),
 # ---- Mill ----
-N('mill-at-anselma','Mill at Anselma (Lightfoot Mill)','Chester Springs','pae','industry','standing',40.08119,-75.64406,'exact','public','drive','','c. 1747–1982',
+N('mill-at-anselma','Mill at Anselma (Lightfoot Mill)','Chester Springs','pae','industry','standing',40.08119,-75.64406,'exact','open','drive','','c. 1747–1982',
   'Samuel Lightfoot built this small custom grist mill about 1747 to grind for the farmers of Pikeland, the first of eight grist mills in the township. It later ground feed for the dairy farms and stayed at work until 1982. It is probably the only mill in the United States with its colonial-era power transmission still intact, and was made a National Historic Landmark in 2005.',
   'The mill with its colonial gearing, which is run on demonstration days, and the miller\'s house, on 22 acres of grounds. Open inside on weekend tours (below).',
   '',

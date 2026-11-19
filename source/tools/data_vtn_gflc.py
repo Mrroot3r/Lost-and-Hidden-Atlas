@@ -13,7 +13,7 @@ BATCH={'key':'vtn_gflc','label':'Orleans County, Vermont','added':'2026-11-19 12
 VHS=['Vermont Historical Society: Essex and Orleans county museum directory','https://vermonthistory.org/essex-and-orleans-county-museum-directory']
 def HM(n,t): return ['HMdb: '+t,'https://www.hmdb.org/m.asp?m=%d'%n]
 PLACES=[
-N('old-stone-house-brownington','Old Stone House (Athenian Hall)','Brownington','vtn','civic','standing',44.83602,-72.16568,'site','public','drive','','1834–1836',
+N('old-stone-house-brownington','Old Stone House (Athenian Hall)','Brownington','vtn','civic','standing',44.83602,-72.16568,'site','open','drive','','1834–1836',
   'Alexander Twilight, the first African-American college graduate in the country, was principal of the Orleans County Grammar School and minister of the Brownington church. When his trustees would not build a dormitory he built one himself: four storeys of granite, begun in 1834 and finished in 1836, which he called Athenian Hall. It housed boarding pupils until 1859, two years after his death. It stood empty until it was auctioned in 1918, when a railroad man bid for its stone to use in bridge abutments; the Orleans County Historical Society won it for $500 (the society\'s own directory entry gives 1916) and opened it as a museum in 1925.',
   'A four-storey granite block, rare in a county where nobody built in granite; where the stone came from is not known. Inside are 22 or 23 rooms of exhibits (the sources differ), with furniture, paintings, folk art, tools and "town rooms" for eleven of the county\'s towns. Across the road is Twilight\'s own house of about 1830, now the visitor centre; the museum village also has the Cyrus Eaton house (about 1834), the Samuel Read Hall house (1831), the Lawrence barn (moved here in 1997) and 55 acres of farmland.',
   'The granite school dormitory the country\'s first Black college graduate built with his own hands.',
@@ -43,7 +43,7 @@ N('crystal-lake-bathhouse-barton','Crystal Lake State Park bathhouse','Barton','
   'A CCC bathhouse of granite from across the lake, part Modern, part rustic.',
   'Vermont State Parks, 96 Bellwater Avenue off VT 16. Open the Friday of Memorial Day weekend to Labor Day weekend, 10 am to sunset; day-use fee; no pets. Outside the season the gate is not checked. Park in the park lot.',
   [W('Crystal Lake State Park'),['Vermont State Parks: Crystal Lake','https://vtstateparks.com/crystal.html']],conf='mixed',brick='no',th=[44.74636,-72.17188],thn='Crystal Lake State Park lot, Bellwater Avenue'),
-N('haskell-free-library-opera-house','Haskell Free Library and Opera House','Derby Line','vtn','civic','standing',45.00574,-72.09767,'exact','public','drive','','1901–1904',
+N('haskell-free-library-opera-house','Haskell Free Library and Opera House','Derby Line','vtn','civic','standing',45.00574,-72.09767,'exact','open','drive','','1901–1904',
   'Martha Stewart Haskell and her son Horace gave this library and opera house to the two border villages, building it on purpose across the line between Derby Line, Vermont and Stanstead, Quebec. The opera house opened on June 7, 1904. The book stacks and the stage are in Canada and the main door and most seats in the United States, so it is called the only opera house in the country with no stage. Since 2025 American rules have limited how Canadians may reach the front door, and a new entrance on the Canadian side opened in 2026.',
   'A Queen Anne building by James Ball, with the library on the ground floor and a 500-seat theatre on the two floors above. A black line across the floors marks the border. The opera house is seen only on a guided tour with staff.',
   'A library and opera house built across the Canadian border, with the line painted on the floor.',
@@ -73,7 +73,7 @@ N('newport-federal-building-vt','U.S. Courthouse, Post Office and Customs House'
   'A 1904 border town\'s court, post office and customs house in one.',
   'At Main and Second streets, east of the county courthouse; a working court building. Seen from the street. Street parking downtown.',
   [W('United States Courthouse, Post Office and Customs House (Newport, Vermont)')],brick='yes'),
-N('goodrich-memorial-library','Goodrich Memorial Library','Newport','vtn','civic','standing',44.93565,-72.21022,'exact','public','drive','','1898–1899',
+N('goodrich-memorial-library','Goodrich Memorial Library','Newport','vtn','civic','standing',44.93565,-72.21022,'exact','open','drive','','1898–1899',
   'Converse and Almira Goodrich paid for this free library; it was begun in 1898 to designs by William Storey and dedicated on September 1, 1899. When the stock that funded it failed in 1933 the town took on its keep. It was restored after a grant in 2003.',
   'A Romanesque building with fireplaces of coloured brick and rooms finished in red birch, Georgia pine, cypress, spruce and Swanton red marble, with quartered-oak furniture. Upstairs are an art room with old paintings and a floor-to-ceiling wall of glass cases of stuffed animals and curiosities (an alligator, an ostrich egg), preserved with mercury and not to be touched.',
   'An 1899 library with a cabinet of curiosities upstairs.',

@@ -38,7 +38,7 @@ BAHF_ABOUT=L('Beaver Area Heritage Foundation: about the museum','https://beaver
 BCLS_BF=L('Beaver County Library System: Carnegie Free Library, Beaver Falls (hours)','https://beaverlibraries.org/libraries/beaver-falls')
 PLACES=[
 # ---- Standing ----
-N('old-economy-village-ambridge','Old Economy Village','Ambridge','paw','town','standing',40.59612,-80.23300,'site','public','walk','','1824–1905',
+N('old-economy-village-ambridge','Old Economy Village','Ambridge','paw','town','standing',40.59612,-80.23300,'site','open','walk','','1824–1905',
   'The third and last town of the Harmony Society, a celibate Christian commune led by George Rapp that came from Württemberg in 1803–04 and built Harmony (Butler County) and New Harmony (Indiana) before settling here on the Ohio in 1824. Between 1824 and 1832 the Harmonists built more than a hundred houses, mills and a church; Frederick Rapp, a stonemason, designed the larger buildings. The society ran mills, a brick works, an oil company and a savings bank, and was dissolved in 1906. The Commonwealth bought 6 acres and 17 buildings in 1916; it is a National Historic Landmark.',
   'Seventeen buildings and the gardens inside a picket fence, in red brick and frame: the Feast Hall (offices below, a 96-by-50-foot hall with an elliptical ceiling above, its ground floor once one of the country\'s earliest museums), the joined George and Frederick Rapp houses with their portico and jerkinhead roof, the half-timbered 1824 Granary on a rubble foundation, and in the garden the round Grotto of yellow sandstone with a thatched roof and a plastered Greek Revival room inside. Around the village, about eighty more Harmonist-era houses and shops still stand in Ambridge. Part of the visit is a guided tour, the rest self-guided.',
   'A celibate commune\'s last town, with its feast hall, granary and hermit\'s grotto still standing.',
@@ -50,7 +50,7 @@ N('merrill-lock-6-industry','Merrill Lock No. 6 lock station','Industry','paw','
   'An Ohio River lock station from 1904, left almost as built.',
   'Beside Midland-Beaver Road (PA 68), 610 Midland-Beaver Road, Industry. Who owns it now was not checked; Atlas Obscura describes two large parking lots and no one in attendance, but the buildings are closed. Look from the road and do not go in.',
   [SAH_LOCK6,AO_LOCK6,W('Merrill Lock No. 6')],conf='mixed',brick='yes'),
-N('greersburg-academy-darlington','Greersburg Academy','Darlington','paw','civic','standing',40.80990,-80.42342,'exact','view','drive','','1806–',
+N('greersburg-academy-darlington','Greersburg Academy','Darlington','paw','civic','standing',40.80990,-80.42342,'exact','open','drive','','1806–',
   'A college-preparatory academy founded in 1802 by the Reverend Thomas Hughes; the stone building went up about 1806, which makes it one of the oldest standing in Beaver County. John Brown the abolitionist, John White Geary and William Holmes McGuffey studied here. From 1883 to 1972 the building served several railroads as a station. The Little Beaver Historical Society keeps it as a museum.',
   'A Georgian stone schoolhouse on Market Street. The Historical Society\'s displays inside have included the 100th Pennsylvania Volunteers and a scale model of Legionville; original interior fabric not checked.',
   'The school John Brown attended, later a railroad station.',
@@ -68,13 +68,13 @@ N('aliquippa-ple-station','Pittsburgh and Lake Erie station, Aliquippa','Aliquip
   '',
   'Station Street, Aliquippa, beside the active CSX line. Owner not checked. Look from the street; keep off the tracks.',
   [SAH_ALIQ,W('Aliquippa station')],conf='mixed',brick='?'),
-N('beaver-ple-stations','Beaver P&LE stations (Beaver Area Heritage Museum)','Beaver','paw','rail','standing',40.69780,-80.29671,'site','public','drive','','1897–',
+N('beaver-ple-stations','Beaver P&LE stations (Beaver Area Heritage Museum)','Beaver','paw','rail','standing',40.69780,-80.29671,'site','open','drive','','1897–',
   'The Pittsburgh and Lake Erie Railroad\'s passenger station (1897) and freight station (1911) in Beaver. The borough acquired them when the railroad sold its real estate, and in 1996 made the freight house available to the Beaver Area Heritage Foundation, which opened it as a museum in 1998 and later restored the passenger station as an event center. A log house built in 1998 from 18th-century logs salvaged from a local house stands beside the museum.',
   'Brick and stone stations with deep eaves on oversized wooden brackets; the passenger station has eyebrow dormers and stone round arches, and lost its porte-cochère. A tunnel under the tracks leads to the far platform. The freight office now holds railroad displays and the museum shop.',
   '',
   'Beaver Area Heritage Museum (Beaver Area Heritage Foundation), in the borough-owned freight station on East End Avenue / River Road, Beaver. Free parking beside the building. The foundation\'s page said only that the museum would reopen in spring 2025; current hours not checked.',
   [SAH_BEAVSTA,BAHF_ABOUT,HM_BAHF],brick='?'),
-N('carnegie-library-beaver-falls','Carnegie Free Library of Beaver Falls','Beaver Falls','paw','civic','standing',40.75427,-80.31973,'exact','public','drive','','1899–1903',
+N('carnegie-library-beaver-falls','Carnegie Free Library of Beaver Falls','Beaver Falls','paw','civic','standing',40.75427,-80.31973,'exact','open','drive','','1899–1903',
   'Beaver County\'s first purpose-built library, paid for with $50,000 from Andrew Carnegie and designed by Pittsburgh architect Frederick J. Osterling. Building began in 1899 and it opened a week before Christmas 1903. It is still the town library.',
   'A Neoclassical building of yellow brick on a raised stone foundation, with granite trim and terracotta round many windows. The second floor holds a genealogy and local-history library, and the city\'s historical museum is in the basement, in what was the performance hall until 1961. Original interior fittings not checked.',
   '',

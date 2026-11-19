@@ -17,7 +17,7 @@ ROCR=' Rock Creek Park (National Park Service) says the park is open year-round 
 CWDW=['NPS: Civil War Defenses of Washington','https://www.nps.gov/cwdw/index.htm']
 PLACES=[
 # ---- Rock Creek valley ----
-N('peirce-mill-dc','Peirce Mill','Washington','dc','industry','standing',38.94026,-77.05190,'exact','public','walk','','1820s–1897',
+N('peirce-mill-dc','Peirce Mill','Washington','dc','industry','standing',38.94026,-77.05190,'exact','open','walk','','1820s–1897',
   'A water-powered grist mill on Rock Creek built for the millwright Isaac Peirce. The National Park Service gives 1829; Wikipedia says either 1820 or 1829. It ground corn, wheat and rye, and its machinery followed Oliver Evans\'s automated system. It stopped in 1897 when the main shaft broke. Congress took the mill and 350 acres into Rock Creek Park in 1890; it was a tea room in the 1920s, was restored and set grinding again by 1936, ground flour for government cafeterias until 1958, was shut down in 1993, and was restored again with the Friends of Peirce Mill, reopening in October 2011.',
   'The stone mill (Wikipedia\'s 2008 photograph shows rubble-stone walls and a small red brick chimney) on its mill race at Tilden Street and Beach Drive, with the park-built dam on the creek beside it. Inside, the machinery has been restored and the Park Service runs milling demonstrations; Wikipedia says on the 2nd and 4th Saturdays, the NPS says only that the mill is open seasonally and lists events on the park calendar. Interior hours not checked.',
   'A working 1820s mill inside the city limits of the capital.',
@@ -49,7 +49,7 @@ N('battleground-national-cemetery','Battleground National Cemetery','Washington'
   accn='Rock Creek Park (National Park Service), 6625 Georgia Avenue NW, about half a mile north of Fort Stevens.'+ROCR+' Opening hours of the gate not checked. Street parking only seen on the map.',
   links=[W('Battleground National Cemetery'),['NPS: Battleground National Cemetery',NPSP+'battleground-national-cemetery.htm']],conf='mixed',brick='?'),
 # ---- Georgetown and the canal ----
-N('old-stone-house-georgetown','Old Stone House','Washington','dc','landmark','standing',38.90542,-77.06038,'exact','public','walk','','1765',
+N('old-stone-house-georgetown','Old Stone House','Washington','dc','landmark','standing',38.90542,-77.06038,'exact','open','walk','','1765',
   'Built in 1765 for Christopher and Rachel Layman on M Street (then Bridge Street) in Georgetown, in three stages through the 18th century. The NPS calls it the oldest structure on its original foundation in Washington. It was a shop or business through the 19th and 20th centuries, a used-car dealership by 1953, when the government bought it; the Park Service stripped later additions and opened it in 1960. Local lore that Washington and L\'Enfant had met there helped save it.',
   'Walls of blue granite and fieldstone (Wikipedia), a brick third floor, oak front door, and an English garden behind on the old car lot. Wikipedia says the house is 85% original. The NPS says that now only the front room (a shop) and the kitchen exhibits are open; the upper floors are closed.',
   'The last pre-Revolution building in the capital, between the shops of M Street.',
@@ -85,7 +85,7 @@ N('mount-zion-female-union-band-cemetery','Mount Zion and Female Union Band Soci
   'The oldest Black burial grounds in Georgetown.',
   accn='Owned by the trustees of the two cemeteries; the Mount Zion - Female Union Band Historic Memorial Park, Inc. cares for them, and its page invites visitors to help keep the grounds tidy. Entrance on Mill Road NW off 27th Street NW (Wikipedia). Hours not checked. Street parking only.',
   links=[W('Mount Zion Cemetery (Washington, D.C.)'),['Mount Zion - Female Union Band Historic Memorial Park','https://www.mtzion-fubs.org/']],brick='?'),
-N('tudor-place','Tudor Place','Washington','dc','landmark','standing',38.91147,-77.06304,'exact','public','walk','','1794–1816',
+N('tudor-place','Tudor Place','Washington','dc','landmark','standing',38.91147,-77.06304,'exact','open','walk','','1794–1816',
   'A Federal house on Georgetown Heights. The merchant Francis Lowndes built its two wings after buying the land in 1794; Thomas Peter and Martha Parke Custis Peter, a granddaughter of Martha Washington, bought it and had William Thornton, architect of the Capitol, design the centre block and the links to the wings (Wikipedia gives 1815 for its completion). The family lived there until it opened as a museum in October 1988.',
   'The house in buff stucco over brick, with its domed porch, in five and a half acres of garden. Guided tours only inside, with a show of George and Martha Washington\'s belongings; the garden is self-guided.',
   'Martha Washington\'s granddaughter\'s house, with the family\'s things still in it.',
@@ -98,7 +98,7 @@ N('holt-house-dc','Holt House','Washington','dc','landmark','standing',38.92507,
   accn='Smithsonian Institution, on the grounds of the National Zoo (3001 Connecticut Avenue NW). The Zoo\'s page: grounds open 8 a.m. to 4 p.m., last entry 3 p.m.; entry is free but a pass must be reserved for every visitor; parking is charged. The house is closed.',
   links=[W('Holt House (Washington, D.C.)'),['Smithsonian National Zoo: visit','https://nationalzoo.si.edu/visit']],conf='mixed',brick='some'),
 # ---- The Mall and Capitol Hill ----
-N('lockkeepers-house-dc',"Lockkeeper's House",'Washington','dc','canal','standing',38.89183,-77.03988,'exact','public','walk','canal','1837',
+N('lockkeepers-house-dc',"Lockkeeper's House",'Washington','dc','canal','standing',38.89183,-77.03988,'exact','open','walk','canal','1837',
   'Built in 1837 for the keeper of the lock where the C&O Canal\'s extension met the Washington City Canal on what is now Constitution Avenue; he collected tolls and kept the canal. The canal was abandoned by 1855 and the house became a squatters\' tenement, then a Park Police station from 1903. It was moved west in 1915, sat empty for some forty years, and in 2017-18 was moved again, about 36 feet south and 35 feet west, and restored by the Trust for the National Mall with the NPS; it opened in September 2018.',
   'The small house (about 540 square feet, the Trust says) with its chimneys rebuilt to the pre-1915 look, an exhibit and a six-minute film inside. The NPS page calls it a two-storey brick building, but Wikipedia\'s August 2018 photograph shows walls of coursed grey and buff stone under red brick chimneys and dormers in the roof. It is the oldest building on the National Mall.',
   'The last trace of the canal that once ran down Constitution Avenue.',

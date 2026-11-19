@@ -44,7 +44,7 @@ N('first-parish-church-site-dover-point','First Parish meetinghouse site, Dover 
   'Kept by the First Parish Church congregation. Seen from Dover Point Road; whether visitors may walk onto it, and where to park, was not checked.',
   [W('First Parish Church Site-Dover Point')]),
 # ---- Standing: Dover ----
-N('damm-garrison-dover','William Damm Garrison, Woodman Museum','Dover','nhl','fort','standing',43.18972,-70.87417,'site','public','drive','forts',
+N('damm-garrison-dover','William Damm Garrison, Woodman Museum','Dover','nhl','fort','standing',43.18972,-70.87417,'site','open','drive','forts',
   'c.1675',
   'A fortified log house built about 1675 by Deacon John Damm and his son William, one of fourteen known from colonial Dover. The Damm, Drew, Nute and Hayes families lived in it for nearly two hundred years. Ellen Rounds gave it to the Woodman Institute in 1915, and it was moved to the museum grounds on rollers.',
   'The garrison house under a sheltering colonnade between the Woodman House and the Hale House, with two floors of colonial galleries inside.',
@@ -118,7 +118,7 @@ N('milton-town-house','Milton Town House','Milton','nhl','civic','standing',43.4
   '',
   'Town of Milton. Seen from the road; open only for town meetings and events (not checked).',
   [W('Milton Town House')]),
-N('nh-farm-museum-milton','New Hampshire Farm Museum (Plumer-Jones Farm)','Milton','nhl','landmark','standing',43.46056,-70.99167,'site','public','drive','',
+N('nh-farm-museum-milton','New Hampshire Farm Museum (Plumer-Jones Farm)','Milton','nhl','landmark','standing',43.46056,-70.99167,'site','open','drive','',
   '1782–',
   'Joseph and Beard Plumer settled this ridge in the 1780s. Joseph Plumer\'s house of 1782, possibly one of the first frame houses in the area, survives as one link in a chain of connected farm buildings ending in the Great Barn, one of the biggest barns in southeastern New Hampshire.',
   'The connected farmstead, the three-story Great Barn full of farm machinery, sleighs and wagons, working fields, animals and a nature trail.',

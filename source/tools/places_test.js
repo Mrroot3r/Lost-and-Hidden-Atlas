@@ -98,6 +98,44 @@ const { chromium } = require('playwright');
     const other=await p.evaluate(()=>{ const s=window.__atlasNM.sites().find(x=>!x.tip&&!x.mine); location.hash='#'+s.id; return s.id; }); await p.waitForTimeout(600);
     ok('a place a session found has no such badge',await p.evaluate(()=>!document.querySelector('#v-detail .tag.tipd')),other);
     ok('reader tips: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- Access "Open to visitors", and the Hours row under it (November 2026): a museum, an inn or a church that opens is not
+  //      "Public land or street"; the page says the hours research read and how old they are, and links to today's.
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(400);
+    const S=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.map(x=>({id:x.id,name:x.name,acc:x.acc,cat:x.cat,st:x.st,hrs:x.hrs||'',nw:x.new||''})));
+    const open=S.filter(x=>x.acc==='open');
+    ok('several hundred places are "Open to visitors"',open.length>=300,open.length);
+    ok('the old landmark pins that are museums or theatres are among them',['lm-schuyler-mansion','lm-proctors','lm-olana'].every(i=>!S.find(x=>x.id===i)||S.find(x=>x.id===i).acc==='open'));
+    await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+    const chips=await p.evaluate(()=>{ const g=[...document.querySelectorAll('#fbody .fgrp')].find(x=>/^Access/.test(x.textContent.trim())); return g?[...g.querySelectorAll('.chip')].map(x=>x.textContent.trim()):[]; });
+    ok('Filters, Access: "Open to visitors" comes second, after public land',chips[0]==='Public land or street'&&chips[1]==='Open to visitors, check hours'&&chips.length===6,chips.join(' | '));
+    await p.evaluate(()=>{ [...document.querySelectorAll('#fbody .chip')].find(x=>x.textContent.trim()==='Open to visitors, check hours').click(); }); await p.waitForTimeout(350);
+    const v=await p.evaluate(()=>window.__atlasNM.visible().map(s=>s.acc));
+    ok('that filter lists the open-to-visitors places and no others',v.length>=open.length-8&&v.length<=open.length&&v.every(a=>a==='open'),v.length+' of '+open.length);
+    await p.evaluate(()=>{ [...document.querySelectorAll('#fbody .chip')].find(x=>x.textContent.trim()==='Open to visitors, check hours').click(); const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(250);
+    const row=async id=>{ await p.evaluate(id=>{ location.hash='#'+id; },id); await p.waitForTimeout(550);
+      return p.evaluate(()=>{ const kv=document.querySelector('#v-detail dl.kv'), dts=[...kv.querySelectorAll('dt')], g=t=>{ const d=dts.find(x=>x.textContent===t); return d?d.nextElementSibling:null; }, h=g('Hours'), a=h&&h.querySelector('a');
+        return {acc:(g('Access')||{}).textContent,order:dts.map(x=>x.textContent).join(),has:!!h,txt:h?((h.querySelector('span')||{}).textContent||''):'',when:h?((h.querySelector('small')||{}).textContent||''):'',link:a?a.textContent:'',href:a?a.href:'',target:a?a.target:'',fits:h?h.getBoundingClientRect().right<=innerWidth:true}; }); };
+    const noh=open.find(x=>!x.hrs&&x.st==='standing'); let r=await row(noh.id);
+    ok('an open-to-visitors place says so beside Access',r.acc==='Open to visitors, check hours',noh.id+': '+r.acc);
+    ok('Hours comes straight after Access',/^Access,Hours,/.test(r.order),r.order);
+    ok('with no hours on record it offers a look-up of today’s by the place’s name, in a new tab',r.has&&r.txt===''&&r.link==='Today’s hours in Google Maps'&&r.href.indexOf('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(noh.name))===0&&r.target==='_blank',r.link+' | '+r.href.slice(0,110));
+    const wh=S.find(x=>x.hrs&&x.nw);
+    if(!wh) ok('some place has its hours on record',false);
+    else { r=await row(wh.id);
+      ok('a place with hours on record shows them, word for word',r.has&&r.txt===wh.hrs,wh.id+': '+r.txt.slice(0,80));
+      ok('and says which month they were read, since hours change',/^As read [A-Z][a-z]+ 20\d\d\.$/.test(r.when),r.when);
+      ok('and still links to today’s',r.link==='Today’s hours in Google Maps'&&r.fits,r.link); }
+    ok('recorded hours are short enough to be a row, not a paragraph',S.every(x=>x.hrs.length<=180),S.filter(x=>x.hrs.length>180).map(x=>x.id).join());
+    const pv=S.find(x=>x.acc==='view'&&x.cat==='landmark'&&x.st==='standing'&&!x.hrs); r=await row(pv.id);
+    ok('a private house seen from the street has no Hours row',!r.has&&/^Access,Effort/.test(r.order),pv.id+': '+r.order);
+    const ch=S.find(x=>x.acc==='view'&&x.cat==='worship'&&x.st==='standing'&&!x.hrs); r=await row(ch.id);
+    ok('a standing church seen from the street still gets the look-up: services are when it is open',r.has&&r.txt===''&&r.link==='Today’s hours in Google Maps',ch.id);
+    const ru=S.find(x=>x.acc==='public'&&x.st==='ruins'&&!x.hrs); r=await row(ru.id);
+    ok('a ruin on public land has no Hours row',!r.has,ru.id);
+    ok('open to visitors and hours: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the kinds of place: one list in the app, every place's kind is on it, and "Places of worship" has its own chip, shortcut and colour
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); });

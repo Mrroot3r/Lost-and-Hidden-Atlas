@@ -29,13 +29,13 @@ WO_ROAD='White Oaks is about 3 miles off U.S. 54 on State Road 349, north-east o
 FS_ACC=['Fort Stanton Inc.: hours and admission','https://fortstanton.org/information']
 
 PLACES=[
-N('lincoln-county-courthouse-lincoln-nm','Old Lincoln County Courthouse (Murphy-Dolan Store)','Lincoln','nm','civic','standing',33.49372,-105.39068,'site','public','walk','','1874',
+N('lincoln-county-courthouse-lincoln-nm','Old Lincoln County Courthouse (Murphy-Dolan Store)','Lincoln','nm','civic','standing',33.49372,-105.39068,'site','open','walk','','1874',
   'Built in 1874 as the store and home of L. G. Murphy & Co., the headquarters of the Murphy-Dolan side in the Lincoln County War of 1878. The firm failed and the building became the county courthouse in 1880, serving as the county\'s government and court until 1913. Billy the Kid broke out of the jail here in April 1881, killing his two guards.',
   'A two-storey, L-shaped building of stuccoed adobe brick with a hipped shingle roof and a two-storey porch across the front (1974 nomination). It is a museum of the state historic site. Interior fabric not checked.',
   'The building Billy the Kid shot his way out of in 1881.',
   LINC_ACC,
   [LINC_NR,LINC_W,LINC_CLIO,HM(119775,'Murphy-Dolan Store')],brick='no'),
-N('tunstall-store-lincoln-nm','Tunstall Store','Lincoln','nm','civic','standing',33.49277,-105.38705,'site','public','walk','','1877–1878',
+N('tunstall-store-lincoln-nm','Tunstall Store','Lincoln','nm','civic','standing',33.49277,-105.38705,'site','open','walk','','1877–1878',
   'The store of the Englishman John H. Tunstall and the lawyer Alexander McSween, rivals of the Murphy-Dolan store; Tunstall\'s killing in February 1878 set off the Lincoln County War, and McSween was killed in the July battle. The marker gives the building as 1877, the nomination as 1878. The store was looted in the war but went on trading, notably under John M. Penfield.',
   'A single-storey U-shaped building of plastered adobe with a gable roof and a porch the length of the south front; a later addition forms the west arm (nomination). A photograph caption in the Los Alamos Daily Post shows a store interior open to visitors. Interior fabric not checked.',
   '',
@@ -53,7 +53,7 @@ N('san-juan-church-lincoln-nm','San Juan Bautista Church','Lincoln','nm','worshi
   '',
   'In Lincoln\'s historic district, on U.S. 380; who owns it now and whether it is open was not checked: see it from the road.',
   [LINC_NR,HM(45970,'San Juan Church')],brick='no'),
-N('fort-stanton-nm','Fort Stanton','Fort Stanton','nm','fort','standing',33.4952,-105.5255,'site','public','walk','','1855–1896',
+N('fort-stanton-nm','Fort Stanton','Fort Stanton','nm','fort','standing',33.4952,-105.5255,'site','open','walk','','1855–1896',
   'An Army post founded in 1855 against the Mescalero Apaches; Confederates held it in 1861, and Kit Carson, John J. Pershing and Buffalo Soldiers of the 9th Cavalry served here. The Army left in 1896, and in 1899 it became the country\'s first federal tuberculosis sanatorium; in the Second World War German seamen from the liner Columbus were held here. It is now a state historic site.',
   'Stone buildings round the parade ground: the nomination says a dozen or more predate 1896 and several keep walls from the 1850s, with one adobe building of the fort period. The museum is in an 1855 barracks that became the hospital\'s administration building. The Fort Administration Building marker says most buildings began in 1855 as single-storey stone; it was raised a storey for the hospital and had a theatre upstairs.',
   'A frontier fort that became a TB hospital and a wartime internment camp.',
@@ -77,7 +77,7 @@ N('cedarvale-cemetery-white-oaks-nm','Cedarvale Cemetery','White Oaks','nm','bur
   '',
   'Ownership not checked; visitors are named by Discover Ruidoso. Keep to the cemetery and respect the graves. '+WO_ROAD,
   [WO_NR,WO_W,HM(280155,'White Oaks')],brick='?'),
-N('no-scum-allowed-saloon-white-oaks-nm','No Scum Allowed Saloon','White Oaks','nm','civic','standing',33.7503,-105.73643,'exact','public','drive','','',
+N('no-scum-allowed-saloon-white-oaks-nm','No Scum Allowed Saloon','White Oaks','nm','civic','standing',33.7503,-105.73643,'exact','open','drive','','',
   'The one saloon of the old gold camp still open, in a building Discover Ruidoso calls a hundred years old and made of brick. Its date of building was not found in any source opened.',
   'A brick building on the main road through White Oaks; inside not checked.',
   '',

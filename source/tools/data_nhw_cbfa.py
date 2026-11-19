@@ -38,7 +38,7 @@ N('piermont-bridge-old-pier','Piermont Bridge and the 1875 bridge pier','Piermon
   'Carries NH 25 to Bradford, Vermont (VT 25); public road and sidewalk. Park in Piermont village and walk out; there is no lot at the bridge.',
   [W('Piermont Bridge')],brick='no'),
 # ---- Standing ----
-N('enfield-shaker-village','Enfield Shaker Village and Great Stone Dwelling','Enfield','nhw','inst','standing',43.61995,-72.14621,'site','public','drive','',
+N('enfield-shaker-village','Enfield Shaker Village and Great Stone Dwelling','Enfield','nhw','inst','standing',43.61995,-72.14621,'site','open','drive','',
   '1793–1923',
   'Shakers settled on the shore of Mascoma Lake in 1793, built a meetinghouse that year and grew to nearly 300 members by 1840. Their later buildings were granite; the Great Stone Dwelling, built 1837 to 1841 for the Church Family, was the largest dwelling north of Boston and is the largest Shaker building. The Shakers left for Canterbury in 1923 and the Missionaries of La Salette bought most of the village in 1927 for a seminary. The state owns the core, and the Enfield Shaker Museum has kept it since 1986.',
   'The six-storey Great Stone Dwelling with its granite walls and slate roof, the Brethren Stone Shop, the laundry and dairy, and restored gardens: eight Shaker buildings in all. The museum interprets the Shaker years and the La Salette years. Overnight guests sleep in the original Shaker rooms of the Great Stone Dwelling. The South Family cemetery, 1.1 miles south on NH 4A, keeps its original headstones.',
@@ -89,7 +89,7 @@ N('ashland-gristmill-dam','Ashland Gristmill and Dam','Ashland','nhw','industry'
   '',
   'Private offices; see the mill and dam from Main Street and the bridge.',
   [W('Ashland Gristmill and Dam')],brick='no'),
-N('ashland-railroad-station','Ashland Railroad Station','Ashland','nhw','rail','standing',43.69056,-71.63444,'site','public','drive','stations',
+N('ashland-railroad-station','Ashland Railroad Station','Ashland','nhw','rail','standing',43.69056,-71.63444,'site','open','drive','stations',
   '1869',
   'The Boston, Concord and Montreal Railroad came through in 1849 and built this passenger station in 1869, apart from its freight depot; it was remodelled in 1891. The building was restored to its 1891 look in 1997 and 1998 and has been a railroad museum of the Ashland Historical Society since 1999.',
   'A single-storey wooden station with a hipped slate roof on wide eaves held up by knee braces, the agent\'s bay on the track side. The rail line beside it is still in place.',
