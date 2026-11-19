@@ -16,7 +16,7 @@ LCHAHRS=('The Lincoln County Historical Association\'s own pages could not be re
          'Exact hours and fees not checked.')
 PLACES=[
 # ---- Forts, ruins and traces ----
-N('fort-edgecomb','Fort Edgecomb blockhouse','Edgecomb','mec','fort','standing',43.99357,-69.65668,'exact','public','walk','forts','1808–1818',
+N('fort-edgecomb','Fort Edgecomb blockhouse','Edgecomb','mec','fort','standing',43.99357,-69.65668,'exact','open','walk','forts','1808–1818',
   'A fort built in 1808–1809 at the south end of Davis Island to guard Wiscasset, then an important port. Its main weapon was a water battery of five cannon in tiered bastions; the octagonal two-storey wooden blockhouse, its upper floor wider than the lower, held two carronades. It was manned until 1818 and brought back into use in the Civil War.',
   'The blockhouse stands on the high point of the site with musket loopholes on the ground floor, gun ports above and a watchtower reached through the attic; visitors may climb to the watchtower when the site is open. The earthwork bastions of the water battery have been restored. Interpretive panels and picnic tables.',
   'An 1809 blockhouse that is wider at the top than the bottom.',
@@ -91,7 +91,7 @@ N('harrington-meeting-house','Harrington Meeting House','Bristol','mec','worship
   '278 Harrington Road. A 2024 notice gave Monday, Wednesday and Friday afternoons, 2 to 4:30 p.m., from late June through August; this year\'s hours not checked. The cemetery is open ground; at other times see the building from outside.',
   [W('Harrington Meeting House'),['Wiscasset Newspaper: Bristol meeting house now open','https://wiscassetnewspaper.com/node/187954']],
   brick='no'),
-N('old-german-meeting-house','Old German Meeting House and cemetery','Waldoboro','mec','worship','standing',44.0899,-69.3886,'site','view','drive','cemeteries',
+N('old-german-meeting-house','Old German Meeting House and cemetery','Waldoboro','mec','worship','standing',44.0899,-69.3886,'site','open','drive','cemeteries',
   '1772',
   'Waldoboro was settled by four shiploads of German immigrants between 1740 and 1753. Their Lutheran church was framed in 1772 by the ferry landing on the east side of the Medomak, replacing a log church of 1763. In the winter of 1795 it was taken down and moved across the river to this hill, and the inside was finished and painted by 1804. Andrew Wyeth painted its interior in 1974.',
   'Box pews left unpainted, walls and woodwork above them painted green, a large gallery mostly of box pews, and a porch with three outside doors and two stairs. The German burying ground lies around it.',
@@ -117,7 +117,7 @@ N('st-patricks-newcastle','St. Patrick\'s Church, Damariscotta Mills','Newcastle
   [W("St. Patrick's Catholic Church (Newcastle, Maine)"),['Bangor Daily News: restoration (2022)','https://www.bangordailynews.com/2022/07/10/bdn-maine/st-patrick-church-in-newcastle-to-celebrate-restoration-and-214th-anniversary-on-july-17/']],
   th=[44.05874,-69.53337],thn='Lot beside the church, Cottril Road (OpenStreetMap)',brick='yes'),
 # ---- Court, jail, school and houses ----
-N('pownalborough-courthouse','Pownalborough Court House','Dresden','mec','civic','standing',44.10672,-69.76731,'exact','public','walk','',
+N('pownalborough-courthouse','Pownalborough Court House','Dresden','mec','civic','standing',44.10672,-69.76731,'exact','open','walk','',
   '1761',
   'Built in the early 1760s on the ground of Fort Shirley as the first court house of Lincoln County, set up in 1760. It is the only colonial-era courthouse left in Maine. John Adams argued a case here as a young lawyer. The fort commander Samuel Goodwin lived in it, and his descendants until the 1930s; the historical society bought it in 1954.',
   'Three-storey clapboard block under a hip roof with a one-storey wing, above the Kennebec. Original wide floorboards; never fitted with electricity or plumbing. An old cemetery on the grounds holds veterans of three wars, and a trail system, part of it built to ADA standard, runs through the land.',
@@ -125,7 +125,7 @@ N('pownalborough-courthouse','Pownalborough Court House','Dresden','mec','civic'
   '23 Courthouse Road, off Route 128, Dresden. Lincoln County Historical Association museum; admission charged. ' + LCHAHRS + ' The trails are open to all.',
   [W('Pownalborough Courthouse'),LCHA25,LCHA19],
   conf='mixed',brick='no'),
-N('lincoln-county-old-jail','Lincoln County Old Jail, Wiscasset','Wiscasset','mec','civic','standing',44.01048,-69.66198,'exact','public','walk','',
+N('lincoln-county-old-jail','Lincoln County Old Jail, Wiscasset','Wiscasset','mec','civic','standing',44.01048,-69.66198,'exact','open','walk','',
   '1811–1953',
   'Authorized by the county in 1807 and built by 1811, this was one of Maine\'s first jails and served as the state\'s penitentiary from 1820 to 1824. It held prisoners until 1953 and was sold to the historical society the next year.',
   'A three-storey granite cell block with granite floors and walls inside: twelve cells off a central hall on each floor, eleven with heavy barred windows and one windowless for solitary, and debtors\' rooms on the top floor. The two-storey brick jailer\'s house, Federal style, is attached at one end. The grounds run down toward the Sheepscot, where there is a short trail.',
@@ -133,7 +133,7 @@ N('lincoln-county-old-jail','Lincoln County Old Jail, Wiscasset','Wiscasset','me
   '133 Federal Street (Route 218), Wiscasset. Lincoln County Museum and Old Jail, run by the Lincoln County Historical Association. ' + LCHAHRS,
   [W('Wiscasset Jail and Museum'),LCHA25,LCHA19],
   conf='mixed',brick='some'),
-N('chapman-hall-house','Chapman-Hall House','Damariscotta','mec','civic','standing',44.032,-69.52926,'site','public','walk','',
+N('chapman-hall-house','Chapman-Hall House','Damariscotta','mec','civic','standing',44.032,-69.52926,'site','open','walk','',
   '1754',
   'Built in 1754 by Nathaniel Chapman, a housewright from Ipswich, Massachusetts, who came to build houses for the first settlers and at one time owned all of what is now downtown Damariscotta. It is the oldest house in the town. Local people saved it from demolition in 1960 and it was restored to its 18th-century look under Abbott Lowell Cummings.',
   'A one-storey Cape with unpainted wooden shingles and a big central chimney. Inside: exposed beams, panelled fireplaces and period plaster. A house museum since the 1960s, since 2008 run by the Lincoln County Historical Association.',
@@ -158,7 +158,7 @@ N('pemaquid-point-light','Pemaquid Point Light','Bristol','mec','light','standin
   'Pemaquid Point Lighthouse Park, Bristol Road, a Town of Bristol park (the town\'s page for it could not be opened). Park facilities open early May to the end of October with a small entrance fee; the grounds are open year-round for sightseeing. The Fishermen\'s Museum is free, daily 9 to 5 in the season. Volunteer docents open the tower mid-May to mid-October (Wikipedia). The ledges below are wet and slippery. (The federal public-land map marks the light station closed; the museum\'s page says the park grounds are open.)',
   [W('Pemaquid Point Light'),['The Fishermen\'s Museum','https://www.thefishermensmuseum.org/?p=8']],
   th=[43.83730,-69.50655],thn='Lighthouse park lot',brick='no'),
-N('thompson-ice-house','Thompson Ice House','South Bristol','mec','industry','standing',43.87889,-69.56056,'exact','public','drive','',
+N('thompson-ice-house','Thompson Ice House','South Bristol','mec','industry','standing',43.87889,-69.56056,'exact','open','drive','',
   '1826',
   'Asa Thompson began cutting ice from the pond here in 1826 and his family kept the business going until 1985. In 1987 Herbert Thompson gave the property to a non-profit on condition that ice still be cut the old way. It is believed to be the only working ice-harvesting operation in Maine.',
   'A one-storey ice house of unpainted horizontal pine boards with a nine-inch sawdust-filled gap in the walls, big doors on both sides, and a channel on the pond side for floating ice cakes in. Its building date is not known. Volunteers cut ice from Thompson Pond each February and use it for ice cream in July.',

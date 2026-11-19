@@ -7,14 +7,14 @@ _C=re.findall(r"(\w+):\['([^']+)','#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})'\]",
 CAT={k:n for k,n,r,g,b in _C}; COL={k:'ff'+b+g+r for k,n,r,g,b in _C}
 ST={'ruins':'Ruins','traces':'Traces','standing':'Standing','marker':'Marker only','gone':'Nothing visible','water':'Under water'}
 PREC={'exact':'Exact','site':'On site','area':'Approximate'}
-ACC={'public':'Public land or street','view':'View from the public way','ask':'Ask permission first','permit':'Permit required','boat':'On the water'}
+ACC=dict(re.findall(r"(\w+):'([^']*)'",re.search(r'const ACC=\{[^\n]*?\};',open(R+'src/app.js',encoding='utf-8').read()).group(0)))      # the access types, likewise
 EFF={'drive':'Drive-up','walk':'Short walk','hike':'Hike','boat':'Boat or shore view'}
 with open(R+'dist/lost-hidden-atlas-places.csv','w',newline='',encoding='utf-8-sig') as f:
-    w=csv.writer(f); w.writerow(['Name','Town','Years','Kind','What is left','Pin accuracy','Latitude','Longitude','Access','Effort','Parking latitude','Parking longitude','Minutes from Albany','Minutes from Schenectady','Minutes from Troy','Minutes from Saratoga Springs','Verified','Changing now','Old USGS map year','What was here','Look for','Access notes','Pin evidence','Google Maps','Sources'])
+    w=csv.writer(f); w.writerow(['Name','Town','Years','Kind','What is left','Pin accuracy','Latitude','Longitude','Access','Effort','Parking latitude','Parking longitude','Minutes from Albany','Minutes from Schenectady','Minutes from Troy','Minutes from Saratoga Springs','Verified','Changing now','Old USGS map year','What was here','Look for','Access notes','Pin evidence','Google Maps','Sources','Hours'])
     TM=json.load(open(R+'build/topo/meta.json'))
     for s in S:
         th=s.get('th') or ['','']
-        w.writerow([s['name'],s['town'],s.get('years',''),CAT[s['cat']],ST[s['st']],PREC[s['prec']],s['lat'],s['lon'],ACC[s['acc']],EFF[s['eff']],th[0],th[1],s['dt'].get('alb',[''])[0],s['dt'].get('sch',[''])[0],s['dt'].get('troy',[''])[0],s['dt'].get('sar',[''])[0],{'verified':'Verified','lead':'Lead','mixed':'Partly verified','reference':'Reference'}[s['conf']],'Yes' if s.get('now') else '',(TM.get(s['id']) or {}).get('y',''),s.get('story',''),s.get('look',''),s.get('accn',''),s.get('pn',''),f"https://www.google.com/maps/search/?api=1&query={s['lat']},{s['lon']}",' | '.join(l[1] for l in s.get('links',[]))])
+        w.writerow([s['name'],s['town'],s.get('years',''),CAT[s['cat']],ST[s['st']],PREC[s['prec']],s['lat'],s['lon'],ACC[s['acc']],EFF[s['eff']],th[0],th[1],s['dt'].get('alb',[''])[0],s['dt'].get('sch',[''])[0],s['dt'].get('troy',[''])[0],s['dt'].get('sar',[''])[0],{'verified':'Verified','lead':'Lead','mixed':'Partly verified','reference':'Reference'}[s['conf']],'Yes' if s.get('now') else '',(TM.get(s['id']) or {}).get('y',''),s.get('story',''),s.get('look',''),s.get('accn',''),s.get('pn',''),f"https://www.google.com/maps/search/?api=1&query={s['lat']},{s['lon']}",' | '.join(l[1] for l in s.get('links',[])),s.get('hrs','')])
 e=html.escape
 k=['<?xml version="1.0" encoding="UTF-8"?>','<kml xmlns="http://www.opengis.net/kml/2.2"><Document>','<name>Lost &amp; Hidden Atlas</name>','<description>Lost and hidden places across upstate New York, Massachusetts and Rhode Island. Built '+__import__('datetime').date.today().strftime('%B %-d, %Y')+'.</description>']
 for c,col in COL.items():
@@ -25,6 +25,7 @@ for c,label in CAT.items():
         if s['cat']!=c: continue
         d=[f"<b>{e(s['town'])}</b>"+(f" · {e(s['years'])}" if s.get('years') else ''),f"{ST[s['st']]} · Pin: {PREC[s['prec']].lower()} · {ACC[s['acc']]} · {EFF[s['eff']]}",e(s.get('story',''))]
         if s.get('look'): d.append('<b>Look for:</b> '+e(s['look']))
+        if s.get('hrs'): d.append('<b>Hours:</b> '+e(s['hrs']))
         if s.get('accn'): d.append('<b>Access:</b> '+e(s['accn']))
         if s.get('pn'): d.append('<b>Pin:</b> '+e(s['pn']))
         if s.get('th'): d.append(f"<b>Park at:</b> {e(s.get('thn',''))} ({s['th'][0]}, {s['th'][1]})")

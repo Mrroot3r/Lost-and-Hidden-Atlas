@@ -95,7 +95,7 @@ N('judges-cave-west-rock','Judges Cave','New Haven','ctsw','landmark','standing'
   'Where two of the judges who condemned Charles I hid from his son.',
   'West Rock Ridge State Park (CT DEEP). Open daily 8 a.m. to sunset. Regicide Drive, the 1.6-mile road from Wintergreen Avenue to Judges Cave and the South Overlook, is open to cars daily from Memorial Day weekend to the last weekend in October, 8 a.m. to 6 p.m.; the rest of the year walk it or use the trails from the Lake Wintergreen lot. No fee.',
   [['CT DEEP: West Rock Ridge State Park','https://portal.ct.gov/deep/state-parks/parks/west-rock-ridge-state-park'],W('West Rock Ridge State Park')]),
-N('henry-whitfield-house','Henry Whitfield House','Guilford','ctsw','landmark','standing',41.27775,-72.6764,'site','public','walk','','1639',
+N('henry-whitfield-house','Henry Whitfield House','Guilford','ctsw','landmark','standing',41.27775,-72.6764,'site','open','walk','','1639',
   'A stone house begun in 1639, when English Puritans led by the Reverend Henry Whitfield settled Guilford by agreement with the Menunkatuck band of the Quinnipiac. It also served as a meeting place, a refuge in case of attack and a shelter for travellers. It was remodelled in 1868, opened as Connecticut\'s first state museum in 1899, and restored in 1902 to 1904 and again in the 1930s. It is a National Historic Landmark and a State Archaeological Preserve.',
   'The stone house, much restored, its grounds and the visitor centre with an archaeology exhibit.',
   '',

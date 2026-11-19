@@ -21,14 +21,14 @@ HRTACC=('Historic Richmond Town (Staten Island Historical Society, on city land)
 BATCH={'key':'nyc_opzz','label':'Staten Island, New York City','added':'2026-11-18 15:48'}
 
 PLACES=[
-N('conference-house-tottenville','Conference House (Billop House)','Tottenville','nyc','landmark','standing',40.50313,-74.25322,'exact','public','walk','','c. 1680–',
+N('conference-house-tottenville','Conference House (Billop House)','Tottenville','nyc','landmark','standing',40.50313,-74.25322,'exact','open','walk','','c. 1680–',
   'Christopher Billopp, a Royal Navy captain granted the southern tip of Staten Island, built this two-storey fieldstone manor house around 1680; a map shows a building on the site before 1680. On September 11, 1776 his grandson hosted the Staten Island Peace Conference here, the failed attempt to end the Revolutionary War quickly. The house opened as a museum in 1927. The ground round it, Burial Ridge at Ward\'s Point, is the largest pre-European site in New York City.',
   'The fieldstone house with high gabled end walls that hold the fireplaces and chimney stacks; inside, two parlours off a central hall on the main floor and two bedchambers above (Historic House Trust). The Conference House Association restored the roof, the stairs to the basement, the second floor and the old well. Open inside on weekend afternoons (below). The park runs down to Raritan Bay at the southern tip of New York State.',
   'Where the British offered the Americans a way out in 1776, at the southern tip of New York.',
   'Conference House Park, New York City Parks; the house is run by the Conference House Association. The Historic House Trust gives its hours as Saturday and Sunday, 12 to 4 pm. The mapped lot on the park greenway is about 200 m east of the house.',
   [W('Conference House'),HHT('conference-house','Conference House')],th=[40.50226,-74.25131],thn='Conference House Park lot (greenway)',brick='no'),
 
-N('voorlezers-house-richmond-town','Voorlezer\'s House, Historic Richmond Town','Richmondtown','nyc','civic','standing',40.57142,-74.1475,'exact','public','walk','','1760s (traditionally before 1696)',
+N('voorlezers-house-richmond-town','Voorlezer\'s House, Historic Richmond Town','Richmondtown','nyc','civic','standing',40.57142,-74.1475,'exact','open','walk','','1760s (traditionally before 1696)',
   'A Dutch-style clapboard house long held to be the oldest schoolhouse in the United States, built for the voorlezer, the lay reader who led services and taught school in Dutch settlements. It was traditionally dated before 1696, but Wikipedia says it was more likely built in the 1760s by Jacob Rezeau, whose family owned the land from 1705; the date is not settled. Near demolition by 1936, it was bought by the museum in 1939, restored, and opened in 1942; it became a National Historic Landmark in 1961.',
   'Foundation walls of undressed fieldstone laid in mud and mortar, a massive stone-and-brick chimney at the north-east end, white pine floors of wide boards, a large first-floor room for church services and the upstairs room believed to have been the school, with an extra set of floor beams to carry a crowd. The leaded casement windows were put in at the second restoration (reopened 1985) to match a house of about 1696. One of some thirty old buildings in Historic Richmond Town; the Third County Courthouse (the visitor entrance) and St. Andrew\'s Church are a short walk.',
   'The schoolhouse that was too old by about seventy years.',
@@ -91,7 +91,7 @@ N('swinburne-island-quarantine','Swinburne Island quarantine station','Lower New
   'Gateway National Recreation Area (National Park Service). Both islands are closed to the public as bird and wildlife sanctuaries; landing is not allowed. Seen at a distance from the Staten Island shore (Midland Beach, about 2.5 km away, measured on the map) or from a boat.',
   [W('Swinburne Island'),W('Hoffman Island')],brick='?'),
 
-N('alice-austen-house','Alice Austen House (Clear Comfort)','Rosebank','nyc','landmark','standing',40.61492,-74.06361,'exact','public','walk','','1690s–',
+N('alice-austen-house','Alice Austen House (Clear Comfort)','Rosebank','nyc','landmark','standing',40.61492,-74.06361,'exact','open','walk','','1690s–',
   'A one-room Dutch Colonial house built in the 1690s or early 1700s on the shore of the Narrows, enlarged through the 1800s and remodelled in 1844 by John Haggerty Austen, who named it Clear Comfort. His granddaughter, the photographer Alice Austen, lived here most of her life. The city bought it in 1975 and it opened as a museum in 1985; in 2021 it was the first New York site dedicated to a woman to be recognised by the LGBT historic sites project.',
   'The house and lawn on the water at 2 Hylan Boulevard looking at the Narrows and the bridge; inside, a museum of Austen\'s photographs with guided tours on the hour. What original fabric survives inside was not checked.',
   'A 1690s farmhouse turned Victorian cottage, home to a pioneering photographer.',

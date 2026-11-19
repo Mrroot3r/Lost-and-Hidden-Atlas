@@ -55,7 +55,7 @@ N('graceham-moravian-church','Graceham Moravian Church and parsonage','Graceham'
   accn='An active church at 8231 Rocky Ridge Road (MD 77). Seen from the road; visiting hours not checked. The church grounds are private: ask before parking or walking the graveyard.',
   links=[W('Graceham Moravian Church and Parsonage')],brick='no'),
 # ---- Frederick ----
-N('schifferstadt-frederick','Schifferstadt','Frederick','md','civic','standing',39.42369,-77.42698,'exact','public','drive','','1758',
+N('schifferstadt-frederick','Schifferstadt','Frederick','md','civic','standing',39.42369,-77.42698,'exact','open','drive','','1758',
   'A German colonial stone farmhouse completed in 1758 by the Brunner family, German immigrants who settled the land in 1736 and named it after Klein Schifferstadt in the Rhineland-Palatinate. It is the oldest standing house in Frederick and was made a National Historic Landmark in 2016. The Frederick County Landmarks Foundation keeps it as an architectural museum.',
   'The original stone house. Wikipedia says it was built with two great hearth fireplaces and five-plate cast-iron stoves dated 1758; one stove survives. Enter through the gift shop to the left of the stone house.',
   'The oldest house in Frederick, with its 1758 iron stove.',
@@ -67,7 +67,7 @@ N('hessian-barracks-frederick','Hessian Barracks','Frederick','md','fort','stand
   'Where Hessian prisoners waited out the Revolution.',
   accn='On the campus of the Maryland School for the Deaf, a working school. View from the street; ask the school before going onto the grounds. Hours not checked.',
   links=[W('Hessian Barracks')],brick='no'),
-N('rose-hill-manor-frederick','Rose Hill Manor','Frederick','md','civic','standing',39.43639,-77.40583,'exact','public','drive','','c.1790–1798',
+N('rose-hill-manor-frederick','Rose Hill Manor','Frederick','md','civic','standing',39.43639,-77.40583,'exact','open','drive','','c.1790–1798',
   'The retirement home of Thomas Johnson, Maryland\'s first elected governor and a Supreme Court justice, built in the mid-1790s by his daughter and son-in-law; Wikipedia says work ran eight years from the foundation to occupation about 1798. The land was part of the Tasker\'s Chance tract, settled by German farmers. Frederick County keeps it as a park with a children\'s museum.',
   'A brick house, painted white, on a low fieldstone foundation with brick cellar walls, a two-storey pedimented portico with Doric columns below and Ionic above, a chimney at each gable end, and a kitchen wing with a fireplace and beehive oven (Wikipedia). What original fabric can be seen inside on a tour was not checked.',
   'A first governor\'s retirement house.',

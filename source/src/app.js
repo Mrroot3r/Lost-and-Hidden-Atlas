@@ -20,7 +20,9 @@ const ST={ruins:'Ruins you can see',traces:'Traces: grades, piers, earthworks',s
 const STS={ruins:'Ruins',traces:'Traces',standing:'Standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STRANK={ruins:0,standing:1,traces:2,marker:3,gone:4,water:5};
 const PREC={exact:['Pin on the spot','On the structure or marker itself, within about 30 m.',30],site:['Pin within the site','Inside the documented footprint, within about 150 m.',150],area:['Pin approximate','Right vicinity, but the exact spot is not established. Scout it with the old map and LiDAR first.',500]};
-const ACC={public:'Public land or street',view:'View from the public way',ask:'Ask permission first',permit:'Permit required',boat:'On the water'};
+/* How you get to see it. 'open' is a place you go into, at set times: a museum, a house shown by tour, a working inn or shop, a church that opens.
+   tools/check.py and tools/export.py read this list from here. */
+const ACC={public:'Public land or street',open:'Open to visitors, check hours',view:'View from the public way',ask:'Ask permission first',permit:'Permit required',boat:'On the water'};
 const EFF={drive:'Drive-up',walk:'Short walk',hike:'Hike',boat:'Boat or shore view'};
 const MY={'':'Not started',todo:'Want to scout',scouted:'Scouted online',asked:'Asked the owner',ok:'Have permission',visited:'Visited',filmed:'Filmed',skip:'Skip'};
 /* states, their regions and start cities come from tools/states.py, so a new area needs no change here */
@@ -178,7 +180,7 @@ const F={line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new 
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
 const HAY=new Map(), fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+(s.name2||'')),t:fold(s.town),
-  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,Array.isArray(s.tags)?s.tags.join(' '):s.tags,s.bk==='y'?'red brick':s.bk==='s'?'some red brick':'',s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
+  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,s.bk==='y'?'red brick':s.bk==='s'?'some red brick':'',s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
 let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
@@ -1774,7 +1776,7 @@ function kitDescription(l,stops,ch){ const tl=trimmed(l)||l, out=[], first=x=>{ 
     stops.forEach(o=>{ const s=o.s; out.push('• '+s.name+(s.town?', '+s.town:'')+(s.years?' ('+s.years+')':'')+((s.hook||s.story)?': '+(s.hook||first(s.story)):'')); }); out.push(''); }
   if(ch.length>=3){ out.push('Chapters',kitChapText(ch),''); }
   out.push('On foot: '+fmtMi(trackMi(tl.pts),1)+' in '+fmtMin(Math.max(1,Math.round(((tl.t1||tl.t0)-tl.t0)/60)))+'.');
-  const acc=stops.filter(o=>o.s.accn||ACC[o.s.acc]); if(acc.length){ out.push('','Before you go'); acc.forEach(o=>out.push(('• '+o.s.name+': '+(ACC[o.s.acc]||'')+(o.s.accn?(ACC[o.s.acc]?'. ':'')+first(o.s.accn):'')).replace(/[.\s]*$/,'.'))); }
+  const acc=stops.filter(o=>o.s.accn||ACC[o.s.acc]); if(acc.length){ out.push('','Before you go'); acc.forEach(o=>out.push(('• '+o.s.name+': '+(ACC[o.s.acc]||'')+(o.s.accn?(ACC[o.s.acc]?'. ':'')+first(o.s.accn):'')).replace(/[.\s]*$/,'.')+(o.s.hrs?' Hours: '+o.s.hrs.replace(/[.\s]*$/,'.'):''))); }
   const src=stops.filter(o=>Array.isArray(o.s.links)&&o.s.links.length); if(src.length){ out.push('','Sources and further reading'); src.forEach(o=>{ out.push(o.s.name+':'); o.s.links.forEach(k=>out.push('  '+k[0]+' '+k[1])); }); }
   if(String(pref('kitSign')||'').trim()) out.push('',String(pref('kitSign')).trim());
   out.push('','Route recorded with the Lost & Hidden Atlas: '+KITSITE+(stops.length?'#'+stops[0].s.id:''),'Route map: base map from USGS The National Map.');
@@ -2112,6 +2114,16 @@ function nameFit(){ const v=$('#v-detail'), h=v&&v.querySelector('.dhead h2'), i
   if(cut&&!old) intro.prepend(el('p',{class:'fullname',text:h.textContent})); else if(!cut&&old) old.remove(); }
 window.addEventListener('resize',debounce(()=>{ if(view==='detail') nameFit(); },150));
 /* "on November 18, 2026" for a place that began as a reader's tip (s.tip is that day), or nothing */
+/* When it is open. s.hrs is what a source said when the place was written up, so the row says which month that was (the batch's own date):
+   hours change. A place that takes visitors also gets a search for it by name, where Google Maps shows today's hours; so does a standing
+   place of worship that is only seen from the street, because its services are when it is open. Other places have no Hours row. */
+const takesVisitors=s=>s.acc==='open'||(s.cat==='worship'&&s.st==='standing'&&s.acc!=='ask'&&!s.mine);
+function hoursAsOf(s){ const b=s.new&&BATCHES.find(x=>x.key===s.new), m=b&&/^(\d{4})-(\d\d)/.exec(b.added||''); return m?new Date(+m[1],+m[2]-1,1).toLocaleDateString(undefined,{month:'long',year:'numeric'}):''; }
+function hoursDd(s){ if(!s.hrs&&!takesVisitors(s)) return null;
+  const dd=el('dd',{class:'hrs'}), when=s.hrs?hoursAsOf(s):'';
+  if(s.hrs) dd.append(el('span',{text:s.hrs}));
+  dd.append(el('div',null,when?el('small',{text:'As read '+when+'.'}):null,when?' ':'',ext('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([s.name,s.town,STATE[REG_STATE[s.reg]]].filter(Boolean).join(', ')),'Today\u2019s hours in Google Maps')));
+  return dd; }
 const tipDay=s=>{ const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(s.tip||''); return m?' on '+new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):''; };
 function renderDetail(s){
   const v=$('#v-detail'); v.textContent=''; v.scrollTop=0;
@@ -2149,9 +2161,11 @@ function renderDetail(s){
   /* with the position on, leave the origin out: Google Maps then starts from where the phone is */
   const gd='https://www.google.com/maps/dir/?api=1'+(nearAt||!homePicked()?'':'&origin='+H.lat+','+H.lon)+'&destination='+dst.lat+','+dst.lon+'&travelmode=driving';
   const cbtn=el('button',{class:'btn sm',type:'button'},'Copy'); cbtn.addEventListener('click',()=>copy(ll(p),cbtn));
+  const hrs=hoursDd(s);
   v.append(el('div',{class:'sec pad'},el('h3',{text:'Getting there'}),times,
     el('dl',{class:'kv',style:'margin-top:8px'},
       el('dt',{text:'Access'}),el('dd',{text:ACC[s.acc]||''}),
+      hrs?el('dt',{text:'Hours'}):null,hrs,
       el('dt',{text:'Effort'}),el('dd',{text:(EFF[s.eff]||'')+(s.th?' from '+(s.thn||'the trailhead'):'')}),
       s.pl?el('dt',{text:'Land'}):null,s.pl?el('dd',null,el('span',{class:'sw',style:'--c:'+(PADC[s.pl[2]]||PADC.UK)[1]}),' '+s.pl[0]+' · '+(PADC[s.pl[2]]||PADC.UK)[0]):null,
       el('dt',{text:'Pin'}),el('dd',null,el('span',{class:'mono',text:ll(p)}),' ',cbtn)),

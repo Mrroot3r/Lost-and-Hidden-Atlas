@@ -11,13 +11,13 @@ def HM(n,t): return ['HMdb: '+t,'https://www.hmdb.org/m.asp?m=%d'%n]
 SHS=['Vermont State Historic Sites: hours of operation','https://historicsites.vermont.gov/hours-operation']
 PLACES=[
 # ---- The lake shore ----
-N('chimney-point-tavern','Chimney Point Tavern','Addison','vtn','hotel','standing',44.03488,-73.42118,'exact','public','drive','','1780s–',
+N('chimney-point-tavern','Chimney Point Tavern','Addison','vtn','hotel','standing',44.03488,-73.42118,'exact','open','drive','','1780s–',
   'Chimney Point juts into Lake Champlain at the narrows opposite Crown Point. The French settled it in 1731 and fortified both shores; after the Revolution Benjamin Paine built a tavern here in the mid-1780s and started a ferry across the lake. Thomas Jefferson and James Madison stayed the night of May 31, 1791 on their northern tour. The Barnes family, owners from 1821, cased the tavern in brick and later ran it as a summer resort; the state bought the point in 1966 and reopened the restored tavern as a museum in 1991.',
   'The 1780s tavern itself, now the Chimney Point State Historic Site museum, with exhibits on the Native American, French and early American people of the point and a restored tavern room (Wikipedia shows its interior). Lake views across to the Crown Point forts and the 2011 Lake Champlain Bridge.',
   'The tavern where Jefferson and Madison slept, at the foot of the Champlain bridge.',
   'A Vermont State Historic Site, 8149 VT Route 17W, Addison: turn left just before the Lake Champlain Bridge. The state\'s page gives it closed for the 2026 season now; it opened on May 22 this year (WCAX), and Wikipedia says the museum is open from late May through Columbus Day. Opening days and admission for 2027 not checked. Free to veterans and active military and their families; picnicking and fishing access on the grounds.',
   [W('Chimney Point, Vermont'),['Vermont State Historic Sites: Chimney Point hours and directions','https://historicsites.vermont.gov/chimney-point/hours-admissions-directions'],SHS,['WCAX: six historic sites open for the season (May 2026)','https://www.wcax.com/2026/05/19/6-vermont-historic-sites-open-season-friday/']],brick='yes'),
-N('john-strong-mansion','John Strong Mansion','Addison','vtn','civic','standing',44.05472,-73.4117,'exact','public','drive','','1795–1796',
+N('john-strong-mansion','John Strong Mansion','Addison','vtn','civic','standing',44.05472,-73.4117,'exact','open','drive','','1795–1796',
   'John Strong, a Connecticut man who came here in 1765, saw his first house burned by the British in the Revolution. He rebuilt it after the war and then put up this large brick Federal house in 1795-96 to replace it. The Vermont Daughters of the American Revolution bought his land in 1934, gave most of it to the state for D.A.R. State Park, and keep the house as a museum.',
   'A two-storey hipped-roof house of five bays with a Palladian window over the door; the porch is an early 1900s addition. Inside, Wikipedia says the central staircase and fireplace surrounds are original; the rooms are set out as period displays, and the 2026 exhibit was the house\'s ten schoolgirl samplers. Open to the public in season.',
   '',
@@ -54,7 +54,7 @@ N('old-stone-blacksmith-shop-cornwall','Old Stone Blacksmith Shop','Cornwall','v
   '',
   'On the west side of VT Route 30, about midway between Ridge Road and Robbins Road (Wikipedia); the pin is on the road there, as the shop could not be picked out from above. Private: see it from the road.',
   [W('Old Stone Blacksmith Shop')],conf='mixed',brick='no'),
-N('frog-hollow-stone-mill','Frog Hollow Stone Mill','Middlebury','vtn','industry','standing',44.01329,-73.17004,'exact','public','drive','','1840',
+N('frog-hollow-stone-mill','Frog Hollow Stone Mill','Middlebury','vtn','industry','standing',44.01329,-73.17004,'exact','open','drive','','1840',
   'Mills worked this bend of Otter Creek from 1789, when a gristmill was built; it turned to cotton in 1812. The present four-storey stone mill went up in 1840 and was burned and rebuilt inside more than once. The town got it in the early 1970s and it was a student art space for Middlebury College until 2019, when the college sold it; it reopened after a year\'s work as a public market, restaurant, event space and four hotel rooms.',
   'A four-storey mill of local stone laid in rough courses, gabled, with loading doors stacked up the middle of the Mill Street front and a hoist boom in the gable. The inside has been refitted, after the fires and the 2019-20 work; open to the public as shops and a restaurant.',
   '',
@@ -85,7 +85,7 @@ N('robert-frost-farm-ripton','Robert Frost Farm (Homer Noble Farm)','Ripton','vt
   'Owned by Middlebury College, down a drive off the north side of VT 125 about 3 miles east of Ripton, ringed by the Green Mountain National Forest. Wikipedia says the grounds are open in daylight; the college\'s own rules not checked.',
   [W('Robert Frost Farm (Ripton, Vermont)'),['Friends of Robert Frost: Ripton','https://frostfriends.org/ripton.html']],brick='no'),
 # ---- Ferrisburgh, Starksboro, New Haven, Leicester ----
-N('rokeby-museum','Rokeby Museum','Ferrisburgh','vtn','landmark','standing',44.22261,-73.23737,'site','public','drive','','1780s–',
+N('rokeby-museum','Rokeby Museum','Ferrisburgh','vtn','landmark','standing',44.22261,-73.23737,'site','open','drive','','1780s–',
   'The Quaker Robinson family farmed here for almost 200 years after Thomas Rowland Robinson bought it in 1793. In the 1830s and 1840s Rowland T. and Rachel Robinson, radical abolitionists, openly sheltered people escaping slavery, and their letters name them; the letters are one of the best records of how the Underground Railroad worked. The farm is a National Historic Landmark and a museum.',
   'The 1814 Federal main house with its 1780s Cape ell, a smokehouse, hen house, outhouse, creamery, tool shed and other farm buildings with exhibits, the foundations of a barn and a school, and trails over the 90-acre grounds.',
   'A safe house of the Underground Railroad whose letters name the people it sheltered.',

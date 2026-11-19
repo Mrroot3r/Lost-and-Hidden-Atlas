@@ -73,7 +73,7 @@ N('stark-covered-bridge','Stark Covered Bridge and Union Church','Stark','nhw','
   'Carries a town road from NH 110 to Northside Road, open to traffic; steel beams give it a 15-ton capacity. Parking not checked.',
   [W('Stark Covered Bridge')],conf='mixed',brick='no'),
 # ---- Standing buildings ----
-N('brick-store-bath','Brick Store','Bath','nhw','town','standing',44.16696,-71.96606,'exact','view','drive','',
+N('brick-store-bath','Brick Store','Bath','nhw','town','standing',44.16696,-71.96606,'exact','open','drive','',
   'c.1804–1814',
   'A two-story brick store in Federal style, said by a 1937 reference work to date from 1804; other records show it standing in 1814. It was damaged by fire in 1824, and the repairs probably added its Greek Revival details. It claims to be the oldest continuously operating general store in the United States, and is the only commercial building left of Bath\'s many Federal brick buildings. It closed for a time, was sold at auction in July 2016 and reopened in July 2017 after a historically minded renovation.',
   'The Federal brick front beside the Bath Covered Bridge. It is a working store, so the inside can be seen when it is open; original interior fabric not checked.',

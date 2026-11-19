@@ -110,7 +110,7 @@ N('belchertown-state-school','Belchertown State School','Belchertown','pv','inst
 N('monson-developmental','Monson Developmental Center','Monson','pv','inst','standing',42.14528,-72.33444,'site','view','drive','','1854–2012',
   'State land since 1854 that housed a string of institutions. The last 31 residents left in 2012, and the state planned to demolish nearly half the buildings.',
   'Brick ward buildings on the hill.','','State property, closed; view from the road.',[W('Monson Developmental Center')]),
-N('springfield-armory','Springfield Armory','Springfield','pv','fort','standing',42.10806,-72.58167,'site','public','drive','forts','1777–1968',
+N('springfield-armory','Springfield Armory','Springfield','pv','fort','standing',42.10806,-72.58167,'site','open','drive','forts','1777–1968',
   'The country\'s main centre for making military firearms from 1777 until it closed.','The Main Arsenal and the fenced armory square.','','National historic site.',[W('Springfield Armory')]),
 N('holyoke-canals','Holyoke Canal System','Holyoke','pv','canal','standing',42.2086,-72.6002,'site','public','walk','canal','1840s on',
   'Three levels of power canals fed from the Holyoke Dam, lined with mills.','Canal walks and mill fronts; many mills are empty.','','Public streets and canal walk.',[W('Holyoke Canal System')]),

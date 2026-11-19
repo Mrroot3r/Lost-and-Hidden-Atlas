@@ -1,9 +1,9 @@
 # Split pins and new entries. p = parent catalogue entry index (links and confidence are inherited when given)
-def N(id,name,town,reg,cat,st,lat,lon,prec,acc,eff,tags,years,story,look='',hook='',accn='',links=None,p=None,conf=None,th=None,thn=None,name2='',brick='',tip='',was=''):
+def N(id,name,town,reg,cat,st,lat,lon,prec,acc,eff,tags,years,story,look='',hook='',accn='',links=None,p=None,conf=None,th=None,thn=None,name2='',brick='',tip='',was='',hours=''):
     # brick: 'yes' red brick is the main thing you see, 'some' part brick (a chimney, an arch, brick over stone), 'no' none or not red, '?' not checked (GUIDE.md section 4)
     # tip: the day a reader sent this place to the Atlas ('2026-11-18'); empty for a place a session found. The app shows "Sent in by a reader" (GUIDE.md sections 4 and 15)
     # was: the id of an older, thinner entry for the same place that this one replaces, 'lm-mabee-farm' (GUIDE.md section 4). The old pin is dropped and a reader's notes move to this one
-    return dict(id=id,name=name,town=town,reg=reg,cat=cat,st=st,lat=lat,lon=lon,prec=prec,acc=acc,eff=eff,tags=tags,years=years,story=story,look=look,hook=hook,accn=accn,links=links or [],p=p,conf=conf,th=th,thn=thn,name2=name2,brick=brick,tip=tip,was=was)
+    return dict(id=id,name=name,town=town,reg=reg,cat=cat,st=st,lat=lat,lon=lon,prec=prec,acc=acc,eff=eff,tags=tags,years=years,story=story,look=look,hook=hook,accn=accn,links=links or [],p=p,conf=conf,th=th,thn=thn,name2=name2,brick=brick,tip=tip,was=was,hours=hours)
 B=[
 N('dudley-observatory-1','First Dudley Observatory site','Albany','alb','inst','gone',42.66471,-73.74935,'site','public','drive','','1856–1893',
   'The first observatory (1856) stood on "Goat Hill," now Dudley Heights in Arbor Hill, until vibration from the railroad below ruined its readings.',
@@ -92,10 +92,10 @@ N('electric-park','Electric Park','Niverville','hud','amuse','gone',42.4535,-73.
   'Electric Park Road keeps the name. The trolley bed is the raised straight embankment just east of the shore, now the Albany–Hudson Electric Trail; the park filled the lobed peninsulas between it and the lake.',
   'A whole amusement park whose only monument is a street sign.',accn='Lakefront lots are private homes. The Albany–Hudson Electric Trail and Electric Park Road are public.',
   links=[['Columbia County Historical Society: Electric Park 1901–1920','https://cchsny.org/?p=747'],['RCDB','https://rcdb.com/10642.htm'],['Postcards (rootsweb)','https://freepages.rootsweb.com/~howardlake/history/amusement7/electricpark.html']],conf='Verified'),
-N('gilboa-museum','Gilboa Museum and fossil forest','Gilboa','cat','town','standing',42.40043,-74.45008,'exact','public','drive','drowned','museum',
+N('gilboa-museum','Gilboa Museum and fossil forest','Gilboa','cat','town','standing',42.40043,-74.45008,'exact','open','drive','drowned','museum',
   'The Gilboa Museum holds photographs and objects from the drowned village, along with stumps of the Devonian fossil forest uncovered when the dam was dug.',
   'Start here for old photographs to match against the reservoir shore.','',accn='Seasonal hours; check before driving.',p=108),
-N('penfield-homestead','Penfield Homestead Museum, Ironville','Crown Point','adk','industry','standing',43.92294,-73.5362,'exact','public','drive','monitor','1828',
+N('penfield-homestead','Penfield Homestead Museum, Ironville','Crown Point','adk','industry','standing',43.92294,-73.5362,'exact','open','drive','monitor','1828',
   'Ironville was the working heart of the Crown Point Iron Company. The Penfield Homestead Museum is the safe starting point for Hammondville, whose shafts and cellar holes lie in the woods to the west.',
   'Museum buildings and the ironworks remains along Putnam Creek.','',accn='Seasonal museum; check hours.',p=126),
 ]

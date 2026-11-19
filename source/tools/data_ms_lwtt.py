@@ -128,7 +128,7 @@ N('jefferson-college-ms','Historic Jefferson College','Washington','ms','civic',
   'Owned by MDAH. Closed to visitors during rehabilitation (MDAH page, read November 2026): look from the public road in Washington and check the MDAH page before going.',
   [W('Jefferson College (Mississippi)'),L('MDAH: Historic Jefferson College','https://mdah.ms.gov/explore-mississippi/historic-jefferson-college')],brick='yes'),
 # ---- Natchez and Church Hill ----
-N('longwood-natchez','Longwood','Natchez','ms','civic','standing',31.53680,-91.40525,'exact','public','drive','','1859–1861',
+N('longwood-natchez','Longwood','Natchez','ms','civic','standing',31.53680,-91.40525,'exact','open','drive','','1859–1861',
   'An octagonal mansion designed by the Philadelphia architect Samuel Sloan in 1859 for the cotton planter Haller Nutt and built in part by enslaved people. Work stopped in 1861 when the Pennsylvania craftsmen left for the Union army; only nine rooms of the basement floor, of 32 planned, were ever finished, and the family lived in them. Nutt died in 1864. On July 4, 1867 more than 9,000 freed people held a picnic on the grounds. Given to the Pilgrimage Garden Club in 1968 on condition that it never be finished, it is the largest octagonal house in the country.',
   'The onion dome over an eight-sided shell; inside, the finished basement floor with original furnishings and, above it, the bare, unfinished upper floors, with the builders\' tools still there by the tour company\'s account.',
   'A mansion frozen the day its builders went to war.',

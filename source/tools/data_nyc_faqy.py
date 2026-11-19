@@ -39,7 +39,7 @@ N('roslyn-main-street-clock-tower','Roslyn Main Street and the Ellen E. Ward Clo
   'Public streets in the Village of Roslyn; the houses are private. Changes to them need the village\'s Historic District Board. Village Municipal Parking Field 4 on East Broadway is about 300 m north-east of the clock tower.',
   [W('Main Street Historic District (Roslyn, New York)')],th=[40.80127,-73.64682],thn='Village of Roslyn Municipal Parking Field 4, East Broadway',brick='?'),
 
-N('cedarmere-roslyn-harbor','Cedarmere (William Cullen Bryant\'s home)','Roslyn Harbor','nyc','landmark','standing',40.81122,-73.64603,'exact','public','walk','','1787–',
+N('cedarmere-roslyn-harbor','Cedarmere (William Cullen Bryant\'s home)','Roslyn Harbor','nyc','landmark','standing',40.81122,-73.64603,'exact','open','walk','','1787–',
   'The poet and New York Evening Post editor William Cullen Bryant bought a small house here in 1843 (built by Joseph Moulton; the first known house on the land was a Quaker farmer\'s, of 1787) and enlarged house and grounds through the 1850s and 1860s on the cottage principles of Andrew Jackson Downing. It stayed in the family until 1975, when the last owner left it at her death to Nassau County as a memorial to him. The inland part of his land became the Bryce and Frick estate, now the Nassau County Museum of Art.',
   'A stuccoed house on a stone foundation behind a high stone wall above Hempstead Harbor, with two ponds, a stone bridge and an Olmsted-designed landscape. By the pond stands the Mill, a Gothic Revival folly with a brick basement, board-and-batten walls, carved bargeboards and a slate roof, said to be by Calvert Vaux; it was never a working mill. A side window of the house has Bryant\'s initials etched in the top panes (Wikipedia). The house opened as a museum in 1994 and closed in 2008; now only the first floor is shown, on guided tours, and the Mill is closed for interior restoration (Friends of Cedarmere).',
   'A poet\'s retreat with a mill that never ground anything.',
@@ -70,7 +70,7 @@ N('saddle-rock-grist-mill','Saddle Rock Grist Mill','Saddle Rock','nyc','industr
    L('Long Island Press: the Village of Saddle Rock (January 5, 2026)','https://www.longislandpress.com/2026/01/05/focus-on-the-g-n-peninsula-the-village-of-saddle-rock')],
   th=[40.7966,-73.75172],thn='Grist Mill Lane lot (village park)',brick='?'),
 
-N('castle-gould-hempstead-house','Castle Gould and Hempstead House, Sands Point Preserve','Sands Point','nyc','landmark','standing',40.86119,-73.69768,'site','public','walk','','1900–1912',
+N('castle-gould-hempstead-house','Castle Gould and Hempstead House, Sands Point Preserve','Sands Point','nyc','landmark','standing',40.86119,-73.69768,'site','open','walk','','1900–1912',
   'Howard Gould, a son of Jay Gould, bought the land in 1900 and built an estate whose limestone stables and servants\' quarters, Castle Gould (about 100,000 sq ft), are bigger than the 40-room main house finished in 1912. Gould sold it in 1917 to Daniel Guggenheim, who renamed the main house Hempstead House. The Guggenheims gave it to the Institute of Aeronautical Sciences in 1942; the Navy held it from 1946 to 1967, and the federal government passed the deed to Nassau County in 1971.',
   'Castle Gould (pin), with the welcome centre, and Hempstead House about 500 m north-west, with its 80 ft tower. Inside Hempstead House: the oak organ case in the entry foyer with show pipes still on the walls, the walnut-panelled library copied from a palace of James I with relief portraits on the plaster ceiling, and a billiard room with carved oak from a 17th-century Spanish palace (Wikipedia). Hempstead House and the Guggenheim house Falaise are shown on guided tours only.',
   'A railroad heir\'s stable block grander than his house.',
@@ -78,7 +78,7 @@ N('castle-gould-hempstead-house','Castle Gould and Hempstead House, Sands Point 
   [W('Hempstead House'),L('Sands Point Preserve: hours and admission','https://www.sandspointpreserveconservancy.org/?p=6519')],
   th=[40.86155,-73.69857],thn='Castle Gould lot (mapped lot on an unpaved oval by the castle)',brick='?'),
 
-N('raynham-hall-oyster-bay','Raynham Hall','Oyster Bay','nyc','landmark','standing',40.87228,-73.53168,'exact','public','walk','','1738–',
+N('raynham-hall-oyster-bay','Raynham Hall','Oyster Bay','nyc','landmark','standing',40.87228,-73.53168,'exact','open','walk','','1738–',
   'Samuel Townsend bought a two-up, two-down house here in 1738 and enlarged it to an eight-room saltbox. In the Revolution it was the headquarters of John Graves Simcoe\'s Loyalist Queen\'s Rangers, while Townsend\'s son Robert worked in Manhattan as a spy in Washington\'s Culper Ring. A grandson renamed it Raynham Hall and remodelled it in Victorian style in 1851. The family deeded it to the local DAR in 1941; it passed to the Town of Oyster Bay, which keeps it as a museum.',
   'A house that shows two eras: the colonial saltbox and the 1851 Victorian enlargement. Officers of the Queen\'s Rangers etched compliments to the Townsend sisters on panes of glass, and Simcoe gave Sally Townsend a valentine in 1778 (Wikipedia; whether the glass is on show was not checked). Tours take in the house and an exhibition hall.',
   'A Patriot spy\'s family home with Loyalist officers living in it.',
@@ -86,7 +86,7 @@ N('raynham-hall-oyster-bay','Raynham Hall','Oyster Bay','nyc','landmark','standi
   [W('Raynham Hall Museum'),L('Raynham Hall Museum: tours and tickets','https://raynhamhallmuseum.org/?p=9385'),L('Village of Upper Brookville: Raynham Hall','https://upperbrookville.gov/raynham-hall-museum/')],
   th=[40.8718,-73.53169],thn='Parking Field O-2, West Main Street',brick='?'),
 
-N('oyster-bay-station-turntable','Oyster Bay station and turntable (Oyster Bay Railroad Museum)','Oyster Bay','nyc','rail','standing',40.87502,-73.5316,'exact','public','walk','stations','1889–',
+N('oyster-bay-station-turntable','Oyster Bay station and turntable (Oyster Bay Railroad Museum)','Oyster Bay','nyc','rail','standing',40.87502,-73.5316,'exact','open','walk','stations','1889–',
   'The Victorian depot opened on June 24, 1889 as the end of the line from Locust Valley. In 1891 a 1,000 ft wharf let whole passenger cars go onto a ferry to Connecticut on a short-lived New York to Boston route, and that September locomotive No. 113 blew up while idling at the station. Theodore Roosevelt commuted through it, and in 1902 Bradford Lee Gilbert enlarged it for the crowds expected at the Summer White House. The old depot and the turntable were listed on the Register separately in 2005; the Town of Oyster Bay owns the depot and the Oyster Bay Railroad Museum has restored it.',
   'The 1889 depot with its western and southern fronts restored and a rebuilt ticket window, holding museum exhibits and three LIRR cab simulators. The turntable, said to be 117 years old when it turned again in 2021, is in the museum\'s open-air display yard on the east side of Theodore Roosevelt Memorial Park, a short walk away (about 40.87502, -73.52854). Trains still use the modern platform beside the depot.',
   'The station that took trains onto ferries and a president to his summer home.',
@@ -94,7 +94,7 @@ N('oyster-bay-station-turntable','Oyster Bay station and turntable (Oyster Bay R
   [W('Oyster Bay station'),L('Herald: taking a spin on a railroad turntable (July 2021)','https://www.liherald.com/stories/taking-a-spin-on-a-railroad-turntable,133328'),L('Oyster Bay Railroad Museum','https://www.obrm.org/')],
   th=[40.87355,-73.53106],thn='Parking Field O-5, Audrey Avenue',brick='?'),
 
-N('planting-fields-main-house','Planting Fields Main House (Coe Hall)','Upper Brookville','nyc','landmark','standing',40.8649,-73.55765,'exact','public','walk','','1918–1921',
+N('planting-fields-main-house','Planting Fields Main House (Coe Hall)','Upper Brookville','nyc','landmark','standing',40.8649,-73.55765,'exact','open','walk','','1918–1921',
   'William Robertson Coe bought the estate in 1913. Its first mansion burned to the ground on March 19, 1918, and the present Main House was built 1918 to 1921 in Tudor Revival style to designs by Walker & Gillette. The Olmsted Brothers and Lowell & Sargent laid out the grounds, with camellia and main greenhouses from 1914 on. Coe gave the estate to New York State in 1949; it was a first home for what became Stony Brook University until 1968, and is now a state historic park.',
   'A 65-room Tudor Revival house faced in Indiana limestone, kept with furnishings of the estate years and shown on guided tours. Also on the grounds: the wrought-iron Carshalton Gates made in 1712 for Carshalton Park in England and brought here in 1921, the Camellia Greenhouse (1917), the main greenhouse, the Italian Blue Pool Garden with its 1915 tea house, and five miles of woodland trails.',
   'A Tudor manor rebuilt after the first one burned, with 1712 English gates.',
@@ -103,7 +103,7 @@ N('planting-fields-main-house','Planting Fields Main House (Coe Hall)','Upper Br
    L('NYS Parks: Planting Fields','https://parks.ny.gov/historic-sites/plantingfields/details.aspx')],
   th=[40.86404,-73.555],thn='Planting Fields West Parking',brick='no'),
 
-N('sagamore-hill-roosevelt','Sagamore Hill (Theodore Roosevelt\'s home)','Cove Neck','nyc','landmark','standing',40.88558,-73.50107,'exact','public','walk','','1885–',
+N('sagamore-hill-roosevelt','Sagamore Hill (Theodore Roosevelt\'s home)','Cove Neck','nyc','landmark','standing',40.88558,-73.50107,'exact','open','walk','','1885–',
   'Theodore Roosevelt had Lamb & Rich design this Shingle-style Queen Anne house in 1884; it was built in 1885 and was his home until he died in 1919. It was the "Summer White House" for the seven summers of 1902 to 1908. Congress made it a national historic site in 1962. The museum is in Old Orchard, the 1938 house of his son Theodore Jr.; the visitor centre burned on Christmas Eve 2018.',
   'Inside the house nearly all the furnishings are original (Wikipedia), seen on a ticketed tour. The grounds, the Old Orchard Museum and a nature trail are open to walk.',
   'The Summer White House, still furnished as Roosevelt left it.',
@@ -126,7 +126,7 @@ N('jericho-friends-meeting-house','Jericho Friends Meeting House and Elias Hicks
   'An active Quaker meeting; seen from Old Jericho Turnpike. When visitors may enter the grounds or attend was not checked. Parking not checked.',
   [W('Jericho Friends Meeting House Complex')],brick='no'),
 
-N('westbury-house-old-westbury-gardens','Westbury House, Old Westbury Gardens','Old Westbury','nyc','landmark','standing',40.77375,-73.59474,'exact','public','walk','','1903–1906',
+N('westbury-house-old-westbury-gardens','Westbury House, Old Westbury Gardens','Old Westbury','nyc','landmark','standing',40.77375,-73.59474,'exact','open','walk','','1903–1906',
   'John Shaffer Phipps, an heir to the Phipps family fortune, began the estate in 1903 for his bride Margarita Grace, and the house was ready for the family in 1906. Next to it is a mid-1860s farmhouse, enlarged, known as Orchard Hill. The estate opened as a museum in 1959. Scenes of North by Northwest, Love Story and many other films were shot here.',
   'Westbury House and its gardens, including the walled garden. John Singer Sargent\'s portrait of Mrs. Henry Phipps and her grandson Winston (1906–07) hangs in the dining room. The ground floor rooms seen in Love Story are on the house tour.',
   'A Gold Coast house left as the Phipps family lived in it.',

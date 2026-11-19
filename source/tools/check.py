@@ -12,10 +12,12 @@ T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_byte
 import safe_data; safe_data.must(T)
 err=[]; warn=[]
 ST='ruins traces standing marker gone water'.split(); PREC='exact site area'.split()
-ACC='public view ask permit boat'.split(); EFF='drive walk hike boat'.split(); CONF=('', 'verified','mixed','lead')
+EFF='drive walk hike boat'.split(); CONF=('', 'verified','mixed','lead')
 app=open(os.path.join(REPO,'source','src','app.js'),encoding='utf-8').read()
 CAT=re.findall(r"(\w+):\['[^']+','#[0-9a-f]{6}'\]",re.search(r'const CAT=\{[^\n]*\};',app).group(0))      # the kinds of place: app.js holds the one list
 if len(CAT)<10: sys.exit('check.py could not read the kinds of place (const CAT) from app.js')
+_acc=re.search(r'const ACC=\{[^\n]*?\};',app); ACC=re.findall(r"(\w+):'",_acc.group(0)) if _acc else []      # and the access types
+if len(ACC)<5: sys.exit('check.py could not read the access types (const ACC) from app.js')
 from states import REG,HUBS,REG_STATE
 OUTL=json.load(open(os.path.join(REPO,'source','build','states.json'))) if os.path.exists(os.path.join(REPO,'source','build','states.json')) else {}
 def _in(r,x,y):
@@ -113,6 +115,11 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
             if not re.match(r'https?://[^\s<>"]+$',l[1]) and not re.match(r'https?://[^<>"\n\r\t]+$',l[1]): err.append(f"{w}: the link '{l[0][:40]}' is not a web address (it must begin http:// or https:// and hold no < > or quote marks): {l[1][:80]}")
             elif ' ' in l[1]: warn.append(f"{w}: the link '{l[0][:40]}' has a space in its address; write %20")
         if p['acc'] in('ask','view','permit','boat') and not p.get('accn'): warn.append(f'{w}: access is {p["acc"]} but there is no access note')
+        # when it is open (GUIDE.md section 4, "Access and hours"): a place you go into at set times is acc='open' and says its hours
+        _h=(p.get('hours') or '').strip()
+        if len(_h)>180: err.append(f"{w}: hours= is {len(_h)} characters; it is one row on the page, so keep it to the days and times (180 at most) and put the rest in the access note")
+        if p['acc']=='open' and p['st']=='standing' and not _h and _ad[:10]>='2026-11-20': warn.append(f"{w}: open to visitors but no hours=. Give them as the place's own page does (hours='Thu to Sun 11 to 4, May to October'), or hours='?' when no page you read gives any")
+        if p['acc']=='public' and p['st']=='standing' and _ad[:10]>='2026-11-20' and re.search(r"\b(museum|inn|tavern|theat(?:er|re)|opera house|playhouse|library|brewery|diner|restaurant)\b",p['name'],re.I) and not re.search(r'\b(site|ruins?|park|street|district|village|museums)\b',p['name'],re.I): warn.append(f"{w}: the name reads as a place you go into at set times; that is acc='open', not 'public' (which is open ground: a park, a street, a trail), unless it is shut")
 if not SRC_ONLY:
     # ---- built site matches the sources ----
     def rd(*p): return open(os.path.join(REPO,*p),encoding='utf-8').read()

@@ -94,7 +94,7 @@ N('st-marys-covered-bridge','St. Mary\'s Covered Bridge','Cromwell Township','pa
   'Look from the road. Ownership and whether the bridge is open were not checked.',
   [W("St. Mary's Covered Bridge")]),
 # ---- Broad Top coal country ----
-N('east-broad-top-rockhill','East Broad Top Railroad, Rockhill Furnace','Rockhill Furnace','pac','rail','standing',40.24146,-77.89900,'site','public','drive','stations','1871–1956',
+N('east-broad-top-rockhill','East Broad Top Railroad, Rockhill Furnace','Rockhill Furnace','pac','rail','standing',40.24146,-77.89900,'site','open','drive','stations','1871–1956',
   'A three-foot-gauge coal railroad that ran from 1871 to 1956 and was kept whole afterwards: Wikipedia calls it one of the oldest and best preserved narrow-gauge lines in America. Tourist trains ran until 2011; a non-profit foundation bought it in February 2020 and trains returned in 2021. It was made a National Historic Landmark in 1964.',
   'The station on Meadow Street and the original shops, with a pair of Babcock and Wilcox boilers, a 19th-century stationary steam engine and overhead line shafts; all six of the line\'s last narrow-gauge steam engines are still on site, with the 1927 M-1 motor car and more than 150 hoppers.',
   'A whole railroad that simply stopped in 1956 and was never broken up.',

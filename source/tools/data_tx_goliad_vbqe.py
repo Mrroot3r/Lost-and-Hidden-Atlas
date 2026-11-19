@@ -12,7 +12,7 @@ L_GSP=L('TPWD: Goliad State Park and Historic Site (hours, fees)','https://tpwd.
 L_GAHS=L('TPWD: Goliad area historic sites','https://tpwd.texas.gov/state-parks/goliad/goliad-area-historic-sites/')
 HM=lambda t,n: L('HMdb: '+t,'https://www.hmdb.org/m.asp?m=%d'%n)
 R=[
-N('presidio-la-bahia-goliad','Presidio La Bahía','Goliad','tx','fort','standing',28.6475,-97.3825,'site','public','drive','forts','1749–1836',
+N('presidio-la-bahia-goliad','Presidio La Bahía','Goliad','tx','fort','standing',28.6475,-97.3825,'site','open','drive','forts','1749–1836',
   'The Spanish fort moved here, to the San Antonio River, in 1749 (Wikipedia gives 1747), after earlier sites on Matagorda Bay (1721) and the Guadalupe River (1726); by 1771 it had been rebuilt in stone, and the town of Goliad grew up round it. In the Texas Revolution it was taken in October 1835, and on Palm Sunday, March 27, 1836, Fannin\'s captured men held here were marched out and shot on Santa Anna\'s order: the Goliad massacre, behind the cry "Remember Goliad". A gift from Kathryn O\'Connor paid for a restoration in the 1960s that Wikipedia says rebuilt the fort almost from the ground up; it became a National Historic Landmark in 1967.',
   'The walled quadrangle and the chapel of Our Lady of Loreto, which the Texas Historical Commission calls the oldest building in the compound and in use since the 1700s; the fresco behind its altar was painted in 1946 by Antonio Garcia, and the statue over its door is by Lincoln Borglum. Museum inside. Open to the public: see the access note. The Zaragoza Birthplace (a reconstruction, run by the same agency) is next door.',
   'The fort where Fannin\'s men were held before the Goliad massacre.',
@@ -20,7 +20,7 @@ N('presidio-la-bahia-goliad','Presidio La Bahía','Goliad','tx','fort','standing
   [L('THC: Presidio La Bahía (hours, admission)','https://thc.texas.gov/historic-sites/presidio-la-bahia'),
    L('THC: Presidio La Bahía history','https://thc.texas.gov/state-historic-sites/presidio-la-bahia/presidio-la-bahia-history'),
    W('Presidio La Bahía'),L_GAHS],brick='no'),
-N('mission-espiritu-santo-goliad','Mission Espíritu Santo','Goliad State Park','tx','inst','standing',28.65731,-97.38683,'exact','public','drive','','1749; rebuilt 1933–1941',
+N('mission-espiritu-santo-goliad','Mission Espíritu Santo','Goliad State Park','tx','inst','standing',28.65731,-97.38683,'exact','open','drive','','1749; rebuilt 1933–1941',
   'Mission Nuestra Señora del Espíritu Santo de Zúñiga was founded in 1722 on Matagorda Bay, moved to the Guadalupe River in 1726 and then here beside the presidio; its stone walls and buildings were not finished until 1758, and it ran one of the largest ranching operations in 18th-century Texas. After it closed, its stones were taken for building and the old church fell to ruin. The ruins went into the new state park in 1931; the Civil Works Administration began rebuilding the chapel and granary in 1933, and Civilian Conservation Corps Company 3822(V) finished the work between 1935 and 1941.',
   'The whitewashed mission church and granary as the 1930s crews rebuilt them, with exhibits on mission life (TPWD says some original items) and a bell visitors may ring. The large anacua tree by the mission entrance is put at nearly two centuries old. The chapel and granary are largely a 1930s reconstruction, not 18th-century fabric.',
   'A Spanish mission the Civilian Conservation Corps rebuilt from a ruin.',
@@ -49,7 +49,7 @@ N('goliad-county-courthouse','Goliad County Courthouse and the Hanging Tree','Go
   [HM('Goliad County Courthouse',132435),HM('The Hanging Tree',34113),
    L('SAH Archipedia: Goliad County Courthouse','https://sah-archipedia.org/node/47960'),
    L('THC: restored courthouse, Goliad County','https://thc.texas.gov/preserve/preservation-programs/courthouse-preservation/restored-historic-courthouses/goliad-county')],brick='?'),
-N('market-house-museum-goliad','Market House Museum','Goliad','tx','civic','standing',28.66693,-97.39117,'exact','view','drive','','1871',
+N('market-house-museum-goliad','Market House Museum','Goliad','tx','civic','standing',28.66693,-97.39117,'exact','open','drive','','1871',
   'The town set the lot aside for public use in 1853, and about 1871 a market with stalls for meat and produce sellers went up on it. From 1886 it was the firehouse, with a meeting hall and a room for the hook and ladder; the false front and belfry date from an 1890 remodeling, and a bell bought that year rang the night hours and the alarms. The volunteer fire company left in 1964, and the building has been a museum since 1967.',
   'A small wooden building with a false front and belfry. Inside, exhibits on farming and ranching, with a wall of local cattle brands; TPWD says it gives out a walking-tour map of the courthouse square. Hours not checked.',
   'Market stall, then firehouse, then museum.',
@@ -78,7 +78,7 @@ N('old-helena-courthouse','Old Helena Courthouse (Karnes County Museum)','Helena
   [L('Handbook of Texas: Helena, TX','https://www.tshaonline.org/handbook/entries/helena-tx'),HM('Old Helena Courthouse',132370),HM('Helena',132367),
    L('THC: Karnes County craftsmanship','https://thc.texas.gov/blog/karnes-county-craftsmanship'),W('Helena, Texas'),
    L('Texas Time Travel: Karnes County Museum','https://texastimetravel.com/directory/karnes-county-museum/')],brick='no'),
-N('panna-maria-church','Immaculate Conception Church, Panna Maria','Panna Maria','tx','worship','standing',28.9572,-97.89814,'exact','public','drive','','1877; school 1868',
+N('panna-maria-church','Immaculate Conception Church, Panna Maria','Panna Maria','tx','worship','standing',28.9572,-97.89814,'exact','open','drive','','1877; school 1868',
   'Silesian Polish settlers led by Father Leopold Moczygemba reached this spot on Christmas Eve 1854 and held their first Mass under an oak; Panna Maria claims to be the oldest permanent Polish settlement in America. Their first church, consecrated in 1856, was destroyed by lightning in 1875, and this one with its 100-foot tower was built in 1877 and remodeled in 1937. In 2000 workers found that 1937 tiles hid a painted ceiling in the sanctuary, which was restored. St. Joseph\'s School nearby was built in 1868 and is called the oldest Polish private school in America.',
   'The white church with its tall tower and steeple (Wikipedia photograph) beside the oak of the first Mass. Inside: the restored painted ceiling, large stained-glass windows restored in 2013, and a mosaic of the Virgin of Czestochowa given by President Johnson in 1966. The Austin Chronicle says the church welcomes visitors daily during most daylight hours. Across the road are the 1868 school, the Polish Heritage Center and the visitors center in the old Pilarczyk store.',
   'The mother church of Polish America, with a ceiling found under tiles.',

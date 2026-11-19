@@ -188,6 +188,7 @@ details.filters[open]>summary::after{content:"\2212"}
 .hook{border-left:3px solid var(--accent);padding-left:10px;font-style:italic}
 .kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;margin:0}
 .kv dt{color:var(--mute);font-size:12.5px}.kv dd{margin:0}
+.kv dd.hrs span{display:block}.kv dd.hrs small{color:var(--mute);font-size:12.5px}.kv dd.hrs a{display:inline-block}
 .scout{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:6px}
 .scout .btn{justify-content:flex-start}
 .times{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
