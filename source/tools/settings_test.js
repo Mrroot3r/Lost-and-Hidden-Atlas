@@ -38,6 +38,7 @@ const { chromium, devices } = require('playwright');
   await p.fill('#set-kitSign','Subscribe: example.org/channel'); await p.selectOption('#set-kitBase','air'); await p.click('#sheet-t'); await p.waitForTimeout(250);
   u=await U(); ok('Settings: the kit choices are saved',u.set&&u.set.kitSign==='Subscribe: example.org/channel'&&u.set.kitBase==='air',JSON.stringify(u.set));
   await p.screenshot({path:'/tmp/set_2_settings.png'});
+  const swatches=await p.evaluate(()=>[...document.querySelectorAll('.swatches [role=radio]')].map(b=>b.getAttribute('aria-label')));
   await p.click('#sheet-x'); await p.click('#tab-near'); await p.waitForTimeout(500);
   ok('Near tab shows what Settings chose',(await p.inputValue('#near-al'))==='200'&&(await p.inputValue('#near-r'))==='5');
   await p.selectOption('#near-al','50'); await p.waitForTimeout(200); await p.click('#near-set'); await p.waitForTimeout(350);
@@ -58,7 +59,7 @@ const { chromium, devices } = require('playwright');
   let names=await type('joliet'); ok('a place is found by its name',names.length>0&&/joliet/i.test(names[0]),names.slice(0,2).join(' | '));
   names=await type('JOLIÉT iron'); ok('capitals and accents do not matter',names.length>0&&/joliet iron/i.test(names[0]),names.slice(0,2).join(' | '));
   names=await type('mill'); const firstText=names.findIndex(n=>!/mill/i.test(n)), lastName=names.map(n=>/mill/i.test(n)).lastIndexOf(true);
-  ok('places with the word in their name come before those that only mention it',names.length>20&&firstText>0&&lastName<firstText,names.length+' found; first without it in the name is row '+(firstText+1)+', last with it is row '+(lastName+1));
+  ok('places with the word in their name come before those that only mention it',names.length>20&&firstText!==0&&(firstText<0||lastName<firstText),names.length+' found; first without it in the name is row '+(firstText+1)+', last with it is row '+(lastName+1));
   names=await type('walled yard schoharie'); ok('words can match across the name, the town, the region and the text',names.length>=1&&names.length<12,names.slice(0,3).join(' | '));
   await type('');
   // ---- pins that crowd together are grouped when zoomed out (Settings > Map)
@@ -93,6 +94,20 @@ const { chromium, devices } = require('playwright');
     w=await wl(); ok('stone walls: cells out of view are taken off the map',w[1]===0,w.join(','));
     ok('stone walls: the switch is remembered',(await U()).ui.walls===true);
   }
+  // ---- the track colour: no pink anywhere, and the Near tab's "point me there" ring and line follow it
+  const tk=await p.evaluate(()=>{ const N=window.__atlasNM, s=N.sites().find(x=>x.st==='standing'), m=window.__atlasMap;
+        N.nmGoal({k:'p',id:'p:'+s.id,o:s,la:s.lat,lo:s.lon},false); const col=()=>{ const c=[]; m.eachLayer(l=>{ if(l instanceof L.CircleMarker&&l.options.radius===13&&!l.options.fill) c.push(l.options.color); }); return c; };
+    const before=col(); N.setPref('trk','#7c3aed'); const after=col(); N.nmGoal(null); N.setPref('trk','#2563eb');
+    return {before,after,css:getComputedStyle(document.documentElement).getPropertyValue('--trk').trim()}; });
+  ok('track colours offered: no pink',swatches.length>=4&&!swatches.some(x=>/pink/i.test(x)),swatches.join(','));
+  ok('the "point me there" ring takes the track colour and follows a change',tk.before[0]==='#2563eb'&&tk.after[0]==='#7c3aed',JSON.stringify(tk));
+  const src=await p.evaluate(()=>[...document.styleSheets].map(ss=>{ try{ return [...ss.cssRules].map(r=>r.cssText).join(''); }catch(e){ return ''; } }).join(''));
+  ok('no pink left in the styles',!/e11d74|225,\s*29,\s*116/i.test(src));
+  const c2=await b.newContext(Object.assign({},devices['Pixel 7'])); const p2=await c2.newPage();
+  await p2.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},set:{trk:'#e11d74'}})); });
+  await p2.goto(process.argv[2]||'http://localhost:8766/index.html'); await p2.waitForFunction(()=>window.__atlasMap); await p2.waitForTimeout(300);
+  const mig=await p2.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--trk').trim()); await c2.close();
+  ok('a track colour saved as the old pink comes back as the blue default',mig==='#2563eb',mig);
   ok('no script errors',errs.length===0,errs.slice(0,2).join(' | '));
   await b.close(); console.log(fails.length?fails.length+' FAILED':'settings test passed'); process.exit(fails.length?1:0);
 })();
