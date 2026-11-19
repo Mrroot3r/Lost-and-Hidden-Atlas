@@ -1,0 +1,148 @@
+# November 19, 2026: Fayette County, Texas, with the Burton gin just over the line in Washington County
+# (region tx drawn at random by tools/choose.py). Facts from the linked sources only, read in this session:
+# Texas Historical Commission site pages, National Register forms from the THC Atlas (PDFs with a text layer),
+# HMdb marker texts, Wikipedia read with tools/wiki_raw.py, Texas Parks & Wildlife magazine, a Houston Chronicle
+# feature, the Texas Cotton Gin Museum's own page and Texas Time Travel directory pages.
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+HM=lambda t,n: L('HMdb: '+t,'https://www.hmdb.org/m.asp?m=%d'%n)
+NR=lambda t,r: L('National Register form: '+t,'https://atlas.thc.state.tx.us/NR/pdfs/%s/%s.pdf'%(r,r))
+THC=('Monument Hill and Kreische Brewery State Historic Sites, Texas Historical Commission, 414 TX-92 Spur, La Grange. '
+     'Grounds open daily 8 a.m. to 4:30 p.m., visitor center 9 a.m. to 4:30 p.m.; closed Thanksgiving, Christmas Eve, Christmas Day '
+     'and New Year\'s Day. Adults $5, seniors, veterans, teachers and first responders $3, children 6 to 17 $2, under 6 free. Pets '
+     'on a leash allowed. The THC page (November 2026) says a new visitor center is being built and a temporary one is by the parking lot.')
+L_KB=L('THC: Kreische Brewery (hours, tickets)','https://thc.texas.gov/historic-sites/kreische-brewery')
+L_MH=L('THC: Monument Hill (hours, tickets)','https://thc.texas.gov/historic-sites/monument-hill')
+L_TPW=L('Texas Parks & Wildlife magazine: the painted churches (January 2021)','https://tpwmagazine.com/archive/2021/jan/travel/')
+L_CHR=L('Houston Chronicle: Painted Churches are Texas gems','https://www.chron.com/lifestyle/houston-belief/article/Painted-Churches-are-Texas-gems-3462732.php')
+L_TTT=L('Texas Time Travel: Painted Churches tour','https://texastimetravel.com/directory/painted-churches-tour/')
+PAINTED=('An active Catholic parish church, owned by the Catholic Diocese of Victoria according to the 1983 Register forms. The Greater Schulenburg Chamber of Commerce runs guided tours of the four painted churches '
+         'and hands out a map for touring on your own; its page refused this session, so its hours are not checked. A Houston Chronicle '
+         'feature (date not checked) says the churches are open Monday to Saturday except holy days, and that Dubina\'s is kept locked and '
+         'seen only on the guided tour. Be quiet and keep out of the way of Mass. Parking at the church, not checked on the aerial.')
+R=[
+N('kreische-brewery-la-grange','Kreische Brewery ruins and house','La Grange','tx','industry','ruins',29.889722,-96.874722,'site','public','walk','','1860s–1884',
+  'Heinrich Kreische, a German stonemason who came to Fayette County and bought about 172 acres on the bluff over the Colorado River in 1849, built a three-storey house here and, in the 1860s, a brewery fed by the spring in the ravine below; his Bluff Beer sold across Central Texas. The THC marker says the brewery had a system of tunnels to keep the brewing cool. Kreische died in a work accident in 1882 and the brewery shut in 1884; the building was left to decay and became a picnic spot. His family lived in the house until 1952; the state stabilised and excavated the ruins and opened the whole site in 1986.',
+  'The stone ruins of the brewery in the ravine below the house, reached on the site\'s trails, and the Kreische family house on the bluff (THC: the sites give daily access to both, with living-history programs at the house). What the brewery walls are built of was not checked. Monument Hill tomb is a short walk away on the same grounds.',
+  'A German stonemason\'s 1860s brewery, in ruins in a spring-fed ravine.',
+  THC+' Parking lot on Spur 92 at the site entrance.',
+  [L_KB,W('Monument Hill and Kreische Brewery State Historic Sites'),HM('Kreische Complex',53216)],th=[29.88788,-96.87589],thn='Monument Hill / Kreische Brewery parking lot (Spur 92)',brick='?'),
+N('monument-hill-tomb-la-grange','Monument Hill: Dawson and Mier men\'s tomb','La Grange','tx','burial','standing',29.889027,-96.876972,'site','public','walk','','1848; monument 1936',
+  'On September 18, 1848 the bones of the Texans killed in the Dawson Massacre (September 1842) and of the men shot after drawing black beans in the Mier Expedition (March 1843) were brought back and buried together in a sandstone vault on this bluff, a spot chosen by a committee that included the Black Bean survivor N. W. Faison. Kreische, who bought the land the next year, kept the tomb up until his death. A new granite vault was dedicated in 1933, and for the 1936 Centennial a 48-foot shellstone monument with an Art Deco mural was raised over the grave.',
+  'The 1936 shellstone shaft with its mural, and the tomb in front of it, on the bluff 200 feet over the Colorado River; a view over La Grange.',
+  'The common grave of the Dawson men and the Black Bean dead.',
+  THC+' Parking lot on Spur 92 at the site entrance.',
+  [L_MH,W('Monument Hill and Kreische Brewery State Historic Sites')],th=[29.88788,-96.87589],thn='Monument Hill / Kreische Brewery parking lot (Spur 92)',brick='no'),
+N('fayette-county-courthouse-la-grange','Fayette County Courthouse','La Grange','tx','civic','standing',29.905278,-96.878611,'exact','view','drive','','1890–1891',
+  'J. Riely Gordon designed the courthouse, built 1890 to 1891, with all the offices and the courtroom arranged round a 30-foot square open courtyard in the middle for light and air, a break from the usual cross-corridor plan. It still dominates the square of La Grange, the county seat since 1837.',
+  'Four stones in bands and checkerboard gables: Belton white limestone and Muldoon blue sandstone, red Pecos sandstone string courses and pink Burnet granite columns and steps; a carved eagle and griffins at the foot of the clock tower. On the square stands the scarred stump of the old oak from which, says its marker, the county sent its men to war. Interior not checked.',
+  'J. Riely Gordon\'s courthouse built round an open-air courtyard.',
+  'Fayette County; a working courthouse on the square in La Grange. Street parking round the square. Hours and whether visitors may look inside were not checked.',
+  [NR('Fayette County Courthouse and Jail','75001973'),HM('Fayette County Courthouse',53236)],brick='no'),
+N('fayette-county-jail-la-grange','Old Fayette County Jail','La Grange','tx','civic','standing',29.90393,-96.87806,'site','view','drive','','1881–1883',
+  'The county\'s 1853 jail, built by Heinrich Kreische, was burned by an arsonist in April 1880. Its replacement on the same lot was designed by James Wahrenberger and John Andrewartha; the Register form says it was built in 1881 by Fritz Schulte, the THC marker that it was completed in 1883. It had 16 cells and rooms for the sheriff\'s family, and served until August 1985. It was remodelled in the 1990s with many original features kept, and has since been put to other uses (the marker does not say which).',
+  'A T-shaped Victorian Gothic jail of rough sandstone from Buckner\'s Creek trimmed with smooth Muldoon sandstone, behind an ornamental iron fence put up in May 1884. Interior not checked.',
+  '',
+  'Owned by Fayette County according to the 1975 Register form (current owner and use not checked). A block from the courthouse square; street parking. View from the street.',
+  [HM('Fayette County Jail',183156),NR('Fayette County Courthouse and Jail','75001973')],conf='mixed',brick='no'),
+N('faison-house-la-grange','N. W. Faison House','La Grange','tx','landmark','standing',29.899206,-96.872764,'exact','view','drive','','1841; front section 1884',
+  'The marker says the house began in 1841 as two pine rooms and was enlarged after 1855; the Register form says it grew in three sections, the oldest before 1860 and the most elaborate, facing Jefferson Street, in 1884. N. W. Faison, a survivor of the Dawson fight and the Mier Expedition who worked to bring his comrades\' bones home to Monument Hill, owned it until he died in 1870 and left it to Louisiana Brown, a freedwoman who had worked for him; the form calls it a rare, perhaps unique, Texas property owned outright by a freedwoman in the decade after the Civil War. His brother Peter\'s family lived in it for decades; the La Grange Garden Club bought it from the Faison estate in 1961 and keeps it as a house museum.',
+  'A one-storey frame house of three sections on a brick foundation round a small courtyard, with a coloured-glass sidelit front door. Texas Time Travel says the museum shows original furnishings, artwork and household goods. Opening hours not checked.',
+  'A Black Bean survivor\'s house, left to a freedwoman in 1870.',
+  'Owned by the La Grange Garden Club as a house museum (Register form, 2010), 822 S. Jefferson Street. Hours and tours not checked; marked look-only until they are. Street parking.',
+  [NR('Nathaniel W. Faison House','08000538'),HM('The Faison House',215137),L('Texas Time Travel: N.W. Faison House and Museum','https://texastimetravel.com/directory/nw-faison-house-and-museum')],conf='mixed',brick='?'),
+N('st-james-episcopal-la-grange','St. James Episcopal Church','La Grange','tx','worship','standing',29.908056,-96.873611,'exact','view','drive','','1885',
+  'The parish began in 1855 as Trinity Parish and became St. James about 1860. Its rector W. G. W. Smith, influenced by the Oxford Movement, engaged the Gothic Revival architect Richard M. Upjohn in 1883; the cornerstone was laid on February 5, 1885, on land left for the purpose by Benjamin and Georgiana Shropshire, and the local contractor Carl Michaelis built it.',
+  'A wooden church in the Stick style, between Carpenter Gothic and Queen Anne. Inside, exposed yellow-pine columns and trusses against white plaster; stained glass, including the elaborate Shropshire memorial window, makers uncertain; the altar, lectern, communion rail and bishop\'s chair designed and built by Smith, and pews he designed, made in Frank Reichert\'s shop, all still in use (Wikipedia). Whether the church is open outside services was not checked.',
+  '',
+  'An active Episcopal parish at Monroe and Colorado streets. Seen from the street; inside at services. Street parking.',
+  [W('St. James Episcopal Church (La Grange, Texas)'),HM('St. James Episcopal Church',183217)],brick='no'),
+N('katy-depot-la-grange','La Grange M-K-T (Katy) Depot','La Grange','tx','rail','standing',29.90679,-96.87879,'exact','view','drive','stations','1897',
+  'The Katy reached La Grange on August 17, 1887, and built a passenger depot. It burned on March 19, 1897, and was rebuilt in November that year where it still stands. Theodore Roosevelt spoke from a train here for five minutes in 1911. Passenger trains ended in 1957; the Katy became part of the Union Pacific in 1988, and freight trains still use the line.',
+  'A green and yellow depot; the marker says the inside keeps the office with ticket windows, the operator\'s desk, telegraph and semaphore controls, and two waiting rooms, a remnant of segregation. HMdb lists a "La Grange Depot Museum" marker at the same spot; opening hours not checked.',
+  '',
+  'Owner and opening not checked. An active Union Pacific line runs beside it: stay off the track. View from the street.',
+  [HM('La Grange M-K-T ("Katy") Depot',297390),HM('La Grange Depot Museum',195093)],brick='no'),
+N('high-hill-painted-church','St. Mary\'s Church, High Hill (Nativity of Mary, Blessed Virgin)','High Hill','tx','worship','standing',29.7175,-96.927778,'exact','public','drive','','1906',
+  'The third church on the nine acres given to the parish in 1868: a log church came first, then a larger frame one in 1875, and in 1906 this Gothic Revival church designed by Leo Dielmann and built by Frank Bohlmann of Schulenburg, partly from the second building\'s materials. It is one of the painted churches of the Schulenburg country, listed in 1983 with the "Churches with Decorative Interior Painting" group.',
+  'Red brick outside, with stone sills, keystones and string courses. Inside, the Register form calls the painting one of the most elaborate in any Texas church: every ceiling, wall and column painted in many colours over a groin-vaulted ceiling, gold vines in the apse; and 18 stained-glass windows bought between 1884 and 1889 and reused from the older church. Open to visitors: see the access note.',
+  'The grandest of the painted churches, in red brick.',
+  PAINTED,
+  [NR('Nativity of Mary, Blessed Virgin Catholic Church','83003136'),L_TPW,L_CHR,L_TTT],brick='yes'),
+N('ammannsville-painted-church','St. John the Baptist Church, Ammannsville','Ammannsville','tx','worship','standing',29.787222,-96.858889,'exact','public','drive','','1917–1918',
+  'The parish\'s first church, a small frame building of 1890, was blown down by a hurricane in 1909; the larger frame church that replaced it, dedicated in 1910, burned in 1917. The present wooden Gothic Revival church followed: the Register form gives 1917 as the building date in one place and calls it "a 1918 statement in wood" in another. It stands in pasture on FM 1383.',
+  'A white frame church with buttresses and a bell tower. Inside, decorative painting in one main colour, a warm pink, with white woodwork: stencilled borders on the ceiling beams, floral bands on the walls, pilasters painted as marble, and two cherubs with a chalice over the apse (Register form); Texas Parks & Wildlife magazine describes the pink walls and stained-glass windows. Open to visitors: see the access note.',
+  'A pink-painted wooden church rising from a pasture.',
+  PAINTED,
+  [W('St. John the Baptist Catholic Church (Ammannsville, Texas)'),NR('St. John the Baptist Catholic Church','83003137'),L_TPW,L_CHR],brick='no'),
+N('praha-painted-church','St. Mary\'s Church of the Assumption, Praha','Praha','tx','worship','standing',29.67010,-97.06670,'exact','public','drive','','1895',
+  'The fourth church on this site; three frame churches built in 1865, 1866 and 1876 are gone. This one, designed by O. Kramer, was finished in 1895 in rough-cut sandstone, and its outer walls were stuccoed in 1930. Its interior was painted soon after it was finished and the Register form says it keeps its original look.',
+  'Stuccoed walls with the stone buttresses, hood moulds and sills left bare; lancet windows of stained glass and a wheel window over the door. Inside, a wooden vaulted ceiling painted as a sky, plant forms that seem to spill over the side-aisle cornice, and, at the foot of the mural, two faint churches of Prague (Register form). Open to visitors: see the access note.',
+  '',
+  PAINTED,
+  [NR('St. Mary\'s Church of the Assumption','83003138'),L_TPW,L_CHR,HM('Assumption of the Blessed Virgin Mary Catholic Church',206432)],brick='no'),
+N('dubina-painted-church','Sts. Cyril and Methodius Church, Dubina','Dubina','tx','worship','standing',29.72923,-96.83453,'site','view','drive','','1909–1911',
+  'Dubina, settled in 1856 by Czech Moravians who sheltered under an oak grove in a November sleet storm (hence the name, "oak grove"), is called the first settlement in Texas founded wholly by Czechs. Its church was built by the congregation between 1909 and 1911 to Leo Dielmann\'s design. The church, its cemetery and the KJZT social hall are all that remain in use; the 2003 Register form notes ruins of a former store complex beyond the curve of the old road (CR 480, "Piano Bridge Road") toward the river.',
+  'A white wood-frame Carpenter Gothic church with a central spire; inside, stencilled vines and flowers outline the arches and windows. The Houston Chronicle feature says the church is kept locked and seen only on the chamber\'s guided tour. The commercial ruins near the river were not located.',
+  '',
+  PAINTED,
+  [NR('Dubina Historic District','03000970'),HM('Dubina',61290),L_TPW,L_CHR],brick='no'),
+N('bedstead-truss-bridge-schulenburg','Bedstead Truss Bridge','Schulenburg','tx','landmark','standing',29.67405,-96.91084,'site','public','walk','','1888',
+  'A wrought-iron Pratt "bedstead" truss built in 1888 by A. J. Tullock & Co. of Leavenworth, Kansas, as a road bridge over the West Navidad River. It was later moved to Mulberry Creek (as the Mulberry Creek Bridge it was first listed in 1975) and then to Hermis Road southwest of Schulenburg, where it stayed until 2001, when it was set on new concrete abutments in Wolters Park and given over to people on foot.',
+  'Pin-connected iron truss with the builder\'s plaques, "BUILT BY AJ TULLOCK & CO LEAVENWORTH KAN 1888", on the endposts. The 2013 form found it intact, with peeling paint and some loose bracing.',
+  '',
+  'In Wolters Park, Schulenburg, 0.1 mile northwest of the Hillje and Kallus streets corner (Register form); a footbridge. Park owner and hours not checked; no mapped lot, so park where the park allows.',
+  [NR('Bedstead Truss Bridge','13000888')],brick='no'),
+N('bethlehem-lutheran-round-top','Bethlehem Lutheran Church','Round Top','tx','worship','standing',30.06307,-96.69974,'exact','view','drive','','1866',
+  'Built between May 6 and October 28, 1866 to the design of Carl Siegismund Bauer, a German Texan who was also head mason, with his sons and the townspeople doing the work; the sandstone was quarried from Cummins Creek beside the site and cedar from the creek bottom was hewn for the frame. Wikipedia calls it the oldest Lutheran sanctuary in Texas, in use since it was built.',
+  'Stone walls held by iron tie rods (1873) and four buttresses. Inside, the cedar pipe organ built by John Traugott Wantke and dedicated in January 1867, restored in 1966 and 1995 and still played (Wikipedia). Whether the church is open outside services was not checked.',
+  '',
+  'An active Lutheran congregation, 412 South White Street, Round Top. View from the street; inside at services. Street parking.',
+  [W('Bethlehem Lutheran Church (Round Top, Texas)'),HM('Bethlehem Church',183301)],brick='no'),
+N('winedale-stagecoach-inn','Winedale Stagecoach Inn (Lewis-Wagner House)','Winedale','tx','hotel','standing',30.086389,-96.641389,'site','view','drive','','about 1834; enlarged about 1850',
+  'A one-room cedar house with a loft, built about 1834 (by William S. Townsend, says the 1967 marker). Samuel K. Lewis bought it in 1848 and enlarged it to its present two storeys with an open central hall, and it was known as Sam Lewis\' Stopping Place. Ima Hogg restored it in 1964, and the University of Texas made it the centre of the 225-acre Winedale Historical Complex. Sources differ on the date: the marker says about 1834, Texas Time Travel says the 1840s.',
+  'German painted and stencilled decoration on ceilings and walls in several rooms, one ceiling covered in garlands of fruit and flowers, thought to be by Rudolph Melchior (Register form). Round it: Hazel\'s Lone Oak Cottage (1854), the Lauderdale House, two barns, a log kitchen, a smokehouse and the 1859 MacGregor House. The Briscoe Center holds free public events here with tours of the houses; ordinary opening hours not checked.',
+  'A stagecoach stop with painted German ceilings.',
+  'University of Texas at Austin (Briscoe Center for American History), on FM 2714 south of Round Top. Hours were not checked (the university\'s visiting page answered 404); marked look-only until they are. Parking not checked.',
+  [NR('Winedale Inn Complex','70000745'),HM('Winedale Stagecoach Inn',84603),L('Texas Time Travel: Winedale Historical Complex','https://texastimetravel.com/directory/winedale-historical-complex-tour/'),L('Briscoe Center: Christmas at Winedale','https://briscoecenter.org/?p=3769')],conf='mixed',brick='no'),
+N('zapp-building-fayetteville','Zapp Building','Fayetteville','tx','civic','standing',29.90373,-96.67624,'exact','view','drive','','1900',
+  'Built in 1900 (the parapet reads "H. Zapp, 1900") on a corner of Fayetteville\'s town square, it was in 1983 the only masonry commercial building on the square. Its common name on the Register form is the Country Place Hotel and Restaurant.',
+  'A two-storey Romanesque Revival front with a cut-off corner entrance, a round-arched gallery above it, and a parapet panelled in "Whitesell\'s Corsicana Cherry-Red brick" against yellow brick; inside, pressed-metal ceilings (1983 form). Current use and interior not checked.',
+  '',
+  'Privately owned (1983 form). On the square at Fayette and Washington streets. View from the street.',
+  [NR('H. Zapp Building','83003139'),HM('Zapp Building',61300),W('Fayetteville Historic District (Fayetteville, Texas)')],brick='some'),
+N('fayetteville-precinct-courthouse','Fayette County Precinct No. 2 Courthouse','Fayetteville','tx','civic','standing',29.90425,-96.67590,'exact','view','drive','','1880',
+  'Fayetteville raised $600 itself, got $200 from the county, and built this Victorian precinct courthouse in the middle of its square in 1880; a ball held in it paid for the paint. A two-cell calaboose upstairs was finished in 1887, and a ladies\' club gave the clock in 1934. The marker says precinct courthouses were very rare in early Texas.',
+  'A two-storey square wooden building with horizontal siding, wood stairs and panelled double doors on the south front (Wikipedia, from the district form). The square round it has five buildings sheathed in pressed tin made to look like stone. Interior not checked.',
+  '',
+  'On the town square at Washington and Main streets, Fayetteville; owner not checked. View from the square; street parking.',
+  [HM('Fayette County Precinct No. 2 Courthouse',183382),W('Fayetteville Historic District (Fayetteville, Texas)')],brick='no'),
+N('burton-farmers-gin','Burton Farmers Gin (Texas Cotton Gin Museum)','Burton','tx','industry','standing',30.18000,-96.59403,'exact','public','drive','','1914–1974',
+  'Local farmers formed the Burton Farmers Gin Association in December 1913 and built this two-storey gin in 1914. It ran on steam until 1925, when an oil engine was put in; it was the only gin in Burton after 1948 and worked until 1974. The museum calls it the oldest operating cotton gin in America and one of the few complete gin and mill complexes left in the country.',
+  'A corrugated-metal gin house with its machinery, driven by a 1925 Bessemer engine that the museum says is the largest of its age still running in the United States; a guided tour of the gin follows a talk and a 20-minute film. The 38th Cotton Gin Festival is set for April 17, 2027.',
+  'A 1914 cotton gin that still runs, powered by a 1925 engine.',
+  'Run by the Texas Cotton Gin Museum, which keeps the gin (its page); who holds the title was not checked. 307 North Main Street (Highway 125), Burton, in Washington County. Open Tuesday to Saturday, 10 a.m. to 4 p.m. (museum page, November 2026); admission not checked; groups book by email through its page. Parking at the museum not checked on the aerial.',
+  [L('Texas Cotton Gin Museum (hours, tours)','https://www.cottonginmuseum.org/'),HM('Burton Farmers Gin',111945)],brick='no'),
+]
+BATCH={'key':'tx_fayette_rowq','label':'Texas: Fayette County','added':'2026-11-19 09:30'}
+PLACES=R
+PIN_NOTES={
+ 'kreische-brewery-la-grange':'National Register list point for the Kreische Brewery and House.',
+ 'monument-hill-tomb-la-grange':'National Register list point for the Mier Expedition and Dawson\'s Men Monument and Tomb.',
+ 'fayette-county-courthouse-la-grange':'National Register list point.',
+ 'fayette-county-jail-la-grange':'HMdb position of the Fayette County Jail marker.',
+ 'faison-house-la-grange':'National Register list point.',
+ 'st-james-episcopal-la-grange':'National Register list point.',
+ 'katy-depot-la-grange':'HMdb position of the La Grange M-K-T Depot marker.',
+ 'high-hill-painted-church':'National Register list point.',
+ 'ammannsville-painted-church':'National Register list point.',
+ 'praha-painted-church':'National Register list point was 54 m south of the church on the aerial; moved onto the church with pix.py, between that and the OpenStreetMap church point; the LiDAR shows the building there.',
+ 'dubina-painted-church':'The HMdb marker point was on the road. Moved with look.py and pix.py to the cross-shaped building beside the Sts. Cyril and Methodius cemetery (OpenStreetMap cemetery point), taken to be the church from its plan; site precision because no source gives its position.',
+ 'bedstead-truss-bridge-schulenburg':'National Register list point.',
+ 'bethlehem-lutheran-round-top':'OpenStreetMap place-of-worship point at 412 South White Street (nom.py); the Register point was 35 m off in trees.',
+ 'winedale-stagecoach-inn':'National Register list point.',
+ 'zapp-building-fayetteville':'OpenStreetMap building named Zapp Building (nom.py); the HMdb marker point was on the street corner.',
+ 'fayetteville-precinct-courthouse':'HMdb position of the Precinct No. 2 Courthouse marker.',
+ 'burton-farmers-gin':'HMdb marker point (on the building\'s southeast corner, says the marker page) was on the road; moved with look.py and pix.py onto the large building beside it.',
+}
