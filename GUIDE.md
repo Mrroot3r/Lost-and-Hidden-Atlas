@@ -534,7 +534,7 @@ The app is the same Atlas page inside an Android shell (Capacitor 8), in `androi
 **Marks, sharing and backups.**
 
 - The recording notification has a **Mark here** button. The service writes the time and position to `<log>.marks.csv`; the page reads new ones with `marks` alongside the points and turns each into a note called "Mark N", which can be renamed from its card on the map.
-- A note's card has Rename, Delete and **Add to the Atlas**, which opens the add-a-place form filled in from the note. The place remembers its note (`from: {log, t}`) and shows that note's photos.
+- A note's card has Rename, Delete, **+ Add to my places** and **Send to the public Atlas** (with a line under them: my places stay on this phone, the public Atlas is the shared map), which opens the add-a-place form filled in from the note. The place remembers its note (`from: {log, t}`) and shows that note's photos.
 - **Share this walk** packs one log into a `.atlas.json` file (`walkFile()`): track, notes, video stretches and 400-pixel photo previews. **Open a shared walk or GPX file** in the Log tab reads it (`readWalk()`), on the website as well as in the app. Opened logs are marked `imp`; their media carry `x` and are never looked up on the receiving phone, because another phone's photo numbers mean nothing there.
 - **Edit sheet** lists, per video, the time inside it of every note and photo.
 - When a log ends, the app writes everything to `Download/Lost Hidden Atlas/atlas-backup.json` (`saveBackup`), which survives uninstalling. It is restored through the normal backup restore.
@@ -609,7 +609,7 @@ GitHub can also start a review without opening a chat: Anthropic's Claude GitHub
 
 Anyone can send the Atlas two things without knowing GitHub: **a place they know about** (a lead: a name and a spot are enough) and **a report of a visit** to a place already on the map. Nothing a reader sends changes the map by itself. It waits in an inbox until a research session checks it.
 
-**How a reader sends one.** In the app, "I was here" on a place page saves a visit report, and "Send to the Atlas" on the saved report opens a box with up to three buttons; "+ Add" makes a place of the reader's own, and "Suggest it to the Atlas" on its page opens the same box; the Guide tab has the box for a place with no pin (`shareBox()`, `shareLinks()`, `shareText()` in `app.js`; test: `tools/visit_test.js`). The buttons:
+**How a reader sends one.** In the app, "I was here" on a place page saves a visit report, and "Send to the public Atlas" on the saved report opens a box with up to three buttons; "+ Add" makes a place of the reader's own, and "Suggest it to the Atlas" on its page opens the same box; the Guide tab has the box for a place with no pin (`shareBox()`, `shareLinks()`, `shareText()` in `app.js`; test: `tools/visit_test.js`). The buttons:
 
 | Button | Where it goes | The sender needs |
 |---|---|---|
