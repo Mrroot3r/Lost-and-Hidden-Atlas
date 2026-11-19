@@ -38,13 +38,16 @@ def fits(s,title,co):
     if ' ' in tt.strip() and (tt in allw(s['name']) or tt in allw(s.get('name2'))): return True
     town=set(words(s.get('town'))); mine=set(w for w in words(s['name'])+words(s.get('name2')) if w not in town)
     return any(w not in town and w in mine for w in words(re.sub(r'\s*\(.*\)\s*$','',title)))
+def nomail(t):
+    """a credit sometimes carries the photographer's e-mail address: the name is credit enough, and the Atlas publishes no addresses"""
+    return re.sub(r'\s+',' ',re.sub(r'[\s,;:·|/-]*[(<\[]?\s*(?:mailto:)?[\w.+-]+@[\w-]+(?:\.[\w-]+)+\s*[)>\]]?','',str(t or ''))).strip(' ,;:·|/-')
 def by(h):
     """photoBy() in app.js: the photographer's name out of Commons' Artist field"""
-    h=str(h or ''); t=re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',re.sub(r'(?is)<(style|script)[^>]*>.*?</\1>','',h)))).strip()
+    h=str(h or ''); t=nomail(re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',re.sub(r'(?is)<(style|script)[^>]*>.*?</\1>','',h)))).strip())
     if t and len(t)<=70: return t
     for m in re.finditer(r'(?is)<a\b[^>]*href="([^"]*)"[^>]*>(.*?)</a>',h):
         x=re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',m.group(2)))).strip()
-        if 'User:' in m.group(1) and x: return x[:70]
+        if 'User:' in m.group(1) and nomail(x): return nomail(x)[:70]
     if not t or re.search(r'(?i)<(table|img|figure)\b',h): return ''
     return re.sub(r'\s+\S*$','',t[:68])+'…'
 def ask(params):
