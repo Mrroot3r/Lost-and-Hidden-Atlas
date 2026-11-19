@@ -50,6 +50,7 @@ def coords(w):
     except Exception: return None
 def clean(w):
     w=re.sub(r'<ref[^>]*/>','',w); w=re.sub(r'<ref[^>]*>.*?</ref>','',w,flags=re.S); w=re.sub(r'<!--.*?-->','',w,flags=re.S)
+    w=re.sub(r'\{\{(?:convert|cvt)\|([\d.,]+)\|(?:(?:-|to|and|by|x)\|([\d.,]+)\|)?([^|{}]+)[^{}]*\}\}',lambda m:m.group(1)+('–'+m.group(2) if m.group(2) else '')+' '+m.group(3),w,flags=re.I)   # {{convert|60|ft|m}} -> 60 ft
     for _ in range(5): w=re.sub(r'\{\{[^{}]*\}\}','',w)
     w=re.sub(r'\[\[(?:File|Image):[^\]]*\]\]','',w); w=re.sub(r'\[\[(?:[^\]|]*\|)?([^\]]*)\]\]',r'\1',w); w=re.sub(r"'{2,}",'',w); w=re.sub(r'<[^>]+>','',w)
     w=re.sub(r'\[https?://\S+ ([^\]]*)\]',r'\1',w); w=re.sub(r'^[=|!{}*#:;].*$','',w,flags=re.M)
@@ -73,6 +74,8 @@ for t in a:
     c=coords(w); txt=clean(w)
     print(f"## {t}"+(f" => {real}" if real!=t else '')+f"  coordinates: {c if c else 'none in the article'}")
     print('https://en.wikipedia.org/wiki/'+urllib.parse.quote(real.replace(' ','_')))
-    if pat: print(' '.join(s for s in re.split(r'(?<=[.!?])\s+(?=[A-Z])',txt) if pat.search(s) and 25<len(s)<400)[:2500])
-    else: print(txt[:1500])
+    if pat: print('\n'.join('- '+s for s in re.split(r'(?<=[.!?])\s+(?=[A-Z])',txt) if pat.search(s) and 25<len(s)<400)[:4000])      # one sentence a line
+    else:
+        print(txt[:1500])
+        if len(txt)>1500: print('[... %d characters more: the whole article is in research/wikiraw/%s.txt, or use -g]'%(len(txt)-1500,re.sub(r'[^\w]+','_',real)))
     print()

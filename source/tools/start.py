@@ -2,6 +2,7 @@
 """The first command of a research session: everything the Atlas already knows about an area, in one go.
    python3 tools/start.py "Syracuse, New York" [km=15]
    python3 tools/start.py 43.05 -76.15 [km=15]
+   python3 tools/start.py --prs                  only the open pull requests (the look just before publishing)
 It prints: where the area is and which state; the region codes a new place there can use; the places already on the map
 (so nothing is added twice) and which data files hold them; the unchecked leads already carried there (mapped ruins,
 vanished places, old mines), each with a coordinate; the rows of LEADS.md for that ground; what GUIDE.md says about the
@@ -9,6 +10,13 @@ state and the area; and the order of work. Read its output instead of reading GU
 import sys,os,re,json,math,time,subprocess,urllib.parse,urllib.request
 a=sys.argv[1:]
 if not a: sys.exit(__doc__)
+if a[0]=='--prs':          # only the open pull requests: the second look just before publishing (gh may print nothing in a scheduled session)
+    try:
+        pr=json.load(urllib.request.urlopen(urllib.request.Request('https://api.github.com/repos/Mrroot3r/Lost-and-Hidden-Atlas/pulls?state=open&per_page=50',headers={'User-Agent':'lost-hidden-atlas-research/1.0','Accept':'application/vnd.github+json'}),timeout=30))
+        print('Open pull requests: %d'%len(pr))
+        for x in pr: print('  #%d  %s  [branch %s, opened %s]'%(x['number'],x['title'][:110],x['head']['ref'],x['created_at'][:16].replace('T',' ')))
+    except Exception as e: print('The open pull requests could not be listed (%s): look at the repository\'s pull requests page.'%str(e)[:60])
+    sys.exit(0)
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE)
 num=lambda s:re.fullmatch(r'-?\d+(\.\d+)?',s) is not None
 name=''; words=[]
@@ -85,7 +93,8 @@ for l in list(open(os.path.join(repo,'LEADS.md'),encoding='utf-8'))+[x for n in 
     for m in re.finditer(r'(-?\d{2}\.\d{3,}),\s*(-\d{2,3}\.\d{3,})',l):
         if d(float(m.group(1)),float(m.group(2)))<=km*1.5: hit=True
     where=l.split('|')[2] if l.count('|')>3 else l
-    if not hit and any(re.search(r'\b'+re.escape(k)+r'\b',where) for k in keys): hit=True
+    other=[c for c in re.findall(r',\s*([A-Z]{2})\b',where) if c.lower()!=(st or '')]      # a row in another state ("New Orleans, LA" for Orleans County, NY)
+    if not hit and not other and any(re.search(r'\b'+re.escape(k)+r'\b',where) for k in keys): hit=True
     if hit: rows.append(l.strip())
 print(f'== Leads on file for this ground (LEADS.md and the notes/ files): {len(rows)}'+(' (try these before hunting for new names; delete a row, wherever it is, when its place is added)' if rows else ''))
 for r in rows[:25]: print('  '+(r if len(r)<520 else r[:520]+' …'))
