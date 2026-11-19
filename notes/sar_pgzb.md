@@ -13,9 +13,7 @@ Twenty places in Saratoga County, drawn at random by `choose.py` (region `sar`, 
 |---|---|---|---|
 | Marshall House | Schuylerville, NY, west of NY 32 a mile north of the village (Wikipedia 43.11111, -73.58056) | Wikipedia: 1770–73 farmhouse, British field hospital in 1777 and Baroness Riedesel's refuge; cannonball damage kept; owned and lived in by the Bullard family since 1930 | Up a long private drive; whether anything can be seen from the road, and whether the owners still show it |
 | Victory Mills | Victory, NY (43.08908, -73.59188) | Wikipedia: 1918 cotton mill, burned May 31, 2025 and demolished | Nothing left to see; listed so nobody adds it |
-| Grooms Tavern Complex | Grooms Corners, Clifton Park, NY (42.83472, -73.84472) | Wikipedia: about 1825 tavern and store, 1840s wagon and blacksmith shop | Owner and present use; whether it is seen from the road |
 | Saratoga Surrender Site | US 4 half a mile south of Schuylerville | Wikipedia: 19-acre park owned by the Open Space Institute, run by the NPS since 2021, dawn to dusk, plaques and two cannon | A coordinate and the NPS page; mostly markers |
-| Jonesville Store | Jonesville, Clifton Park, NY (42.91028, -73.82333) | Wikipedia: about 1860 country store and post office, still a store | Present use (the Register list calls it vacant, Wikipedia a store) |
 
 ## Tips
 - The NPS Saratoga hours page (`nps.gov/sara/planyourvisit/hours.htm`) gives every unit's season in one place; `nps.gov/places/schuyler-estate.htm` is the Schuyler House page (the obvious `schuyler-house.htm` is 404).
