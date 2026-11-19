@@ -15,6 +15,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    # The signing key belongs in the environment "release" (Settings, Environments), which GitHub can be told to hand only to
+    # runs on main. A run that is not a pull request asks for that environment; a pull request never does, so once the key is
+    # kept there and nowhere else, a branch cannot reach it: its app is compiled to prove it builds, and is neither signed
+    # nor published. Until the owner moves the key (GUIDE.md section 12), the two repository secrets still work as before.
+    environment: ${{ github.event_name != 'pull_request' && 'release' || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,7 +55,7 @@ jobs:
             echo "ATLAS_KEYSTORE=$RUNNER_TEMP/atlas.jks" >> "$GITHUB_ENV"
             echo "signed=yes" >> "$GITHUB_OUTPUT"
           else
-            echo "::warning::The repository secrets ATLAS_KEYSTORE_B64 and ATLAS_KEYSTORE_PASSWORD are not set. The app was built to prove it compiles, but it is not signed with the Atlas key, cannot update an installed copy, and was not published. See GUIDE.md section 12."
+            echo "::warning::No signing key reached this run (the secrets ATLAS_KEYSTORE_B64 and ATLAS_KEYSTORE_PASSWORD). On a pull request that is as it should be once the key is kept in the release environment. The app was built to prove it compiles, but it is not signed with the Atlas key, cannot update an installed copy, and was not published. See GUIDE.md section 12."
             echo "signed=no" >> "$GITHUB_OUTPUT"
           fi
       - name: Build the app
