@@ -49,6 +49,9 @@ if [ -n "$FULL" ]; then bash "$W/tools/into_repo.sh" "$W" "$REPO"; fi
 if [ -n "$LAYERS" ] && [ -z "$FULL" ]; then
   mkdir -p data/pock
   for f in lines leads vanished mines pockets; do [ -f "$W/dist/web/data/$f.json" ] && cp "$W/dist/web/data/$f.json" "data/$f.json"; done
+  for f in vanished mines; do      # these two travel in pieces (an index and one file per state): the pieces replace the old ones whole
+    [ -d "$W/dist/web/data/$f" ] && { rm -rf "data/$f"; mkdir -p "data/$f"; cp "$W"/dist/web/data/$f/*.json "data/$f/"; }
+  done
   [ -d "$W/dist/web/data/pock" ] && cp "$W"/dist/web/data/pock/*.json data/pock/
 fi
 mkdir -p source/src source/tools source/build
