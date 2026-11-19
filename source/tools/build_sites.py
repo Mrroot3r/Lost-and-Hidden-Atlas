@@ -50,6 +50,7 @@ for b in B+C:
            story=b['story'],look=b['look'],hook=b['hook'],accn=b['accn'],links=(b['links'] or (e['links'] if e else [])),now='now' in b['tags'].split(','))
     if b.get('th'): s['th']=b['th']; s['thn']=b.get('thn','')
     if b.get('brick') in ('yes','some','no'): s['bk']=b['brick'][0]      # red brick: y, s or n; left out when nobody has looked
+    if b.get('tip'): s['tip']=b['tip']                                   # the day a reader sent it in; left out for every other place
     sites.append(s)
 # landmarks
 LREG={'Albany':'alb','Menands':'albco','Normanskill Farm':'alb','Rensselaer':'renss','Troy':'troy','Cohoes':'conf','Waterford':'conf','Schenectady':'sch','Rotterdam Junction':'mohawk','Scotia':'mohawk','Colonie':'albco','Fort Hunter':'mohawk','Schoharie':'mohawk','Saratoga Springs':'sar','Mount McGregor':'sar','Catskill':'hud','Hudson':'hud','Coxsackie':'hud','Hudson River':'hud','Woodstock':'cat','Saugerties':'cat','Ticonderoga':'adk','Raquette Lake':'adk'}

@@ -79,6 +79,8 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         i=p['id']; w=f'{name}:{i}'; seen(i,name)
         if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*',i): err.append(f'{w}: id must be lowercase words joined by hyphens')
         # red brick (GUIDE.md section 4): every place written since November 19, 2026 says yes, some, no, or ? for not checked
+        _tip=p.get('tip') or ''      # a place that began as a reader's lead carries the day it was sent (GUIDE.md section 15)
+        if _tip and not(re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',_tip) and _tip<=_ad[:10]): err.append(f"{w}: tip='{_tip}' must be the day the reader sent it, as YYYY-MM-DD, and not after the batch's own date")
         _bk=p.get('brick') or ''
         if _bk not in ('','yes','some','no','?'): err.append(f"{w}: brick='{_bk}' must be yes, some, no or ? (not checked)")
         if not _bk and _ad[:10]>='2026-11-19': err.append(f"{w}: no brick=. Say whether red brick can be seen there: brick='yes' (mostly brick), 'some' (part brick), 'no', or '?' if no source or picture settles it")

@@ -1,7 +1,8 @@
 # Split pins and new entries. p = parent catalogue entry index (links and confidence are inherited when given)
-def N(id,name,town,reg,cat,st,lat,lon,prec,acc,eff,tags,years,story,look='',hook='',accn='',links=None,p=None,conf=None,th=None,thn=None,name2='',brick=''):
+def N(id,name,town,reg,cat,st,lat,lon,prec,acc,eff,tags,years,story,look='',hook='',accn='',links=None,p=None,conf=None,th=None,thn=None,name2='',brick='',tip=''):
     # brick: 'yes' red brick is the main thing you see, 'some' part brick (a chimney, an arch, brick over stone), 'no' none or not red, '?' not checked (GUIDE.md section 4)
-    return dict(id=id,name=name,town=town,reg=reg,cat=cat,st=st,lat=lat,lon=lon,prec=prec,acc=acc,eff=eff,tags=tags,years=years,story=story,look=look,hook=hook,accn=accn,links=links or [],p=p,conf=conf,th=th,thn=thn,name2=name2,brick=brick)
+    # tip: the day a reader sent this place to the Atlas ('2026-11-18'); empty for a place a session found. The app shows "Sent in by a reader" (GUIDE.md sections 4 and 15)
+    return dict(id=id,name=name,town=town,reg=reg,cat=cat,st=st,lat=lat,lon=lon,prec=prec,acc=acc,eff=eff,tags=tags,years=years,story=story,look=look,hook=hook,accn=accn,links=links or [],p=p,conf=conf,th=th,thn=thn,name2=name2,brick=brick,tip=tip)
 B=[
 N('dudley-observatory-1','First Dudley Observatory site','Albany','alb','inst','gone',42.66471,-73.74935,'site','public','drive','','1856–1893',
   'The first observatory (1856) stood on "Goat Hill," now Dudley Heights in Arbor Hill, until vibration from the railroad below ruined its readings.',
