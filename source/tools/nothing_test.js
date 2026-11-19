@@ -29,7 +29,7 @@ const { chromium } = require('playwright');
   ok('a standing place still buzzes',await buzzAt(p,pick.standing),pick.standing);
   const near=await p.evaluate(id=>{ const {sites,nmFix,nmCollect,nmBuzzes,NM,XL,xlLoad,syncMarkers}=window.__atlasNM; const s=sites().find(x=>x.id===id); return nmCollect([s.lat,s.lon],1).some(x=>x.id==='p:'+id); },pick.gone);
   ok('by default a place with nothing to see is still listed in the Near tab',near);
-  const vz=await p.evaluate(async()=>{ const {nmCollect,nmBuzzes,XL,xlLoad}=window.__atlasNM; xlLoad('vanished',true); for(let i=0;i<60&&!(XL.vanished&&XL.vanished.idx);i++) await new Promise(r=>setTimeout(r,150));
+  const vz=await p.evaluate(async()=>{ const {nmCollect,nmBuzzes,XL,xlLoad}=window.__atlasNM; xlLoad('vanished',true); for(let i=0;i<60&&!(XL.vanished&&XL.vanished.data);i++) await new Promise(r=>setTimeout(r,150)); window.__atlasNM.xlNeed('vanished',42,-75,43.5,-73); for(let i=0;i<60&&!Object.keys((XL.vanished&&XL.vanished.idx)||{}).length;i++) await new Promise(r=>setTimeout(r,150));      /* the index, then New York's own file */
     const X=XL.vanished; if(!X||!X.idx) return null; let list=[], t=null;
     for(const k of Object.keys(X.idx).slice(0,400)){ const x=X.idx[k][0]; list=nmCollect([x[0],x[1]],0.3); t=list.find(y=>y.k==='v'); if(t) break; }      /* some kinds (old schools) are hidden by default */ return {listed:!!t,buzz:t?nmBuzzes(t):null,pushed:list.filter(nmBuzzes).some(y=>y.k==='v')}; });
   ok('a vanished place is listed in the Near tab but does not buzz, nor go to the phone\'s recorder',vz&&vz.listed&&vz.buzz===false&&!vz.pushed,JSON.stringify(vz));
@@ -39,7 +39,7 @@ const { chromium } = require('playwright');
   // 2. switched the other way
   ({c,p}=await open({quietGone:false,buzzVanished:true}));
   ok('"No buzz for places with nothing to see" off: it buzzes again',await buzzAt(p,pick.gone));
-  const v2=await p.evaluate(async()=>{ const {nmCollect,nmBuzzes,XL,xlLoad}=window.__atlasNM; xlLoad('vanished',true); for(let i=0;i<60&&!(XL.vanished&&XL.vanished.idx);i++) await new Promise(r=>setTimeout(r,150));
+  const v2=await p.evaluate(async()=>{ const {nmCollect,nmBuzzes,XL,xlLoad}=window.__atlasNM; xlLoad('vanished',true); for(let i=0;i<60&&!(XL.vanished&&XL.vanished.data);i++) await new Promise(r=>setTimeout(r,150)); window.__atlasNM.xlNeed('vanished',42,-75,43.5,-73); for(let i=0;i<60&&!Object.keys((XL.vanished&&XL.vanished.idx)||{}).length;i++) await new Promise(r=>setTimeout(r,150));      /* the index, then New York's own file */
     const X=XL.vanished; let t=null; for(const k of Object.keys(X.idx).slice(0,400)){ const x=X.idx[k][0]; t=nmCollect([x[0],x[1]],0.3).find(y=>y.k==='v'); if(t) break; } return t?nmBuzzes(t):null; });
   ok('"Buzz for vanished places too" on: they buzz',v2===true);
   await c.close();

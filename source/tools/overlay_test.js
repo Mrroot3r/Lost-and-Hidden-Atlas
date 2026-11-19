@@ -70,6 +70,33 @@ const { chromium } = require('playwright');
   for(const z of [11,9,8,6]){ await go(42.75,-73.9,z); s=await snap(); t=await tap();
     ok('zoom '+z+': the lines are a handful of layers and a tap still opens a box',s.lines>0&&s.lines<90&&t.length>5&&!/^no /.test(t),s.lines+' layers; '+t); }
   await go(42.75,-73.9,12); s=await snap(); ok('everything switched on at zoom 12: hundreds of layers, not thousands',s.layers<900,s.layers+' layers');
+  // ---- vanished places and old mines come one state at a time: an index, then a state's own file when the map is zoomed in
+  //      over it or the reader stands in it. Nobody looking at Albany downloads Missouri.
+  { const c2=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c2.newPage(); const got=[]; q.on('pageerror',e=>errs.push(e.message));
+    await c2.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    q.on('request',r=>{ const m=/\/data\/(vanished|mines)(?:\/([a-z]+)-[0-9a-f]+\.json|\/(index)\.json|(\.json))/.exec(r.url()); if(m) got.push(m[1]+':'+(m[2]||m[3]||'WHOLE')); });
+    await q.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},ui:{base:'streets',view:[42.6526,-73.7562,13],hist:false,xl:{vanished:true,mines:true}}})); }catch(e){} });
+    await q.goto(url); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(2600);
+    const st=()=>q.evaluate(()=>{ const X=window.__atlasNM.XL, n=k=>Object.values(X[k].idx||{}).reduce((a,v)=>a+v.length,0), by=k=>{ const o={}; Object.values(X[k].idx||{}).forEach(v=>v.forEach(x=>{ const s=x[x.length-1]; o[s]=(o[s]||0)+1; })); return o; };
+      return {v:n('vanished'),m:n('mines'),vs:by('vanished'),idx:X.vanished.data&&X.vanished.data.s?Object.keys(X.vanished.data.s).length:0,nyN:X.vanished.data&&X.vanished.data.s&&X.vanished.data.s.ny?X.vanished.data.s.ny.n:0,p:Array.isArray(X.vanished.data&&X.vanished.data.p)}; });
+    let s2=await st();
+    ok('over Albany: the index and New York\'s own file are fetched, for both layers',got.indexOf('vanished:index')>=0&&got.indexOf('vanished:ny')>=0&&got.indexOf('mines:index')>=0&&got.indexOf('mines:ny')>=0,got.join(' '));
+    ok('and no far state\'s file, nor the old whole-layer file',!got.some(x=>/:(mo|ks|pa|me|WHOLE)$/.test(x)),got.join(' '));
+    ok('the index lists every state with its count, and carries no points itself',s2.idx>=11&&!s2.p&&s2.nyN>1000,s2.idx+' states; New York '+s2.nyN);
+    ok('New York\'s points are all there and nothing else',s2.vs.ny===s2.nyN&&Object.keys(s2.vs).every(k=>k==='ny'||k==='ma'||k==='vt'),JSON.stringify(s2.vs));
+    const dots=()=>q.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.pane==='lines'&&l.getRadius&&l.options.fillColor==='#ff8a3d') n++; }); return n; });
+    ok('its orange dots are on the map',await dots()>0,await dots()+' dots');
+    await q.evaluate(()=>window.__atlasMap.setView([39.10,-94.58],12,{animate:false})); await q.waitForTimeout(2200); s2=await st();
+    ok('the map moved to Kansas City: Missouri and Kansas come then',got.indexOf('vanished:mo')>=0&&got.indexOf('vanished:ks')>=0&&s2.vs.mo>1000&&s2.vs.ks>100,JSON.stringify(s2.vs));
+    ok('and their dots are drawn',await dots()>0,await dots()+' dots');
+    const before=got.length; await q.evaluate(()=>window.__atlasMap.setView([39.12,-94.50],12,{animate:false})); await q.waitForTimeout(900);
+    ok('a state that has come is not fetched again',got.length===before,got.slice(before).join(' '));
+    // Near: standing in Pennsylvania with the map elsewhere brings Pennsylvania's file
+    const near=await q.evaluate(async()=>{ const NM=window.__atlasNM; const c=[40.44,-79.99]; NM.nmCollect(c,2); for(let i=0;i<40;i++){ await new Promise(r=>setTimeout(r,150)); if(NM.XL.vanished.got&&NM.XL.vanished.got.pa===true) break; } const S=(JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}').ui||{}).nm; return {pa:NM.XL.vanished.got.pa===true,list:NM.nmCollect(c,2).filter(x=>x.k==='v').length,kinds:S&&S.k}; });
+    ok('Near: standing in Pittsburgh with vanished places among the kinds wanted brings Pennsylvania\'s file',near.pa||!(near.kinds&&near.kinds.v),JSON.stringify(near).slice(0,160));
+    const whole=await q.evaluate(()=>Promise.all(['vanished','mines'].map(k=>fetch('data/'+k+'.json').then(r=>r.json()).then(j=>({n:j.p.length,st:Object.keys(j.s).length,t:j.t.length})))));
+    ok('the old whole-layer files are still there for older copies of the Android app, holding the eleven states they held',whole.every(w=>w.n>10000&&w.st===11&&w.t>0),JSON.stringify(whole));
+    await c2.close(); }
   ok('no script errors',errs.length===0,errs.join(' | ').slice(0,200));
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\noverlay test passed'); process.exit(fails.length?1:0);
 })();

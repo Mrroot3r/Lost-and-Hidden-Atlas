@@ -14,7 +14,11 @@ for (const f of need) if (!fs.existsSync(path.join(site, f))) { console.error('M
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'data'), { recursive: true });
 for (const f of need.slice(1)) fs.copyFileSync(path.join(site, f), path.join(out, f));
-for (const f of ['data/pockets.json', 'data/vanished.json', 'data/mines.json']) if (fs.existsSync(path.join(site, f))) fs.copyFileSync(path.join(site, f), path.join(out, f));   // optional layers
+for (const f of ['data/pockets.json']) if (fs.existsSync(path.join(site, f))) fs.copyFileSync(path.join(site, f), path.join(out, f));   // optional layer
+// vanished places and old mines: an index and one file per state, each named with a stamp of its content (data/vanished/, data/mines/).
+// All of them are built in, so the layers work with no signal; a state added to the site later is fetched by boot.js when needed.
+for (const d of ['vanished', 'mines']) { const src = path.join(site, 'data', d);
+  if (fs.existsSync(src)) { fs.mkdirSync(path.join(out, 'data', d), { recursive: true }); for (const f of fs.readdirSync(src)) if (f.endsWith('.json')) fs.copyFileSync(path.join(src, f), path.join(out, 'data', d, f)); } }
 // one detail file per state for the historic pockets; a state added to the site after this app was built is fetched by boot.js when needed
 const pock = path.join(site, 'data', 'pock');
 if (fs.existsSync(pock)) { fs.mkdirSync(path.join(out, 'data', 'pock'), { recursive: true }); for (const f of fs.readdirSync(pock)) if (f.endsWith('.json')) fs.copyFileSync(path.join(pock, f), path.join(out, 'data', 'pock', f)); }

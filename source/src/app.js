@@ -670,7 +670,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,nmGoal:nmGoal,setPref:setPref,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,nmGoal:nmGoal,setPref:setPref,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,xlNeed:xlNeed,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -1167,13 +1167,13 @@ function leadSync(){ const b=map.getBounds().pad(0.25), s=b.getSouth(), n=b.getN
    Both are fetched only when switched on. There are thousands of points, so they are indexed on a grid and only the
    ones in view are drawn, from zoom XL[k].z. */
 const XL={
-  vanished:{file:'data/vanished.json',z:10,fill:'#ff8a3d',ring:'#5a2600',what:'vanished place',
+  vanished:{file:'data/vanished/index.json',z:10,fill:'#ff8a3d',ring:'#5a2600',what:'vanished place',
     src:'From the U.S. Board on Geographic Names file of 2021, which marks it "historical": it no longer exists or no longer serves that purpose. Something may still stand. The position can be 100 m or more out.',
     seed:x=>'Lead from the federal place-names file (GNIS '+x[4]+'), which marks it historical. Not checked yet.'},
-  mines:{file:'data/mines.json',z:9,fill:'#aeb7c2',ring:'#1f2a36',what:'old mine or quarry',
+  mines:{file:'data/mines/index.json',z:9,fill:'#aeb7c2',ring:'#1f2a36',what:'old mine or quarry',
     src:'From the USGS Mineral Resources Data System, last updated in 2011. The position is often only good to a few hundred metres. Old workings can be flooded, fenced or on private land: do not enter shafts or adits.',
     seed:x=>'Lead from the USGS Mineral Resources Data System (record '+x[4]+'). Not checked yet.'} };
-Object.keys(XL).forEach(k=>{ XL[k].k=k; XL[k].data=null; XL[k].idx=null; XL[k].layer=null; XL[k].wait=null; });
+Object.keys(XL).forEach(k=>{ XL[k].k=k; XL[k].data=null; XL[k].idx=null; XL[k].got={}; XL[k].layer=null; XL[k].wait=null; });
 const xlOn=k=>!!(U.ui.xl&&U.ui.xl[k]);
 const xlShow=(k,x)=>k!=='vanished'||x[2]!==1||!!(U.ui.xl&&U.ui.xl.schools);     /* old school sites are two thirds of the file: off unless asked for */
 /* ---------- stone walls found on LiDAR (tools/lidar_walls.py finds them, tools/walls.py builds the layer) ----------
@@ -1202,10 +1202,23 @@ function drawWalls(){ if(!map) return;
         .catch(()=>{ wallCells.delete(k); });
       return; }
     if(c.layer&&!map.hasLayer(c.layer)) c.layer.addTo(map); }); }
+/* These two layers hold tens of thousands of points, so they come in pieces: a small index (the kinds of point, and for each
+   state how many, a stamp of its file and the box it lies in), then one file per state, fetched the first time the map is
+   zoomed in over that state or the reader stands in it (xlNeed). A state's file is named with its stamp, so a copy kept on
+   the phone is never a stale one. X.idx sorts the points that have arrived into squares a twentieth of a degree across. */
 function xlLoad(k,quiet){ const X=XL[k]; if(X.data||X.wait) return;
   X.wait=(AT?AT.fetch(X.file):fetch(X.file+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
-    .then(j=>{ X.data=j; X.idx={}; j.p.forEach(x=>{ const g=Math.floor(x[0]*20)+','+Math.floor(x[1]*20); (X.idx[g]=X.idx[g]||[]).push(x); }); drawXL(k); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
+    .then(j=>{ X.data=j; X.idx={}; X.got={}; if(Array.isArray(j.p)) xlAdd(X,j.p); drawXL(k); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
     .catch(()=>{ X.wait=null; if(!quiet||xlOn(k)) banner('That layer could not load. Check your signal and switch it on again.',true,6000); }); }
+function xlAdd(X,rows){ rows.forEach(x=>{ const g=Math.floor(x[0]*20)+','+Math.floor(x[1]*20); (X.idx[g]=X.idx[g]||[]).push(x); }); }
+/* fetch every state whose box touches this one (south, west, north, east) and has not come yet; a failure is tried again after half a minute */
+function xlNeed(k,S,W,N,E){ const X=XL[k], st=X.data&&X.data.s; if(!st) return;
+  Object.keys(st).forEach(key=>{ const o=st[key], b=o&&o.b, g=X.got[key]; if(!b||!o.h||g===true||g==='wait'||(g&&Date.now()-g.t<30000)) return;
+    if(b[0]>N||b[2]<S||b[1]>E||b[3]<W) return;
+    X.got[key]='wait'; const p='data/'+k+'/'+key+'-'+o.h+'.json';
+    (AT?AT.fetch(p):fetch(p+'?v='+o.h)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+      .then(j=>{ X.got[key]=true; xlAdd(X,j.p||[]); drawXL(k); nmLoaded(); })
+      .catch(()=>{ X.got[key]={t:Date.now()}; if(xlOn(k)) banner('Part of that layer could not load here. Check your signal.',true,5000); }); }); }
 function xlInView(k,b){ const X=XL[k], out=[]; if(!X.idx) return out;
   for(let i=Math.floor(b.getSouth()*20);i<=Math.floor(b.getNorth()*20);i++) for(let j=Math.floor(b.getWest()*20);j<=Math.floor(b.getEast()*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(k,x)&&b.contains([x[0],x[1]])) out.push(x); });
   return out; }
@@ -1215,6 +1228,7 @@ function drawXL(k){ const X=XL[k]; if(!map) return;
   if(!X.data){ off(); xlLoad(k); return; }
   if(!map._xlOn){ map._xlOn=true; map.on('moveend',()=>Object.keys(XL).forEach(drawXL)); }
   if(map.getZoom()<X.z){ off(); return; }
+  { const b=map.getBounds().pad(0.1); xlNeed(k,b.getSouth(),b.getWest(),b.getNorth(),b.getEast()); }      /* the states in view, if they have not come yet */
   if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
   if(!X.layer){ X.layer=viewDots(); X.layer.grp.addTo(map); }                /* a dot already drawn stays; only what came into view is made */
   viewSync(X.layer,xlInView(k,map.getBounds().pad(0.1)).slice(0,1500),x=>{
@@ -1471,6 +1485,7 @@ function nmCollect(c,rmi){ const S=nmSet(), out=[], add=(id,k,la,lo,n,t,o)=>{ if
   if(S.k.p) sites().forEach(s=>{ if(pref('hideGone')&&nothingToSee(s)) return; const q=pos(s), my=U.status[s.id]; add('p:'+s.id,'p',q.lat,q.lon,s.name,[s.cat==='lidar'?'LiDAR find, not verified':STS[s.st],s.town,my?MY[my]:''].filter(Boolean).join(' · '),s); });
   if(S.k.l&&LEADS) LEADS.p.forEach(p=>add('l:'+p[0]+','+p[1],'l',p[0],p[1],p[3]||LEADS.t[p[2]],(p[3]?LEADS.t[p[2]]+' · ':'')+'unchecked lead',p));
   [['v','vanished'],['m','mines']].forEach(q=>{ const X=XL[q[1]]; if(!S.k[q[0]]||!X.idx) return; const dla=rmi/69+0.002, dlo=rmi/(69*Math.cos(rad(c[0])))+0.002;
+    xlNeed(q[1],c[0]-dla,c[1]-dlo,c[0]+dla,c[1]+dlo);      /* the state the reader stands in, and a neighbour within reach; when it comes, nmLoaded() counts again */
     for(let i=Math.floor((c[0]-dla)*20);i<=Math.floor((c[0]+dla)*20);i++) for(let j=Math.floor((c[1]-dlo)*20);j<=Math.floor((c[1]+dlo)*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(q[1],x)) add(q[0]+':'+x[4],q[0],x[0],x[1],x[3]||X.data.t[x[2]],xlLine(q[1],x)+' · unchecked lead',x); }); });
   if(S.k.c&&POCK) POCK.k.forEach(k=>{ if(pockC(k)) add('c:'+k[0]+','+k[1],'c',k[0],k[1],k[7],'Old town centre'+(k[12]?' · '+k[12]:''),k); });
   return out; }
