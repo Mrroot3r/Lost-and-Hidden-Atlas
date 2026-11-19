@@ -5,6 +5,8 @@
    python3 tools/choose.py --release <clone>   give the claim up (run it after the pull request is open)
    python3 tools/choose.py --claim <clone> --state ny     the same draw, kept to one state or province (its two-letter key),
                                                           or to several: --state qc,nb,ns,pe,nl
+   python3 tools/choose.py --claim <clone> --thinnest     no draw: the state or province with the fewest places that nobody has
+                                                          taken (for ONE task that runs alone; several would follow each other)
 Why random: "take the thinnest region" is the same answer for every session, so four sessions started in one hour all
 took the same county. A claim is one line added to claims.txt on the repository's "claims" branch, pushed at once. Git refuses the second of
 two pushes made at the same moment, and that session reads again and picks other ground, so two sessions cannot hold
@@ -91,6 +93,10 @@ def lead_states(clone):
 def pick(tk,leads=()):
     cand=[(c,l,sn,k) for c,l,sn,k in REG if c not in tk and (not ONLY or k in ONLY.split(','))]
     if not cand: sys.exit('Every region of %s is taken just now (%s). Wait for a claim to lapse, or work on leads or pins there instead.'%(ONLY.upper(),', '.join(sorted(c for c,l,sn,k in REG if k in ONLY.split(',')))))
+    if THIN:      # the state or province with the fewest places of all, and in it the region with the fewest; a tie is settled by lot
+        tot={}
+        for c,l,sn,k in REG: tot[k]=tot.get(k,0)+cnt.get(c,0)
+        r=random.SystemRandom(); return min(cand,key=lambda x:(tot[x[3]],cnt.get(x[0],0),r.random()))
     w=[(2.0 if k in DEEP else 1.0)*(1.5 if k in leads else 1.0)/(cnt.get(c,0)+3) for c,l,sn,k in cand]
     return random.SystemRandom().choices(cand,weights=w,k=1)[0]
 def km(a,b,c,d):
@@ -116,6 +122,8 @@ def centres(reg,st):
     return random.SystemRandom().sample(out,min(3,len(out)))
 a=sys.argv[1:]
 ONLY=''
+THIN='--thinnest' in a
+if THIN: a.remove('--thinnest')
 if '--state' in a:
     i=a.index('--state'); ONLY=a[i+1].lower(); del a[i:i+2]
     for _k in ONLY.split(','):
