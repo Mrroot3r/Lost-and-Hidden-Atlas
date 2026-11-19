@@ -1,0 +1,26 @@
+# bc_kmrl: British Columbia: Kaslo, Sandon and New Denver (the silvery Slocan)
+state: British Columbia
+region: bc
+date: 2026-11-19
+places: 16
+file: data_bc_kmrl.py
+
+## What this batch is
+Sixteen places in the West Kootenay silver country, drawn as region `bc` by `choose.py`: eight standing buildings in Kaslo (the S.S. Moyie sternwheeler, the 1898 municipal hall, the Langham hotel, three wooden churches of 1893 to 1902, the 1896 brick store and the Masonic hall), three in New Denver (the Nikkei Internment Memorial Centre, the 1893 church, the Silvery Slocan Museum in the old Bank of Montreal), three in Sandon (the brick Slocan Mercantile store, the 1900 city hall, the Silversmith powerhouse) and two traces (the Kaslo & Slocan grade to Payne Bluff with the Payne concentrator ruins, and the Three Forks townsite on the Galena Trail). Most facts and coordinates come from the Canadian Register of Historic Places statements (historicplaces.ca, read with a short script), with Wikipedia (`wiki_raw.py`) for Sandon, Three Forks, the K&S railway and the Moyie. Hours come from the managing bodies' pages where they opened (Kootenay Lake Historical Society, the Langham, the Regional District of Central Kootenay) and otherwise from the FETCH Kootenay Boundary directory, Kootenay Rockies Tourism and the Sandon visitor site; the Sandon city hall and Silversmith hours given are for the 2024 season, and the Sandon museum's hours differ between two sources (both given). Not checked: anything on the ground; parking everywhere except the two trailheads (no lots are mapped in Kaslo's centre or Sandon); church service times and whether the churches can be entered; the present use and owner of the New Denver Church; the Silvery Slocan Museum's building year (1896 rests on one Waymarking page); who owns the land under the K&S trail. The federal public-land map (`land:` line) does not cover Canada, so every pin there reads "not on mapped public land"; the access notes name the owners from the sources instead. Pins that mark only an area: Payne Bluff (a point on the OpenStreetMap K&S grade; the concentrator was not found on the aerial) and Three Forks (the Wikipedia coordinate). There is no 1 m LiDAR here. Red brick was set from the Register's own photographs (1896 Building and Slocan Mercantile yes; wooden buildings no from the Register's descriptions and photographs); four are '?'.
+
+## Leads
+Places you read about and could not finish. One row each; delete the example row. Leave the table header.
+
+| Place | Where | What is known | What is missing |
+|---|---|---|---|
+| Cody ghost town (Noble Five concentrator, K&S station) | Cody, BC, about 1 km east of Sandon (49.97513, -117.19687, Wikipedia) | Wikipedia: surviving remnants are the K&S station, the Noble Five concentrator, a few shacks and parts of the aerial tramway | Who owns the ground and whether the public may walk in; a source other than Wikipedia for what stands; the exact spot |
+| Zincton mill ruins | Highway 31A, about 15 km north-east of New Denver (50.03306, -117.20111, Wikipedia) | Wikipedia: Lucky Jim mine, mill of 1928, closed 1959; buildings burned in the 1980s and concrete ruins occupy the overgrown site | Owner and access (a resort is proposed there); a pin on the ruins |
+| Retallack | Highway 31A, 37 km north-west of Kaslo (50.05, -117.13333, Wikipedia) | Ghost town after the 1956 mine closure; a large lodge was built on the townsite in 1996 | Whether anything old survives to see, and from where |
+| Slocan City internment cemetery monument | Slocan, BC (Register id 23237; 49.76965, -117.47083) | The Register says the 1944 monument in the Slocan cemetery to at least nine Japanese Canadians cremated there is the only physical trace of the internment in Slocan City | A pin on the cemetery and the cemetery's owner |
+| Rosebery internment camp | Rosebery Park Road, north of New Denver (Register id 23016; 50.03353, -117.40419) | Register lists it with New Denver and Sandon as internment places | Nothing visible is described; probably not worth a pin without a source that says what is left |
+
+## Tips
+- historicplaces.ca (the Canadian Register) reads with plain `requests` and `page.py`'s user agent. Each place page (`/en/rep-reg/place-lieu.aspx?id=N`) holds a latitude and longitude in its HTML (grep `lat` near a `-1xx.` number), a construction date, the full statement and character-defining elements, and a medium photo at `/hpimages/Thumbnails/<n>_Medium.jpg` good enough to settle red brick. The keyword search (`/en/results-resultats.aspx?m=2&Keyword=Kaslo`) returns ten results; its later pages need an ASP.NET postback, which a plain POST of the hidden fields did not get past, so search with several keywords (town names, street names) instead.
+- Canadian Register coordinates in Kaslo were on the building for most places; the S.S. Moyie's was 86 m off in trees.
+- The pin check's `land:` line and `CHECK ACCESS` warnings mean nothing in Canada (PAD-US is US only); name the owner from a source in the access note.
+- The FETCH Kootenay Boundary directory (`kb.fetchbc.ca/service.html?i=N`) lists West Kootenay museums with hours and is updated in 2026; newdenver.ca answers 403 to `page.py` with no usable archive copy.
