@@ -22,10 +22,24 @@ def _in(r,x,y):
         if (yi>y)!=(yj>y) and x<(xj-xi)*(y-yi)/(yj-yi)+xi: ins=not ins
         j=i
     return ins
+def states_at(lat,lon):
+    """every state whose outline holds the point: the outlines are coarse and overlap along shores and rivers"""
+    return [k for k,rs in OUTL.items() if any(_in(r,lon,lat) for r in rs)]
 def state_of(lat,lon):
-    for k,rs in OUTL.items():
-        if any(_in(r,lon,lat) for r in rs): return k
-    return None
+    s=states_at(lat,lon); return s[0] if s else None
+def near_state(lat,lon,k,m=1000):
+    """is the point within m metres of state k's outline? The outlines are simplified to about a kilometre and run a few
+    hundred metres off border rivers (the Salmon Falls at South Berwick, the Connecticut), so a pin on the right bank can
+    fall just outside its own state."""
+    import math
+    kx=math.cos(math.radians(lat))*111320; ky=110540
+    for r in OUTL.get(k,[]):
+        n=len(r)//2
+        for i in range(n):
+            ax,ay,bx,by=(r[2*i]-lon)*kx,(r[2*i+1]-lat)*ky,(r[2*((i+1)%n)]-lon)*kx,(r[2*((i+1)%n)+1]-lat)*ky
+            dx,dy=bx-ax,by-ay; L=dx*dx+dy*dy; t=max(0,min(1,-(ax*dx+ay*dy)/L)) if L else 0
+            if (ax+t*dx)**2+(ay+t*dy)**2<=m*m: return True
+    return False
 mk=open(os.path.join(T,'make.py'),encoding='utf-8').read()
 TAGS=set(re.findall(r"^ \['(\w+)',",mk,re.M))|{'now'}
 BOUNDS=[float(x) for x in re.search(r"MAXB=\[\[([\d.,\-\[\]]+)\]\]",app).group(1).replace('[','').replace(']','').split(',')]
@@ -71,10 +85,11 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if p['reg'] not in REG: err.append(f"{w}: region '{p['reg']}' is not listed in tools/states.py")
         if (p.get('conf') or '').lower() not in CONF: err.append(f"{w}: conf='{p['conf']}' must be empty, 'mixed' or 'lead'")
         for t in [x for x in p['tags'].split(',') if x]:
-            if t not in TAGS: err.append(f"{w}: tag '{t}' is not a series tag ({' '.join(sorted(TAGS))})")
+            if t not in TAGS: err.append(f"{w}: tag '{t}' is not a series tag ({' '.join(sorted(TAGS))})"+(" (a burial ground's series tag is cemeteries; burial is a category)" if t=='burial' else " (a railroad building's series tag is stations; a freight house or a line fits none: leave tags empty)" if t=='rail' else " ('"+t+"' is a category, cat=, not a tag)" if t in CAT else ''))
         if not(BOUNDS[0]<=p['lat']<=BOUNDS[2] and BOUNDS[1]<=p['lon']<=BOUNDS[3]): err.append(f"{w}: pin {p['lat']},{p['lon']} is outside the map bounds; widen maxBounds in app.js if this is a new area")
-        stt=state_of(p['lat'],p['lon'])
-        if p['reg'] in REG_STATE and stt!=REG_STATE[p['reg']]: err.append(f"{w}: the pin is in {stt or 'no listed state'} but region '{p['reg']}' belongs to {REG_STATE[p['reg']]}; check the coordinate and the region")
+        sts=states_at(p['lat'],p['lon']); stt=sts[0] if sts else None; want=REG_STATE.get(p['reg'])
+        if want and want not in sts and near_state(p['lat'],p['lon'],want): warn.append(f"{w}: the pin is just outside {want}'s outline, which is coarse along borders; fine if the pin is on the {want} side on the aerial")
+        elif p['reg'] in REG_STATE and want not in sts: err.append(f"{w}: the pin is in {stt or 'no listed state'} but region '{p['reg']}' belongs to {REG_STATE[p['reg']]}; check the coordinate and the region")
         if p.get('th') and not(isinstance(p['th'],(list,tuple)) and len(p['th'])==2): err.append(f'{w}: th must be [lat, lon]')
         if not p['story'].strip(): err.append(f'{w}: empty story')
         # a drafted place (tools/lidar.py draft) is not finished while any of its text still says TODO
