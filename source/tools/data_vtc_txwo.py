@@ -81,7 +81,7 @@ N('elmore-state-park-ccc','Elmore State Park CCC beach house and fire tower','El
   'Vermont State Parks (Department of Forests, Parks and Recreation). Open from the Friday of Memorial Day weekend to the second Monday in October; day-use and camping fees. Pets are not allowed on the beach at any time. Beach lot off Beach Road from VT 12; a separate trailhead lot serves the mountain trails.',
   [W('Elmore State Park'),['Vermont State Parks: Elmore','https://vtstateparks.com/elmore.html']],th=[44.54246,-72.52831],thn='Beach Road lot',brick='?'),
 # ---- Cambridge ----
-N('cambridge-meetinghouse','Cambridge Meetinghouse (Old Brick Church)','Jeffersonville','vtc','civic','standing',44.6436,-72.83134,'exact','view','drive','','1826–',
+N('cambridge-meetinghouse','Cambridge Meetinghouse (Old Brick Church)','Jeffersonville','vtc','worship','standing',44.6436,-72.83134,'exact','view','drive','','1826–',
   'Built in 1826 as a union church to be shared by four denominations, which made it a scene of sectarian quarrels; the Perfectionist movement that led to the Oneida Community in New York in the 1840s rose here. The town began holding meetings in it in 1866, the last services were held in 1889, and it was the town hall until 1958. It now holds the post office.',
   'A two-story red brick Federal meeting house with "1826" over the door (Wikimedia photograph), a pedimented gable and projecting centre bay, a recessed entrance framed by pilasters, and a square tower with an octagonal belfry and cupola. A stage was added at the back in the early 1900s. The post office lobby is the part the public can enter in its hours; the rest of the interior not checked.',
   '',
@@ -118,7 +118,7 @@ N('vermont-state-hospital','Vermont State Hospital (Waterbury State Office Compl
   'The asylum whose name became a Vermont insult, and what became of it after Irene.',
   'State office complex at the south end of Waterbury village (Register district, 2016). See it from the drives and the public roads; it is a working state office, and access to the buildings was not checked.',
   [W('Vermont State Hospital'),NR('16000765','Vermont State Hospital Historic District')],brick='yes'),
-N('waterbury-white-meeting-house','White Meeting House (Waterbury Congregational Church)','Waterbury','vtc','civic','standing',44.33807,-72.75738,'exact','view','drive','','1824–',
+N('waterbury-white-meeting-house','White Meeting House (Waterbury Congregational Church)','Waterbury','vtc','worship','standing',44.33807,-72.75738,'exact','view','drive','','1824–',
   'Waterbury\'s United Church of Christ, known as the White Meeting House, was built in 1824 by the Carpenter brothers, who also built the town\'s 1826 Stagecoach Inn. It was remodelled in 1860 to give it a Gothic look; the chapel was added in 1880 and the stained glass in 1890. Hope Cemetery behind it holds many of the village\'s early settlers.',
   'A three-bay frame church with buttresses ending in pinnacles at the corners and a two-tier tower and spire over the double doors; the 1890 stained glass windows. Interior not checked.',
   '',

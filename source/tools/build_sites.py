@@ -83,6 +83,22 @@ for f in sorted(glob.glob('tools/bricks_*.py')):
 for s in sites:
     v=BRICKS.get(s['id'])
     if v and 'bk' not in s and v[0] in ('yes','some','no'): s['bk']=v[0][0]
+# A full entry can take the place of an older, thinner one for the same place: was='lm-mabee-farm'. The old pin is dropped
+# here, and the app is told (build/alias.json, D.alias) so a reader's notes, status and trip stop move to the new id.
+ALIAS={}
+for b in B+C:
+    for o in ([b['was']] if isinstance(b.get('was'),str) and b.get('was') else list(b.get('was') or [])):
+        if o in ALIAS: raise SystemExit(f"Two places say they replace '{o}': {ALIAS[o]} and {b['id']}")
+        ALIAS[o]=b['id']
+if ALIAS:
+    import math
+    by={s['id']:s for s in sites}
+    for o,n in ALIAS.items():
+        if o in by:
+            a,c=by[o],by[n]; m=math.hypot((a['lat']-c['lat'])*111000,(a['lon']-c['lon'])*111000*math.cos(math.radians(a['lat'])))
+            if m>600: raise SystemExit(f"{n} says it replaces '{o}', but that pin is {int(m)} m away: was= is for the same place only")
+    sites=[s for s in sites if s['id'] not in ALIAS]
+json.dump(ALIAS,open('build/alias.json','w'),indent=0,sort_keys=True)
 ids=[s['id'] for s in sites]
 dup=sorted({i for i in ids if ids.count(i)>1})
 if dup: raise SystemExit('Duplicate place ids: '+', '.join(dup)+'. Ids are shared across every state, so add a town or state suffix to the NEW one (queens-fort-exeter). Never rename an id that is already published.')

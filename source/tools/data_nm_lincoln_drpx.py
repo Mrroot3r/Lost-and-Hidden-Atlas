@@ -47,7 +47,7 @@ N('torreon-lincoln-nm','The Torreon','Lincoln','nm','fort','standing',33.49256,-
   '',
   'Owned by the State of New Mexico (1974 nomination). Seen from U.S. 380 in the middle of Lincoln. '+LINC_ACC,
   [LINC_NR,HM(45990,'Torreon')],brick='no'),
-N('san-juan-church-lincoln-nm','San Juan Bautista Church','Lincoln','nm','civic','standing',33.49218,-105.38607,'site','view','walk','','1887',
+N('san-juan-church-lincoln-nm','San Juan Bautista Church','Lincoln','nm','worship','standing',33.49218,-105.38607,'site','view','walk','','1887',
   'La Iglesia de San Juan Bautista, Lincoln\'s adobe church, dedicated in 1887, just after the years of the Lincoln County War. New Mexico State Monuments restored it in 1984.',
   'A rectangular adobe building (nomination), beside the Torreon on U.S. 380. Whether it is open and what survives inside was not checked.',
   '',

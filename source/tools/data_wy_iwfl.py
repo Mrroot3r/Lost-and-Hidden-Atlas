@@ -38,7 +38,7 @@ N('ferris-mansion-rawlins','George Ferris Mansion','Rawlins','wy','landmark','st
   '',
   'Private, 607 W. Maple Street. View from the street. Not open to the public as far as any source opened here says.',
   [W('George Ferris Mansion'),L('Cowboy State Daily: From ruin to regal (2023)','https://cowboystatedaily.com/2023/09/23/from-ruin-to-regal-a-wyoming-familys-mission-to-save-the-ferris-mansion/'),L('Wake Up Wyoming: Ferris Mansion for sale','https://wakeupwyo.com/ferris-mansion-rawlins-wy/')],conf='mixed',brick='yes'),
-N('france-memorial-church-rawlins','France Memorial Presbyterian Church','Rawlins','wy','civic','standing',41.78815,-107.23666,'exact','view','drive','','1882',
+N('france-memorial-church-rawlins','France Memorial Presbyterian Church','Rawlins','wy','worship','standing',41.78815,-107.23666,'exact','view','drive','','1882',
   'Rawlins\' Presbyterians built their first church in 1870, the only church in town, and outgrew it by 1880. This Gothic Revival church went up in 1882 for $7,800 on a mortgage that James France, husband of a member, largely paid off in 1885; it was named for his wife Elizabeth. It is built of stone quarried in the hills north of town and is the only stone church in Rawlins. The building passed to Victory Baptist Church, which kept the old name.',
   'Stone walls and Gothic windows. Interior not checked.',
   '',

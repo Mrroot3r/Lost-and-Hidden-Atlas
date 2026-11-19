@@ -1,12 +1,14 @@
 import json,csv,html,os
 R=os.environ.get('ATLAS','/home/claude/atlas').rstrip('/')+'/'
 S=json.load(open(R+'build/sites.json'))
-CAT={'amuse':'Amusement & trolley parks','hotel':'Hotels & resorts','canal':'Canal works','rail':'Rail, trolley & bridges','industry':'Mills, iron, brick & ice','burial':'Burial grounds','town':'Ghost & drowned towns','civic':'Downtown losses','fort':'Forts & depots','water':'Water works & buried creeks','inst':'Estates, institutions & parks','light':'Lighthouses','landmark':'Standing landmarks','lidar':'LiDAR find, unverified'}
+# the kinds of place, their names and colours: read from the one list in the app (KML wants a colour as aabbggrr)
+import re
+_C=re.findall(r"(\w+):\['([^']+)','#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})'\]",re.search(r'const CAT=\{[^\n]*\};',open(R+'src/app.js',encoding='utf-8').read()).group(0))
+CAT={k:n for k,n,r,g,b in _C}; COL={k:'ff'+b+g+r for k,n,r,g,b in _C}
 ST={'ruins':'Ruins','traces':'Traces','standing':'Standing','marker':'Marker only','gone':'Nothing visible','water':'Under water'}
 PREC={'exact':'Exact','site':'On site','area':'Approximate'}
 ACC={'public':'Public land or street','view':'View from the public way','ask':'Ask permission first','permit':'Permit required','boat':'On the water'}
 EFF={'drive':'Drive-up','walk':'Short walk','hike':'Hike','boat':'Boat or shore view'}
-COL={'amuse':'ff8a33d6','hotel':'ff2b32c8','canal':'ffd08f2f','rail':'ff544f4b','industry':'ff1f69b4','burial':'ffa04f6b','town':'ff4a9e2e','civic':'ff009ac7','fort':'ff1e6a7a','water':'ffb3a319','inst':'ff794e1f','light':'ff248af0','landmark':'ff948f8a'}
 with open(R+'dist/lost-hidden-atlas-places.csv','w',newline='',encoding='utf-8-sig') as f:
     w=csv.writer(f); w.writerow(['Name','Town','Years','Kind','What is left','Pin accuracy','Latitude','Longitude','Access','Effort','Parking latitude','Parking longitude','Minutes from Albany','Minutes from Schenectady','Minutes from Troy','Minutes from Saratoga Springs','Verified','Changing now','Old USGS map year','What was here','Look for','Access notes','Pin evidence','Google Maps','Sources'])
     TM=json.load(open(R+'build/topo/meta.json'))

@@ -13,7 +13,9 @@ const topoImg=s=>{ if(!s||!s.tm) return null; if(HOSTED) return 'topo/'+s.id+'.w
 function topoSrc(s){ if(!s||!s.tm) return Promise.resolve(null); if(AT) return AT.topo(s.id,s.tm.v).catch(()=>null); return Promise.resolve(topoImg(s)); }
 function topoWarm(list){ if(!HOSTED) return; list.forEach(x=>{ if(AT){ topoSrc(x); return; } const u=topoImg(x); if(u) fetch(u).catch(()=>{}); }); }
 
-const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Rail, trolley & bridges','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],burial:['Burial grounds','#6b4fa0'],town:['Ghost & drowned towns','#2e9e4a'],civic:['Downtown losses','#5c6bc0'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Standing landmarks','#f2b705'],lidar:['LiDAR finds, unverified','#00a88f']};
+/* The kinds of place. This line is the one list: tools/check.py and tools/export.py read the codes, names and colours from it.
+   What belongs in each kind is set out for research sessions in GUIDE.md section 4. */
+const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Railroads & trolleys','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],worship:['Places of worship','#9b1b45'],burial:['Burial grounds','#6b4fa0'],town:['Ghost, drowned & historic towns','#2e9e4a'],civic:['Civic & downtown buildings','#5c6bc0'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Houses, bridges & landmarks','#f2b705'],lidar:['LiDAR finds, unverified','#00a88f']};
 const ST={ruins:'Ruins you can see',traces:'Traces: grades, piers, earthworks',standing:'Still standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STS={ruins:'Ruins',traces:'Traces',standing:'Standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STRANK={ruins:0,standing:1,traces:2,marker:3,gone:4,water:5};
@@ -93,6 +95,15 @@ if(DARKQ&&DARKQ.addEventListener) DARKQ.addEventListener('change',applyTheme);  
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
 
 const sites=()=>BASE.concat(U.custom);
+/* Ids that gave way to a fuller entry for the same place: {old id: new id} (was= in a place list). What a reader had saved
+   against the old id (status, notes, a moved pin, visit reports, a trip stop, a field-log note's place) moves to the new one. */
+const ALIAS=D.alias||{};
+function aliasMigrate(){ let ch=false; Object.keys(ALIAS).forEach(o=>{ const n=ALIAS[o];
+    ['status','notes','moved','visits'].forEach(k=>{ const m=U[k]; if(m&&Object.prototype.hasOwnProperty.call(m,o)){ if(!Object.prototype.hasOwnProperty.call(m,n)) m[n]=m[o]; delete m[o]; ch=true; } });
+    if(Array.isArray(U.trip)){ const i=U.trip.indexOf(o); if(i>=0){ if(U.trip.indexOf(n)<0) U.trip[i]=n; else U.trip.splice(i,1); ch=true; } }
+    (U.logs||[]).forEach(l=>(l.notes||[]).forEach(x=>{ if(x.pl===o){ x.pl=n; ch=true; } })); });
+  if(ch) save(); }
+aliasMigrate();
 /* "Nothing to see": a place marked Nothing visible or Marker only. Under water is not counted: something can show at low water.
    Settings: quietGone (default on) keeps them from buzzing; hideGone (default off) takes them off the map, the lists and Near. */
 const nothingToSee=s=>!!s&&(s.st==='gone'||s.st==='marker');
@@ -216,7 +227,8 @@ const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{
   ['Red brick',()=>{ F.brick=true; }],
   ['Within 30 min',()=>{ F.max=30; }],
   ['Changing now',()=>{ F.now=true; }],
-  ['Standing landmarks',()=>{ F.cat.add('landmark'); }],
+  ['Places of worship',()=>{ F.cat.add('worship'); }],
+  ['Houses, bridges & landmarks',()=>{ F.cat.add('landmark'); }],
   ['Pins to confirm',()=>{ F.lead=true; }]
 ]);
 function chipGroup(label,map,set,colors){
@@ -2417,7 +2429,7 @@ function dataSections(v){
   const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status,visits:visitExport()},null,1); out.value=t; copy(t,b3); });
   const inp=el('textarea',{id:'bk-in',placeholder:'Paste a backup here',style:'min-height:60px;font-family:var(--fm);font-size:11.5px'});
   const msg=el('span',{class:'note-saved'});
-  const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; save(); applyTheme(); drawScale(); pushPrefs(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
+  const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; aliasMigrate(); save(); applyTheme(); drawScale(); pushPrefs(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
   const file=el('input',{type:'file',id:'bk-file',accept:'.json,application/json',onchange:e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>load(String(r.result)); r.readAsText(f); }});
   const bkf=NATIVE?(()=>{ const m2=el('span',{class:'note-saved'}), b=el('button',{class:'btn sm',type:'button'},'Save a backup file now'); b.addEventListener('click',()=>{ m2.textContent=' Saving…'; backupFile().then(r=>{ m2.textContent=' Saved to '+r.where+'.'; },e=>{ m2.textContent=' '+((e&&e.message)||'Could not save.'); }); });
     return el('div',null,P('The app also saves a backup file by itself each time a field log ends: Download / Lost Hidden Atlas / atlas-backup.json on the phone. It stays there if the app is removed. To bring it back, use "Restore" below and pick that file.'),el('div',{class:'row'},b,m2)); })():null;
@@ -2611,6 +2623,6 @@ window.atlasBack=()=>{
 if(AT){ const look=()=>AT.check().then(r=>{ if(r.state==='updated'){ banner('New places downloaded'+(r.places?' ('+r.places+' in all)':'')+'. Tap here to load them.',false); $('#banner').onclick=()=>location.reload(); } },()=>{});
   setTimeout(look,5000); window.addEventListener('online',()=>{ if(Date.now()-AT.checked>36e5) look(); });
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&Date.now()-AT.checked>6*36e5) look(); }); }
-(function fromHash(){ const id=decodeURIComponent((location.hash||'').replace(/^#/,'')); const s=id&&byId(id); if(s) select(s,true); })();
-window.addEventListener('hashchange',()=>{ const id=decodeURIComponent((location.hash||'').replace(/^#/,'')); const s=id&&byId(id); if(s&&(!sel||sel.id!==s.id)) select(s,true); });
+(function fromHash(){ const id=decodeURIComponent((location.hash||'').replace(/^#/,'')); const s=id&&(byId(id)||byId(ALIAS[id])); if(s) select(s,true); })();      /* a link to a replaced id opens the entry that replaced it */
+window.addEventListener('hashchange',()=>{ const id=decodeURIComponent((location.hash||'').replace(/^#/,'')); const s=id&&(byId(id)||byId(ALIAS[id])); if(s&&(!sel||sel.id!==s.id)) select(s,true); });
 })();

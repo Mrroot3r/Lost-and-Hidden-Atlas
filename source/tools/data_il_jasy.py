@@ -97,7 +97,7 @@ N('union-brewery-alton','Yakel House and Union Brewery','Alton','il','industry',
   'Private property; view from Pearl Street. Street parking.',
   [W('Yakel House and Union Brewery')],brick='yes'),
 
-N('godfrey-memorial-chapel','Benjamin Godfrey Memorial Chapel','Godfrey','il','landmark','standing',38.95030,-90.19192,'site','view','drive','','1854–',
+N('godfrey-memorial-chapel','Benjamin Godfrey Memorial Chapel','Godfrey','il','worship','standing',38.95030,-90.19192,'site','view','drive','','1854–',
   'Captain Benjamin Godfrey, a Massachusetts sea captain who founded Monticello Seminary for girls in 1838, had this church built in 1854 to look like one he remembered from his New England childhood; W.H. Howell was the builder. It served the seminary, later Monticello College, until the college closed in 1971 and Lewis and Clark Community College took over the campus. In 1991 it was moved from across the road to its present place on the campus.',
   'A Greek Revival temple front with six Doric columns under a pediment, and a Gothic steeple; the 1934 Historic American Buildings Survey named it one of the six most authentic New England churches built outside New England. Some of the original window glass remains (HMdb marker). Interior not checked: the college rents it for events.',
   'A New England meeting house on a prairie campus.',
@@ -139,7 +139,7 @@ N('kamp-store-kampsville','Kamp Store','Kampsville','il','town','standing',39.29
   'The Center for American Archeology\'s visitor centre. Its hours are not settled: greatriverroad.com lists it open mid-April to mid-November, Tuesday to Friday 10 am to 5 pm, free with donations welcome, while the Great Rivers & Routes listing says "closed until further notice". Hours not checked with the Center. Mapped lot on Oak Street.',
   [W('Kamp Store'),L('Great River Road: Center for American Archeology','https://www.greatriverroad.com/mgr-attractions-2/center-american-archeology'),L(GRR+': Center for American Archeology','https://riversandroutes.com/directory/center-for-american-archeology')],conf='mixed',th=[39.29829,-90.60974],thn='Oak Street lot',brick='no'),
 
-N('salem-baptist-church-alton','Salem Baptist Church','Alton','il','landmark','standing',38.96694,-90.1225,'site','view','drive','','1912–',
+N('salem-baptist-church-alton','Salem Baptist Church','Alton','il','worship','standing',38.96694,-90.1225,'site','view','drive','','1912–',
   'A Black Baptist congregation formed in 1819 built this, its third church, in 1912. The African-American stonemason Madison Banks and the white contractor Samuel Marshall, both of Alton, built it with help from two members, John Walker and William Emery. In years of segregation it was the social centre for the area\'s Black community, with picnics, hay rides, a Ladies Aid Society that gave a college scholarship, and a youth club; membership fell away after the 1960s.',
   'The 1912 church on Seiler Road in rural Foster Township: white-painted walls of block and a corner tower with a spire, in the photograph on Wikipedia. Interior not checked.',
   'Built by a Black stonemason in 1912.',

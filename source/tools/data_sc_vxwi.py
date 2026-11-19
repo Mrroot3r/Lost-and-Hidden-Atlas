@@ -21,7 +21,7 @@ REER=L('NPS: Reconstruction Era NHP, places to go','https://home.nps.gov/reer/pl
 
 PLACES=[
 # ---- northern Beaufort County ----
-N('old-sheldon-church-ruins','Old Sheldon Church ruins (Prince William\'s Parish Church)','Sheldon','sc','civic','ruins',32.61854,-80.78046,'exact','view','walk','','1745–1753',
+N('old-sheldon-church-ruins','Old Sheldon Church ruins (Prince William\'s Parish Church)','Sheldon','sc','worship','ruins',32.61854,-80.78046,'exact','view','walk','','1745–1753',
   'Built between 1745 and 1753 as the church of Prince William\'s Parish, in the English Georgian style with a row of Tuscan columns. The usual account is that the British burned it in 1779, that it was rebuilt in 1826 and burned again by Sherman\'s army in 1865; but a letter of February 1866 says the church was not burned, only gutted inside, and it is now thought local people stripped it for materials to rebuild their own burned houses. Governor William Bull is buried inside the ruin. A tablet on the grounds gives the building years as 1745–1755, and a local magazine says the first services were held in 1757.',
   'The outer walls, three and a half feet thick, laid in Flemish bond brick, stand roofless among live oaks and old graves, with the four brick columns of the west portico (the nomination). Since 2019 a locked black fence surrounds the ruin itself: visitors may walk the grounds and look, but may not go in among the columns and arches.',
   'Two fires, or one fire and a gutting: the sources argue about how this church became a ruin.',
@@ -31,7 +31,7 @@ N('old-sheldon-church-ruins','Old Sheldon Church ruins (Prince William\'s Parish
   conf='mixed',th=[32.61754,-80.78122],thn='Old Sheldon Church Road parking area',brick='?'),
 
 # ---- Beaufort ----
-N('parish-church-st-helena-beaufort','Parish Church of St. Helena','Beaufort','sc','civic','standing',32.43406,-80.67467,'exact','view','walk','','1724',
+N('parish-church-st-helena-beaufort','Parish Church of St. Helena','Beaufort','sc','worship','standing',32.43406,-80.67467,'exact','view','walk','','1724',
   'The parish was set up by act of the colonial assembly in 1712, two years after Beaufort was founded, and its church was finished about 1724 after the Yamasee War held up the work. It was enlarged in 1769 and again in 1842, when galleries were added inside; in the Civil War it served as a hospital. It is still a working church and one of the oldest church buildings in continuous use in the country.',
   'A large church in a walled churchyard of live oaks and palmettos, with old graves including that of Colonel John "Tuscarora Jack" Barnwell, buried in 1724. A local guide describes white columns inside. Interior fabric beyond that not checked.',
   '',
@@ -61,13 +61,13 @@ N('fort-frederick-port-royal','Fort Frederick (Fort Prince Frederick)','Port Roy
    L('The Island News: Fort Frederick Heritage Preserve now open','https://archive.yourislandnews.com/?p=48342'),BC_NR],conf='mixed',brick='no'),
 
 # ---- St. Helena Island ----
-N('st-helena-chapel-of-ease-ruins','St. Helena Parish Chapel of Ease ruins','St. Helena Island','sc','civic','ruins',32.37555,-80.57656,'exact','view','drive','','c.1740–1886',
+N('st-helena-chapel-of-ease-ruins','St. Helena Parish Chapel of Ease ruins','St. Helena Island','sc','worship','ruins',32.37555,-80.57656,'exact','view','drive','','c.1740–1886',
   'A tabby chapel built about 1740, by enslaved people, for planters on St. Helena Island who lived too far from the parish church in Beaufort. In 1812 it became a parish church in its own right. The planters fled in 1861; in the Union occupation the Northern teachers held meetings here, and the freedmen, who worshipped at the Brick Church, called it the "White Church". Methodist freedmen used it from 1868 until a forest fire burned it in February 1886, and it was never repaired.',
   'Roofless tabby walls with much of their plaster still on them, beside a small cemetery whose gravestones the Register counts as exceptional; the Edgar Fripp mausoleum in the churchyard is listed separately.',
   'Built by enslaved hands, burned by a forest fire.',
   'Beside Lands End Road. Ownership not checked; the ruin and graves are seen from the grounds. The Register form gives no visiting rules, so hours not checked. No mapped parking: pull off at the site.',
   [W('St. Helena Parish Chapel of Ease Ruins'),F('88001777','St. Helena Parish Chapel of Ease ruins'),BC_NR],brick='no'),
-N('brick-baptist-church-st-helena','Brick Baptist Church','St. Helena Island','sc','civic','standing',32.38967,-80.576,'exact','view','drive','','1855',
+N('brick-baptist-church-st-helena','Brick Baptist Church','St. Helena Island','sc','worship','standing',32.38967,-80.576,'exact','view','drive','','1855',
   'Built in 1855 by enslaved people as a church for the island\'s white planters, several of whom lie in the small cemetery beside it. After the Union army took the sea islands it became a refuge for the freed people, and in 1862 Laura Towne and Ellen Murray opened what became the Penn School inside it. It is part of the Reconstruction Era National Historical Park.',
   'The fingerprints of the enslaved people who made the bricks can still be seen in some of the walls (NPS). The National Park Service keeps the outside; the inside belongs to a working congregation and is not usually open to visitors.',
   'Fingerprints in the brick.',
@@ -125,7 +125,7 @@ N('stoney-baynard-ruins','Stoney-Baynard plantation ruins','Hilton Head Island',
   [W('Stoney-Baynard Plantation'),F('94000038','Stoney/Baynard Plantation')],conf='mixed',th=[32.12891,-80.81346],thn='Plantation Drive pull-off',brick='no'),
 
 # ---- Bluffton ----
-N('church-of-the-cross-bluffton','Church of the Cross','Bluffton','sc','civic','standing',32.23159,-80.86372,'exact','public','walk','','1857',
+N('church-of-the-cross-bluffton','Church of the Cross','Bluffton','sc','worship','standing',32.23159,-80.86372,'exact','public','walk','','1857',
   'A cruciform Gothic church on the bluff over the May River, designed by E. B. White and consecrated in July 1857. When Federal troops burned most of Bluffton in 1863 the church was spared, though its people fled; services began again in 1870. A new roof of 1892 was damaged with the rest of the building in the 1898 hurricane.',
   'A wooden church of vertical board and batten under a grey metal roof (Wikimedia Commons photograph). Mullioned windows topped by fanned arches like palmetto fronds, with lattice shutters; the rose-coloured glass came from England. Inside, scored pink plaster and exposed pine timbers.',
   '',

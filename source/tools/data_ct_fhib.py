@@ -42,7 +42,7 @@ N('saville-dam','Saville Dam','Barkhamsted','ct','water','standing',41.91,-72.95
   'Owned by the Metropolitan District Commission. Connecticut Route 318 (Saville Dam Road) crosses the top, so it can be seen from the road. A lot is mapped on Saville Dam Road west of the dam; who owns it and the MDC\'s rules for walking there were not checked (the MDC rules page would not open). Reservoir land is watershed: keep to the road.',
   [W('Saville Dam')],th=[41.90822,-72.95917],thn='Mapped lot on Saville Dam Road (owner not checked)',brick='?'),
 # ---- Riverton ----
-N('union-church-riverton','Union Church (St. Paul\'s), Riverton','Barkhamsted','ct','civic','standing',41.96229,-73.02011,'exact','view','drive','','1829',
+N('union-church-riverton','Union Church (St. Paul\'s), Riverton','Barkhamsted','ct','worship','standing',41.96229,-73.02011,'exact','view','drive','','1829',
   'Built in 1829 as a meeting house shared by several denominations. As each built its own church this one emptied, and in 1880 it became St. Paul\'s Episcopal Church, which closed in 1971. The revived Hitchcock Chair Company bought it and opened a museum, which closed in the early 2000s along with the chair factory; since then it has been a glass-blower\'s studio.',
   'A granite church of randomly coursed ashlar with Greek Revival proportions and tall Gothic Revival windows; a square tower in front has a stone lower stage and wooden upper stages with corner pinnacles. Wikipedia says the interior keeps many original features. Whether and when the studio lets visitors in was not checked.',
   'A granite meeting house turned chair museum turned glass studio.',

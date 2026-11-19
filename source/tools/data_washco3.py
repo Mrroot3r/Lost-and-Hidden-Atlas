@@ -37,7 +37,7 @@ N('susan-b-anthony-childhood-house','Susan B. Anthony childhood house','Battenvi
   'Where the young Susan B. Anthony lived, and the house the state nearly lost.',
   'Owned by the state (Office of Parks, Recreation and Historic Preservation). Not open as a museum: look from NY 29. In 2020 the state agreed to buy the four-acre lot next door, with a former tavern, for future parking; whether that happened was not checked.',
   [W('Susan B. Anthony Childhood House'),GFBJ]),
-N('william-miller-farm','William Miller farm, chapel and Ascension Rock','Hampton','wash','landmark','standing',43.5954,-73.31243,'site','public','drive','','1815–1849',
+N('william-miller-farm','William Miller farm, chapel and Ascension Rock','Hampton','wash','worship','standing',43.5954,-73.31243,'site','public','drive','','1815–1849',
   'The farm of William Miller, the Baptist preacher whose reading of Bible prophecy began the Millerite movement, from which the Seventh-day Adventists and Advent Christians grew. His house dates from 1815 and he built the chapel in 1848. On October 22, 1844, some of his followers gathered on a limestone outcrop here, Ascension Rock, to wait for the Second Coming. The chapel and the rock were listed on the National Register in 1975 and the farm added in 1994.',
   'The farmhouse, the 1848 chapel and the outcrop called Ascension Rock; the HMdb marker says several restored farm buildings can be visited.',
   'Where a crowd stood on a rock in October 1844 and waited for the end of the world.',

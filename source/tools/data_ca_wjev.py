@@ -52,7 +52,7 @@ N('downieville-foundry','Downieville Foundry','Downieville','ca','industry','sta
   'A pegged-timber foundry that built mine machinery for the Sierra Buttes and lit the town in 1910.',
   'Owned by a local nonprofit as a museum (marker, which does not give the year it says so). Opening hours not checked, so count on seeing it from Pearl Street. '+DVTOWN,
   [HM(44238,'Downieville Foundry'),WDV],th=DVLOT,thn=DVLOTN,brick='?'),
-N('immaculate-conception-church-downieville','Immaculate Conception Catholic Church, Downieville','Downieville','ca','civic','standing',39.56126,-120.82856,'exact','view','walk','','1858',
+N('immaculate-conception-church-downieville','Immaculate Conception Catholic Church, Downieville','Downieville','ca','worship','standing',39.56126,-120.82856,'exact','view','walk','','1858',
   'The first Catholic church in Downieville went up near here in 1852 under Father Dalton. It burned in 1858 and the present church was built the same year (marker).',
   'The 1858 church on Sunnyside Drive, where Church Street becomes Sunnyside Drive (207 Sunnyside Drive in OpenStreetMap). Interior not checked; when it is open for services or visits was not checked.',
   '',

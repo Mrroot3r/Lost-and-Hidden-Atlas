@@ -101,7 +101,7 @@ N('conesus-amusement-hall','Conesus Amusement Hall (Conesus Town Hall)','Conesus
   '',
   'Town of Conesus offices; open when the town hall is open (hours not checked). Parking not checked.',
   [W('Conesus Amusement Hall'),HM(116982,'Conesus Amusement Hall')],brick='no'),
-N('st-pauls-lutheran-dansville','St. Paul\'s Lutheran Church (Clara Barton\'s Red Cross church)','Dansville','wny','civic','standing',42.5588,-77.69560,'exact','view','drive','','1847',
+N('st-pauls-lutheran-dansville','St. Paul\'s Lutheran Church (Clara Barton\'s Red Cross church)','Dansville','wny','worship','standing',42.5588,-77.69560,'exact','view','drive','','1847',
   'A late Greek Revival frame church of 1847, the English Evangelical Lutheran Church of Dansville. Clara Barton founded the first local chapter of the American Red Cross here in 1881. An education wing was added in 1924 and enlarged in the 1950s, and a front entrance in 1947; it was listed on the National Register in 2013.',
   'A front-gabled frame church with a wide frieze, round-arched windows and a two-tier steeple, on Clara Barton Street (NY 36) at Church Street; the Register plaque is on the wall. Interior not checked.',
   'The church where the first local Red Cross chapter was formed.',

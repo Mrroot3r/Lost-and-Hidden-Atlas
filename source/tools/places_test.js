@@ -98,6 +98,34 @@ const { chromium } = require('playwright');
     const other=await p.evaluate(()=>{ const s=window.__atlasNM.sites().find(x=>!x.tip&&!x.mine); location.hash='#'+s.id; return s.id; }); await p.waitForTimeout(600);
     ok('a place a session found has no such badge',await p.evaluate(()=>!document.querySelector('#v-detail .tag.tipd')),other);
     ok('reader tips: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- the kinds of place: one list in the app, every place's kind is on it, and "Places of worship" has its own chip, shortcut and colour
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(400);
+    await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+    const k=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent).sites, grp=[...document.querySelectorAll('#filters .fgrp')].find(g=>/Kind of place/.test(g.textContent)), chips=[...grp.querySelectorAll('.chip')];
+      const names=chips.map(x=>x.textContent.trim()), cols=chips.map(x=>x.querySelector('.dot').style.getPropertyValue('--c'));
+      return {names,dupCol:cols.length-new Set(cols).size,kinds:[...new Set(D.map(x=>x.cat))].length,worship:D.filter(x=>x.cat==='worship').length,churchElsewhere:D.filter(x=>x.cat==='civic'&&/\b(church|meeting ?house|synagogue)\b/i.test(x.name)).map(x=>x.name)}; });
+    ok('Filters lists every kind of place, each in a colour of its own',k.names.length===k.kinds&&k.dupCol===0&&k.names.indexOf('Places of worship')>=0&&k.names.indexOf('Downtown losses')<0,k.names.join(' | '));
+    ok('churches and meeting houses are filed under Places of worship, not under civic buildings',k.worship>150&&k.churchElsewhere.length<=Math.max(8,k.worship*0.05),k.worship+' places of worship; '+k.churchElsewhere.length+' with church in the name are civic (a church park, a civic centre in an old church): '+k.churchElsewhere.slice(0,3).join('; '));      /* a few are right to stay; many would mean sessions are not using the kind */
+    await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(x=>x.textContent==='Places of worship').click(); }); await p.waitForTimeout(350);
+    const w=await p.evaluate(()=>{ const v=window.__atlasNM.visible(); return {n:v.length,other:v.filter(s=>s.cat!=='worship').length}; });
+    ok('the "Places of worship" shortcut lists them and nothing else',w.n===k.worship&&w.other===0,w.n+' listed');
+    ok('kinds of place: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- an older thin pin that a full entry replaced (was=): the pin is gone, a reader's notes moved, and an old link opens the new entry
+  { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasNM);
+    const al=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent); const o=Object.keys(D.alias||{})[0]; return o?{o,n:D.alias[o],oldThere:D.sites.some(x=>x.id===o),newThere:D.sites.some(x=>x.id===D.alias[o])}:null; });
+    if(!al) ok('(no entry has replaced another yet: nothing to test)',true);
+    else { ok('a replaced pin is no longer on the map and its replacement is',!al.oldThere&&al.newThere,al.o+' -> '+al.n);
+      /* a reader who saved things against the old id, in a context of their own: the page writes its own state when it is left, so it cannot be planted from inside */
+      const c2=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p2=await c2.newPage(); p2.on('pageerror',e=>errs.push(e.message));
+      await p2.addInitScript(a=>{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},status:{[a.o]:'visited'},notes:{[a.o]:'my note on the old pin'},trip:[a.o],visits:{[a.o]:[{t:'2026-11-01',v:'found',x:'x'}]}})); },al);
+      await p2.goto(url+'#'+al.o); await p2.waitForFunction(()=>window.__atlasNM); await p2.waitForTimeout(1200);
+      const r=await p2.evaluate(a=>{ const U=JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')); return {status:U.status[a.n],note:U.notes[a.n],trip:U.trip.join(),visits:(U.visits[a.n]||[]).length,old:(a.o in U.status)||(a.o in U.notes)||(a.o in U.visits),open:(document.querySelector('#v-detail h2')||{}).textContent||'',hash:location.hash}; },al);
+      ok('what the reader saved against the old pin moved to the new entry',r.status==='visited'&&r.note==='my note on the old pin'&&r.trip===al.n&&r.visits===1&&!r.old,JSON.stringify(r).slice(0,160));
+      ok('a link to the old pin opens the entry that replaced it',r.open.length>0&&r.hash==='#'+al.n,r.hash+' | '+r.open.slice(0,40)); await c2.close(); }
+    ok('replaced pins: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- a place of the reader's own is a diamond even when it is standing; a standing place that is changing now still pulses
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},custom:[{id:'my-test-1',mine:true,name:'Zz my own standing place',lat:42.6526,lon:-73.7562,cat:'landmark',st:'standing',prec:'exact',acc:'public',eff:'drive',town:'Albany',story:'x',links:[]}]})); });

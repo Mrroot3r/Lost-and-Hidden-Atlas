@@ -85,7 +85,7 @@ N('sharon-springs','Sharon Springs spa district','Sharon Springs','scho','hotel'
 N('howes-cave','Howe Caverns and the Howes Cave quarry','Howes Cave','scho','industry','traces',42.69136,-74.38444,'site','ask','drive','amusements','1843',
   'Lester Howe opened his cave to visitors in 1843 and built a hotel over the entrance. Cement and quarry companies later bought the natural entrance and quarried into the cave. The Cave House Museum of Mining & Geology keeps the story at the quarry.',
   'The stone Cave House hotel at the quarry and the old quarry face.','','The quarry is private and the museum keeps limited hours; arrange a visit first. The pin is the museum.',[W('Howe Caverns')]),
-N('blenheim-bridge','Old Blenheim Bridge','North Blenheim','scho','rail','standing',42.47167,-74.44139,'site','public','drive','','1855; rebuilt 2018',
+N('blenheim-bridge','Old Blenheim Bridge','North Blenheim','scho','landmark','standing',42.47167,-74.44139,'site','public','drive','','1855; rebuilt 2018',
   'An 1855 covered bridge with a single 210-foot span, among the longest ever built. Tropical Storm Irene carried it away on August 28, 2011. A replica was built in 2017–18.',
   'The rebuilt bridge and the old stone abutments.','','Public roadside park.',[W('Old Blenheim Bridge')]),
 N('oneonta-roundhouse','Oneonta roundhouse site','Oneonta','scho','rail','traces',42.44921,-75.08582,'area','view','drive','','',

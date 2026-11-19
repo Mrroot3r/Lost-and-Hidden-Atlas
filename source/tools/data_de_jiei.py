@@ -122,7 +122,7 @@ N('old-brick-store-smyrna','Old Brick Store','Smyrna','de','landmark','standing'
   'Ownership not checked; look from the road. The federal land map puts the pin inside a state-owned area called the Fox-Brickstore Landing District, so the building may be on state land, but no page saying so was found.',
   [W('Old Brick Store')],conf='mixed',brick='yes'),
 
-N('appoquinimink-friends-meetinghouse','Appoquinimink Friends Meetinghouse','Odessa','de','civic','standing',39.45733,-75.6638,'site','view','walk','','1785',
+N('appoquinimink-friends-meetinghouse','Appoquinimink Friends Meetinghouse','Odessa','de','worship','standing',39.45733,-75.6638,'site','view','walk','','1785',
   'A tiny Quaker meetinghouse built by David Wilson about 1785 in the village then called Cantwell\'s Bridge, now Odessa. It may be the smallest brick house of worship in the United States, and it was used as a station on the Underground Railroad.',
   'The small brick meetinghouse, restored in 1938, with a burial ground behind it whose stones run from early fieldstones to modern markers.',
   '',
