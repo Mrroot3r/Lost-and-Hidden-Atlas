@@ -43,7 +43,10 @@ function el(tag,a){
     if(Array.isArray(c)) c.forEach(x=>{ if(x!=null&&x!==false) n.append(x); }); else n.append(c); }
   return n;
 }
-const ext=(href,text,cls)=>el('a',{href:href,target:'_blank',rel:'noopener',class:cls||'',text:text});
+/* a link out of the Atlas. Only a web address is ever made into one: an address from a place list, a reader's own place or a
+   backup file that begins any other way (javascript:, data:) becomes a link that goes nowhere */
+const webUrl=u=>/^https?:\/\//i.test(String(u||'').trim())?String(u).trim():'#';
+const ext=(href,text,cls)=>el('a',{href:webUrl(href),target:'_blank',rel:'noopener noreferrer',class:cls||'',text:text});
 const rad=x=>x*Math.PI/180;
 function hav(a,b,c,d){ const R=3958.8,dl=rad(c-a),dn=rad(d-b),h=Math.sin(dl/2)**2+Math.cos(rad(a))*Math.cos(rad(c))*Math.sin(dn/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
 const fmtMin=m=> m<60? m+' min' : Math.floor(m/60)+' h '+String(m%60).padStart(2,'0');
