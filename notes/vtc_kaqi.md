@@ -12,11 +12,8 @@ Nineteen places in Washington County, Vermont (region drawn at random by `choose
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Kents Corner sawmill | Calais, VT (north of the Kent Hill Road junction on Robinson Cemetery Road) | A 19th-century sawmill (Wikipedia, 2006 Register increase); Seven Days dates the sawmill to 1803 | Owner, whether it can be seen from the road, a pin |
-| Waterbury Feed Company mill and dam | Waterbury, VT (44.34306, -72.74778, Mill Village Historic District) | The only surviving mill of Mill Village, with its dam and penstock of about 1830 (Wikipedia) | Owner and current use; a pin on the building |
 | Upper Cox Brook and Slaughter House covered bridges | Northfield, VT (44.17361, -72.65528; 44.16833, -72.65444) | 1872 queen post bridges (Wikipedia); named in the Northfield Falls entry only | Separate entries if wanted |
 | Pine Brook Covered Bridge | Waitsfield, VT (44.20583, -72.79194) | 1872 king post, one of two left in the state (Wikipedia) | Not added for want of time; town road |
-| Vermont State Hospital campus | Waterbury, VT (44.33182, -72.75055) | 1890 asylum, now the Waterbury State Office Complex; Register district 2016 (Wikipedia) | Which buildings survive and what the public may see |
-| Green Mountain Seminary | Waterbury Center, VT (44.3775, -72.71806) | 1869 Italianate Free Will Baptist seminary (Wikipedia) | Current use and owner |
 | National Clothespin Factory | Montpelier, VT (44.25222, -72.57111) | 1918 factory, the last US wooden clothespin maker until 2003 (Wikipedia) | Current tenants, a picture for brick |
 
 ## Tips
