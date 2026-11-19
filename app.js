@@ -59,7 +59,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={quietGone:true,hideGone:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#e11d74',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -84,6 +84,9 @@ if(DARKQ&&DARKQ.addEventListener) DARKQ.addEventListener('change',applyTheme);  
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
 
 const sites=()=>BASE.concat(U.custom);
+/* "Nothing to see": a place marked Nothing visible or Marker only. Under water is not counted: something can show at low water.
+   Settings: quietGone (default on) keeps them from buzzing; hideGone (default off) takes them off the map, the lists and Near. */
+const nothingToSee=s=>!!s&&(s.st==='gone'||s.st==='marker');
 const byId=id=>sites().find(s=>s.id===id);
 const pos=s=>{ const m=U.moved[s.id]; return m?{lat:m[0],lon:m[1]}:{lat:s.lat,lon:s.lon}; };
 const dest=s=>s.th?{lat:s.th[0],lon:s.th[1]}:pos(s);
@@ -160,6 +163,7 @@ let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
 function match(s){
+  if(pref('hideGone')&&nothingToSee(s)&&!F.st.has(s.st)&&!(sel&&sel.id===s.id)) return false;      /* choosing the chip in Filters still shows them */
   if(F.line&&!F.line.ids.has(s.id)) return false;
   if(F.q){ const h=hay(s); if(!qWords().every(w=>h.n.indexOf(w)>=0||h.t.indexOf(w)>=0||h.x.indexOf(w)>=0)) return false; }
   if(F.cat.size&&!F.cat.has(s.cat)) return false;
@@ -619,7 +623,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -722,6 +726,7 @@ function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawSca
 function pushPrefs(){ if(NATIVE) AT.call('configure',{units:pref('units'),step:STEP(),every:({fine:1000,normal:2000,coarse:5000})[pref('detail')]||2000,buzz:!!pref('buzz')}).catch(()=>{}); }
 function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme(); drawScale(); pushPrefs();
   if(k==='cluster') syncMarkers();
+  if(k==='hideGone'||k==='quietGone'||k==='buzzVanished'){ NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(k==='hideGone') refresh(); if(view==='near') nmDraw(true); }
   if(k==='trk'){ if(rec) drawRec(); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
   if(k==='units'){ const nv=$('#v-near'); if(nv) nv.textContent=''; if(view==='near') renderNear(); nmPush(true); }
   if(k==='units'||k==='clock'){ renderList(); if(sel&&view==='detail') renderDetail(sel); if(view==='log') renderLog(); if(view==='trip') renderTrip(); syncRec(); } }
@@ -752,6 +757,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     H('Map'),
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
+    tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
     tog('follow','Keep the map on me as I move','When your dot walks off the edge of the map, the map moves with it.'),
     pick('start','The map opens at',[['last','Where I left it'],['home','My start place']]),
     el('label',{class:'field setrow',for:'set-home'},el('span',{text:'Start place'}),hs,el('small',{class:'snote',text:'Drive times count from here, and the Places list puts the nearest first. While your location is switched on, the list counts from where you are instead. Until you choose a start place, the Atlas uses the start city nearest to where you are or last were.'})),
@@ -761,6 +767,8 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     H('Near me'),
     nmPick('r','List what is within',NMR),
     nmPick('al','Buzz when I walk within',NMA,NATIVE?'While a field log is recording the phone buzzes with the screen off too. Old town centres are listed but never buzz.':'Works while the Atlas is open and showing where you are. Old town centres are listed but never buzz.'),
+    tog('quietGone','No buzz for places with nothing to see','Places marked "Nothing visible" or "Marker only" are still listed in the Near tab, but do not buzz.'),
+    tog('buzzVanished','Buzz for vanished places too','The orange dots: places the federal names file marks as gone. Off, they are listed in the Near tab but never buzz. Turn it on when you want to go and see whether anything is left.'),
     el('small',{class:'snote',text:'Which kinds count (places, leads, vanished places, mines, town centres) is chosen with the chips at the top of the Near tab.'}),
     H('Field log'),
     pick('detail','Track detail',[['fine','Fine: a point every 2 m'],['normal','Normal: every 4 m'],['coarse','Coarse: every 10 m']],NATIVE?'Coarse also checks GPS less often, which saves some battery on long days. Takes effect on the next recording.':'Takes effect on the next recording.'),
@@ -1394,7 +1402,7 @@ function nmEnsure(force){ const t=Date.now(); if(!force&&t-(NM.ens||0)<60000) re
 function nmLoaded(){ NM.ver++; NM.cand=null; clearTimeout(NM.lt); NM.lt=setTimeout(()=>nmPush(false),1200); nmDraw(true); }
 /* every target of the chosen kinds within rmi miles of c */
 function nmCollect(c,rmi){ const S=nmSet(), out=[], add=(id,k,la,lo,n,t,o)=>{ if(hav(c[0],c[1],la,lo)<=rmi) out.push({id:id,k:k,la:la,lo:lo,n:n,t:t,o:o}); };
-  if(S.k.p) sites().forEach(s=>{ const q=pos(s), my=U.status[s.id]; add('p:'+s.id,'p',q.lat,q.lon,s.name,[s.cat==='lidar'?'LiDAR find, not verified':STS[s.st],s.town,my?MY[my]:''].filter(Boolean).join(' · '),s); });
+  if(S.k.p) sites().forEach(s=>{ if(pref('hideGone')&&nothingToSee(s)) return; const q=pos(s), my=U.status[s.id]; add('p:'+s.id,'p',q.lat,q.lon,s.name,[s.cat==='lidar'?'LiDAR find, not verified':STS[s.st],s.town,my?MY[my]:''].filter(Boolean).join(' · '),s); });
   if(S.k.l&&LEADS) LEADS.p.forEach(p=>add('l:'+p[0]+','+p[1],'l',p[0],p[1],p[3]||LEADS.t[p[2]],(p[3]?LEADS.t[p[2]]+' · ':'')+'unchecked lead',p));
   [['v','vanished'],['m','mines']].forEach(q=>{ const X=XL[q[1]]; if(!S.k[q[0]]||!X.idx) return; const dla=rmi/69+0.002, dlo=rmi/(69*Math.cos(rad(c[0])))+0.002;
     for(let i=Math.floor((c[0]-dla)*20);i<=Math.floor((c[0]+dla)*20);i++) for(let j=Math.floor((c[1]-dlo)*20);j<=Math.floor((c[1]+dlo)*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(q[1],x)) add(q[0]+':'+x[4],q[0],x[0],x[1],x[3]||X.data.t[x[2]],xlLine(q[1],x)+' · unchecked lead',x); }); });
@@ -1470,8 +1478,10 @@ function nmDraw(now){ if(view!=='near') return; const v=$('#v-near'); if(!v||!v.
   ul.append(frag); if(all.length>cap) ul.append(el('li',{class:'pad',style:'padding-block:10px'},btn('Show all '+all.length,()=>{ NM.more=true; nmDraw(true); })));
   v.scrollTop=top; }
 /* every GPS fix comes through here: refresh the list, and alert when something has come within range */
+/* may this target buzz? Town centres never; places with nothing to see and vanished places only when Settings say so */
+const nmBuzzes=x=>x.k!=='c'&&!(x.k==='p'&&pref('quietGone')&&nothingToSee(x.o))&&!(x.k==='v'&&!pref('buzzVanished'));
 function nmFix(p,acc){ nmDraw(NM.org==='me'&&NM.how!=='live'); if(NM.goal) nmGoalDraw(); const S=nmSet(); if(!S.al) return; nmEnsure(); if(NATIVE&&rec) nmPush(false); if(acc>35) return;
-  let hit=null, more=0; nmCands(p).forEach(x=>{ if(x.k==='c') return; const m=hav(p[0],p[1],x.la,x.lo)*1609.344;
+  let hit=null, more=0; nmCands(p).forEach(x=>{ if(!nmBuzzes(x)) return; const m=hav(p[0],p[1],x.la,x.lo)*1609.344;
     if(m<=S.al){ if(!NM.in.has(x.id)){ NM.in.add(x.id); if(!hit||m<hit.m){ if(hit) more++; hit={x:x,m:m}; } else more++; } } else if(m>S.al*2+30) NM.in.delete(x.id); });
   if(!hit) return; const x=hit.x;
   if(!(NATIVE&&rec)){ try{ if(navigator.vibrate) navigator.vibrate([260,140,260]); }catch(e){} }   /* while a log records in the app, the recorder buzzes */
@@ -1481,7 +1491,7 @@ function nmFix(p,acc){ nmDraw(NM.org==='me'&&NM.how!=='live'); if(NM.goal) nmGoa
 function nmPush(force){ if(!NATIVE) return; const S=nmSet(), p=geo.ll||(U.last&&U.last.ll);
   if(!S.al||!p){ if(force||NM.push){ NM.push=null; AT.call('targets',{r:0,list:[]}).catch(()=>{}); } return; }
   if(!force&&NM.push&&NM.push.v===NM.ver&&hav(p[0],p[1],NM.push.c[0],NM.push.c[1])<8) return;
-  const list=nmCollect(p,25).filter(x=>x.k!=='c').map(x=>{ x.mi=hav(p[0],p[1],x.la,x.lo); return x; }).sort((a,b)=>a.mi-b.mi).slice(0,4000).map(x=>[+(+x.la).toFixed(5),+(+x.lo).toFixed(5),x.id,String(x.n||'').slice(0,60)]);
+  const list=nmCollect(p,25).filter(nmBuzzes).map(x=>{ x.mi=hav(p[0],p[1],x.la,x.lo); return x; }).sort((a,b)=>a.mi-b.mi).slice(0,4000).map(x=>[+(+x.la).toFixed(5),+(+x.lo).toFixed(5),x.id,String(x.n||'').slice(0,60)]);
   NM.push={c:p.slice(),v:NM.ver,n:list.length}; AT.call('targets',{r:S.al,list:list}).catch(()=>{}); }
 
 /* field log: a GPS track with timed notes, kept in this browser */
