@@ -107,7 +107,7 @@ N('huntington-memorial-library','Huntington Memorial Library (the Huntington hom
   'The homestead, now the library, and Huntington Park round it. Interior fabric not checked.',
   '',
   'Public library in a building given to the city for it, 62 Chestnut Street. Its site lists Saturday 9 to 4 and Tuesday to Thursday 9 to 8 (the full week not checked). Huntington Park has parking along Dietz Street (All Otsego).',
-  [L('Huntington Memorial Library','https://hmloneonta.org'),HM('259282','Huntington Home')],brick='?'),
+  [L('Huntington Memorial Library','https://hmloneonta.org'),HM('259282','Huntington Home')],brick='?',hours='Saturday 9 to 4; Tuesday to Thursday 9 to 8 (the rest of the week not checked)'),
 N('wilber-house-oneonta','George I. Wilber House (CANO arts center)','Oneonta','scho','landmark','standing',42.45578,-75.06183,'exact','view','walk','','1875–1890',
   'George I. Wilber (1845–1922), president of the Wilber National Bank from 1890, built this Queen Anne house in two stages, 1875 and about 1890: three stories of wood frame on a stone foundation, with a round three-story corner tower, cross gables and a large decorated wrap-around porch with a porte-cochère. Since 1997 it has housed the Upper Catskill Community Council of the Arts, now the Community Arts Network of Oneonta. Listed on the National Register in 2000.',
   'The round tower and the porch. Interior seen during the arts center\'s shows; its fabric and hours not checked.',

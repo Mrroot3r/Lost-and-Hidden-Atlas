@@ -43,7 +43,7 @@ N('john-mark-verdier-house','John Mark Verdier House','Beaufort','sc','town','st
   'A two-storey merchant\'s house of painted weatherboard over a raised basement, with a two-tier columned portico on Bay Street (Wikimedia Commons photograph); shown on guided tours. Original interior fabric not checked.',
   '',
   'Historic Beaufort Foundation house museum. Wikipedia gives tours Monday to Saturday 10 to 4 at $10 a person, children and military free; the foundation\'s own site refused to open (HTTP 403), so hours not checked. Street parking downtown.',
-  [W('John Mark Verdier House'),L('Historic Beaufort Foundation','https://historicbeaufort.org/'),BC_NR],brick='no'),
+  [W('John Mark Verdier House'),L('Historic Beaufort Foundation','https://historicbeaufort.org/'),BC_NR],brick='no',hours='Tours Monday to Saturday 10 to 4 (per Wikipedia; not checked with the foundation)'),
 N('beaufort-arsenal','Beaufort Arsenal (Beaufort History Museum)','Beaufort','sc','fort','standing',32.43276,-80.67069,'exact','open','walk','','1798, rebuilt 1852',
   'Built in 1798 on the original town square as the headquarters and armoury of the Beaufort Volunteer Artillery, a militia of the town\'s leading families. Secessionists enlarged it and rebuilt the first tabby building in brick; the National Park Service gives 1852 as the year the present Arsenal was built. After the Civil War the Reconstruction government disbanded the company and took over the building. It now holds the Beaufort History Museum.',
   'A yellowish walled building on Craven Street, across the street from the Reconstruction Era National Historical Park visitor center, which shares the site. Interior fabric not checked.',
@@ -80,7 +80,7 @@ N('penn-center-st-helena','Penn Center (Penn School Historic District)','St. Hel
   '',
   'Penn Center, 16 Penn Center Circle West. Museum Tuesday to Saturday 10 to 4, welcome center Tuesday to Saturday 9 to 4; self-guided tour $10, docent tour with film $15, under 5 free; parking free (Penn Center visit page, read November 18, 2026). Heritage Days are each November.',
   [L('Penn Center: visit','https://penncenter.com/visit'),W('Penn Center (Saint Helena Island, South Carolina)'),REER],
-  th=[32.38791,-80.57718],thn='Penn Center parking',brick='?'),
+  th=[32.38791,-80.57718],thn='Penn Center parking',brick='?',hours='Museum Tuesday to Saturday 10 to 4; welcome center Tuesday to Saturday 9 to 4'),
 N('fort-fremont-batteries','Fort Fremont batteries','St. Helena Island','sc','fort','ruins',32.30616,-80.64285,'exact','public','walk','','1899–1911',
   'A coast-artillery fort begun in 1899 for the Spanish-American War, to guard the naval station on Parris Island across Port Royal Sound. It had three 10-inch disappearing guns and two 4.7-inch rapid-fire guns. The War Department gave it up after nineteen years and sold it at auction in June 1930. The Register calls it one of two coastal forts in the country surviving intact from the Spanish-American War era.',
   'The poured-concrete 10-inch battery and rapid-fire battery, in woods facing the sound; no guns remain. The brick post hospital is listed separately and whether it is inside the preserve was not checked. A history center with scale models of the fort.',
@@ -130,7 +130,7 @@ N('church-of-the-cross-bluffton','Church of the Cross','Bluffton','sc','worship'
   'A wooden church of vertical board and batten under a grey metal roof (Wikimedia Commons photograph). Mullioned windows topped by fanned arches like palmetto fronds, with lattice shutters; the rose-coloured glass came from England. Inside, scored pink plaster and exposed pine timbers.',
   '',
   'An active parish. Docents give tours of the historic campus Monday to Thursday 11 to 2; call ahead (843-757-2661), as funerals and services change this (Church of the Cross, historic campus page).',
-  [W('Church of the Cross'),L('Church of the Cross: historic campus','https://thechurchofthecross.net/?p=2868'),BC_NR],brick='no'),
+  [W('Church of the Cross'),L('Church of the Cross: historic campus','https://thechurchofthecross.net/?p=2868'),BC_NR],brick='no',hours='Docent tours Monday to Thursday 11 to 2; call ahead (843-757-2661), as funerals and services change this'),
 ]
 
 PIN_NOTES={

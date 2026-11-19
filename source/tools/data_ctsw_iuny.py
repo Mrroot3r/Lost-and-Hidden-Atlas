@@ -101,7 +101,7 @@ N('henry-whitfield-house','Henry Whitfield House','Guilford','ctsw','landmark','
   '',
   'Henry Whitfield State Museum (State of Connecticut), 248 Old Whitfield Street, free parking. In 2026 the house was open May 1 to August 16, Wednesday to Sunday 10 to 4, and closed for restoration from August 19 to December 31; the visitor centre is open 10 to 4 most weekdays. Call 203-453-2457 to check.',
   [['CT DECD: Henry Whitfield State Museum','https://portal.ct.gov/DECD/Content/Historic-Preservation/04_State_Museums/Henry-Whitfield-State-Museum'],W('Henry Whitfield House')],
-  th=[41.27815,-72.67557],thn='Museum lot, Stone House Lane'),
+  th=[41.27815,-72.67557],thn='Museum lot, Stone House Lane',hours='2026: May 1 to August 16, Wednesday to Sunday 10 to 4; closed for restoration August 19 to December 31. Visitor centre 10 to 4 most weekdays'),
 N('red-bridge-meriden','Red Bridge','Meriden','ctsw','landmark','standing',41.52269,-72.83842,'exact','public','walk','','1891',
   'A wrought-iron lenticular pony truss over the Quinnipiac River, built for the city in 1891 by the Berlin Iron Bridge Company. It replaced a wooden bridge of the same name on Oregon Road, then a main road to Cheshire. Fewer than twenty of the company\'s lenticular bridges survive in Connecticut. Bypassed in the 1970s, it was restored in 2018 and reopened to people on foot.',
   'The iron truss with its lens-shaped top chords on brownstone abutments, with a new wooden deck.',

@@ -28,7 +28,7 @@ N('shaker-village-pleasant-hill','Shaker Village of Pleasant Hill','Harrodsburg'
   'Shaker Village of Pleasant Hill (a nonprofit), 3501 Lexington Road, Harrodsburg. Its own page: exhibits and tours Tuesday to Sunday 10 a.m. to 5 p.m., admission $20 adults (ages 13 to 61), $15 seniors 62 and over, $10 ages 6 to 12; hiking and walking daily 6 a.m. to 8:30 p.m. or dusk, $10 per car suggested donation. Lots on the village grounds.',
   [['Shaker Village: Plan your visit (hours and rates)',SVP+'/plan/'],['Shaker Village: building guide (PDF)',SVP+'/wp-content/uploads/2015/12/Shaker-Village-of-Pleasant-Hill.pdf'],
    W('Shaker Village of Pleasant Hill'),['Advocate-Messenger: Centre Family Dwelling open again for tours','https://www.amnews.com/?p=43649']],
-  th=[37.81797,-84.73865],thn='East Lot, Shaker Village grounds',brick='?'),
+  th=[37.81797,-84.73865],thn='East Lot, Shaker Village grounds',brick='?',hours='Exhibits and tours Tuesday to Sunday 10 a.m. to 5 p.m.; hiking and walking daily 6 a.m. to 8:30 p.m. or dusk'),
 
 N('shaker-landing-kentucky-river','Shaker Landing and the 1866 stable','Harrodsburg','ky','water','standing',37.82119,-84.72480,'area','public','drive','','1826–',
   'The Pleasant Hill Shakers traded down the Kentucky River as far as New Orleans from this landing below the palisades. They cut a road down to it in 1826, and kept a timber-frame stable here to change horses for stagecoaches.',
@@ -85,7 +85,7 @@ N('mcdowell-house-danville','McDowell House','Danville','ky','civic','standing',
   'A brick ell of 1792–1795, the clapboard front of 1803–1804 and a small brick office of 1820, with an apothecary and two gardens. Guided tours of the house, apothecary and gardens Tuesday to Saturday at set times; book ahead.',
   'The house where abdominal surgery began.',
   'McDowell House Museum, 125 South Second Street, Danville, across the street from Constitution Square. Its own page: tours Tuesday to Saturday at select times, office Tuesday to Friday 10 to 4; adults $8, seniors $7, students $4, children 5 to 12 $3. Small visitor lot on the north side of the property.',
-  [W('Ephraim McDowell House'),['McDowell House Museum','https://mcdowellhouse.com/']],brick='?'),
+  [W('Ephraim McDowell House'),['McDowell House Museum','https://mcdowellhouse.com/']],brick='?',hours='Tours Tuesday to Saturday at select times; office Tuesday to Friday 10 to 4'),
 
 N('old-centre-danville','Old Centre, Centre College','Danville','ky','inst','standing',37.645556,-84.781667,'site','view','walk','','1819–',
   'The first building of Centre College, chartered in 1819; classes began in it in 1820. It is the oldest college administration building west of the Alleghenies. Confederate and then Union troops occupied it in 1862.',

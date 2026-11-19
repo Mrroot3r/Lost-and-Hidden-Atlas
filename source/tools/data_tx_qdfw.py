@@ -104,7 +104,7 @@ N('fort-leaton','Fort Leaton','Presidio','tx','fort','standing',29.542511,-104.3
   'The restored adobe fort, with walls 18 to 22 feet high, the family\'s living quarters, and exhibits. It is also the west entrance and visitor center of Big Bend Ranch State Park.',
   'A trading post kept by a scalp hunter.',
   'Fort Leaton State Historic Site, Texas Parks and Wildlife Department, 16952 FM 170 East, Presidio. Open daily, 8 a.m. to 4:30 p.m., closed December 25; $5 a day for anyone 13 or older.',
-  [W('Fort Leaton State Historic Site'),['TPWD: Fort Leaton State Historic Site','https://tpwd.texas.gov/state-parks/fort-leaton'],L_BBRSP]),
+  [W('Fort Leaton State Historic Site'),['TPWD: Fort Leaton State Historic Site','https://tpwd.texas.gov/state-parks/fort-leaton'],L_BBRSP],hours='Daily, 8 a.m. to 4:30 p.m.; closed December 25'),
 N('gage-hotel-marathon','Gage Hotel','Marathon','tx','hotel','standing',30.20695,-103.24657,'exact','open','drive','','1927–',
   'The rancher Alfred S. Gage had the El Paso architect Henry Trost build this hotel in Marathon; it opened in 1927 and was also Gage\'s office until he died a year later. J. P. Bryan bought it in 1978 for $30,000 and renovated and enlarged it from the 1990s. It is on the National Register.',
   'The 1927 hotel building, still a hotel.',

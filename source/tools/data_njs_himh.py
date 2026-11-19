@@ -37,7 +37,7 @@ N('hancock-house-hancocks-bridge','Hancock House and the Swedish cabin','Hancock
   'A Quaker judge\'s patterned-brick house where a night raid ended in a massacre.',
   'Hancock House State Historic Site, New Jersey Division of Parks and Forestry, Locust Island Road. Park on Front Street by the site. Open Wednesday to Saturday, 9 a.m. to 4 p.m., closed Monday and Tuesday, as Journey Through Jersey gives it (the state page would not open to the tools); Sunday hours not checked.',
   [W('Hancock House (Lower Alloways Creek Township, New Jersey)'),HM(21703,'Patterned Brick Houses'),HM(127787,'Swedish Cabin'),HM(21604,'Hancock House Massacre'),HM(21606,'Old Bridges at this Location'),NJ_HANCOCK,JTJ_HANCOCK],
-  th=HB_LOT,thn='Hancock House lot, Front Street',brick='yes'),
+  th=HB_LOT,thn='Hancock House lot, Front Street',brick='yes',hours='Wednesday to Saturday, 9 a.m. to 4 p.m.; closed Monday and Tuesday; Sunday not checked'),
 N('alloways-creek-friends-meetinghouse','Alloways Creek Friends Meetinghouse','Hancock\'s Bridge','njs','worship','standing',39.50222,-75.45917,'site','view','drive','','1756–',
   'The third meetinghouse of the Alloways Creek Quakers, whose first stood on the creek bank in 1685 and the second in 1718. This one was built in 1756 on land given by William Hancock, and a second storey was added in 1784. It is a brick building in Flemish bond, documented by the Historic American Buildings Survey and listed in 2003.',
   'From Buttonwood Avenue: an uneven six-bay, two-storey brick front showing the 1756 part and the 1784 addition. The 2003 nomination describes original paneled shutters with their old iron hinges and catches, and inside a sloping four-level gallery on three walls; whether the public can go in was not checked.',

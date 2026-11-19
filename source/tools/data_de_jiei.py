@@ -79,7 +79,7 @@ N('hagley-powder-yards','Hagley powder yards','Wilmington','de','industry','stan
   '',
   'Hagley Museum and Library, a nonprofit museum, 200 Hagley Creek Road. Admission charged ($22 for adults from February 1, 2026). Open 10 a.m. to 5 p.m. six days a week, closed Wednesdays, last admission at 4 (hours page as quoted in a search result; an older copy gives 10 to 4 after daylight saving time ends). In January only the exhibition is open and walking on the grounds is not allowed. Free parking at the visitor center.',
   [W('Hagley Museum and Library'),['Hagley: hours and tickets','https://www.hagley.org/hours-tickets'],['Hagley: plan a visit','https://www.hagley.org/visit']],
-  th=[39.77494,-75.5784],thn='Hagley visitor center parking',brick='?'),
+  th=[39.77494,-75.5784],thn='Hagley visitor center parking',brick='?',hours='10 a.m. to 5 p.m. six days a week; closed Wednesdays; last admission at 4'),
 
 N('brecks-mill','Breck\'s Mill','Wilmington','de','industry','standing',39.77058,-75.57941,'site','view','drive','','1813–1854',
   'A mill on the Brandywine rebuilt in 1813 and rebuilt again within six weeks after a fire in 1846. It stopped working in 1854 and by the 1890s was a community house for the DuPont workers of Henry Clay village.',

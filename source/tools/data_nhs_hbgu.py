@@ -167,7 +167,7 @@ N('walpole-academy','Walpole Academy (Walpole Historical Society)','Walpole','nh
   '',
   'Owned by the Walpole Historical Society (Wikipedia), on the east side of Main Street, on the south side of Walpole village. Museum open Saturdays noon to 4 pm, late May to early October, per a Waymarking listing; the society\'s own page was not read, so check before going.',
   [W('Walpole Academy'),['Waymarking: Walpole Historical Society','https://www.waymarking.com/waymarks/WM17EGG_Walpole_Historical_Society_Walpole_NH']],
-  brick='no'),
+  brick='no',hours='Late May to early October: Saturdays noon to 4 p.m. (per a Waymarking listing; check before going)'),
 ]
 PIN_NOTES={
  'otter-brook-preserve-cellar-holes':'The Nature Conservancy\'s own map point for the preserve (its directions link); on the aerial it is the end of a woods track inside the preserve, with a house clearing about 80 m north-east. The Bowlder Road lot and the Wilder cellar hole were not found on the aerial or LiDAR, so the pin is area only.',

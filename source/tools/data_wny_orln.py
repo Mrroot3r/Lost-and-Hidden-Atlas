@@ -34,7 +34,7 @@ N('medina-railroad-museum','Medina freight depot (Medina Railroad Museum)','Medi
   'The long wooden freight house itself is the thing to see, with the museum inside. Which original fittings survive inside was not checked.',
   'One of the biggest wooden freight houses left.',
   'Run by the Medina Railroad Museum, 530 West Avenue. Open Thursday to Saturday 10 a.m. to 4:30 p.m. and Sunday noon to 4:30 p.m., closed Monday to Wednesday; admission charged (museum home page, read November 18, 2026). Train rides are ticketed separately.',
-  [L('Medina Railroad Museum','https://medinarailroadmuseum.org/'),W('Medina Railroad Museum')],brick='no'),
+  [L('Medina Railroad Museum','https://medinarailroadmuseum.org/'),W('Medina Railroad Museum')],brick='no',hours='Thursday to Saturday 10 a.m. to 4:30 p.m.; Sunday noon to 4:30 p.m.; closed Monday to Wednesday'),
 N('medina-armory','Medina Armory','Medina','wny','civic','standing',43.221944,-78.392222,'exact','view','walk','','1901',
   'A two-storey armory of Medina sandstone laid in random ashlar, with an administration building on Prospect Avenue and a drill shed behind. It was the first armory designed by state architect George Heins, for the 29th Separate Company of the National Guard. The Guard left in 1977 and it is now the local YMCA; it was listed on the National Register in 1995.',
   'The red sandstone front with its projecting entrance pavilion faces south across a lawn. Inside it is a working YMCA; interior not checked.',

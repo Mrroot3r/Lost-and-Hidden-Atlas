@@ -31,7 +31,7 @@ N('iron-center-museum-port-henry','Iron Center Museum and the Witherbees, Sherma
   'The office that ran Moriah\'s iron, now its town hall.',
   'The town hall is a public building. The Iron Center Museum: Lakes to Locks Passage gives mid-June to mid-October, Thursday to Saturday, noon to 3 pm, or by appointment; the Town of Moriah\'s own page says it runs on volunteers and asks visitors to call before coming, as it cannot promise the museum will be open. Phone numbers are on the town\'s page.',
   [S('26','26-the-witherbees-sherman-company-buildings','The Witherbees, Sherman & Company Buildings'),MORIAH,
-   L('Lakes to Locks Passage: The Iron Center Museum','https://passageport.org/places-to-go/the-iron-center-museum/')],brick='?'),
+   L('Lakes to Locks Passage: The Iron Center Museum','https://passageport.org/places-to-go/the-iron-center-museum/')],brick='?',hours='Mid-June to mid-October: Thursday to Saturday, noon to 3 p.m., or by appointment. Run by volunteers: call before coming'),
 N('sherman-free-library-port-henry','Sherman Free Library','Port Henry','adk','civic','standing',44.04743,-73.46001,'exact','open','drive','','1887–88',
   'George R. Sherman of the iron company built the library in 1887-88 for $7,700 in the Richardsonian Romanesque style, stocked it with 3,000 books and endowed it with $10,000; his widow Jane left it another $10,000. It was doubled in size in 1907 and is still the town\'s library.',
   'The tour says the oak interior and brass light fixtures are intact, with portraits of Frank S. Witherbee and George R. Sherman and a bird\'s-eye map of Port Henry from the early 1900s. Its neighbour up Church Street is the Mount Moriah Presbyterian Church, also Sherman\'s.',

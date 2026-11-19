@@ -78,7 +78,7 @@ N('prescott-church-swift-river-museum','North Prescott Methodist church (Swift R
   'The church, the Whitaker-Clary House and the Carriage Shed hold the society\'s museum of Dana, Enfield, Greenwich and Prescott, including a 1929 Dana fire truck.',
   'A church that left the valley in pieces and came back to the edge of it.',
   'The society owns the museum grounds at 40 Elm Street, New Salem, just west of Route 202 (Wikipedia: the church is now the society\'s home). The society\'s site gives the museum as open Wednesdays and Sundays 1 to 4 p.m. from mid-June to mid-September, free; it listed a closing date of September 16 for 2026. The grounds outside those hours were not checked.',
-  [SRVHS,REC_MOVE,W('Prescott, Massachusetts'),PREBLE]),
+  [SRVHS,REC_MOVE,W('Prescott, Massachusetts'),PREBLE],hours='Mid-June to mid-September: Wednesdays and Sundays 1 to 4 p.m.; closing date for 2026 was September 16'),
 N('prescott-town-house-petersham','Prescott Town House','Petersham','cmass','civic','standing',42.49889,-72.18361,'area','ask','drive','drowned','1838–',
   'The town hall of Prescott, a Greek Revival building of 1838 that stood just south of Atkinson Hollow. When Prescott was given up for the Quabbin, Judge John Monroe Woolsey paid to move it to Petersham and used it as a law library and office. It was listed on the National Register in 1989.',
   'The town house on a hill above a hay meadow north of Petersham centre, off Route 32. Whether it can be seen from Route 32 was not checked.',

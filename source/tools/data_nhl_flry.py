@@ -57,7 +57,7 @@ N('warner-house-portsmouth','Warner House (MacPheadris-Warner House)','Portsmout
   'A brick house with 15-inch walls laid in Flemish bond, a later gambrel roof and the cupola named in the 1716 builder\'s bill. Inside, four murals on the hall and stair walls, possibly by Nehemiah Partridge, are the oldest Anglo-American wall murals in place in the country (Wikipedia). Guided tours in season.',
   '',
   'Warner House Association, 150 Daniel Street. Its page (opened November 2026): open May 28 to October 18, 11 am to 4 pm, last tour 3:30, walk-in guided tours of about 45 minutes; adults $10, students $5, under 6 free; garden free. Closed now, reopening late May 2027. Metered street parking; the museum suggests the High-Hanover garage, 34 Hanover Street.',
-  [W('MacPheadris–Warner House'),['Warner House: Visit','https://www.warnerhouse.org/visit']],brick='yes'),
+  [W('MacPheadris–Warner House'),['Warner House: Visit','https://www.warnerhouse.org/visit']],brick='yes',hours='May 28 to October 18: 11 a.m. to 4 p.m., last tour 3:30'),
 N('jackson-house-portsmouth','Richard Jackson House','Portsmouth','nhl','landmark','standing',43.08088,-70.76707,'site','open','walk','',
   '1664',
   'Richard Jackson, a woodworker, farmer and mariner, built the first part of this house in 1664 on his family\'s 25-acre plot by an inlet of the Piscataqua. It is the oldest wood-frame house in New Hampshire. A lean-to was soon added at the back, sloping nearly to the ground, and end additions came about 1764. William Sumner Appleton bought it in 1924 from the seventh generation of Jacksons and stripped the 19th-century changes.',
