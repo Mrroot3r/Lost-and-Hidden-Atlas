@@ -57,7 +57,23 @@ PYEOF
   elif [ -f "$REPO/data/$f.json" ]; then cp "$REPO/data/$f.json" "$W/build/$f.json"; fi
 done
 # historic pockets: the built layer travels with the site, so a workspace without the raw downloads keeps every state
-if [ -f "$REPO/data/pockets.json" ]; then
+# Since November 20, 2026 it travels in pieces (tools/make.py): data/pock/index.json, each state's discs in
+# data/pock/<state>-k-<stamp>.json and its markers and listings in data/pock/<state>.json. build/pockets.json is the whole
+# layer put together again, which tools/pockets.py, tools/nearby.py and tools/make.py read. (data/pockets.json is NOT the
+# whole layer: it is frozen at fifteen states for old copies of the Android app, and used only when there are no pieces.)
+if [ -f "$REPO/data/pock/index.json" ]; then
+  mkdir -p "$W/build/pock"; for f in "$REPO"/data/pock/??.json; do [ -f "$f" ] && cp "$f" "$W/build/pock/"; done
+  python3 - "$REPO/data/pock" "$W/build/pockets.json" <<'PYEOF'
+import json,os,sys
+d,out=sys.argv[1],sys.argv[2]; ix=json.load(open(os.path.join(d,'index.json'),encoding='utf-8')); k=[]; s={}
+for st,o in ix['s'].items():
+    f=os.path.join(d,'%s-k-%s.json'%(st,o['kh']))
+    if not os.path.exists(f): sys.exit('setup.sh: %s is listed in data/pock/index.json but the file is missing'%os.path.basename(f))
+    k+=json.load(open(f,encoding='utf-8'))['k']; s[st]={a:b for a,b in o.items() if a not in('kh','n','b')}
+k.sort(key=lambda p:(p[10]!='c',-p[11]))
+json.dump({'v':3,'k':k,'s':s},open(out,'w',encoding='utf-8'),separators=(',',':'),ensure_ascii=False)
+PYEOF
+elif [ -f "$REPO/data/pockets.json" ]; then
   cp "$REPO"/data/pockets.json "$W/build/pockets.json"
   mkdir -p "$W/build/pock"; [ -d "$REPO/data/pock" ] && cp "$REPO"/data/pock/*.json "$W/build/pock/"
 fi

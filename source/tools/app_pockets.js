@@ -5,7 +5,7 @@
      2. a state whose detail is NOT built into the app (added to the site after the app was built): fetched from the
         Atlas address, and kept on the phone
      3. an update: only the states whose detail changed are downloaded again
-   Run it after any change to boot.js, to pockLoad/pockFetch in app.js, or to the shape of data/pockets.json:
+   Run it after any change to boot.js, to pockLoad/pockNeed/pockFetch in app.js, or to the shape of data/pock/index.json:
      cd android-app && node scripts/make-www.js && cd ..
      node source/tools/app_pockets.js            (from the repository root; it starts its own three little servers)
    Needs Playwright (npm install playwright; npx playwright install chromium). Exits 1 on any failure. */
@@ -24,15 +24,17 @@ function newer(site) { const out = fs.mkdtempSync(path.join(os.tmpdir(), 'atlas-
   const v = JSON.parse(fs.readFileSync(path.join(site, 'version.json'), 'utf8')).v, nv = String(+v + 1);
   for (const f of ['version.json', 'index.html']) fs.writeFileSync(path.join(out, f), fs.readFileSync(path.join(site, f), 'utf8').split(v).join(nv));
   for (const f of ['data/lines.json', 'data/leads.json']) fs.copyFileSync(path.join(site, f), path.join(out, f));
-  const j = JSON.parse(fs.readFileSync(path.join(site, 'data/pockets.json'), 'utf8')), first = Object.keys(j.s)[0]; j.s[first].h = 'changed1';
-  fs.writeFileSync(path.join(out, 'data/pockets.json'), JSON.stringify(j));
-  for (const k of Object.keys(j.s)) fs.copyFileSync(path.join(site, 'data/pock', k + '.json'), path.join(out, 'data/pock', k + '.json'));
+  const j = JSON.parse(fs.readFileSync(path.join(site, 'data/pock/index.json'), 'utf8')), first = Object.keys(j.s)[0]; j.s[first].h = 'changed1';
+  for (const f of fs.readdirSync(path.join(site, 'data/pock'))) fs.copyFileSync(path.join(site, 'data/pock', f), path.join(out, 'data/pock', f));
+  fs.writeFileSync(path.join(out, 'data/pock/index.json'), JSON.stringify(j));
   return { dir: out, changed: first }; }
 const fails = []; const ok = (name, cond, detail) => { console.log((cond ? 'ok   ' : 'FAIL ') + name + (detail !== undefined ? '  [' + detail + ']' : '')); if (!cond) fails.push(name); };
 (async () => {
   const www = path.join(REPO, 'android-app', 'www');
   if (!fs.existsSync(path.join(www, 'index.html'))) { console.error('No android-app/www. Run: cd android-app && node scripts/make-www.js'); process.exit(1); }
-  const idx = JSON.parse(fs.readFileSync(path.join(REPO, 'data/pockets.json'), 'utf8')), states = Object.keys(idx.s);
+  const idx = JSON.parse(fs.readFileSync(path.join(REPO, 'data/pock/index.json'), 'utf8')), states = Object.keys(idx.s);
+  idx.k = []; for (const k of states) idx.k = idx.k.concat(JSON.parse(fs.readFileSync(path.join(REPO, 'data/pock', k + '-k-' + idx.s[k].kh + '.json'), 'utf8')).k);
+  const far = states.find(k => !fs.existsSync(path.join(www, 'data/pock', k + '.json')));      /* a state the app does not carry at all */
   if (states.length < 2) { console.error('This check needs pockets for at least two states.'); process.exit(1); }
   /* a town centre in each of the first two states to zoom in on */
   const spot = k => { const r = idx.k.find(x => x[8] === k && x[10] === 'c'); return [r[0], r[1]]; }, A1 = states[0], A2 = states[1];
@@ -55,7 +57,7 @@ const fails = []; const ok = (name, cond, detail) => { console.log((cond ? 'ok  
   let t = await open(site.url, A2);
   ok('nothing about pockets is fetched before the layer is on', t.reqs.length === 0, t.reqs.join(' '));
   await t.layerOn();
-  ok('the index comes from the copy built into the app', t.reqs.join(' ') === 'app:pockets.json', t.reqs.join(' '));
+  ok('the index and the discs of the states round the start place come from the copy built into the app', t.reqs[0] === 'app:pock/index.json' && t.reqs.some(x => /^app:pock\/[a-z]{2}-k-[0-9a-f]{8}\.json$/.test(x)) && t.reqs.every(x => x.indexOf('app:') === 0) && t.reqs.indexOf('app:pockets.json') < 0, t.reqs.join(' '));
   ok('the list of old town centres is filled', (await t.p.$$('.pocklist .btn')).length > 0);
   await t.p.click('#sheet-x'); await t.go(spot(A1), 16);
   ok('zoomed in (' + A1 + '): that state\'s detail from the built-in copy', t.reqs.indexOf('app:pock/' + A1 + '.json') >= 0 && t.reqs.indexOf('atlas:pock/' + A1 + '.json') < 0, t.reqs.join(' '));
@@ -64,12 +66,14 @@ const fails = []; const ok = (name, cond, detail) => { console.log((cond ? 'ok  
   ok('zoomed in (' + A2 + '): its detail is not built in, so it comes from the Atlas address', t.reqs.indexOf('atlas:pock/' + A2 + '.json') >= 0, t.reqs.join(' '));
   const n2 = await t.shapes(); ok('and its markers and listings are drawn', n2 > 3, n2);
   const k1 = await t.kept(); ok('and it is kept on the phone', k1.indexOf('data/pock/' + A2 + '.json') >= 0, k1.join(' '));
+  if (far) { await t.go(spot(far), 12); const kf = 'pock/' + far + '-k-' + idx.s[far].kh + '.json', k9 = await t.kept(), d9 = await t.p.evaluate(() => { let n = 0; window.__atlasMap.eachLayer(l => { const o = l.options || {}; if (o.pane === 'lines' && l.getRadius && o.fillOpacity <= 0.3) n++; }); return n; });
+    ok('a state the app does not carry (' + far + '): its discs come from the Atlas address, are drawn and are kept', t.reqs.indexOf('atlas:' + kf) >= 0 && d9 > 0 && k9.indexOf('data/' + kf) >= 0, d9 + ' discs; ' + t.reqs.filter(x => x.indexOf(far + '-k-') >= 0).join(' ')); }
   ok('no page errors', t.errs.length === 0, t.errs.join(' | ')); await t.c.close();
   // ---- 3: the Atlas address now holds a newer version in which only one state's detail changed
   t = await open(site2.url);
   await t.p.waitForFunction(() => { const x = document.getElementById('banner'); return x && !x.hidden && /New places downloaded/.test(x.textContent); }, null, { timeout: 30000 }).catch(() => {});
-  const k2 = await t.kept(), got = k2.filter(x => x.indexOf('data/pock/') === 0);
-  ok('an update was downloaded', k2.indexOf('data/pockets.json') >= 0 && k2.indexOf('atlas-sites.json') >= 0, k2.join(' '));
+  const k2 = await t.kept(), got = k2.filter(x => /^data\/pock\/[a-z]{2}\.json$/.test(x));
+  ok('an update was downloaded', k2.indexOf('data/pock/index.json') >= 0 && k2.indexOf('atlas-sites.json') >= 0, k2.join(' '));
   ok('with it, only the state whose detail changed (' + nw.changed + ')', got.join() === 'data/pock/' + nw.changed + '.json', got.join(' '));
   await t.p.reload(); await t.p.waitForFunction(() => window.__atlasMap, null, { timeout: 30000 }); await t.p.waitForTimeout(1500);
   await t.layerOn(); await t.p.click('#sheet-x'); t.reqs.length = 0; await t.go(spot(nw.changed), 16);

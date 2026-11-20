@@ -14,7 +14,7 @@ for (const f of need) if (!fs.existsSync(path.join(site, f))) { console.error('M
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'data'), { recursive: true });
 for (const f of need.slice(1)) fs.copyFileSync(path.join(site, f), path.join(out, f));
-for (const f of ['data/pockets.json']) if (fs.existsSync(path.join(site, f))) fs.copyFileSync(path.join(site, f), path.join(out, f));   // optional layer
+// (data/pockets.json, the whole pockets layer in one file, is no longer carried: the app reads data/pock/index.json)
 // vanished places and old mines: an index and one file per state, each named with a stamp of its content (data/vanished/, data/mines/).
 // Every state is 15 MB, so only the index and the Northeast's states are built in and work with no signal from the first day;
 // any other state is fetched by boot.js the first time the map is zoomed in there, and kept on the phone after that.
@@ -22,9 +22,9 @@ const XL_BUILT_IN = ['ny', 'ma', 'vt', 'ct', 'nh', 'nj', 'pa', 'ri', 'me'];
 for (const d of ['vanished', 'mines']) { const src = path.join(site, 'data', d);
   if (fs.existsSync(src)) { fs.mkdirSync(path.join(out, 'data', d), { recursive: true });
     for (const f of fs.readdirSync(src)) if (f === 'index.json' || XL_BUILT_IN.indexOf(f.split('-')[0]) >= 0) fs.copyFileSync(path.join(src, f), path.join(out, 'data', d, f)); } }
-// one detail file per state for the historic pockets, for the nine states in XL_BUILT_IN only (the rest would add megabytes to the app); any other state is fetched by boot.js when needed and kept
+// the historic pockets: the index, and for the nine states in XL_BUILT_IN their discs (<state>-k-<stamp>.json) and their detail (<state>.json); any other state is fetched by boot.js when the map looks at it, and kept
 const pock = path.join(site, 'data', 'pock');
-if (fs.existsSync(pock)) { fs.mkdirSync(path.join(out, 'data', 'pock'), { recursive: true }); for (const f of fs.readdirSync(pock)) if (f.endsWith('.json') && XL_BUILT_IN.indexOf(f.slice(0, -5)) >= 0) fs.copyFileSync(path.join(pock, f), path.join(out, 'data', 'pock', f)); }
+if (fs.existsSync(pock)) { fs.mkdirSync(path.join(out, 'data', 'pock'), { recursive: true }); for (const f of fs.readdirSync(pock)) if (f === 'index.json' || (f.endsWith('.json') && XL_BUILT_IN.indexOf(f.slice(0, 2)) >= 0)) fs.copyFileSync(path.join(pock, f), path.join(out, 'data', 'pock', f)); }
 let html = fs.readFileSync(path.join(site, 'index.html'), 'utf8');
 const swap = (re, to, what) => { if (!re.test(html)) { console.error('Could not find ' + what + ' in index.html; the page layout has changed.'); process.exit(1); } html = html.replace(re, to); };
 swap(/<script src="app\.js\?v=[^"]*"><\/script>/, '<script src="boot.js"></script>', 'the app script tag');

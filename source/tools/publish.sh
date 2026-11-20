@@ -52,7 +52,7 @@ if [ -n "$LAYERS" ] && [ -z "$FULL" ]; then
   for f in vanished mines; do      # these two travel in pieces (an index and one file per state): the pieces replace the old ones whole
     [ -d "$W/dist/web/data/$f" ] && { rm -rf "data/$f"; mkdir -p "data/$f"; cp "$W"/dist/web/data/$f/*.json "data/$f/"; }
   done
-  [ -d "$W/dist/web/data/pock" ] && cp "$W"/dist/web/data/pock/*.json data/pock/
+  [ -d "$W/dist/web/data/pock" ] && { rm -rf data/pock; mkdir -p data/pock; cp "$W"/dist/web/data/pock/*.json data/pock/; }      # the index, each state's discs (named with a stamp) and its detail: the pieces replace the old ones whole
   [ -d "$W/dist/web/data/leads" ] && { rm -rf data/leads; mkdir -p data/leads; cp "$W"/dist/web/data/leads/*.json data/leads/; }      # the leads' second file, named with its stamp
 fi
 mkdir -p source/src source/tools source/build
