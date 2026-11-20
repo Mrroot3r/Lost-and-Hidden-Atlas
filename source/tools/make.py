@@ -96,9 +96,23 @@ if _lx:
 if os.path.exists(R+'build/pockets.json'):       # historic pockets (tools/pockets.py); fetched only when the layer is turned on
     pj=json.load(open(R+'build/pockets.json',encoding='utf-8'))
     for part in ('m','r','d'): pj.setdefault(part,[])     # empty, for an Android app built before the detail moved to one file per state
-    open(WEB+'data/pockets.json','w',encoding='utf-8').write(json.dumps(pj,separators=(',',':'),ensure_ascii=False))
-    os.makedirs(WEB+'data/pock')
-    for k in pj.get('s',{}): shutil.copyfile(R+f'build/pock/{k}.json',WEB+f'data/pock/{k}.json')   # one state's markers and listings, fetched when the map is zoomed in there
+    # The layer goes out in pieces since November 20, 2026, as the vanished places and mines do: data/pock/index.json (for
+    # each state its counts, the stamp of its detail file h, the stamp of its discs kh and its box b), the discs of one state
+    # in data/pock/<state>-k-<kh>.json, and its markers and listings in data/pock/<state>.json. The page fetches the index
+    # when the layer is switched on and a state's discs when the map looks at it. data/pockets.json, the whole layer in one
+    # file, is what copies of the Android app built before that read: it stays, frozen at the fifteen states it then held.
+    PK_OLD=('ny','ma','vt','ct','nh','nj','pa','ri','me','md','de','dc','va','oh','wv')
+    _old=dict(pj,s={k:v for k,v in pj.get('s',{}).items() if k in PK_OLD},k=[r for r in pj['k'] if r[8] in PK_OLD])
+    open(WEB+'data/pockets.json','w',encoding='utf-8').write(json.dumps(_old,separators=(',',':'),ensure_ascii=False))
+    os.makedirs(WEB+'data/pock'); _ix={}
+    for k,v in pj.get('s',{}).items():
+        shutil.copyfile(R+f'build/pock/{k}.json',WEB+f'data/pock/{k}.json')   # one state's markers and listings, fetched when the map is zoomed in there
+        _rows=[r for r in pj['k'] if r[8]==k]
+        if not _rows: continue
+        _txt=json.dumps({'k':_rows},separators=(',',':'),ensure_ascii=False); _kh=hashlib.md5(_txt.encode('utf-8')).hexdigest()[:8]
+        open(WEB+f'data/pock/{k}-k-{_kh}.json','w',encoding='utf-8').write(_txt)
+        _ix[k]=dict(v,kh=_kh,n=len(_rows),b=[round(min(r[0]-r[2]/70000 for r in _rows),3),round(min(r[1]-r[2]/50000 for r in _rows),3),round(max(r[0]+r[2]/70000 for r in _rows),3),round(max(r[1]+r[2]/50000 for r in _rows),3)])
+    open(WEB+'data/pock/index.json','w',encoding='utf-8').write(json.dumps({'v':4,'s':_ix},separators=(',',':'),ensure_ascii=False))
 if os.path.exists(R+'build/walls.json'):         # stone walls found on LiDAR (tools/walls.py); the index when the layer is switched on, a cell when zoomed in there
     shutil.copyfile(R+'build/walls.json',WEB+'data/walls.json'); shutil.copytree(R+'build/walls',WEB+'data/walls')
 if os.path.exists(R+'src/photos.json'):          # photo details gathered ahead of time (tools/photos.py): only for places that still exist

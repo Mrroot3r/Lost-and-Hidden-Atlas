@@ -102,6 +102,32 @@ const { chromium } = require('playwright');
     await q.evaluate(()=>{ window.__atlasMap.setZoom(8,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
     ok('at the 20-mile scale (zoom 8) the best town centres show',k.discs>0&&k.discs<200,JSON.stringify(k));
     await c4.close(); }
+  // ---- the old town centres travel one state at a time: an index, then a state's discs when the map looks at it or
+  //      the reader stands in it. Nobody looking at Albany downloads Ohio.
+  { const c6=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c6.newPage(); const got=[]; q.on('pageerror',e=>errs.push(e.message));
+    await c6.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    q.on('request',r=>{ const m=/\/data\/(pockets\.json|pock\/index\.json|pock\/([a-z]{2})-k-[0-9a-f]{8}\.json)/.exec(r.url()); if(m) got.push(m[2]?'k:'+m[2]:m[1]); });
+    await q.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},ui:{base:'streets',view:[42.6526,-73.7562,13],hist:false,pockets:true,lines:{oldrail:false,canal:false,rail:false},nm:{r:3,al:0,k:{p:0,l:0,v:0,m:0,c:1}}}})); }catch(e){} });
+    await q.goto(url); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(3000);
+    const discs=()=>q.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ const o=l.options||{}; if(o.pane==='lines'&&l.getRadius&&o.fillOpacity<=0.3) n++; }); return n; });
+    ok('town centres over Albany: the index and New York\'s discs are fetched',got.indexOf('pock/index.json')>=0&&got.indexOf('k:ny')>=0,got.join(' '));
+    ok('and not the old whole file, nor a far state',got.indexOf('pockets.json')<0&&!got.some(x=>/^k:(va|oh|md|me|pa)$/.test(x)),got.join(' '));
+    ok('New York\'s discs are drawn',await discs()>3,await discs()+' discs');
+    const ix=await q.evaluate(()=>fetch('data/pock/index.json').then(r=>r.json()));
+    ok('the index lists every state with its stamps and its box, and no discs itself',Object.keys(ix.s||{}).length>=15&&Object.values(ix.s).every(o=>/^[0-9a-f]{8}$/.test(o.kh||'')&&o.h&&Array.isArray(o.b)&&o.b.length===4&&o.n>0)&&!(ix.k&&ix.k.length),Object.keys(ix.s||{}).length+' states');
+    await q.evaluate(()=>{ window.__atlasMap.setView([37.54,-77.44],12,{animate:false}); }); await q.waitForTimeout(2200);
+    ok('the map moved to Richmond: Virginia\'s discs come then, and are drawn',got.indexOf('k:va')>=0&&await discs()>3,got.join(' ')+'; '+await discs()+' discs');
+    const before=got.length; await q.evaluate(()=>{ window.__atlasMap.setView([37.56,-77.40],12,{animate:false}); }); await q.waitForTimeout(900);
+    ok('a state that has come is not fetched again',got.length===before,got.slice(before).join(' '));
+    await q.click('#lb-opt'); await q.waitForTimeout(1500);
+    ok('Map options lists the town centres near the middle of the map or the start place',await q.locator('#sheet-b .pocklist button').count()>0,await q.locator('#sheet-b .pocklist button').count()+' listed');
+    await q.click('#sheet-x').catch(()=>{});
+    await q.evaluate(()=>{ window.__atlasNM.nmCollect([40.44,-79.99],3); }); await q.waitForTimeout(2000);
+    const nc=await q.evaluate(()=>window.__atlasNM.nmCollect([40.44,-79.99],3).filter(t=>t.k==='c').length);
+    ok('Near: standing in Pittsburgh with town centres among the kinds wanted brings Pennsylvania\'s',got.indexOf('k:pa')>=0&&nc>0,nc+' centres within 3 miles; '+got.join(' '));
+    const old=await q.evaluate(()=>fetch('data/pockets.json').then(r=>r.json()).then(j=>({st:Object.keys(j.s||{}).length,k:j.k.length,stray:j.k.filter(k=>!(j.s||{})[k[8]]).length})));
+    ok('the old whole file is still there for older copies of the Android app, and has stopped growing',old.st>0&&old.st<=15&&old.k>1000&&old.stray===0,JSON.stringify(old));
+    await c6.close(); }
   // ---- grouped pins are coloured by how many places they stand for, cool to hot, and the biggest are a little larger
   { await go(42.9,-75.5,6); await p.waitForTimeout(400);
     const cl=await p.evaluate(()=>[...document.querySelectorAll('.leaflet-marker-pane .clus')].map(e=>({n:+e.textContent,c:(/\bc(\d)\b/.exec(e.className)||[])[1],bg:getComputedStyle(e).backgroundColor,w:e.offsetWidth})).sort((a,b)=>a.n-b.n));
