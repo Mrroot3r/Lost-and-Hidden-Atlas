@@ -30,6 +30,36 @@ def relabel(nums,new,colour,what):
         gh('-X','POST','repos/%s/issues/%s/labels'%(REPO,n),'--input','-',inp=json.dumps({'labels':[new]}))
         subprocess.run(['gh','api','-X','DELETE','repos/%s/issues/%s/labels/%s'%(REPO,n,LAB.replace(' ','%20'))],capture_output=True)
         print('#%s is marked %s.'%(n,new))
+# ---- a pin (or anything else about a place) that a session could not settle from here: an issue for a person to look at.
+# The owner's idea, November 20, 2026: "a folder for that, some more stuff for me or someone else to work on".
+#   python3 tools/unchecked.py --human <place id> "<what was looked at, and why it could not be told>"   (add --dry to see it without filing)
+#   python3 tools/unchecked.py --human              lists the ones still open
+HUMAN='needs a human'
+if a[:1]==['--human']:
+    import os
+    dry='--dry' in a; b=[x for x in a[1:] if x!='--dry']
+    if not b:
+        got=gh('repos/%s/issues?state=open&labels=%s&per_page=100'%(REPO,HUMAN.replace(' ','%20'))) or []
+        print('%d waiting for a person (https://github.com/%s/issues?q=is%%3Aopen+label%%3A%%22needs+a+human%%22):'%(len(got),REPO))
+        for i in got: print('  #%d  %s'%(i['number'],i['title']))
+        sys.exit(0)
+    if len(b)<2 or len(b[1].strip())<20: sys.exit('Give the place id and a sentence or two: what you looked at and why it could not be told from here.')
+    W=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sj=os.path.join(W,'build','sites.json')
+    if not os.path.exists(sj): sys.exit('Run this from the working folder after build_sites.py: build/sites.json is not there.')
+    pl=next((x for x in json.load(open(sj)) if x['id']==b[0]),None)
+    if not pl: sys.exit('No place has the id '+b[0])
+    title='Needs a look: %s, %s (%s)'%(pl['name'],pl.get('town',''),pl['id'])
+    body='\n'.join(['**Place:** [%s](https://mrroot3r.github.io/Lost-and-Hidden-Atlas/#%s), %s'%(pl['name'],pl['id'],pl.get('town','')),
+        '**Pin:** %s, %s  ·  batch `%s`'%(pl['lat'],pl['lon'],pl.get('new') or 'first catalogue'),'',
+        '**What a session could not settle from here:**',b[1].strip(),'',
+        'A person who knows the place, or stands there, can settle it: say in a comment what is right (and where the thing really is, if the pin is off), then a maintainer session makes the correction and closes this.',
+        '','_Filed by `tools/unchecked.py --human`._'])
+    if dry: print('WOULD FILE, labelled "%s":\n%s\n\n%s'%(HUMAN,title,body)); sys.exit(0)
+    if not any(l['name']==HUMAN for l in gh('repos/%s/labels?per_page=100'%REPO)): gh('-X','POST','repos/%s/labels'%REPO,'-f','name='+HUMAN,'-f','color=d93f0b','-f','description=A session could not settle this from an aerial or a source: a person needs to look')
+    same=[i for i in (gh('repos/%s/issues?state=open&labels=%s&per_page=100'%(REPO,HUMAN.replace(' ','%20'))) or []) if '(%s)'%pl['id'] in i['title']]
+    if same: print('Already waiting: #%d %s'%(same[0]['number'],same[0]['title'])); sys.exit(0)
+    r=gh('-X','POST','repos/%s/issues'%REPO,'--input','-',inp=json.dumps({'title':title,'body':body,'labels':[HUMAN]}))
+    print('Filed #%d for a person to look at: %s'%(r['number'],r['html_url'])); sys.exit(0)
 if a[:1]==['--done']: relabel(a[1:2],'double-checked','0e8a16','Research reviewed in full: sources opened, every pin looked at'); sys.exit(0)
 if a[:1]==['--sampled']: relabel(a[1:],'sample-checked','1d76db','Research that passed the automated checks, with one pin drawn at random looked at on the aerial'); sys.exit(0)
 prs=[]; pg=1
@@ -58,6 +88,7 @@ if a[:1]==['--sample']:
     print('\nLook at them (sheets of twelve in research/):\n  python3 tools/pincheck.py '+' '.join(pid for n,pid in picks))
     print('Then, for the batches whose pin is on its building, ruin or site:\n  python3 tools/unchecked.py --sampled '+' '.join(str(n) for n,pid in picks))
     print('A pin that is off: fix it in a pull request first (GUIDE.md section 14), and leave that batch for a full review.')
+    print('A pin you cannot tell either way (trees, a new roof, nothing to match the description): do not guess and do not mark the batch.\n  python3 tools/unchecked.py --human <place id> "<what you looked at and why it could not be told>"\nfiles it for a person to look at; leave that batch waiting.')
     sys.exit(0)
 if not prs: print('Nothing is waiting for a second look.'); sys.exit(0)
 print(len(prs),'pull request(s) merged without a second look, oldest first:')

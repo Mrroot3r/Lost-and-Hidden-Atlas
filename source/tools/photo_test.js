@@ -105,6 +105,18 @@ const { chromium } = require('playwright');
   ok('a place stored as "nothing usable" shows no picture and asks nothing',!r.shown&&asked.wiki===0,JSON.stringify(asked));
   r=await show(p,pick.wiki[2]);
   ok('a place the stored file does not hold is still looked up as before',r.shown&&asked.wiki===1&&asked.commons===1,JSON.stringify(asked));
+  // ---- a tap on the picture shows it large, with its credit; another tap puts it away. And a button looks for more photos elsewhere.
+  { await show(p,pick.wiki[0]);      /* the place whose photo is stored */
+    const tap=()=>p.evaluate(()=>{ const i=document.querySelector('#v-detail .dphoto img'); if(i) i.click(); });
+    const big=()=>p.evaluate(()=>{ const n=document.querySelector('#photobig'); if(!n||n.hidden) return null; const i=n.querySelector('img'), r=i.getBoundingClientRect(); return {src:i.getAttribute('src'),w:Math.round(r.width),cap:n.textContent,vw:innerWidth}; });
+    await tap(); await p.waitForTimeout(400); const g=await big();
+    ok('a tap on the picture opens it large over the page, asking for a bigger copy',!!g&&/\/1600px-Stored\.jpg$/.test(g.src),g?g.src:'no large view');
+    ok('the large view carries the credit',!!g&&/Sam Stored/.test(g.cap)&&/CC BY 4\.0/.test(g.cap),g?g.cap.slice(0,80):'');
+    await p.evaluate(()=>{ const n=document.querySelector('#photobig'); if(n) n.click(); }); await p.waitForTimeout(300);
+    ok('a tap on it puts it away again',(await big())===null);
+    const more=await p.evaluate(()=>{ const a=document.querySelector('#v-detail #d-morephotos'); return a?{href:a.getAttribute('href'),t:a.textContent,target:a.getAttribute('target')}:null; });
+    const nm=await p.evaluate(()=>document.querySelector('#v-detail h2').textContent);
+    ok('the place page has a "More photos" link that searches for pictures of it by name, outside the Atlas',!!more&&/^https:\/\/www\.google\.com\/search\?/.test(more.href)&&/udm=2|tbm=isch/.test(more.href)&&decodeURIComponent(more.href.replace(/\+/g,' ')).indexOf(nm)>=0&&more.target==='_blank',more?more.href.slice(0,120):'no link'); }
   await c.close(); await b.close();
   ok('no page errors',!errs.length,errs.slice(0,3).join(' | '));
   console.log(fails.length?fails.length+' FAILED':'photo_test passed'); process.exit(fails.length?1:0);
