@@ -435,6 +435,14 @@ Done so far:
 | Indiana | 211 | 259 | 4,525 | 2,229 | none |
 | Kentucky | 207 | 245 | 4,385 | 3,416 | none |
 | Wisconsin | 164 | 224 | 3,375 | 2,483 | Milwaukee (575) |
+| South Carolina | 132 | 185 | 4,990 | 1,612 | Charleston (759) |
+| Alabama | 166 | 173 | 4,513 | 1,462 | none |
+| Mississippi | 114 | 156 | 3,202 | 1,409 | Warren (553) |
+| Arkansas | 151 | 168 | 2,061 | 2,913 | none |
+| Colorado | 103 | 135 | 2,510 | 1,603 | none |
+| New Mexico | 64 | 94 | 1,444 | 883 | none |
+| Utah | 81 | 113 | 2,710 | 1,577 | Salt Lake (562) |
+| Nevada | 25 | 44 | 1,107 | 377 | none |
 
 Since November 20, 2026 the layer is being carried to every state, a few at a time (the Register lists and settlement points for all fifty states and the District are already in the maintainer's workspace; the marker lists take the time). **How the layer travels (since November 20, 2026; `pockLoad()`, `pockNeed()`, `pockFetch()` in `app.js`, the pockets part of `tools/make.py`).** In one file the layer was 377 KB with nine states and 605 KB with fifteen, on its way to 2 MB, and every reader who switched it on fetched all of it. Now it goes out in pieces, as the vanished places and mines do: `data/pock/index.json` (3 KB: for each state its counts, the stamp `h` of its detail file, the stamp `kh` of its discs and the box `b` its pockets lie in), each state's discs in `data/pock/<state>-k-<kh>.json`, and its markers and listings in `data/pock/<state>.json` as before. The page fetches the index when the layer is switched on, a state's discs when the map looks at it at zoom 8 or closer, when the list in Map options wants the centres within 40 miles, or when the Near tab wants town centres; and the detail at street level. `data/pockets.json`, the whole layer in one file, is what copies of the Android app built before this read, and it fetches every changed state's detail eagerly: it **stays, frozen at the fifteen states it then held** (`PK_OLD` in `make.py`); do not add to it. In a workspace `build/pockets.json` is still the whole layer (`setup.sh` puts the pieces together again). The Android app carries the index and, for the first nine states (`XL_BUILT_IN` in `android-app/scripts/make-www.js`), the discs and detail; any other state's files are fetched when wanted and kept. After new data arrives it refreshes a state's detail only where the phone already has it (`pockSync()` in `boot.js`). Tests: `tools/overlay_test.js` (the town-centres block) and `tools/app_pockets.js`. `LAYERS=1 publish.sh` replaces `data/pock/` whole.
 
