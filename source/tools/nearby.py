@@ -39,4 +39,18 @@ for f,title in (('leads','OpenStreetMap leads (mapped ruins and old sites)'),('v
         nat=[x for x in json.load(open('build/leads_native.json'))['p'] if d(x[0],x[1])<=km]
         if nat: print(f'  and {len(nat)} more in the category a reader must switch on (Native American sites, leads on reservation land), not listed here. One belongs in the Atlas only where whoever manages it invites visitors and says so on its own page (GUIDE.md section 8).')
     for x in sorted([x for x in P if not str(x[3]).strip()],key=lambda x:d(x[0],x[1]))[:25]: print(f"  {d(x[0],x[1]):4.1f} km {comp(x[0],x[1]):2}  (no name)  |  {L['t'][x[2]]}  |  {x[0]}, {x[1]}   <- look at it: python3 tools/look.py out.jpg lead,{x[0]},{x[1]},150")
+# ---- old town centres (the historic-pockets layer): where markers and National Register listings bunch together. A reader
+# who taps one and finds no Atlas place there is the reader this list is for: the centres with nothing yet come first.
+if os.path.exists('build/pockets.json'):
+    PK=json.load(open('build/pockets.json',encoding='utf-8')); C=[k for k in PK.get('k',[]) if k[10]=='c' and d(k[0],k[1])<=km]
+    ALL=json.load(open('build/sites.json'))
+    def inside(k):
+        r=max(k[2],400)/1000.0
+        return sum(1 for s in ALL if abs(s['lat']-k[0])<0.03 and math.hypot((s['lat']-k[0])*111.32,(s['lon']-k[1])*111.32*math.cos(math.radians(k[0])))<=r)
+    rows=sorted(((inside(k),k) for k in C),key=lambda x:(x[0]>0,x[0],-x[1][11]))
+    if PK.get('s') is not None and not C: print(f'== Old town centres within {km:g} km: none'+('' if any(d(k[0],k[1])<=300 for k in PK.get('k',[])) else ' (the layer does not cover this state yet)'))
+    elif C:
+        print(f'== Old town centres within {km:g} km: {len(C)}, {sum(1 for n,k in rows if n==0)} with no Atlas place yet (those first, best score first). Each is a walkable cluster of old buildings: look up its National Register listings and district, and add what stands.')
+        for n,k in rows[:25]: print(f"  {d(k[0],k[1]):4.1f} km {comp(k[0],k[1]):2}  {k[7]}  |  score {round(k[11])}; {k[4]} listed place{'s' if k[4]!=1 else ''}, {k[5]} district{'s' if k[5]!=1 else ''}"+(f' ({k[6]} buildings)' if k[6] else '')+f", {k[3]} marker{'s' if k[3]!=1 else ''}  |  Atlas places there: {n}  |  {k[0]}, {k[1]}")
+        if len(rows)>25: print(f'  ... {len(rows)-25} more: use a smaller distance')
 print('== Also read LEADS.md for these towns (grep the town names), and try its rows before hunting for new names.')

@@ -35,6 +35,24 @@ const { chromium } = require('playwright');
   ok('a vanished place is listed in the Near tab but does not buzz, nor go to the phone\'s recorder',vz&&vz.listed&&vz.buzz===false&&!vz.pushed,JSON.stringify(vz));
   const rec=await p.evaluate(id=>{ const {sites,nmFix,nmCollect,nmBuzzes,NM,XL,xlLoad,syncMarkers}=window.__atlasNM; const s=sites().find(x=>x.id===id); return nmCollect([s.lat,s.lon],1).filter(nmBuzzes).some(x=>x.id==='p:'+id); },pick.gone);
   ok('the list for the Android app\'s recorder leaves out the place with nothing to see',!rec);
+  // 1b. one place can be silenced for good: it stays in the Near list and stops buzzing, here and on the phone's recorder
+  { const s=await p.evaluate(id=>{ const x=window.__atlasNM.sites().find(x=>x.id===id); return [x.lat,x.lon,x.name]; },pick.standing);
+    await p.evaluate(a=>{ window.__atlasMap.setView([a[0],a[1]],15,{animate:false}); },s); await p.click('#tab-near'); await p.waitForTimeout(500);
+    await p.evaluate(()=>{ const b=[...document.querySelectorAll('#v-near button')].find(b=>/Use map centre/i.test(b.textContent)); if(b) b.click(); }); await p.waitForTimeout(700);
+    const row=p.locator('#near-list .nmitem[data-id="p:'+pick.standing+'"]'); const has=await row.count();
+    if(has) await row.click(); await p.waitForTimeout(500);
+    const mb=p.locator('#near-goal #near-mute');
+    ok('the card for a chosen place has a button to silence it',has===1&&(await mb.count())===1&&/silence|never buzz/i.test(await mb.innerText().catch(()=>'')),has+' row; '+(await mb.innerText().catch(()=>'no button')));
+    if(await mb.count()) await mb.click(); await p.waitForTimeout(400);
+    ok('silenced: standing right on it no longer buzzes',!(await buzzAt(p,pick.standing)));
+    const st=await p.evaluate(id=>{ const {sites,nmCollect,nmBuzzes}=window.__atlasNM; const x=sites().find(x=>x.id===id), l=nmCollect([x.lat,x.lon],1); return {listed:l.some(t=>t.id==='p:'+id),pushed:l.filter(nmBuzzes).some(t=>t.id==='p:'+id),row:(document.querySelector('#near-list .nmitem[data-id="p:'+id+'"]')||{}).textContent||''}; },pick.standing);
+    ok('it is still listed in the Near tab, marked as silenced, and left out of the list for the phone\'s recorder',st.listed&&!st.pushed&&/silenced/i.test(st.row),JSON.stringify(st).slice(0,160));
+    await p.waitForTimeout(300);
+    ok('the choice is kept with the reader\'s other data',await p.evaluate(id=>(JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).mute||[]).indexOf('p:'+id)>=0,pick.standing));
+    await p.click('#lb-opt'); await p.click('#sheet-set'); await p.waitForTimeout(300);
+    const un=p.locator('#set-unmute'); ok('Settings says how many are silenced and offers to undo it',(await un.count())===1&&/1 /.test(await p.locator('#set-muted').innerText().catch(()=>'')),await p.locator('#set-muted').innerText().catch(()=>'no line'));
+    if(await un.count()) await un.click(); await p.waitForTimeout(300); await p.click('#sheet-x').catch(()=>{});
+    ok('undone: it buzzes again',await buzzAt(p,pick.standing)); }
   await c.close();
   // 2. switched the other way
   ({c,p}=await open({quietGone:false,buzzVanished:true}));

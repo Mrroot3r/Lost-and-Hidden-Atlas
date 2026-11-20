@@ -127,8 +127,6 @@ button.chip[aria-pressed="true"]:hover{border-color:var(--ink)}
 .dot.mine{border-radius:1px;transform:rotate(45deg)}
 .stag{display:inline-flex;align-items:center;gap:5px}
 .stag .dot{margin:0}
-.pinkey{margin:8px 0 2px;font-size:12.5px}
-.pinkey .lkhint{color:var(--mute)}
 .lmore{position:absolute;top:0;bottom:0;width:30px;border:0;padding:0 0 0 6px;font-size:26px;line-height:1;color:var(--ink);background:linear-gradient(90deg,transparent,var(--panel) 45%);z-index:2}
 .lmore[hidden]{display:none}
 .tag{font-family:var(--fc);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:1px 6px;background:var(--chip);color:var(--mute);white-space:nowrap}
@@ -426,6 +424,15 @@ details>.phs{margin:8px 0 0}
 #sheet-set.back .bk{display:inline}
 #sheet-set.back::before{content:'\2039';font-size:18px;line-height:1}
 #sheet-b .setrow{flex:none}
+/* the two sheets, tidied (November 2026): a rule and a darker heading between sections; in Settings a choice sits on one
+   line, its name on the left and the list on the right, so the sheet is half as long and reads as a table */
+#sheet-b h3{margin:16px 0 2px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--ink)}
+#sheet-b h3:first-of-type{border-top:0;padding-top:0;margin-top:10px}
+#sheet-b label.setrow:has(>select){flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 12px}
+#sheet-b label.setrow:has(>select)>span{flex:1 1 120px;font-family:inherit;font-size:13.5px;font-weight:500;letter-spacing:0;text-transform:none;color:var(--ink)}
+#sheet-b label.setrow:has(>select)>select{flex:0 1 190px;min-width:0}
+#sheet-b label.setrow:has(>select)>small{flex:1 0 100%}
+@media (min-width:821px){ #sheet{width:400px} }
 #sheet-b .setrow select{min-height:40px}
 #sheet-b .setrow small{margin-top:2px}
 #sheet-b .findrow{display:flex;gap:8px}
@@ -483,6 +490,8 @@ details>.phs{margin:8px 0 0}
 
 /* a numbered disc standing for pins that crowd together (Settings > Map) */
 .clus{display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(34,40,46,.88);color:#fff;font:600 13px/1 var(--fm,ui-monospace,monospace);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);cursor:pointer}
+/* grouped pins by count, cool to hot: under 10, under 30, under 100, under 300, 300 and more. White figures read on all five. */
+.clus.c0{background:rgba(37,99,176,.92)} .clus.c1{background:rgba(13,124,134,.93)} .clus.c2{background:rgba(124,77,160,.94)} .clus.c3{background:rgba(196,61,95,.95);font-size:14px} .clus.c4{background:rgba(199,49,22,.96);font-size:15px}
 
 /* visit reports on a place page */
 .visit-item{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px}
