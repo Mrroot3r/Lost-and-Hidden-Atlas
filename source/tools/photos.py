@@ -50,11 +50,11 @@ def by(h):
         if 'User:' in m.group(1) and nomail(x): return nomail(x)[:70]
     if not t or re.search(r'(?i)<(table|img|figure)\b',h): return ''
     return re.sub(r'\s+\S*$','',t[:68])+'…'
-def ask(params):
+def ask(params,tries=40):
     """one question to Wikipedia, patiently: it answers 429 to machines that hurry"""
     p=dict(action='query',format='json',formatversion='2',**params); out=[]
     while True:
-        for go in range(40):
+        for go in range(tries):
             try:
                 r=requests.get(API,params=p,headers=UA,timeout=60)
                 if r.status_code==200: break
@@ -65,19 +65,13 @@ def ask(params):
         j=r.json(); out.append(j); time.sleep(3)
         if 'continue' not in j: return out
         p.update(j['continue'])
-def main():
-    a=sys.argv[1:]; n=int(a[a.index('--n')+1]) if '--n' in a else 10**9
-    S=json.load(open('build/sites.json',encoding='utf-8')); F='src/photos.json'
-    D=json.load(open(F,encoding='utf-8')) if os.path.exists(F) else {'p':{}}
-    P={} if '--all' in a else dict(D['p']); live={s['id'] for s in S}
-    P={k:v for k,v in P.items() if k in live}
-    todo=[(s,title_of(s)) for s in S if title_of(s) and s['id'] not in P][:n]
-    print(len(todo),'places to look up;',len(P),'already known')
-    def save():
-        json.dump({'asof':datetime.date.today().isoformat(),'p':dict(sorted(P.items()))},open(F+'.part','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':')); os.replace(F+'.part',F)      # whole or not at all: a build may be reading it
+def lookup(todo,P,done=None,tries=40):
+    """ask Wikipedia about (place, article title) pairs, fifty to a request, and put each answer in P: the picture's row, or 0 when the
+    article has no picture the Atlas may show. It writes no file. done(n) is called after each fifty. tools/photo_find.py asks it
+    about one batch's new places; main() below asks it about every place not yet known."""
     for i in range(0,len(todo),50):
         part=todo[i:i+50]; titles=sorted({t for s,t in part}); pages={}; alias={}
-        for j in ask(dict(redirects='1',prop='pageimages|coordinates',piprop='thumbnail|name',pithumbsize='900',pilicense='free',pilimit='50',colimit='max',titles='|'.join(titles))):
+        for j in ask(tries=tries,params=dict(redirects='1',prop='pageimages|coordinates',piprop='thumbnail|name',pithumbsize='900',pilicense='free',pilimit='50',colimit='max',titles='|'.join(titles))):
             q=j.get('query') or {}
             for x in (q.get('normalized') or [])+(q.get('redirects') or []): alias[x['from']]=x['to']
             for pg in q.get('pages') or []:
@@ -95,7 +89,7 @@ def main():
             else: want[s['id']]=(tt,pg,img)
         files=sorted({'File:'+v[2] for v in want.values()}); info={}; fal={}
         for k in range(0,len(files),50):
-            for j in ask(dict(prop='imageinfo',iiprop='extmetadata|url',iiextmetadatafilter='Artist|LicenseShortName',titles='|'.join(files[k:k+50]))):
+            for j in ask(tries=tries,params=dict(prop='imageinfo',iiprop='extmetadata|url',iiextmetadatafilter='Artist|LicenseShortName',titles='|'.join(files[k:k+50]))):
                 q=j.get('query') or {}
                 for x in q.get('normalized') or []: fal[x['from']]=x['to']
                 for pg in q.get('pages') or []:
@@ -105,6 +99,18 @@ def main():
             who=by((m.get('Artist') or {}).get('value')); lic=by((m.get('LicenseShortName') or {}).get('value'))
             if not ii or not who or not lic: P[sid]=0; continue
             th=pg['thumbnail']; P[sid]=[th['source'],th.get('width',0),th.get('height',0),who,lic,ii.get('descriptionurl') or 'https://commons.wikimedia.org/wiki/File:'+urllib.parse.quote(img),tt]
-        save(); print('  %d of %d looked up; %d with a picture so far'%(min(i+50,len(todo)),len(todo),sum(1 for v in P.values() if v)))
+        if done: done(min(i+50,len(todo)))
+    return P
+def main():
+    a=sys.argv[1:]; n=int(a[a.index('--n')+1]) if '--n' in a else 10**9
+    S=json.load(open('build/sites.json',encoding='utf-8')); F='src/photos.json'
+    D=json.load(open(F,encoding='utf-8')) if os.path.exists(F) else {'p':{}}
+    P={} if '--all' in a else dict(D['p']); live={s['id'] for s in S}
+    P={k:v for k,v in P.items() if k in live}
+    todo=[(s,title_of(s)) for s in S if title_of(s) and s['id'] not in P][:n]
+    print(len(todo),'places to look up;',len(P),'already known')
+    def save():
+        json.dump({'asof':datetime.date.today().isoformat(),'p':dict(sorted(P.items()))},open(F+'.part','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':')); os.replace(F+'.part',F)      # whole or not at all: a build may be reading it
+    lookup(todo,P,lambda k:(save(),print('  %d of %d looked up; %d with a picture so far'%(k,len(todo),sum(1 for v in P.values() if v)))))
     save(); print('src/photos.json: %d places, %d with a picture, %d KB'%(len(P),sum(1 for v in P.values() if v),os.path.getsize(F)//1024))
 if __name__=='__main__': main()

@@ -63,6 +63,32 @@ ok('then a street view of the town does not name it, and the city hall does',boo
 ok('a name with telling words of its own is left as it was',pf.name_words('Sag Harbor Custom House (Dering house)','sag harbor')==['custom'] or pf.name_words('Sag Harbor Custom House (Dering house)','sag harbor')==['sag','harbor','custom'])
 ro=getattr(pf,'refused',lambda j:None)
 ok('a reply from Commons that carries an error is a refusal, not "no photographs here"',ro({'error':{'code':'ratelimited'}})is True and ro({'batchcomplete':True})is False and ro({'query':{'pages':[]}})is False)
+# ---- a research session looks for pictures for its own new places (November 20, 2026) ----
+na=getattr(pf,'no_article',lambda p:None)
+ok('a new place with no Wikipedia article is one to look for a picture for',na({'links':[['Old mill (National Register nomination)','https://npgallery.nps.gov/x']]})is True and na({'links':[]})is True and na({})is True)
+ok('one with an article is left to its article',na({'links':[['Wikipedia: Old Mill','https://en.wikipedia.org/wiki/Old_Mill'],['Other','https://example.org']]})is False)
+pn=getattr(pf,'new_places',lambda P,done:None)
+PL=[dict(id='a',st='standing',links=[]),dict(id='b',st='standing',links=[['Wikipedia: B','https://en.wikipedia.org/wiki/B']]),dict(id='c',st='gone',links=[]),dict(id='d',st='ruins',links=[]),dict(id='e',st='standing',links=[])]
+got=pn(PL,{'d':row,'e':('','2026-11-22','only a street sign')})
+ok('of a batch, the places listed are those with no article, still there, and not answered yet',got is not None and [p['id'] for p in got]==['a'],got and [p['id'] for p in got])
+try: got=pn(PL,{},{'b'})
+except TypeError: got=None
+ok('and a place whose article turned out to have no usable picture is listed with them',got is not None and [p['id'] for p in got]==['a','b','d','e'],got and [p['id'] for p in got])
+# the article lookup itself (tools/photos.py), with Wikipedia's answers canned: a session asks it about its own new places only
+try:
+    import photos
+    A={'id':'with-pic','name':'Exampleville Old Mill','town':'Exampleville','lat':42.0,'lon':-73.0,'links':[['Wikipedia: Exampleville Old Mill','https://en.wikipedia.org/wiki/Exampleville_Old_Mill']]}
+    B=dict(A,id='no-pic',name='Exampleville Depot',links=[['Wikipedia: Exampleville Depot','https://en.wikipedia.org/wiki/Exampleville_Depot']])
+    def canned(params,tries=40):
+        if params.get('prop','').startswith('pageimages'):
+            return [{'query':{'pages':[{'title':'Exampleville Old Mill','coordinates':[{'lat':42.0005,'lon':-73.0}],'pageimage':'Old_mill.jpg','thumbnail':{'source':'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Old_mill.jpg/900px-Old_mill.jpg','width':900,'height':600}},
+                                       {'title':'Exampleville Depot','coordinates':[{'lat':42.0005,'lon':-73.0}]}]}}]
+        return [{'query':{'pages':[{'title':'File:Old mill.jpg','imageinfo':[{'descriptionurl':'https://commons.wikimedia.org/wiki/File:Old_mill.jpg','extmetadata':{'Artist':{'value':'Pat Example'},'LicenseShortName':{'value':'CC BY-SA 4.0'}}}]}]}}]
+    real=photos.ask; photos.ask=canned
+    try: R=photos.lookup([(A,photos.title_of(A)),(B,photos.title_of(B))],{}) if hasattr(photos,'lookup') else None
+    finally: photos.ask=real
+    ok('the article lookup can be asked about a few places and writes no file: a picture where the article has one, 0 where it has none',R is not None and R.get('no-pic')==0 and bool(R.get('with-pic')) and R['with-pic'][3]=='Pat Example' and R['with-pic'][6]=='Exampleville Old Mill',str(R)[:140])
+except ImportError as e: print('skip the article lookup check: '+str(e)[:60])
 io=getattr(pf,'id_ok',lambda i,ids:None)
 ok('a landmark pin (lm-...) may have a picture though it is in no place list; any other unknown id may not',io('lm-thomas-cole-house',{'a'})is True and io('a',{'a'})is True and io('no-such-place',{'a'})is False and io('lm-Bad Id',{'a'})is False)
 print(f'{len(fails)} FAILED' if fails else 'photo_find test: all checks passed'); sys.exit(1 if fails else 0)
