@@ -124,6 +124,16 @@ def new_places(P,done,nopic=()):
     """of one batch's places, those a research session should look for a picture for: something still there, no answer yet, and either
     no article or (nopic) an article that turned out to have no picture the Atlas may show"""
     return [p for p in P if p.get('st')!='gone' and (no_article(p) or p['id'] in nopic) and (p['id'] not in done or asked_again(done[p['id']]))]
+def trial_line(pid,page,why):
+    """one answer of a trial: place id | the chosen file's page on Commons, or none | why. Nothing here reaches the map"""
+    return '%s | %s | %s\n'%(pid,page or 'none',str(why or '').replace('|','/').replace('\n',' ')[:160])
+def trial_read(text):
+    """the answers in a trial file: {place id: the chosen file's page, or '' for none}; a later line for the same place wins"""
+    R={}
+    for l in str(text).split('\n'):
+        p=[x.strip() for x in l.split('|')]
+        if len(p)>=2 and re.fullmatch(r'[a-z0-9-]+',p[0]) and (p[1]=='none' or p[1].startswith('https://commons.wikimedia.org/wiki/File:')): R[p[0]]='' if p[1]=='none' else p[1]
+    return R
 def id_ok(i,ids):
     """may a pics file answer for this id: a place in a place list, or a landmark pin (lm-...), which build_sites.py makes and no list holds"""
     return i in ids or bool(re.fullmatch(r'lm-[a-z0-9-]+',str(i)))
@@ -280,6 +290,18 @@ def main(a):
         if usable(c): sys.exit('That candidate may not be used: '+usable(c))
         write_pick(f,a[1],(c['src'].split('?')[0],c['tw'] or 0,c['th'] or 0,credit(c['artist']),c['lic'],c['page'],today))
         print('Recorded for %s: %s, by %s (%s). It is in %s.'%(a[1],c['title'][5:],credit(c['artist']),c['lic'],os.path.relpath(f,W))); return
+    if a[0]=='try':
+        # a trial: the same choice as set, written to research/trial.md and nowhere else. For comparing two models on the same places.
+        if len(a)<3 or a[1] not in BY: sys.exit('try <place id> <n>   or   try <place id> none "<why>"')
+        os.makedirs('research',exist_ok=True); tf='research/trial.md'
+        if a[2]=='none':
+            open(tf,'a',encoding='utf-8').write(trial_line(a[1],'',a[3] if len(a)>3 else '')); print('Trial answer for %s: none. Written to %s only.'%(a[1],tf)); return
+        cf='research/photofind_%s.json'%a[1]
+        if not os.path.exists(cf): sys.exit('Run  python3 tools/photo_find.py look %s  first, and look at its sheet.'%a[1])
+        C=json.load(open(cf,encoding='utf-8'))
+        if not a[2].isdigit() or not 1<=int(a[2])<=len(C): sys.exit('Candidate numbers for %s run from 1 to %d.'%(a[1],len(C)))
+        c=C[int(a[2])-1]; open(tf,'a',encoding='utf-8').write(trial_line(a[1],c['page'],a[3] if len(a)>3 else ''))
+        print('Trial answer for %s: %s. Written to %s only.'%(a[1],c['title'][5:],tf)); return
     if a[0]=='sheet':
         import requests,io
         from PIL import Image,ImageDraw
