@@ -81,10 +81,12 @@ if a[:1]==['--sample']:
     import os,re,random,glob
     W=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sj=os.path.join(W,'build','sites.json')
     if not os.path.exists(sj): sys.exit('Run this from the working folder after build_sites.py: build/sites.json is not there.')
-    S=json.load(open(sj)); rnd=random.Random(a[1] if len(a)>1 else None); picks=[]; none=[]; hrs=[]; hnone=[]
+    S=json.load(open(sj)); rnd=random.Random(a[1] if len(a)>1 else None); picks=[]; none=[]; hrs=[]; hnone=[]; pics=[]
     for i in prs:
         allf=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/')]
         fs=[f for f in allf if f.startswith('data_')]
+        if not fs and any(f.startswith('pics_') for f in allf):      # a batch of found pictures: all of them are looked at on one sheet, beside the names of their places
+            pics.append((i['number'],[f for f in allf if f.startswith('pics_')])); continue
         if not fs and any(f.startswith('hours_') for f in allf):      # a batch of looked-up hours has no pin: one of its rows is drawn, to be read against the page it came from
             import ast
             rows=[]
@@ -115,12 +117,16 @@ if a[:1]==['--sample']:
         print('\n%d batch(es) of looked-up hours; one row drawn from each. Open the page and see that it gives these times for this building:'%len(hrs))
         for n,k,txt,url in hrs: print('  #%d  %s\n       recorded: %s\n       python3 tools/hours.py page %s'%(n,k,txt,url))
         print('For each one the page bears out:  python3 tools/unchecked.py --sampled <its number>. One it does not: correct the row with tools/hours.py set, and leave the batch.')
+    if pics:
+        print('\n%d batch(es) of pictures found for places. Make the sheet for each and LOOK at every tile: the picture must show the place named above it, from outside, and no person.'%len(pics))
+        for n,fl in pics: print('  #%d  '%n+'   '.join('python3 tools/photo_find.py sheet tools/%s'%f for f in fl))
+        print('Every tile right:  python3 tools/unchecked.py --sampled <its number>. One wrong: take it out with  python3 tools/photo_find.py set <place id> none "<what it showed>" , say so, and leave the batch.')
     if hnone: print('\nBatches of hours in which nothing was found for any place (nothing to read against a page), which can be marked as they are:\n  python3 tools/unchecked.py --sampled '+' '.join(str(n) for n in hnone))
     print('A pin you cannot tell either way (trees, a new roof, nothing to match the description): do not guess and do not mark the batch.\n  python3 tools/unchecked.py --human <place id> "<what you looked at and why it could not be told>"\nfiles it for a person to look at; leave that batch waiting.')
     sys.exit(0)
 if not prs: print('Nothing is waiting for a second look.'); sys.exit(0)
 print(len(prs),'pull request(s) merged without a second look, oldest first:')
 for i in prs:
-    fs=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/data_') or f['filename'].startswith('source/tools/bricks_') or f['filename'].startswith('source/tools/hours_')]
+    fs=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/data_') or f['filename'].startswith('source/tools/bricks_') or f['filename'].startswith('source/tools/hours_') or f['filename'].startswith('source/tools/pics_')]
     print('  #%d  %s  merged %s  %s'%(i['number'],i['title'][:70],(i.get('closed_at') or '')[:10],' '.join(fs)))
 print('Review one as GUIDE.md section 14 says (tools/review.py <number>), fix what is wrong in a new pull request, then:  python3 tools/unchecked.py --done <number>')

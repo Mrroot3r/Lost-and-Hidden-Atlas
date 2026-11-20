@@ -92,7 +92,7 @@ const { chromium } = require('playwright');
   ok('the setting is under the gear',st);
   // photo details stored ahead of time (tools/photos.py): shown at once, with their room kept, and Wikipedia is asked nothing
   await c.close();
-  STORED={}; STORED[pick.wiki[0]]=['https://upload.wikimedia.org/stored/900px-Stored.jpg',900,600,'Sam Stored','CC BY 4.0','https://commons.wikimedia.org/wiki/File:Stored.jpg','Stored Article']; STORED[pick.wiki[1]]=0;
+  STORED={}; STORED[pick.wiki[0]]=['https://upload.wikimedia.org/stored/900px-Stored.jpg',900,600,'Sam Stored','CC BY 4.0','https://commons.wikimedia.org/wiki/File:Stored.jpg','Stored Article']; STORED[pick.wiki[1]]=0; STORED[pick.none]=['https://upload.wikimedia.org/found/900px-Found.jpg',900,600,'Fay Found','CC BY-SA 4.0','https://commons.wikimedia.org/wiki/File:Found.jpg',''];      /* found on Wikimedia Commons near the pin (tools/photo_find.py): no article */
   ({c,p}=await open()); MODE='good';
   await p.waitForFunction(()=>true); await p.waitForTimeout(3200);          // the file is fetched a moment after the page opens
   r=await show(p,pick.wiki[0]);
@@ -105,12 +105,16 @@ const { chromium } = require('playwright');
   ok('a place stored as "nothing usable" shows no picture and asks nothing',!r.shown&&asked.wiki===0,JSON.stringify(asked));
   r=await show(p,pick.wiki[2]);
   ok('a place the stored file does not hold is still looked up as before',r.shown&&asked.wiki===1&&asked.commons===1,JSON.stringify(asked));
+  // ---- a picture found on Wikimedia Commons near the pin, for a place with no Wikipedia article at all
+  { const f=await show(p,pick.none);
+    ok('a place with no Wikipedia article shows the picture that was found for it on Wikimedia Commons',f.shown&&f.img==='https://upload.wikimedia.org/found/900px-Found.jpg',JSON.stringify(f).slice(0,120));
+    ok('its credit names the photographer, the licence and Wikimedia Commons, and no article',/Fay Found · CC BY-SA 4\.0/.test(f.cap)&&/Wikimedia Commons/.test(f.cap)&&!/article/i.test(f.cap)&&/commons\.wikimedia\.org\/wiki\/File:Found\.jpg/.test(f.link),f.cap); }
   // ---- a tap on the picture shows it large, with its credit; another tap puts it away. And a button looks for more photos elsewhere.
   { await show(p,pick.wiki[0]);      /* the place whose photo is stored */
     const tap=()=>p.evaluate(()=>{ const i=document.querySelector('#v-detail .dphoto img'); if(i) i.click(); });
     const big=()=>p.evaluate(()=>{ const n=document.querySelector('#photobig'); if(!n||n.hidden) return null; const i=n.querySelector('img'), r=i.getBoundingClientRect(); return {src:i.getAttribute('src'),w:Math.round(r.width),cap:n.textContent,vw:innerWidth}; });
     await tap(); await p.waitForTimeout(400); const g=await big();
-    ok('a tap on the picture opens it large over the page, asking for a bigger copy',!!g&&/\/1600px-Stored\.jpg$/.test(g.src),g?g.src:'no large view');
+    ok('a tap on the picture opens it large over the page, asking for a bigger copy',!!g&&/\/1280px-Stored\.jpg$/.test(g.src),g?g.src:'no large view');
     ok('the large view carries the credit',!!g&&/Sam Stored/.test(g.cap)&&/CC BY 4\.0/.test(g.cap),g?g.cap.slice(0,80):'');
     await p.evaluate(()=>{ const n=document.querySelector('#photobig'); if(n) n.click(); }); await p.waitForTimeout(300);
     ok('a tap on it puts it away again',(await big())===null);

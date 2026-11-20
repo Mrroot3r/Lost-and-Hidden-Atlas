@@ -1,0 +1,233 @@
+#!/usr/bin/env python3
+"""Find a photograph for a place that has none, among the freely licensed ones on Wikimedia Commons taken near its pin.
+
+   python3 tools/photo_find.py                         how many places have no picture, state by state
+   python3 tools/photo_find.py list "<state>" --n 30   thirty of them, in a different order each time
+   python3 tools/photo_find.py look <place id> ...     the candidates for each: a numbered sheet to LOOK at (research/photofind_<id>.jpg)
+                                                       and a list (distance from the pin, the file's name and description, who, licence)
+   python3 tools/photo_find.py set <place id> <n>      choose candidate n from that sheet
+   python3 tools/photo_find.py set <place id> none "<why>"     looked, and none of them shows this place
+   python3 tools/photo_find.py sheet [<pics file>]     one sheet of everything chosen in a file, each beside its place's name, for a second look
+
+Why: about half the places have a picture, all from the lead image of their own Wikipedia article (tools/photos.py). The other
+half have no article or an article with no usable picture, and a reader hunting a ruin in the woods wants to know what he is
+looking for. Commons holds millions of photographs that carry the spot they were taken from.
+
+What the tool decides, so that no session can get it wrong: only Wikimedia Commons; only a photograph (never a map, a plan, a
+seal, a logo or a drawing file); only a free licence (CC BY, CC BY-SA, CC0, public domain) and a photographer to credit; only one
+taken within reach of the pin (150 m for an exact pin, 250 m for a site, 400 m for an area) or, when fewer than four were, one
+whose own name and description hold the town and every telling word of the place's name (marked BY NAME ONLY in red: look twice
+at those, a namesake is the classic mistake). The address, the size, the credit and the licence are copied from Commons by the
+tool, never typed.
+
+What the session decides, by looking: WHICH of the candidates, if any, shows THIS place. Read the place's name and description,
+read each candidate's file name and description, and look at the sheet. Choose one that shows the building, ruin or site from
+outside, as someone arriving would see it. If none plainly does, say `none`: a wrong picture is worse than no picture. A
+namesake down the street, an interior, a plaque close-up, a view from the place of something else, a person: none of these.
+
+Choices go in tools/pics_<four letters>.py (PICS = {place id: (address, width, height, photographer, licence, the file's page,
+day chosen)} or ('', day, why) for "none fits"), which tools/make.py folds into data/photos.json. A picture from a place's own
+Wikipedia article still wins. Nothing is copied but an address and a credit. Test: tools/photo_find_test.py."""
+import sys,os,re,json,math,time,html,random,datetime,glob,importlib
+HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE)
+UA={'User-Agent':'lost-hidden-atlas-photos/1.0 (https://github.com/Mrroot3r/Lost-and-Hidden-Atlas)'}
+API='https://commons.wikimedia.org/w/api.php'
+FREE=re.compile(r'^(CC BY(-SA)?( \d(\.\d)?)?( [a-z]{2,3})?|CC0( 1\.0)?|Public domain|PD[- ].*|No restrictions)$',re.I)
+NOTPHOTO=re.compile(r'\b(map|maps|plan|plans|diagram|logo|seal|coat of arms|flag|locator|location|survey|chart|drawing|sketch|blueprint|elevation|postmark|signature|sanborn|topo|usgs|aerial)\b',re.I)
+REACH={'exact':150,'site':250,'area':400}
+def nomail(t):
+    """a credit sometimes carries the photographer's e-mail address: the name is credit enough, and the Atlas publishes no addresses"""
+    return re.sub(r'\s+',' ',re.sub(r'[\s,;:·|/-]*[(<\[]?\s*(?:mailto:)?[\w.+-]+@[\w-]+(?:\.[\w-]+)+\s*[)>\]]?','',str(t or ''))).strip(' ,;:·|/-')
+def credit(h):
+    """the photographer's name out of Commons' Artist field (the same rule as by() in tools/photos.py and photoBy() in app.js)"""
+    h=str(h or ''); t=nomail(re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',re.sub(r'(?is)<(style|script)[^>]*>.*?</\1>','',h)))).strip())
+    if t and len(t)<=70: return t
+    for m in re.finditer(r'(?is)<a\b[^>]*href="([^"]*)"[^>]*>(.*?)</a>',h):
+        x=re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',m.group(2)))).strip()
+        if 'User:' in m.group(1) and nomail(x): return nomail(x)[:70]
+    if not t or re.search(r'(?i)<(table|img|figure)\b',h): return ''
+    return re.sub(r'\s+\S*$','',t[:68])+'…'
+def usable(c):
+    """'' when a candidate may be offered, else the reason it may not. c: title, mime, width, height, lic, artist"""
+    if c.get('mime') not in('image/jpeg','image/png'): return 'not a photograph file'
+    if not FREE.match(str(c.get('lic') or '').strip()): return 'no free licence'
+    if not credit(c.get('artist')): return 'no photographer to credit'
+    w,h=c.get('width') or 0,c.get('height') or 0
+    if w<800 or h<500: return 'too small'
+    if w/h>3 or h/w>2.2: return 'a sliver, not a view'
+    if NOTPHOTO.search(re.sub(r'[_\-.]',' ',str(c.get('title') or ''))): return 'reads as a map, a plan or an emblem'
+    return ''
+COMMON=set('the and of at on in new old north south east west upper lower great little county city town village historic district site former saint street avenue road park building house hall church ruins ruin mill bridge station school farm company works first second'.split())
+def fold(t):
+    import unicodedata
+    return unicodedata.normalize('NFD',str(t or '').lower()).encode('ascii','ignore').decode()
+def name_words(name):
+    """the telling words of a place's name: not 'the', 'house', 'church' and the like"""
+    return [w for w in re.split(r'[^a-z0-9]+',fold(re.sub(r'\(.*?\)','',str(name or '')))) if len(w)>=3 and w not in COMMON]
+def names_it(text,nw,town):
+    """does a file's name and description name this place: the town, and every telling word of the place's name"""
+    t=' '+re.sub(r'[^a-z0-9]+',' ',fold(text))+' '
+    return bool(nw) and bool(town) and (' '+re.sub(r'[^a-z0-9]+',' ',town).strip()+' ') in t and all((' '+w) in t for w in nw)
+def write_pick(path,pid,row):
+    """add or replace one place's row in a pics file, keeping the rest"""
+    P={}
+    if os.path.exists(path):
+        import ast
+        for n in ast.parse(open(path,encoding='utf-8').read()).body:
+            if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='PICS': P=dict(ast.literal_eval(n.value))
+    P[pid]=tuple(row)
+    with open(path,'w',encoding='utf-8') as f:
+        f.write('# Pictures found on Wikimedia Commons near a place\'s pin, chosen by looking (tools/photo_find.py). Data only.\n')
+        f.write('# id: (picture address, width, height, photographer, licence, the file\'s page on Commons, day chosen)   or   (\'\', day, why none fits)\n')
+        f.write('PICS={\n'+''.join(' %r:%r,\n'%(k,P[k]) for k in sorted(P))+'}\n')
+def merge(p,pics,ids):
+    """what data/photos.json holds: the article pictures (p), then a found picture wherever a place has none. ids: the places that exist"""
+    out={k:v for k,v in p.items() if k in ids}
+    for k,v in pics.items():
+        if k not in ids or not v or not v[0] or out.get(k): continue
+        out[k]=[v[0],v[1],v[2],v[3],v[4],v[5],'']
+    return out
+def all_pics(folder=None):
+    P={}; folder=folder or HERE
+    sys.path.insert(0,folder)
+    for f in sorted(glob.glob(os.path.join(folder,'pics_*.py'))): P.update(importlib.import_module(os.path.basename(f)[:-3]).PICS)
+    return P
+# ---------------------------------------------------------------- the commands
+def _sites():
+    os.chdir(W)
+    if not os.path.exists('build/sites.json'): os.system(sys.executable+' tools/build_sites.py > /dev/null')
+    return json.load(open('build/sites.json',encoding='utf-8'))
+def _myfile():
+    kf=os.path.join(W,'.picskey')
+    if not os.path.exists(kf): open(kf,'w').write(''.join(random.SystemRandom().choice('abcdefghjkmnpqrstvwxyz') for _ in range(4)))
+    return os.path.join(W,'tools','pics_%s.py'%open(kf).read().strip())
+def _waiting(S):
+    ph=json.load(open('src/photos.json',encoding='utf-8'))['p'] if os.path.exists('src/photos.json') else {}
+    done=all_pics()
+    wiki=lambda s:any('en.wikipedia.org/wiki/' in str(l[1] if isinstance(l,(list,tuple)) and len(l)>1 else l) for l in (s.get('links') or []))
+    # waiting: its own article gave no usable picture (0 in photos.json), or it has no article at all. A place with an article that
+    # tools/photos.py has not asked about yet is left for that tool first.
+    return [s for s in S if not s.get('mine') and s['st']!='gone' and s['id'] not in done and (ph.get(s['id'])==0 or (s['id'] not in ph and not wiki(s)))]
+def _get(params,tries=8):
+    import requests
+    for k in range(tries):
+        r=requests.get(API,params=dict(params,format='json',formatversion='2'),headers=UA,timeout=60)
+        if r.status_code==429 or r.status_code>=500: time.sleep(min(90,int(r.headers.get('Retry-After') or 0) or 8*(k+1))); continue
+        r.raise_for_status(); return r.json()
+    raise SystemExit('Wikimedia Commons keeps refusing (too many requests). Wait a few minutes and run the same command again.')
+def _hav(a,b,c,d):
+    p=math.pi/180; h=math.sin((c-a)*p/2)**2+math.cos(a*p)*math.cos(c*p)*math.sin((d-b)*p/2)**2
+    return 2*6371000*math.asin(math.sqrt(h))
+def _plain(t,n=140): return re.sub(r'\s+',' ',html.unescape(re.sub(r'<[^>]+>','',str(t or '')))).strip()[:n]
+def look(s):
+    import requests,io
+    from PIL import Image,ImageDraw
+    reach=REACH.get(s.get('prec') or 'site',250)
+    j=_get(dict(action='query',generator='geosearch',ggsnamespace='6',ggscoord='%s|%s'%(s['lat'],s['lon']),ggsradius=str(reach),ggslimit='60',
+                prop='imageinfo|coordinates',coprimary='all',iiprop='url|size|mime|extmetadata',iiurlwidth='900',iiextmetadatafilter='LicenseShortName|Artist|ImageDescription|DateTimeOriginal'))
+    C=[]
+    for pg in (j.get('query') or {}).get('pages',[]):
+        ii=(pg.get('imageinfo') or [None])[0]
+        if not ii: continue
+        m=ii.get('extmetadata') or {}; co=(pg.get('coordinates') or [{}])[0]
+        c=dict(title=pg['title'],mime=ii.get('mime'),width=ii.get('width'),height=ii.get('height'),lic=_plain((m.get('LicenseShortName') or {}).get('value'),40),artist=(m.get('Artist') or {}).get('value'),
+               desc=_plain((m.get('ImageDescription') or {}).get('value')),when=_plain((m.get('DateTimeOriginal') or {}).get('value'),10),src=ii.get('thumburl'),tw=ii.get('thumbwidth'),th=ii.get('thumbheight'),page=ii.get('descriptionurl'),
+               m=round(_hav(s['lat'],s['lon'],co['lat'],co['lon'])) if 'lat' in co else None)
+        if usable(c) or not c['src'] or not c['page'] or c['m'] is None or c['m']>reach: continue
+        C.append(c)
+    C.sort(key=lambda c:c['m']); C=C[:12]
+    # Second, when few were taken near the pin: photographs that NAME the place. Many carry no camera position, so the tool asks
+    # for the file's name and description to hold the town and every telling word of the place's name before it offers one.
+    if len(C)<4:
+        nw=name_words(s.get('name')); town=fold((s.get('town') or '').split(',')[0].split('(')[0]).strip(); have={c['title'] for c in C}
+        if nw and town:
+            j=_get(dict(action='query',generator='search',gsrnamespace='6',gsrlimit='30',gsrsearch='%s %s'%(re.sub(r'\(.*?\)','',s['name']).strip(),(s.get('town') or '').split(',')[0]),
+                        prop='imageinfo|coordinates',coprimary='all',iiprop='url|size|mime|extmetadata',iiurlwidth='900',iiextmetadatafilter='LicenseShortName|Artist|ImageDescription|DateTimeOriginal'))
+            for pg in (j.get('query') or {}).get('pages',[]):
+                ii=(pg.get('imageinfo') or [None])[0]
+                if not ii or pg['title'] in have: continue
+                m=ii.get('extmetadata') or {}; co=(pg.get('coordinates') or [{}])[0]
+                c=dict(title=pg['title'],mime=ii.get('mime'),width=ii.get('width'),height=ii.get('height'),lic=_plain((m.get('LicenseShortName') or {}).get('value'),40),artist=(m.get('Artist') or {}).get('value'),
+                       desc=_plain((m.get('ImageDescription') or {}).get('value')),when=_plain((m.get('DateTimeOriginal') or {}).get('value'),10),src=ii.get('thumburl'),tw=ii.get('thumbwidth'),th=ii.get('thumbheight'),page=ii.get('descriptionurl'),m=None,byname=True)
+                if usable(c) or not c['src'] or not c['page'] or not names_it(c['title']+' '+c['desc'],nw,town): continue
+                if 'lat' in co:
+                    c['m']=round(_hav(s['lat'],s['lon'],co['lat'],co['lon']))
+                    if c['m']>1500: continue          # it carries a position, and the position is somewhere else: a namesake
+                C.append(c)
+            C=C[:12]
+    print('\n== %s  |  %s, %s  |  %s  |  %s pin'%(s['id'],s['name'],s.get('town',''),s.get('years',''),s.get('prec','')))
+    print('   '+_plain(s.get('story') or s.get('note') or '',300))
+    os.makedirs('research',exist_ok=True)
+    json.dump(C,open('research/photofind_%s.json'%s['id'],'w',encoding='utf-8'))
+    if not C: print('   No free photograph on Commons was taken within %d m of the pin, and none names the place.  ->  python3 tools/photo_find.py set %s none "nothing on Commons within %d m"'%(reach,s['id'],reach)); return
+    tiles=[]
+    for n,c in enumerate(C,1):
+        try:
+            r=requests.get(re.sub(r'/\d+px-','/330px-',c['src'].split('?')[0]),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB')
+        except Exception:
+            im=Image.new('RGB',(330,220),(90,90,90))
+        im.thumbnail((330,250)); t=Image.new('RGB',(340,286),(255,255,255)); t.paste(im,((340-im.width)//2,30+(250-im.height)//2)); d=ImageDraw.Draw(t); d.text((6,4),'%d   %s'%(n,('%d m from the pin'%c['m']) if c['m'] is not None and not c.get('byname') else 'BY NAME ONLY'+(' (%d m)'%c['m'] if c['m'] is not None else ', no position')),fill=(0,0,0) if not c.get('byname') else (170,0,0)); d.text((6,17),c['title'][5:60],fill=(0,70,160)); tiles.append(t)
+        print('  %2d  %s  %s  |  %s  |  %s, %s%s'%(n,('%3d m'%c['m']) if not c.get('byname') else 'by name'+(' %d m'%c['m'] if c['m'] is not None else ''),c['title'][5:75],c['desc'][:110] or '(no description)',credit(c['artist']),c['lic'],', '+c['when'][:4] if c['when'] else ''))
+        time.sleep(0.4)
+    cols=4; rows=(len(tiles)+cols-1)//cols; sheet=Image.new('RGB',(cols*340,rows*286),(255,255,255))
+    for i,t in enumerate(tiles): sheet.paste(t,((i%cols)*340,(i//cols)*286))
+    out='research/photofind_%s.jpg'%s['id']; sheet.save(out,quality=82)
+    print('   LOOK at %s, then:  python3 tools/photo_find.py set %s <n>   or   set %s none "<why>"'%(out,s['id'],s['id']))
+def main(a):
+    S=_sites(); BY={s['id']:s for s in S}
+    from states import STATES
+    REGST={c:st['k'] for st in STATES for c,l in st['regions']}; STNAME={st['k']:st['name'] for st in STATES}
+    today=datetime.date.today().isoformat()
+    if not a:
+        Wt=_waiting(S); n={}
+        for s in Wt: n[REGST.get(s['reg'],'?')]=n.get(REGST.get(s['reg'],'?'),0)+1
+        print('%d places have no picture (of %d):'%(len(Wt),len(S)))
+        for k,v in sorted(n.items(),key=lambda x:-x[1]): print('  %-22s %d'%(STNAME.get(k,k),v))
+        return
+    if a[0]=='list':
+        n=int(a[a.index('--n')+1]) if '--n' in a else 30; st=[x for x in a[1:] if x!='--n' and not x.isdigit()]
+        Wt=_waiting(S)
+        if st: key=next((k for k,v in STNAME.items() if v.lower()==st[0].lower() or k==st[0].lower()),None); Wt=[s for s in Wt if REGST.get(s['reg'])==key or s['reg']==st[0]]
+        random.shuffle(Wt)
+        for s in Wt[:n]: print('%s  |  %s, %s  |  %s'%(s['id'],s['name'],s.get('town',''),s['st']))
+        print('\n%d listed of %d waiting%s. Next:  python3 tools/photo_find.py look %s'%(min(n,len(Wt)),len(Wt),' there' if st else '',' '.join(s['id'] for s in Wt[:6])+(' ...' if len(Wt)>6 else '')))
+        return
+    if a[0]=='look':
+        for i in a[1:]:
+            if i not in BY: print(i,'is not a place id'); continue
+            look(BY[i])
+        return
+    if a[0]=='set':
+        if len(a)<3 or a[1] not in BY: sys.exit('set <place id> <n>   or   set <place id> none "<why>"')
+        f=_myfile()
+        if a[2]=='none':
+            why=(a[3] if len(a)>3 else '').strip()
+            if len(why)<8: sys.exit('Say why in a few words: what the candidates showed instead.')
+            write_pick(f,a[1],('',today,why[:160])); print('Recorded: no picture fits %s.'%a[1]); return
+        cf='research/photofind_%s.json'%a[1]
+        if not os.path.exists(cf): sys.exit('Run  python3 tools/photo_find.py look %s  first, and look at its sheet.'%a[1])
+        C=json.load(open(cf,encoding='utf-8'))
+        if not a[2].isdigit() or not 1<=int(a[2])<=len(C): sys.exit('Candidate numbers for %s run from 1 to %d.'%(a[1],len(C)))
+        c=C[int(a[2])-1]
+        if usable(c): sys.exit('That candidate may not be used: '+usable(c))
+        write_pick(f,a[1],(c['src'].split('?')[0],c['tw'] or 0,c['th'] or 0,credit(c['artist']),c['lic'],c['page'],today))
+        print('Recorded for %s: %s, by %s (%s). It is in %s.'%(a[1],c['title'][5:],credit(c['artist']),c['lic'],os.path.relpath(f,W))); return
+    if a[0]=='sheet':
+        import requests,io
+        from PIL import Image,ImageDraw
+        f=a[1] if len(a)>1 else _myfile()
+        sys.path.insert(0,os.path.dirname(os.path.abspath(f))); P=importlib.import_module(os.path.basename(f)[:-3]).PICS
+        rows=[(k,v) for k,v in sorted(P.items()) if v and v[0]]; tiles=[]
+        for k,v in rows:
+            try: r=requests.get(re.sub(r'/\d+px-','/330px-',v[0]),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB')
+            except Exception: im=Image.new('RGB',(330,220),(90,90,90))
+            im.thumbnail((330,230)); t=Image.new('RGB',(340,296),(255,255,255)); t.paste(im,((340-im.width)//2,62+(230-im.height)//2)); d=ImageDraw.Draw(t); s=BY.get(k,{})
+            d.text((6,6),(s.get('name') or k)[:52],fill=(0,0,0)); d.text((6,22),('%s  %s'%(s.get('town',''),s.get('years','')))[:54],fill=(60,60,60)); d.text((6,38),os.path.basename(v[5])[5:57],fill=(0,70,160)); tiles.append(t); time.sleep(0.4)
+        os.makedirs('research',exist_ok=True); n=0
+        for i in range(0,len(tiles),12):
+            part=tiles[i:i+12]; sheet=Image.new('RGB',(4*340,((len(part)+3)//4)*296),(255,255,255))
+            for j,t in enumerate(part): sheet.paste(t,((j%4)*340,(j//4)*296))
+            n+=1; sheet.save('research/photosheet_%s_%d.jpg'%(os.path.basename(f)[5:-3],n),quality=82)
+        print('%d chosen pictures in %d sheet(s): research/photosheet_%s_*.jpg. %d places had none that fits.'%(len(rows),n,os.path.basename(f)[5:-3],len(P)-len(rows))); return
+    sys.exit(__doc__)
+if __name__=='__main__': main(sys.argv[1:])
