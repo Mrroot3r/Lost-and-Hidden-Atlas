@@ -116,6 +116,13 @@ def rank(C,nw,town):
         named=names_it(str(c.get('title') or '')+' '+str(c.get('desc') or ''),nw,town)
         return (0 if named else 1, 0 if c.get('m') is not None else 1, c.get('m') or 0)
     return sorted(C,key=key)
+def no_article(p):
+    """a place with no Wikipedia article of its own: the page has no article picture to show, so a session looks for one"""
+    return not any('en.wikipedia.org/wiki/' in str(l[1] if isinstance(l,(list,tuple)) and len(l)>1 else l) for l in (p.get('links') or []))
+def new_places(P,done,nopic=()):
+    """of one batch's places, those a research session should look for a picture for: something still there, no answer yet, and either
+    no article or (nopic) an article that turned out to have no picture the Atlas may show"""
+    return [p for p in P if p.get('st')!='gone' and (no_article(p) or p['id'] in nopic) and (p['id'] not in done or asked_again(done[p['id']]))]
 def id_ok(i,ids):
     """may a pics file answer for this id: a place in a place list, or a landmark pin (lm-...), which build_sites.py makes and no list holds"""
     return i in ids or bool(re.fullmatch(r'lm-[a-z0-9-]+',str(i)))
@@ -131,7 +138,7 @@ def _myfile():
 def _waiting(S):
     ph=json.load(open('src/photos.json',encoding='utf-8'))['p'] if os.path.exists('src/photos.json') else {}
     done=all_pics()
-    wiki=lambda s:any('en.wikipedia.org/wiki/' in str(l[1] if isinstance(l,(list,tuple)) and len(l)>1 else l) for l in (s.get('links') or []))
+    wiki=lambda s:not no_article(s)
     # waiting: its own article gave no usable picture (0 in photos.json), or it has no article at all. A place with an article that
     # tools/photos.py has not asked about yet is left for that tool first.
     done={k for k,v in done.items() if not asked_again(v)}
@@ -232,6 +239,25 @@ def main(a):
         random.shuffle(Wt)
         for s in Wt[:n]: print('%s  |  %s, %s  |  %s'%(s['id'],s['name'],s.get('town',''),s['st']))
         print('\n%d listed of %d waiting%s. Next:  python3 tools/photo_find.py look %s'%(min(n,len(Wt)),len(Wt),' there' if st else '',' '.join(s['id'] for s in Wt[:6])+(' ...' if len(Wt)>6 else '')))
+        return
+    if a[0]=='new':
+        # a research session, for the places it has just written: python3 tools/photo_find.py new data_cortland_qhzm
+        if len(a)<2: sys.exit('new <your data file>, for example: new data_cortland_qhzm')
+        nm=os.path.basename(a[1]).replace('.py','')
+        try: P=importlib.import_module(nm).PLACES
+        except Exception as e: sys.exit('Cannot read tools/%s.py (%s)'%(nm,str(e)[:80]))
+        os.system(sys.executable+' tools/build_sites.py > /dev/null'); BY={s['id']:s for s in _sites()}
+        # a place with an article shows the article's picture by itself, if it has one the Atlas may show. Ask which do not (the same
+        # question tools/photos.py asks, for this batch only, writing nothing): those are looked for on Commons like the ones with no article.
+        import photos
+        linked=[(BY[p['id']],photos.title_of(BY[p['id']])) for p in P if p['id'] in BY and photos.title_of(BY[p['id']])]
+        try: R=photos.lookup(linked,{},tries=6) if linked else {}
+        except SystemExit: R=None
+        nopic={k for k,v in (R or {}).items() if not v}; L=new_places(P,all_pics(),nopic)
+        print('%d places in %s. %d have a Wikipedia article with a picture: the page shows it by itself. %d wait for a look: %d with no article, %d whose article has no picture the Atlas may show.'%(len(P),nm,sum(1 for v in (R or {}).values() if v),len(L),sum(1 for p in L if no_article(p)),sum(1 for p in L if not no_article(p))))
+        if R is None: print('Wikipedia would not answer just now, so places WITH an article were not checked: only those with no article are listed.')
+        for p in L: print('%s  |  %s, %s  |  %s'%(p['id'],p['name'],p.get('town',''),p['st']))
+        if L: print('\nNext, five at a time:  python3 tools/photo_find.py look '+' '.join(p['id'] for p in L[:5])+(' ...' if len(L)>5 else '')+'\nthen  set <id> <n>  or  set <id> none "<what they showed>"  for each. The pics file goes in the same pull request.')
         return
     if a[0]=='look':
         for i in a[1:]:
