@@ -14,11 +14,9 @@ Nineteen places spread across New Brunswick, the province's first real batch (Fo
 | Partridge Island Quarantine Station | Saint John harbour, NB | National Historic Site (Register 12721) and light tower (13264) | Whether the public may go on the island now; a source for what stands |
 | Fort Howe | Saint John, NB (45.2765, -66.0728 from the Register list) | National Historic Site (Register 13001) | What is on the ground and access |
 | Fort Nashwaak (Naxoat) site | Fredericton, NB (45.9618, -66.6254) | National Historic Site (Register 13272) | Anything to see above ground |
-| Keillor House and Dorchester | Dorchester, NB | Provincial site (Register idp 2353); Dorchester Penitentiary towers and administration building are federal heritage buildings (4816, 9844) | Museum hours; the penitentiary is in use, view only |
 | Swallowtail Lighthouse | Grand Manan, NB | Lightkeeper's house on the Register (16105) | Register statement not read; access |
 | MacDonald Farm Provincial Historic Site | Bartibog, Miramichi, NB (47.0971, -65.3555) | Register idp 6244 | Statement and opening not read |
 | Sir Samuel Leonard Tilley House | Gagetown, NB (45.7845, -66.1448) | National Historic Site (Register 12662) | Statement and opening not read |
-| Campbell Carriage Factory | Sackville, NB (45.9267, -64.352) | Register idp 2254 | Statement and opening not read |
 | Miramichi Marine (Seamen's) Hospital | Miramichi, NB (47.022, -65.5102) | Federal heritage building (Register 11707) | Statement not read; what it is now |
 | St. Croix Cotton Mill site | Milltown, St. Stephen, NB (45.1758, -67.2946) | Local historic place (Register 10612) | What is left and access |
 
