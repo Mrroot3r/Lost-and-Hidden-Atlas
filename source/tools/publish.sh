@@ -59,6 +59,7 @@ mkdir -p source/src source/tools source/build
 rm -f source/tools/*.py source/tools/*.sh source/tools/*.js source/tools/*.java
 cp "$W"/src/* source/src/
 cp "$W"/tools/*.py "$W"/tools/*.sh "$W"/tools/*.js "$W"/tools/*.java source/tools/
+[ -f "$W/tools/checked_ok.json" ] && cp "$W/tools/checked_ok.json" source/tools/      # warnings a session looked at and accepted (tools/check.py)
 if [ -d "$W/lidar" ]; then
   mkdir -p source/lidar/units source/lidar/walls; rm -f source/lidar/units/*.json
   cp "$W"/lidar/units/*.json source/lidar/units/; for f in "$W"/lidar/*; do [ -f "$f" ] && cp "$f" source/lidar/; done

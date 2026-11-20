@@ -223,6 +223,18 @@ for st_,nm in stamps:
     if 'Delete this bracketed text' in t_ or '| Example mill |' in t_: _nl.append(f'notes/{k_}.md still holds the template text: fill in "What this batch is", the leads and the tips, and delete the bracketed lines and the example row')
     for h_ in('## What this batch is','## Leads','## Tips'):
         if h_ not in t_: _nl.append(f'notes/{k_}.md: the heading "{h_}" is missing')
+# Warnings a session has looked at and accepted (tools/checked_ok.json: place id -> what was looked at and why it stands) are
+# not printed again: the same seventeen warnings every day taught everyone to stop reading them. Only the two kinds of
+# warning that are judgement calls can be accepted this way: the kind of place, and a pin just outside a coarse state outline.
+_okf=os.environ.get('CHECKED_OK') or os.path.join(REPO,'source','tools','checked_ok.json')
+try: _OK=json.load(open(_okf,encoding='utf-8')) if os.path.exists(_okf) else {}
+except ValueError: _OK={}; err.append('source/tools/checked_ok.json is not valid JSON')
+_soft=lambda t:('reads as a place of worship' in t) or ('just outside' in t) or ("is cat='landmark'" in t)
+_wid=lambda t:(re.match(r'\S+?:([a-z0-9-]+): ',t) or [None,None])[1]
+_used={_wid(t) for t in warn if _soft(t) and _wid(t) in _OK}
+_n0=len(warn); warn=[t for t in warn if not(_soft(t) and _wid(t) in _OK)]
+if _n0-len(warn): print(f'{_n0-len(warn)} more warnings already looked at and accepted (source/tools/checked_ok.json), not repeated here.')
+for _i in sorted(set(_OK)-_used): print(f'note: checked_ok.json lists {_i}, which raises no such warning now: take it out when you next edit the file.')
 for w in warn: print('warning:',w)
 for e in err: print('ERROR:',e)
 if stamps:
