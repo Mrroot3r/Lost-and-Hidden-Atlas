@@ -105,7 +105,8 @@ def all_pics(folder=None):
                 o=P.get(k)
                 if o is None or _day(v)>_day(o) or (_day(v)==_day(o) and (v[0] or not o[0])): P[k]=tuple(v)
     return P
-WIDENED='2026-11-21'      # from this day the finder always asks for photographs that name the place, not only ones taken at the pin
+WIDENED='2026-11-20'      # the day the finder began always asking for photographs that name the place, not only ones taken at the pin.
+                          # The "none" answers recorded earlier that same day, under the narrow search, were taken out of their files by hand.
 def asked_again(v):
     """a "none" recorded before the search was widened is offered once more: the wider search may now have a picture for it"""
     return bool(v) and not v[0] and str(v[1])<WIDENED
