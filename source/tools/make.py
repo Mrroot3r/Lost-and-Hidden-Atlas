@@ -117,7 +117,8 @@ if os.path.exists(R+'build/walls.json'):         # stone walls found on LiDAR (t
     shutil.copyfile(R+'build/walls.json',WEB+'data/walls.json'); shutil.copytree(R+'build/walls',WEB+'data/walls')
 if os.path.exists(R+'src/photos.json'):          # photo details gathered ahead of time (tools/photos.py): only for places that still exist
     _ph=json.load(open(R+'src/photos.json',encoding='utf-8')); _ids={s['id'] for s in S}
-    open(WEB+'data/photos.json','w',encoding='utf-8').write(json.dumps({'asof':_ph.get('asof',''),'p':{k:v for k,v in _ph['p'].items() if k in _ids}},separators=(',',':'),ensure_ascii=False))
+    import photo_find      # pictures found on Wikimedia Commons near a pin (tools/pics_*.py) fill the places whose own article gave none
+    open(WEB+'data/photos.json','w',encoding='utf-8').write(json.dumps({'asof':_ph.get('asof',''),'p':photo_find.merge(_ph['p'],photo_find.all_pics(R+'tools'),_ids)},separators=(',',':'),ensure_ascii=False))
 # The optional lead layers (tools/vanished.py, tools/mines.py), fetched only when switched on. Each goes out in pieces:
 # data/<layer>/index.json (the kinds of point, and for each state its count, a stamp and its box) and one file per state,
 # data/<layer>/<state>-<stamp>.json, which the app fetches when the map is zoomed in there or the reader stands there.

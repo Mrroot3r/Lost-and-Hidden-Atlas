@@ -170,6 +170,20 @@ for f in sorted(glob.glob(os.path.join(T,'hours_*.py'))):
     for i,v in HR.items():
         if i not in ids: err.append(f'{nm}: {i} is not a place id')
         elif not(isinstance(v,(list,tuple)) and len(v) in (3,4) and isinstance(v[0],str) and 0<len(v[0].strip())<=180 and re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',str(v[1])) and re.match(r'https?://[^\s<>"]+$',str(v[2])) and (len(v)==3 or isinstance(v[3],bool))): err.append(f"{nm}: {i} must be ('days and times, 180 characters at most, or ?', 'YYYY-MM-DD', 'https://the page they were read on'[, True if the place opens to visitors])")
+# ---- pictures found on Wikimedia Commons (tools/pics_*.py, written by tools/photo_find.py): only Commons, only a free licence, a credit, no address of a person ----
+for f in sorted(glob.glob(os.path.join(T,'pics_*.py'))):
+    nm=os.path.basename(f)[:-3]
+    try: PC=importlib.import_module(nm).PICS
+    except Exception as ex: err.append(f'{nm}: cannot be read ({str(ex)[:60]})'); continue
+    for i,v in PC.items():
+        if i not in ids: err.append(f'{nm}: {i} is not a place id'); continue
+        if isinstance(v,(list,tuple)) and len(v)==3 and v[0]=='' and re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',str(v[1])) and isinstance(v[2],str) and 0<len(v[2])<=160: continue      # looked, none fits
+        if not(isinstance(v,(list,tuple)) and len(v)==7 and all(isinstance(x,str) for x in (v[0],v[3],v[4],v[5],v[6])) and isinstance(v[1],int) and isinstance(v[2],int)): err.append(f'{nm}: {i} is not (address, width, height, photographer, licence, file page, day)'); continue
+        if not re.match(r'https://(upload|thumb)\.wikimedia\.org/[^\s<>"]+\.(jpe?g|png)$',v[0],re.I): err.append(f'{nm}: {i}: the picture must be an address at Wikimedia (upload.wikimedia.org)')
+        if not re.match(r'https://commons\.wikimedia\.org/wiki/File:[^\s<>"]+$',v[5]): err.append(f'{nm}: {i}: the file page must be on commons.wikimedia.org')
+        if not re.match(r'^(CC BY(-SA)?( \d(\.\d)?)?( [a-z]{2,3})?|CC0( 1\.0)?|Public domain|PD[- ].*|No restrictions)$',v[4],re.I): err.append(f"{nm}: {i}: '{v[4]}' is not a free licence the Atlas shows")
+        if not v[3].strip() or len(v[3])>80 or chr(64) in v[3]: err.append(f'{nm}: {i}: the photographer must be a name (no address), 80 characters at most')
+        if not re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',v[6]): err.append(f'{nm}: {i}: the day chosen must be YYYY-MM-DD')
 # ---- red brick found out later (tools/bricks_*.py, written by tools/brick.py) ----
 for f in sorted(glob.glob(os.path.join(T,'bricks_*.py'))):
     nm=os.path.basename(f)[:-3]
