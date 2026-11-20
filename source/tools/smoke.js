@@ -7,7 +7,8 @@ const B = process.argv[2] || 'http://localhost:8766/web/';
   const browser = await chromium.launch(opt), errs = [];
   const ctx = await browser.newContext({ ...devices['Pixel 7'], ignoreHTTPSErrors: true, permissions: ['geolocation'], geolocation: { latitude: 42.8533, longitude: -73.8946, accuracy: 10 } });
   const page = await ctx.newPage(); page.on('pageerror', e => errs.push(e.message));
-  await page.goto(B + '#luna-park'); await page.waitForTimeout(5000);
+  await page.goto(B + '#luna-park'); await page.waitForTimeout(3000);
+  await page.evaluate(() => document.getElementById('lb-rails').click()); await page.waitForTimeout(3500);      /* old rail lines are off until asked for (November 2026): a tap on the bar must bring them */
   const r = await page.evaluate(() => { let lines = 0; window.__atlasMap.eachLayer(l => { if (l.options && l.options.pane === 'lines' && l.getLatLngs) lines++; });
     const i = document.querySelector('.leaflet-hist-pane img');
     return { places: JSON.parse(document.getElementById('d-sites').textContent).sites.length, title: document.querySelector('#v-detail h2').textContent, lineShapes: lines, oldMap: i ? i.naturalWidth : 0, barButtons: document.querySelectorAll('.lb').length, tabs: [...document.querySelectorAll('.tabs button')].map(b => b.textContent.trim()).join(',') }; });
