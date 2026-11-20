@@ -97,6 +97,27 @@ const { chromium } = require('playwright');
     if(sw) await q.evaluate(()=>{ document.querySelector('#pock-m').click(); document.querySelector('#pock-r').click(); }); await q.waitForTimeout(700); k=await pk();
     ok('both switched off: no dots, and the discs stay',k.purple===0&&k.white===0&&k.discs>0,JSON.stringify(k));
     await q.click('#sheet-x').catch(()=>{});
+    // other pockets (dashed rings) are off until asked for; a tap inside a big disc but away from its middle does nothing; the box is small
+    const rings=()=>q.evaluate(()=>{ let d=0,c=0; window.__atlasMap.eachLayer(l=>{ const o=l.options||{}; if(o.pane==='lines'&&l.getRadius&&o.fillOpacity<=0.3){ if(o.dashArray==='3 4') d++; else c++; } }); return {dashed:d,centres:c}; });
+    await q.evaluate(()=>{ window.__atlasMap.setView([42.6526,-73.7562],14,{animate:false}); }); await q.waitForTimeout(900); let rg=await rings();
+    ok('other pockets (the dashed rings) are not drawn until asked for; the town centre is',rg.dashed===0&&rg.centres>0,JSON.stringify(rg));
+    await q.click('#lb-opt'); await q.waitForTimeout(300); const po=await q.evaluate(()=>{ const n=document.querySelector('#pock-o'); return n?n.checked:null; });
+    if(po!==null) await q.evaluate(()=>document.querySelector('#pock-o').click()); await q.waitForTimeout(700); rg=await rings();
+    ok('"Also show other pockets" is off to begin with and brings them when ticked',po===false&&rg.dashed>2,po+' '+JSON.stringify(rg));
+    if(po!==null) await q.evaluate(()=>document.querySelector('#pock-o').click()); await q.click('#sheet-x').catch(()=>{}); await q.waitForTimeout(400);
+    const tapDisc=(frac)=>q.evaluate(f=>{ const m=window.__atlasMap; m.closePopup(); let disc=null; m.eachLayer(l=>{ const o=l.options||{}; if(!disc&&o.pane==='lines'&&l.getRadius&&o.fillOpacity<=0.3&&o.dashArray!=='3 4'&&l.getRadius()>60) disc=l; }); if(!disc) return {none:true};
+      const c=disc.getLatLng(), cp=m.latLngToContainerPoint(c), pt=L.point(cp.x+disc.getRadius()*f,cp.y), ll=m.containerPointToLatLng(pt); disc.fire('click',{latlng:ll,containerPoint:pt,layerPoint:m.containerPointToLayerPoint(pt)});
+      const e=m._popup&&m._popup.isOpen()&&m._popup.getElement(); return {r:Math.round(disc.getRadius()),open:!!e,text:e?e.querySelector('.leaflet-popup-content').textContent:'',h:e?Math.round(e.getBoundingClientRect().height):0}; },frac);
+    let td=await tapDisc(0.7); ok('a tap inside a big town-centre disc, away from its middle, opens nothing',!td.none&&td.r>60&&!td.open,JSON.stringify(td).slice(0,120));
+    td=await tapDisc(0.05); ok('a tap on its middle opens its box',td.open&&/score/i.test(td.text),JSON.stringify(td).slice(0,160));
+    ok('the box is small: the name, the score, the counts and one button',td.open&&td.h<170&&td.text.length<170&&!/Ranked by|mostly speak/.test(td.text),td.h+' px, '+td.text.length+' characters');
+    await q.evaluate(()=>window.__atlasMap.closePopup());
+    // a weak town centre close to a stronger one is left off the map (it is still in the list in Map options)
+    const thin=await q.evaluate(async()=>{ const ix=await fetch('data/pock/index.json').then(r=>r.json()), k=(await fetch('data/pock/ny-k-'+ix.s.ny.kh+'.json').then(r=>r.json())).k.filter(r=>r[10]==='c');
+      const km=(a,b)=>Math.hypot((a[0]-b[0])*111,(a[1]-b[1])*111*Math.cos(a[0]*Math.PI/180)); const w=k.find(r=>r[11]<15&&k.some(o=>o!==r&&o[11]>r[11]&&km(r,o)<3)), lone=k.find(r=>r[11]<15&&r[11]>=8&&!k.some(o=>o!==r&&km(r,o)<6)); if(!w||!lone) return null;
+      const at=async r=>{ const m=window.__atlasMap; m.setView([r[0],r[1]],13,{animate:false}); await new Promise(z=>setTimeout(z,900)); let n=0; m.eachLayer(l=>{ const o=l.options||{}; if(o.pane==='lines'&&l.getRadius&&o.fillOpacity<=0.3){ const c=l.getLatLng(); if(Math.abs(c.lat-r[0])<1e-5&&Math.abs(c.lng-r[1])<1e-5) n++; } }); return n; };
+      return {weak:w[7],weakOn:await at(w),lone:lone[7],loneOn:await at(lone)}; });
+    ok('a weak town centre beside a stronger one is left off the map; a lone weak one stays',!!thin&&thin.weakOn===0&&thin.loneOn===1,JSON.stringify(thin));
     await q.evaluate(()=>{ window.__atlasMap.setView([42.65,-73.75],7,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
     ok('at the 50-mile scale (zoom 7) no pocket disc is drawn',k.discs===0,JSON.stringify(k));
     await q.evaluate(()=>{ window.__atlasMap.setZoom(8,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
@@ -112,7 +133,7 @@ const { chromium } = require('playwright');
     const discs=()=>q.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ const o=l.options||{}; if(o.pane==='lines'&&l.getRadius&&o.fillOpacity<=0.3) n++; }); return n; });
     ok('town centres over Albany: the index and New York\'s discs are fetched',got.indexOf('pock/index.json')>=0&&got.indexOf('k:ny')>=0,got.join(' '));
     ok('and not the old whole file, nor a far state',got.indexOf('pockets.json')<0&&!got.some(x=>/^k:(va|oh|md|me|pa)$/.test(x)),got.join(' '));
-    ok('New York\'s discs are drawn',await discs()>3,await discs()+' discs');
+    ok('New York\'s discs are drawn',await discs()>0,await discs()+' discs');      /* round Albany that is the city's own centre: the other pockets are off by default */
     const ix=await q.evaluate(()=>fetch('data/pock/index.json').then(r=>r.json()));
     ok('the index lists every state with its stamps and its box, and no discs itself',Object.keys(ix.s||{}).length>=15&&Object.values(ix.s).every(o=>/^[0-9a-f]{8}$/.test(o.kh||'')&&o.h&&Array.isArray(o.b)&&o.b.length===4&&o.n>0)&&!(ix.k&&ix.k.length),Object.keys(ix.s||{}).length+' states');
     await q.evaluate(()=>{ window.__atlasMap.setView([37.54,-77.44],12,{animate:false}); }); await q.waitForTimeout(2200);
