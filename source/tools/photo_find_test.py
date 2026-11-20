@@ -89,6 +89,11 @@ try:
     finally: photos.ask=real
     ok('the article lookup can be asked about a few places and writes no file: a picture where the article has one, 0 where it has none',R is not None and R.get('no-pic')==0 and bool(R.get('with-pic')) and R['with-pic'][3]=='Pat Example' and R['with-pic'][6]=='Exampleville Old Mill',str(R)[:140])
 except ImportError as e: print('skip the article lookup check: '+str(e)[:60])
+# ---- a trial: a session says what it would choose and nothing is recorded for the map (comparing two models on the same places) ----
+tl=getattr(pf,'trial_line',None); tr=getattr(pf,'trial_read',None)
+T=(tl('old-mill','https://commons.wikimedia.org/wiki/File:Old_mill.jpg','')+tl('depot','','only a street | sign')+tl('old-mill','https://commons.wikimedia.org/wiki/File:Old_mill_2.jpg','')) if tl else ''
+R=tr(T) if tr else None
+ok('a trial answer is one line a note file can carry, and reads back: the last answer for a place wins, "none" is an empty picture',R=={'old-mill':'https://commons.wikimedia.org/wiki/File:Old_mill_2.jpg','depot':''},R)
 io=getattr(pf,'id_ok',lambda i,ids:None)
 ok('a landmark pin (lm-...) may have a picture though it is in no place list; any other unknown id may not',io('lm-thomas-cole-house',{'a'})is True and io('a',{'a'})is True and io('no-such-place',{'a'})is False and io('lm-Bad Id',{'a'})is False)
 print(f'{len(fails)} FAILED' if fails else 'photo_find test: all checks passed'); sys.exit(1 if fails else 0)
