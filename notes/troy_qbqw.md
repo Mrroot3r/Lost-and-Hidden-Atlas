@@ -11,7 +11,6 @@ Eighteen standing places in region `troy` (drawn at random by `choose.py --state
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Esek Bussey Firehouse (Engine 8) | Troy, NY (Wikipedia 42.73972, -73.67944; the Register list gives 42.7392, -73.6739) | Wikipedia: 1891–92 two-storey red brick firehouse, terra cotta trim, NRHP 1973; saved when the Hoosick Street bridge was built | The two points disagree by 450 m and neither fell on a firehouse in OpenStreetMap; the address and present use |
 | Smart's Pond dam ruins | Troy, NY (OpenStreetMap ruin 42.70814, -73.67862, on "The Narrows Cascade and Heritage Trail: Phase 1") | Only the OpenStreetMap name and trail-route pages; the Rensselaer Land Trust page says a Wynantskill corridor trail is proposed from Burden Pond toward its Staalesen Preserve | A source on the dam, and who owns and opens the trail (digthefalls.com answers 403 to page.py) |
 | Rensselaer Iron Works | South Troy, NY (OpenStreetMap ruin 42.71964, -73.69768) | OpenStreetMap ruin point on Madison Street | The leaf-off aerial shows a cleared brownfield with nothing standing; a source on any remains |
 | Haskell School | Troy, NY (42.75778, -73.67833) | Wikipedia: 1894 red brick school, demolished August 2, 2023 under an emergency order | Nothing to see; listed here so nobody adds it |
