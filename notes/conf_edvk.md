@@ -11,11 +11,9 @@ Ten places in region `conf` (drawn at random by `choose.py --state ny`), the fou
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Fonda House | Cohoes, NY (Wikipedia 42.76917, -73.72806) | Wikipedia: brick centre-entrance house of about 1727 with a gambrel roof and wraparound porch, National Register 2004 (04000351) | The address; the Wikipedia point falls on a residential street and no building could be picked out; NPGallery has only a placeholder and the National Archives copy answers 403 |
 | Godfrey Farmhouse | Cohoes, NY (Wikipedia 42.80778, -73.73472) | Wikipedia: Greek Revival temple-form farmhouse of about 1836 with a fluted-column portico, National Register 1979 | Whether it still stands: the point is among new housing beside Route 9/Columbia Street and no house of that form was seen on the aerial |
 | Corporation Hall | Green Island, NY (George and Clinton Streets, 42.74202, -73.69243) | HMdb "Welcome to Green Island" and "Unique Urban Village" panels: the island's first public building, 1883 | Which corner building it is, and a second source |
 | Rensselaer and Saratoga Railroad Green Island Shops (update to the LEADS.md row) | Green Island, NY (42.75056, -73.69278) | The leaf-off aerial shows cleared ground and fill at the Register point, no roundhouse or water tower | Probably nothing left; a source saying so |
-| Old Military Crossing | Cohoes, NY (HMdb 138976, 42.80487, -73.72436) | 1932 state marker: British and Continental Army ford, held in August and September 1777 by Poor and Arnold | Anything to see beyond the marker |
 
 ## Tips
 - Green Island's town page (villageofgreenisland.com/town/) gives office hours; the Times Union's "Sacred buildings' afterlives" (2013) is the source that St. Mark's is the town offices, which settles the earlier lead.

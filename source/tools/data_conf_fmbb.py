@@ -1,0 +1,100 @@
+# November 20, 2026: the edges of the Cohoes, Waterford and Watervliet ground. Drawn at random by
+# tools/choose.py --state ny (region conf). Downtown Cohoes, Waterford village, Watervliet and Green Island were worked
+# on November 18 (data_conf_simf.py, data_conf_biei.py, data_conf_kovn.py, data_conf_edvk.py), so this batch takes the
+# leads they left and the ground just outside: the Mohawk crossings between Cohoes and Crescent, the Church Hill canal
+# hamlet at Crescent and the Dunsbach ferry in Halfmoon (filed under sar like the Crescent and Vischer Ferry places),
+# Newtonville in Colonie (filed under albco like the Pruyn House), the 1727 Fonda House in Cohoes, the Waterford library
+# in its old station, and two Revolutionary-era sites at Waterford known now by their markers.
+# Sources were opened in this session: Wikipedia as raw text (tools/wiki_raw.py); HMdb marker pages; the Saratoga
+# County History Center's page on the Church Hill district; the Clifton Park Center Baptist Church's own history and
+# contact pages; the Waterford Public Library's home page; historypointer.com's copy of the Register entry for the
+# Fonda House address, all through tools/page.py.
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+BATCH={'key':'conf_fmbb','label':'Mohawk crossings, Crescent and Newtonville','added':'2026-11-20 01:41'}
+HM=lambda n,t: L('HMdb: '+t,'https://www.hmdb.org/m.asp?m=%d'%n)
+PLACES=[
+N('old-military-crossing-cohoes','Old Military Crossing of the Mohawk','Cohoes','conf','fort','marker',42.80487,-73.72435,'site','public','walk','forts','1755–1777',
+  'Before the Barge Canal dam at Crescent raised the river, the Mohawk here was shallow enough to wade most of the year, and Native Americans crossed at this spot for centuries. The 1755 military road from Albany to Lake George (the Loudon road, named for the Earl of Loudoun) crossed nearby, and in 1777, with Burgoyne marching on Albany, the fords at Crescent and Waterford were held by the Continental brigades of Enoch Poor and Benedict Arnold. Two markers stand here: a 1932 state sign and a newer panel that tells the whole story.',
+  'Nothing of the ford itself: the river is now the dammed pool above Crescent. Look for the two markers on Cohoes-Crescent Road and the view of the dam from them. About 1.3 km north, at Crescent Road and New Loudon Road (US 9), a 1938 state marker for the Loudoun Ferry Road says Knox\'s artillery train crossed there in 1776 and Poor\'s brigade camped there in 1777 (the Dunsbach Ferry panel in Halfmoon gives Knox a different crossing; see that place).',
+  'Where an army waded the Mohawk before the dam drowned the ford.',
+  'Roadside markers on Cohoes-Crescent Road, on canal land (federal public-land map: Erie Canal). OpenStreetMap maps a small "Fisherman\'s Path" parking area about 80 m east, a gravel loop on the aerial. No hours.',
+  [HM(138976,'Old Military Crossing (1932)'),HM(268021,'Old Military Crossing (panel)'),HM(24514,'Loudoun Ferry Road')],
+  th=[42.80483,-73.72333],thn="Fisherman's Path parking (OpenStreetMap)",brick='no'),
+N('fonda-house-cohoes','Fonda House','Cohoes','conf','landmark','standing',42.76584,-73.71292,'site','view','drive','','about 1727',
+  'One of the oldest buildings in Cohoes: a brick Dutch house of about 1727, three bays wide with a centre entrance and a gambrel roof, later given a one-storey wraparound porch. The sources opened do not say who built it; a Town of Colonie marker for the Fonda family cemetery, north of the city on Loudon Road, says the Fondas were early settlers at the Boght and Crescent who helped organize the Boght Reformed Church in 1784. The house was listed on the National Register in 2004.',
+  'From the street: a one-and-a-half-storey brick house under a gambrel roof, with the wraparound porch. Interior not checked. Whether it still looks as the 2004 listing describes was not checked on a recent source. Red brick: not checked (the sources say brick but not its colour).',
+  '',
+  'Private house at 55 Western Avenue (the address in the Register entry as copied by historypointer.com; the geocoder matched it to a building). Look from the street only. The Wikipedia coordinate (42.76917, -73.72806) is about 1.3 km west of the address and was not used.',
+  [W('Fonda House'),L('historypointer.com: Fonda House (Register entry 04000351)','https://historypointer.com/nris/resource/04000351'),HM(129626,'Fonda Cemetery')],
+  conf='mixed',brick='?'),
+N('church-hill-crescent','Church Hill Historic District, Crescent','Halfmoon','sar','town','standing',42.82502,-73.72950,'area','view','walk','canal','1820s–1880s',
+  'The canal hamlet of Crescent grew up beside the aqueduct that carried the Erie Canal over the Mohawk, and shipped ice, grain, hay and molders\' sand from southern Saratoga County. Thirteen mostly residential buildings of the 19th century on Church Hill Road, with a surviving piece of the aqueduct, were listed on the State and National Registers in 2021, the eleventh historic district in the county. The Saratoga County History Center credits the prosperity the aqueduct brought for the high-style houses.',
+  'Walk Church Hill Road east from US 9. Oakcliff (about 1840), built by Judge Duncan McMartin and home of businessman T. G. Younglove from 1850 to 1882, has a Halfmoon Historical Society sign; it was restored in 1988. At the Guideboard Road end, a sign marks the Halfmoon Academy, a private school chartered 1851–1877 and then a district common school until 1951; whether its building stands was not checked. Both ends of the road have district markers (2021). The aqueduct remains and the Noxon Bank are separate places in the Atlas. Most buildings are private homes; interiors not checked. Red brick: not checked.',
+  'Erie Canal money built a row of fine houses on one hill road.',
+  'Church Hill Road (County Route 99) is a public road; the houses are private, so look from the road. Parking at the Halfmoon-Crescent Trail lot by the aqueduct, on canal land, about 250 m southwest (OpenStreetMap). The pin is the Oakcliff sign, not the middle of the district.',
+  [L('Saratoga County History Center: Church Hill Historic District (2021)','https://brooksidemuseum.org/2021/03/church-hill-historic-district-to-be-added-to-the-state-and-national-register-for-historic-places/'),HM(217627,'Church Hill Historic District (US 9 end)'),HM(299569,'Church Hill Historic District (Guideboard Road end)'),HM(128556,'Oakcliff'),HM(128389,'Halfmoon Academy')],
+  th=[42.82331,-73.73153],thn='Halfmoon-Crescent Trail parking',brick='?'),
+N('clifton-park-center-baptist','Clifton Park Center Baptist Church and Cemetery','Clifton Park','sar','worship','standing',42.85817,-73.83065,'exact','open','drive','cemeteries','1837',
+  'The congregation began in 1794 as the First Baptist Church of Halfmoon, meeting in the home of Abijah Peck, who was licensed to preach in 1793 and became its pastor in 1801. After a split in 1835 the Peck congregation built a brick meeting house; Wikipedia and the Register give 1837 for the present church, a gable-roofed brick building in a plain Greek Revival style. Peck preached for over 54 years and died in 1848. The cemetery dates from about 1801 and holds some 350 burials.',
+  'The 1837 brick church on its rise, with additions of 1957 and 1990 behind, and beside it the cemetery inside a cast- and wrought-iron picket fence and gate. A Bicentennial sign out front (it says "Church, c. 1830") notes that Peck\'s home is across the road. Interior not checked. Red brick: yes; the July 2013 Wikimedia photograph in the Wikipedia article shows red brick walls with white trim and a pedimented gable.',
+  '',
+  'An active church at 713 Clifton Park Center Road; the church\'s contact page says there is free parking with visitor spaces, an office open Monday to Friday 9 a.m. to 1:30 p.m., and Sunday 10 to 11 a.m. The cemetery is church property: visit with respect.',
+  [L('Clifton Park Center Baptist Church: history','https://www.cliftonparkcenterbaptist.org/about/history/'),L('Clifton Park Center Baptist Church: contact','https://www.cliftonparkcenterbaptist.org/contact-us/'),W('Clifton Park Center Baptist Church and Cemetery'),HM(117280,'Clifton Park Center Baptist Church')],
+  brick='yes',hours='Sunday 10 to 11 a.m.; office Monday to Friday 9 a.m. to 1:30 p.m.'),
+N('newtonville-post-office','Newtonville Post Office (1852 First Baptist Church)','Newtonville','albco','civic','standing',42.72231,-73.75696,'site','view','drive','','1852',
+  'Built in 1852 as the First Baptist Church: a one-storey red brick building with a gable roof. The Rev. William Arthur, father of President Chester A. Arthur, lived in Newtonville from 1855 to 1863 and by tradition preached here. The church closed in the late 19th century and the building was a school, a bus garage and a farm-machinery office before becoming the post office after 1940. It was listed on the National Register in 1973.',
+  'A small red brick former church with a gable roof on Loudon Road. Whether it is still a post office today was not checked, so no hours are given; interior not checked. Red brick: yes; the Wikipedia article calls it red brick, and its 2010 Wikimedia photograph, captioned as the post office, shows a red brick gable-fronted building on a rise above a driveway.',
+  'A church where a president\'s father may have preached, then a bus garage, then a post office.',
+  'On Loudon Road (Route 9) in Newtonville. Present owner and use not checked: look from the road unless you find it open as a post office.',
+  [W('United States Post Office (Newtonville, New York)')],
+  conf='mixed',brick='yes'),
+N('newtonville-methodist','Newtonville United Methodist Church','Newtonville','albco','worship','standing',42.72449,-73.75961,'site','view','drive','','1893',
+  'Methodists have met on this site since 1828; three congregations joined here in 1858 as Asbury Chapel. The present Late Gothic Revival church went up in 1893 for $11,150, paid off in three years, as Asbury Methodist Episcopal Church (architect Ernest Hoffman, builder H. P. Horton). Church members dug a cellar under it by hand in the late 1940s for a fellowship hall; an education wing followed in 1959. It was listed on the National Register in 2001.',
+  'The 1893 Gothic Revival church at Loudon Road and Maxwell Road, with a late 19th-century sexton\'s cottage beside it; the parsonage was taken down in the early 1960s and the carriage sheds burned. The Wikimedia photograph in the Wikipedia article shows a white clapboard church with a tall corner steeple, a shorter second tower and a large pointed-arch window in the gable front. Interior not checked. Red brick: no (white wood, from that photograph).',
+  '',
+  'An active church; no page of its own giving service times was found, so look from the road. Parking not checked.',
+  [W('Newtonville United Methodist Church')],
+  brick='no'),
+N('waterford-station-library','Waterford station (Waterford Public Library)','Waterford','conf','rail','standing',42.79382,-73.67568,'site','open','walk','stations','1896',
+  'A combined passenger station and freight house on the Rensselaer & Saratoga Railroad of 1835, later a branch of the Delaware & Hudson; the Riverspark marker at the library gives it the date 1896. It is now the Waterford Public Library. The Atlas\'s Waterford village entry, from the Waterford museum\'s walking tour, calls it "the D&H building of 1835": that is the year the railroad opened, and the two sources disagree on the building\'s date.',
+  'The old station building at Third and Columbia Streets, lived in as the village library; the marker is at its south end. What survives of the station inside was not checked. Red brick: not checked.',
+  '',
+  'Waterford Public Library, 117 Third Street (US 4). Hours from the library\'s own home page. Parking not checked.',
+  [HM(40592,'Waterford Station'),L('Waterford Public Library','https://waterfordlibrary.net/')],
+  conf='mixed',brick='?',hours='Monday 10 a.m. to 5 p.m.; Tuesday and Thursday 10 to 6; Wednesday 10 to 8; Friday and Saturday 10 to 2'),
+N('halfmoon-fort-site','Halfmoon Fort site','Waterford','conf','fort','marker',42.80130,-73.66893,'area','public','drive','forts','1600s–1764',
+  'Half Moon country, between the Hudson and the Mohawk, was settled by 1675. Its early fort, built round the house of Harme Leversee on the Hudson about a mile north of Waterford, sheltered the Dutch settlers from raids in the French and Indian wars. A 1952 state marker calls it a defence outpost of Albany and the site of the "Ye Halfmoon" settlement of 1764 on the "Great Road" to Canada.',
+  'Only the 1952 state marker beside US 4. Nothing of the fort is known to show.',
+  '',
+  'Roadside marker on the shoulder of Hudson River Road (US 4), a public highway; the land behind it is not public (federal public-land map) and was not checked further. No parking was found close by.',
+  [HM(129177,'Halfmoon Fort'),HM(128408,'Crescent / Mohawk Towpath Byway / Halfmoon')],
+  brick='no'),
+N('dunsbach-ferry-halfmoon','Vandenburgh–Dunsbach Ferry site','Halfmoon','sar','landmark','marker',42.79685,-73.76037,'area','public','drive','','before 1705–1910',
+  'Cornelius Claes Vandenburgh ran a rope ferry here before 1705, where an Indian trail crossed the Mohawk. The Scenic Byway panel says Henry Knox crossed on the ice here in early January 1776 with the cannon from Fort Ticonderoga (the 1938 Loudoun Ferry Road marker in Colonie claims his crossing for that road instead). Henry Dunsbach bought the ferry and Vandenburgh\'s 1718 stone house in 1813 and ran a hotel too; a toll bridge of 1898–1900 was wrecked by ice, and the state bought the ferry for the Barge Canal in 1910.',
+  'The marker in a small turn-out on Towpath Road. Vandenburgh\'s stone house was lost when the Barge Canal raised the river in 1917; nothing of the ferry is known to show. A Halfmoon Historical Society sign about 0.7 km west on Riverview Road marks the Van Den Bergh family farm (farmhouse about 1834; the family\'s ferry dates from 1707 on that sign).',
+  '',
+  'Roadside turn-out on Towpath Road, a public road, near Clamsteam Road (HMdb). The land along the river is not on the federal public-land map and was not checked. No hours.',
+  [HM(128394,'Vandenburgh Dunsbach Ferry'),HM(128382,'Van Den Bergh'),HM(24514,'Loudoun Ferry Road')],
+  conf='mixed',brick='no'),
+N('eagle-tavern-site-waterford','Eagle Tavern site','Waterford','conf','hotel','marker',42.78978,-73.67715,'area','public','walk','hotels','colonial era',
+  'A Riverspark marker places the colonial Eagle Tavern here, kept by Gerardus van Schoonhoven, a gathering place of the rebels of the district in the Revolution. It names Alexander Hamilton, Thomas Jefferson and James Madison among its guests.',
+  'Only the marker on Second Street just north of Broad Street; the tavern is gone. When it was lost was not found.',
+  '',
+  'Public sidewalk in Waterford village; park in the village lots on Broad Street.',
+  [HM(115398,'Eagle Tavern Site')],
+  brick='no'),
+]
+PIN_NOTES={
+ 'old-military-crossing-cohoes':'HMdb position of the 1932 marker on Cohoes-Crescent Road (the panel is about 40 m away), at the gravel turn-off below the Crescent dam and power house; the parking point is the OpenStreetMap lot from tools/parking.py, a gravel loop on the aerial.',
+ 'fonda-house-cohoes':'ArcGIS geocoder PointAddress match for 55 Western Avenue, Cohoes. The aerial shows a small house among trees at the edge of an open field; that it is the Fonda House was not confirmed by a picture.',
+ 'church-hill-crescent':'HMdb position of the Oakcliff sign on Church Hill Road; area pin for the district.',
+ 'clifton-park-center-baptist':'ArcGIS geocoder PointAddress match for 713 Clifton Park Center Road; the aerial shows the church with its additions and the cemetery to the west.',
+ 'newtonville-post-office':'Register point moved 23 m with tools/pix.py onto the small gabled building with its own lot beside New Loudon Road (OpenStreetMap: number 552); that this is the old church was not confirmed by a picture.',
+ 'newtonville-methodist':'Register point fell on the church parking lot; moved 33 m with tools/pix.py onto the church building at Loudon and Maxwell Roads.',
+ 'waterford-station-library':'HMdb position of the Waterford Station marker at the library\'s south end.',
+ 'halfmoon-fort-site':'HMdb position of the 1952 marker on US 4; area pin, the fort\'s spot is not known.',
+ 'dunsbach-ferry-halfmoon':'HMdb position of the Scenic Byway panel on Towpath Road.',
+ 'eagle-tavern-site-waterford':'The HMdb position fell on a building roof; the pin is the corner of Broad and Second Streets (OpenStreetMap), and the marker is a few metres north on Second Street.',
+}

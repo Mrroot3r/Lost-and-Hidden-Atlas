@@ -13,7 +13,6 @@ Fourteen places, region `conf` drawn at random by `choose.py --state ny`, with t
 |---|---|---|---|
 | Cohoes Waterworks pump house | Cohoes, NY (near the falls, Harmony Mills district) | Spindle City Harmony Mills tour (2023): pump house begun 1857, still working, built on a lock of the original Erie Canal | Where it is (not found in OpenStreetMap by name) and whether it can be seen from a public way |
 | Harmony Mills Office and Sunday School | Cohoes, NY (Harmony Mills district) | Spindle City tour and the NHL nomination: 1854 company office with a millworkers' library upstairs | Exact building; mentioned inside the harmony-mills-cohoes entry for now |
-| Church Hill Historic District | Halfmoon, NY | Saratoga County Register list: listed (100006512), no coordinates; the Wikipedia title tried does not exist | Any source on what is there and a coordinate |
 
 ## Tips
 - `brick.py look <id> <picture address>` works for a place that is only in the workspace build, but not for an `lm-` id once a new entry with `was=` replaces it: look the new id up instead. `Special:FilePath/<file>?width=800` fetched where the plain file address got HTTP 429.
