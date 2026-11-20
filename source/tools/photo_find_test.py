@@ -48,10 +48,10 @@ ok('a photograph that names the place comes before a nearer one that does not, a
 r=[c['title'] for c in pf.rank([dict(near,m=90,title='File:B.jpg'),dict(near,m=10,title='File:A.jpg')],nw,'sag harbor')] if hasattr(pf,'rank') else []
 ok('the rest stay nearest first',r==['File:A.jpg','File:B.jpg'],r)
 ag=getattr(pf,'asked_again',lambda v:None)
-ok('a "none" recorded before the search was widened is asked again',ag(('','2026-11-20','nothing on Commons within 150 m'))is True)
-ok('a "none" recorded after it is not, and a chosen picture never is',ag(('','2026-11-21','only a street sign'))is False and ag(row)is False)
+ok('a "none" recorded before the search was widened is asked again',ag(('','2026-11-19','nothing on Commons within 150 m'))is True)
+ok('a "none" recorded on the day it was widened or after is not, and a chosen picture never is',ag(('','2026-11-20','only a street sign'))is False and ag(('','2026-11-21','only a street sign'))is False and ag(row)is False)
 d2=tempfile.mkdtemp(); later=row[:6]+('2026-11-21',)
-pf.write_pick(os.path.join(d2,'pics_zzzz.py'),'place-x',('','2026-11-20','nothing nearby')); pf.write_pick(os.path.join(d2,'pics_aaaa.py'),'place-x',later)
+pf.write_pick(os.path.join(d2,'pics_zzzz.py'),'place-x',('','2026-11-19','nothing nearby')); pf.write_pick(os.path.join(d2,'pics_aaaa.py'),'place-x',later)
 pf.write_pick(os.path.join(d2,'pics_aaaa.py'),'place-y',row); pf.write_pick(os.path.join(d2,'pics_zzzz.py'),'place-y',('','2026-11-22','the picture was of the house next door'))
 A=pf.all_pics(d2)
 ok('a picture chosen on a later day replaces an earlier "none", whichever file holds it',A.get('place-x')==later,str(A.get('place-x'))[:80])
@@ -69,7 +69,7 @@ ok('a new place with no Wikipedia article is one to look for a picture for',na({
 ok('one with an article is left to its article',na({'links':[['Wikipedia: Old Mill','https://en.wikipedia.org/wiki/Old_Mill'],['Other','https://example.org']]})is False)
 pn=getattr(pf,'new_places',lambda P,done:None)
 PL=[dict(id='a',st='standing',links=[]),dict(id='b',st='standing',links=[['Wikipedia: B','https://en.wikipedia.org/wiki/B']]),dict(id='c',st='gone',links=[]),dict(id='d',st='ruins',links=[]),dict(id='e',st='standing',links=[])]
-got=pn(PL,{'d':row,'e':('','2026-11-22','only a street sign')})
+got=pn(PL,{'d':row,'e':('','2026-11-20','only a street sign')})
 ok('of a batch, the places listed are those with no article, still there, and not answered yet',got is not None and [p['id'] for p in got]==['a'],got and [p['id'] for p in got])
 try: got=pn(PL,{},{'b'})
 except TypeError: got=None
