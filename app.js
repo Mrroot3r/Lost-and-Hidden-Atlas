@@ -913,7 +913,7 @@ function buildSheet(){
     lb.append(note(other?'Estates, mill sites, battlefields and other pockets within 40 miles of '+from+'.':'Old town centres within 40 miles of '+from+'. Tap one to go there.'),seg);
     if(all.length){ const ul=el('div',{class:'pocklist'}); all.slice(0,pockList.n).forEach(o=>ul.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ closeSheet(); map.setView([o.k[0],o.k[1]],15); }},el('b',{text:o.k[7]}),el('small',{text:' '+pockLine(o)})))); lb.append(ul);
       if(all.length>pockList.n) lb.append(el('button',{class:'btn sm',type:'button',id:'pock-more',onclick:()=>{ pockList.n+=8; buildSheet(); }},'Show more ('+(all.length-pockList.n)+')')); }
-    else lb.append(note('None are mapped within 40 miles of '+from+' yet. The layer covers '+Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', ')+' so far.')); }
+    else lb.append(note('None are mapped within 40 miles of '+from+' yet. The layer covers '+(Object.keys(POCK.s||{}).length>12?Object.keys(POCK.s).length+' states':Object.keys(POCK.s||{}).map(x=>STATE[x]||x).join(', '))+' so far.')); }
   if(map&&!schematic){ lb.append(H('Offline'));
     lb.append(el('button',{class:'btn sm',type:'button',id:'view-off','aria-expanded':String(viewOpen),onclick:()=>{ viewOpen=!viewOpen; buildSheet(); }},viewOpen?'Close':'Save this map view for offline…'));
     if(viewOpen) lb.append(viewBox()); }
@@ -1287,6 +1287,7 @@ const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8
    Close in, a disc would tint the whole screen: its fill fades and the ring stays. */
 function pockZoom(){ if(!U.ui.pockets||!pockGrp||!POCK) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
   const b=map.getBounds().pad(0.3), S=b.getSouth(), N=b.getNorth(), W=b.getWest(), E=b.getEast(), only=U.ui.pockC, want=[];
+  if(z>=POCKZ) pockNeed(S,W,N,E);
   for(let i=POCK.k.length-1;i>=0;i--){ const k=POCK.k[i], r=k[2]/70000;                      /* its radius in degrees, generously */
     if(z<POCKZ||z<pockFrom(k)||k[0]+r<S||k[0]-r>N||k[1]+r<W||k[1]-r>E||(only&&!pockC(k))) continue; want.push(k); }
   const had=pockGrp.on.size, added=viewSync(pockGrp,want,k=>{ const tc=pockC(k), c=pockColor(k); k.px=k.f=null;
@@ -1295,9 +1296,19 @@ function pockZoom(){ if(!U.ui.pockets||!pockGrp||!POCK) return; const z=map.getZ
   if(added&&had) want.forEach(k=>pockGrp.mk.get(k).bringToFront());
   want.forEach(k=>{ const c=pockGrp.mk.get(k), px=Math.round(pockPx(k,z)*2)/2; if(k.px!==px){ k.px=px; c.setRadius(px); } const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; c.setStyle({fillOpacity:ff}); } }); }
 function pockLoad(quiet){ if(POCK||pockWait) return;
-  pockWait=(AT?AT.fetch('data/pockets.json'):fetch('data/pockets.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
-    .then(j=>{ POCK=j; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
+  pockWait=(AT?AT.fetch('data/pock/index.json'):fetch('data/pock/index.json'+VQ)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(j=>{ POCK={s:j.s||{},k:[],got:{}}; drawPockets(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
     .catch(()=>{ pockWait=null; if(!quiet||U.ui.pockets) banner('Historic pockets could not load. Check your signal and turn them on again.',true,6000); }); }
+/* The discs come one state at a time (tools/make.py): POCK.s lists each state with the box b its pockets lie in and the
+   stamp kh of its file. pockNeed fetches the states a box touches that have not come yet; POCK.k holds what has come,
+   town centres first and best score first, as the drawing and the labels expect. Nobody looking at Albany fetches Ohio. */
+function pockNeed(S,W,N,E){ if(!POCK) return;
+  Object.keys(POCK.s).forEach(key=>{ const o=POCK.s[key], b=o&&o.b, g=POCK.got[key]; if(!b||!o.kh||g===true||g==='wait'||(g&&Date.now()-g.t<30000)) return;
+    if(b[0]>N||b[2]<S||b[1]>E||b[3]<W) return;
+    POCK.got[key]='wait'; const p='data/pock/'+key+'-k-'+o.kh+'.json';
+    (AT?AT.fetch(p):fetch(p+'?v='+o.kh)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+      .then(j=>{ POCK.got[key]=true; POCK.k=POCK.k.concat(j.k||[]).sort((x,y)=>(pockC(y)-pockC(x))||(y[11]-x[11])); pockZoom(); pockDetail(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
+      .catch(()=>{ POCK.got[key]={t:Date.now()}; if(U.ui.pockets) banner('Some town centres could not load here. Check your signal.',true,5000); }); }); }
 /* after "old town centres only" is switched: draw the discs afresh */
 function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp.grp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.f=null; k.px=null; }); drawPockets(); }
 function drawPockets(){
@@ -1361,6 +1372,7 @@ function pockItemPopup(t,x){
 /* for the map options sheet: old town centres within reach of the start place, richest or nearest first, or the other pockets.
    "Nearest" leaves out the thinnest centres when there are plenty, so the list is not all crossroads with one plaque. */
 function pockNear(mode){ if(!POCK) return []; let H=homeObj(); if(!homePicked()&&map){ const c=map.getCenter(); H={lat:c.lat,lon:c.lng}; }
+  pockNeed(H.lat-0.6,H.lon-0.85,H.lat+0.6,H.lon+0.85);      /* the states within 40 miles; the sheet is built again when one comes */
   let a=POCK.k.filter(k=>(mode==='other')!==pockC(k)).map(k=>({k:k,mi:hav(H.lat,H.lon,k[0],k[1])})).filter(o=>o.mi<=40);
   if(mode==='near'){ const solid=a.filter(o=>o.k[11]>=10); if(solid.length>=8) a=solid; return a.sort((x,y)=>x.mi-y.mi); }
   return a.sort((x,y)=>y.k[11]-x.k[11]); }
@@ -1509,6 +1521,7 @@ function nmCollect(c,rmi){ const S=nmSet(), out=[], add=(id,k,la,lo,n,t,o)=>{ if
   [['v','vanished'],['m','mines']].forEach(q=>{ const X=XL[q[1]]; if(!S.k[q[0]]||!X.idx) return; const dla=rmi/69+0.002, dlo=rmi/(69*Math.cos(rad(c[0])))+0.002;
     xlNeed(q[1],c[0]-dla,c[1]-dlo,c[0]+dla,c[1]+dlo);      /* the state the reader stands in, and a neighbour within reach; when it comes, nmLoaded() counts again */
     for(let i=Math.floor((c[0]-dla)*20);i<=Math.floor((c[0]+dla)*20);i++) for(let j=Math.floor((c[1]-dlo)*20);j<=Math.floor((c[1]+dlo)*20);j++) (X.idx[i+','+j]||[]).forEach(x=>{ if(xlShow(q[1],x)) add(q[0]+':'+x[4],q[0],x[0],x[1],x[3]||X.data.t[x[2]],xlLine(q[1],x)+' · unchecked lead',x); }); });
+  if(S.k.c&&POCK){ const dla=rmi/69+0.02, dlo=rmi/(69*Math.cos(rad(c[0])))+0.02; pockNeed(c[0]-dla,c[1]-dlo,c[0]+dla,c[1]+dlo); }
   if(S.k.c&&POCK) POCK.k.forEach(k=>{ if(pockC(k)) add('c:'+k[0]+','+k[1],'c',k[0],k[1],k[7],'Old town centre'+(k[12]?' · '+k[12]:''),k); });
   return out; }
 /* the candidates round p, kept until you have moved a quarter of a mile or something changed */
