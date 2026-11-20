@@ -14,7 +14,6 @@ The first places in Prince County, Prince Edward Island (outside Summerside); th
 | Handrahan's Cutting (1932 train wreck) | Harper, near Tignish, PE (Register list point 46.5635, -64.0402 is wrong: it falls near Tyne Valley) | Register 1926: a wooden cross and plaque on the Confederation Trail mark PEI's worst rail accident, February 21, 1932, four killed | The spot on the trail; OpenStreetMap has no point for the cross |
 | Convent of Notre-Dame-des-Anges, Tignish | Tignish, PE (Register 1904; list point 46.954, -64.0365, beside St. Simon and St. Jude) | On the Prince County list | historicplaces.ca 1904 reset the connection on six tries |
 | Hamilton Hall | 2282 Hamilton Road, Route 104, Hamilton, PE (46.4963, -63.6998) | Register 1641: 1889 rural community hall with its original gable sign; renovated 1948–50 and 1984–85, many windows replaced; 4-H meets there | Whether it is worth a pin; owner and use |
-| Summerside's Register places | Summerside, PE | Wikipedia keeps them on a separate list ("Places listed in Summerside are listed separately") | Not read this session; Summerside has nothing on the map yet |
 
 ## Tips
 - Tourism PEI's search pages `tourismpei.com/search/OperatorDetails/op_id/<n>` read with `page.py` and give "Dates of Operation" when the `/attractions/<slug>` guess is 404; web search results give the op_id address.
