@@ -2186,10 +2186,21 @@ function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
         return {src:pg.thumbnail.source,w:pg.thumbnail.width,h:pg.thumbnail.height,who:who,lic:lic,page:ii.descriptionurl||('https://commons.wikimedia.org/wiki/File:'+encodeURIComponent(pg.pageimage)),where:/commons\.wikimedia\.org/.test(ii.descriptionurl||'commons.wikimedia.org')?'Wikimedia Commons':'Wikipedia',title:pg.title}; }); })
     .catch(()=>{ PHOTO.delete(s.id); return null; });   /* a failure is asked again next time */
   PHOTO.set(s.id,pr); return pr; }
+/* a tap on the picture: the same photo large over the page, with its credit; a tap anywhere (or Escape) puts it away.
+   A bigger copy is asked for where the address is a Wikimedia thumbnail; if that fails the copy already shown is used. */
+function photoBig(ph){ let n=$('#photobig');
+  if(!n){ n=el('div',{id:'photobig',hidden:true,role:'dialog','aria-label':'The photograph, larger'}); document.body.append(n);
+    n.addEventListener('click',e=>{ if(e.target.tagName!=='A') n.hidden=true; }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') n.hidden=true; }); }
+  n.textContent=''; const big=/\/\d+px-[^/]+$/.test(ph.src)?ph.src.replace(/\/\d+px-([^/]+)$/,'/1600px-$1'):ph.src;
+  const img=el('img',{src:big,alt:'Photograph from the Wikipedia article '+ph.title}); img.addEventListener('error',()=>{ if(img.getAttribute('src')!==ph.src) img.src=ph.src; });
+  n.append(img,el('p',null,'Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where),el('span',{text:' · Tap to close'}))); n.hidden=false; }
+/* pictures of the place from elsewhere: an image search by name in the reader's browser. Nothing of it comes into the Atlas. */
+const morePhotos=s=>ext('https://www.google.com/search?udm=2&q='+encodeURIComponent([s.name,s.town,STATE[REG_STATE[s.reg]]].filter(Boolean).join(' ')),'More photos','btn sm');
 function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false||!wikiTitle(s)) return null;
   const box=el('figure',{class:'dphoto',hidden:true});
   const fill=ph=>{ const img=el('img',{src:ph.src,alt:'Photograph from the Wikipedia article '+ph.title,decoding:'async'}); if(ph.w>0&&ph.h>0){ img.width=ph.w; img.height=ph.h; }
     img.addEventListener('error',()=>{ box.hidden=true; });
+    img.title='Tap to see it larger'; img.addEventListener('click',()=>photoBig(ph));
     box.append(img,el('figcaption',null,'From Wikipedia\'s article on '+ph.title+'. Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where)));
     box.hidden=false; };
   const known=phxOf(s);
@@ -2241,7 +2252,8 @@ function renderDetail(s){
     el('div',{class:'dintro pad'},
     el('p',{class:'sub2',text:[s.name2,s.town,s.years,s.bk==='y'?'Red brick':s.bk==='s'?'Some red brick':''].filter(Boolean).join(' · ')}),
     tags,
-    photoBox(s)));
+    photoBox(s),
+    s.mine?null:(()=>{ const a=morePhotos(s); a.id='d-morephotos'; a.title='Search the web for pictures of this place by its name. Opens outside the Atlas.'; return el('p',{class:'dmore'},a); })()));
   nameFit();
   /* getting there */
   const times=el('div',{class:'times'});
