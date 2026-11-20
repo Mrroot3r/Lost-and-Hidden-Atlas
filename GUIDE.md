@@ -412,6 +412,14 @@ Done so far:
 | Pennsylvania | 385 | 477 | 12,612 | 3,671 | Adams (1533), Allegheny (1192), Chester (506), Cumberland (528), Lancaster (625), Philadelphia (1922), York (511) |
 | Rhode Island | 50 | 106 | 1,012 | 781 | none |
 | Maine | 102 | 87 | 1,218 | 1,612 | none |
+| Maryland | 150 | 265 | 5,965 | 1,616 | Anne Arundel (599), Baltimore (1293), Frederick (693), Montgomery (778), Prince George's (679), Washington (930) |
+| Delaware | 45 | 50 | 1,266 | 690 | New Castle (1020), Sussex (590) |
+| District of Columbia | 3 | 101 | 434 | 700 | Washington (2890): only the first 434 markers, so the District's pockets rest mostly on the Register |
+| Virginia | 295 | 600 | 13,667 | 3,392 | Arlington (515), Fairfax (745), Prince William (720), Richmond (642) |
+| Ohio | 304 | 492 | 11,879 | 4,180 | Cuyahoga (669), Franklin (959), Lucas (533), Montgomery (996) |
+| West Virginia | 117 | 143 | 4,051 | 1,186 | none |
+
+Since November 20, 2026 the layer is being carried to every state, a few at a time (the Register lists and settlement points for all fifty states and the District are already in the maintainer's workspace; the marker lists take the time). `data/pockets.json`, the one file every reader of the layer fetches, was 377 KB with nine states and 605 KB with fifteen: **cut it by state, the way the vanished places and mines are, before it passes about 800 KB.** The Android app carries the detail files of the first nine states only (`XL_BUILT_IN` in `android-app/scripts/make-www.js`) and fetches any other when the map is zoomed in there.
 
 To add a state (about an hour, nearly all of it waiting on step 4):
 
