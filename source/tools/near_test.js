@@ -80,6 +80,29 @@ const { chromium, devices } = require('playwright');
   // kilometres
   await p.click('#tab-near'); await p.click('#lb-opt'); await p.click('#sheet-set'); await p.selectOption('#set-units','km'); await p.click('#sheet-x'); await p.waitForTimeout(600);
   r=await rows(); ok('kilometres: distances and choices switch',/ (m|km)[A-Z]/.test(r[0][1].replace(/^[\d.,]+/,' '))&&/5 km/.test(await p.innerText('#near-r')),r[0][1]+' / '+(await p.innerText('#near-r')).replace(/\s+/g,' '));
+  // ---- "Keep the map on me": it follows while you leave the map alone, lets go when you move the map or tap a place,
+  //      and a tap on Me takes hold again (the owner, November 20, 2026: it yanked the map back while he looked round)
+  { const c2=await b.newContext(Object.assign({},devices['Pixel 7'],{permissions:['geolocation']})); const q=await c2.newPage(); q.on('pageerror',e=>errs.push(e.message));
+    await c2.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await q.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},ui:{base:'streets',view:[42.6526,-73.7562,16],hist:false,lines:{oldrail:false,canal:false,rail:false}}})); }catch(e){} });
+    const P=[42.6526,-73.7562]; let cur=P.slice();
+    const fix=async(dn,de)=>{ cur=[P[0]+dn/111320,P[1]+de/82000]; await c2.setGeolocation({latitude:cur[0],longitude:cur[1],accuracy:6}); await q.waitForTimeout(2300); };
+    await c2.setGeolocation({latitude:P[0],longitude:P[1],accuracy:6}); await q.goto(process.argv[2]||'http://localhost:8766/index.html'); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(800);
+    await q.click('#lb-loc'); await q.waitForTimeout(2500); await fix(3,0);
+    /* where my position is on the screen, in pixels from the middle of the map */
+    const off=()=>q.evaluate(ll=>{ const m=window.__atlasMap, s=m.getSize(), pt=m.latLngToContainerPoint(ll); return {x:Math.round(pt.x-s.x/2),y:Math.round(pt.y-s.y/2),on:document.querySelector('#lb-loc').getAttribute('aria-pressed')}; },cur);
+    let o=await off(); ok('location on: the map is on the dot',!!o&&Math.abs(o.x)<40&&Math.abs(o.y)<60&&o.on==='true',JSON.stringify(o));
+    await q.evaluate(()=>{ window.__atlasMap.panBy([160,0],{animate:false}); }); await q.waitForTimeout(400); await fix(6,0); await fix(9,0);
+    o=await off(); ok('I moved the map so my dot is near the edge: the next fixes do not drag the map back',!!o&&o.x<-120,JSON.stringify(o));
+    await q.evaluate(()=>{ window.__atlasMap.panBy([400,0],{animate:false}); }); await q.waitForTimeout(400); await fix(12,0);
+    o=await off(); ok('nor when the dot is off the screen altogether',!!o&&o.x<-350&&o.on==='true',JSON.stringify(o));
+    await q.click('#lb-loc'); await q.waitForTimeout(1200);
+    o=await off(); ok('a tap on Me brings the map back to the dot and leaves location on',!!o&&Math.abs(o.x)<40&&o.on==='true',JSON.stringify(o));
+    await fix(12,420); await fix(12,430);
+    o=await off(); ok('and it follows again: I walked off the edge and the map came along',!!o&&Math.abs(o.x)<60,JSON.stringify(o));
+    await q.click('#lb-loc'); await q.waitForTimeout(700);
+    ok('a tap on Me while it is following switches location off',await q.getAttribute('#lb-loc','aria-pressed')==='false');
+    await c2.close(); }
   ok('no script errors',errs.length===0,errs.join(' | ').slice(0,300));
   await b.close(); console.log(fails.length?fails.length+' FAILED':'near test passed'); process.exit(fails.length?1:0);
 })().catch(e=>{ console.error(e); process.exit(1); });

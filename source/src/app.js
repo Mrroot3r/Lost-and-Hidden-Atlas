@@ -907,7 +907,7 @@ function buildSheet(){
   if(U.ui.pockets&&POCK){ const all=pockNear(pockList.mode), other=pockList.mode==='other';
     lb.append(ck('pock-r',U.ui.pockR!==false,'Listed buildings','White dots at street level: buildings and sites on the National Register of Historic Places. Tap one for its name',v=>{ U.ui.pockR=v; save(); pockDetail(); }));
     lb.append(ck('pock-m',U.ui.pockM,'Historical markers','Purple dots at street level: roadside plaques from HMdb.org. Many mark something that is gone, so they are off unless you ask',v=>{ U.ui.pockM=v; save(); pockDetail(); }));
-    lb.append(ck('pock-c',U.ui.pockC,'Old town centres only','Hide the other pockets: estates, mill sites, battlefields, campuses',v=>{ U.ui.pockC=v; save(); pockReset(); }));
+    lb.append(ck('pock-o',U.ui.pockO,'Also show other pockets','Dashed rings: estates, mill sites, battlefields, campuses and city neighbourhoods away from the centre. Off unless you ask, because a city has many',v=>{ U.ui.pockO=v; save(); pockReset(); }));
     const seg=el('div',{class:'pockseg'}); [['rich','Richest'],['near','Nearest'],['other','Other pockets']].forEach(m=>seg.append(el('button',{class:'btn sm'+(pockList.mode===m[0]?' on':''),type:'button','aria-pressed':String(pockList.mode===m[0]),onclick:()=>{ pockList={mode:m[0],n:8}; buildSheet(); }},m[1])));
     const from=homePicked()?'your start place':'the middle of the map';
     lb.append(note(other?'Estates, mill sites, battlefields and other pockets within 40 miles of '+from+'.':'Old town centres within 40 miles of '+from+'. Tap one to go there.'),seg);
@@ -1273,7 +1273,7 @@ function xlSet(k,v){ U.ui.xl=U.ui.xl||{}; U.ui.xl[k]=v; save(); if(k==='schools'
      m = markers [lat,lon,HMdb number,title], r = listings [lat,lon,NRIS ref,name,kind,contributing buildings (-1 unknown),year],
      d = district outlines [ref,[[lat,lon]...]]
    A pocket is drawn as one disc; the single markers and listings appear only from zoom 15, and only those in view. */
-let POCK=null, pockGrp=null, pockItems=null, pockLab=null, pockWait=null, pockIdx={}, pockDet={}, pockList={mode:'rich',n:8};
+let POCK=null, pockGrp=null, pockItems=null, pockLab=null, pockMid=null, pockWait=null, pockIdx={}, pockDet={}, pockList={mode:'rich',n:8};
 const PKK={b:'building',d:'historic district',s:'site',t:'structure',o:'object'}, PKS={C:'city',t:'town',v:'village',h:'hamlet'};
 const pockC=k=>k[10]==='c';
 const pockColor=k=>{ const s=k[11]; return !pockC(k)?'#8d86ad':s>=40?'#3b1a9e':s>=25?'#5b3fd6':s>=14?'#7a62e8':'#9d8bf2'; };
@@ -1286,13 +1286,20 @@ const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8
    they are gone through backwards, and the order is put right whenever a disc joins ones already drawn.
    Close in, a disc would tint the whole screen: its fill fades and the ring stays. */
 function pockZoom(){ if(!U.ui.pockets||!pockGrp||!POCK) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
-  const b=map.getBounds().pad(0.3), S=b.getSouth(), N=b.getNorth(), W=b.getWest(), E=b.getEast(), only=U.ui.pockC, want=[];
+  const b=map.getBounds().pad(0.3), S=b.getSouth(), N=b.getNorth(), W=b.getWest(), E=b.getEast(), only=!U.ui.pockO, want=[];
   if(z>=POCKZ) pockNeed(S,W,N,E);
   for(let i=POCK.k.length-1;i>=0;i--){ const k=POCK.k[i], r=k[2]/70000;                      /* its radius in degrees, generously */
-    if(z<POCKZ||z<pockFrom(k)||k[0]+r<S||k[0]-r>N||k[1]+r<W||k[1]-r>E||(only&&!pockC(k))) continue; want.push(k); }
+    if(z<POCKZ||k.thin||z<pockFrom(k)||k[0]+r<S||k[0]-r>N||k[1]+r<W||k[1]-r>E||(only&&!pockC(k))) continue; want.push(k); }
   const had=pockGrp.on.size, added=viewSync(pockGrp,want,k=>{ const tc=pockC(k), c=pockColor(k); k.px=k.f=null;
     const m=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:pockPx(k,z),color:tc?c:'#6d6790',weight:tc?2:1.2,dashArray:tc?null:'3 4',opacity:0.95,fillColor:c,fillOpacity:tc?0.3:0.12,bubblingMouseEvents:false});
-    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,e.latlng); }); return m; });
+    m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; }
+      /* a big disc covers half the screen: only a tap near its middle (the dot) opens its box, so a tap on the park lake inside it does not */
+      const px=pockPx(k,map.getZoom()); if(px>32&&e.latlng&&map.latLngToContainerPoint([k[0],k[1]]).distanceTo(map.latLngToContainerPoint(e.latlng))>Math.max(26,px*0.3)) return;
+      pockPopup(k,L.latLng(k[0],k[1])); }); return m; });
+  /* a dot at the middle of each big disc: what to tap */
+  if(pockMid){ map.removeLayer(pockMid); pockMid=null; }
+  { const g=L.layerGroup(); want.forEach(k=>{ if(pockPx(k,z)<=32) return; const d=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:5,color:'#ffffff',weight:1.5,fillColor:pockColor(k),fillOpacity:0.99,bubblingMouseEvents:false});
+      d.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,L.latLng(k[0],k[1])); }); d.addTo(g); }); if(g.getLayers().length) pockMid=g.addTo(map); }
   if(added&&had) want.forEach(k=>pockGrp.mk.get(k).bringToFront());
   want.forEach(k=>{ const c=pockGrp.mk.get(k), px=Math.round(pockPx(k,z)*2)/2; if(k.px!==px){ k.px=px; c.setRadius(px); } const ff=pockC(k)?f:f*0.4; if(k.f!==ff){ k.f=ff; c.setStyle({fillOpacity:ff}); } }); }
 function pockLoad(quiet){ if(POCK||pockWait) return;
@@ -1307,13 +1314,18 @@ function pockNeed(S,W,N,E){ if(!POCK) return;
     if(b[0]>N||b[2]<S||b[1]>E||b[3]<W) return;
     POCK.got[key]='wait'; const p='data/pock/'+key+'-k-'+o.kh+'.json';
     (AT?AT.fetch(p):fetch(p+'?v='+o.kh)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
-      .then(j=>{ POCK.got[key]=true; POCK.k=POCK.k.concat(j.k||[]).sort((x,y)=>(pockC(y)-pockC(x))||(y[11]-x[11])); pockZoom(); pockDetail(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
+      .then(j=>{ POCK.got[key]=true; POCK.k=POCK.k.concat(j.k||[]).sort((x,y)=>(pockC(y)-pockC(x))||(y[11]-x[11])); pockThin(); pockZoom(); pockDetail(); if(!$('#sheet').hidden&&sheetMode==='map') buildSheet(); nmLoaded(); })
       .catch(()=>{ POCK.got[key]={t:Date.now()}; if(U.ui.pockets) banner('Some town centres could not load here. Check your signal.',true,5000); }); }); }
-/* after "old town centres only" is switched: draw the discs afresh */
+/* In and round a city the small centres crowd the strong one. A town centre scoring under 15 that has a stronger one within
+   3 km is left off the map (k.thin); a weak one with nothing near it stays. The list in Map options and the Near tab keep all. */
+function pockThin(){ const g={}, C=POCK.k.filter(pockC); C.forEach(k=>{ const c=Math.floor(k[0]*20)+','+Math.floor(k[1]*20); (g[c]=g[c]||[]).push(k); });
+  C.forEach(k=>{ k.thin=false; if(k[11]>=15) return; const a=Math.floor(k[0]*20), b=Math.floor(k[1]*20);
+    for(let i=a-1;i<=a+1&&!k.thin;i++) for(let j=b-2;j<=b+2&&!k.thin;j++) (g[i+','+j]||[]).forEach(o=>{ if(o!==k&&o[11]>k[11]&&hav(k[0],k[1],o[0],o[1])<1.864) k.thin=true; }); }); }
+/* after "also show other pockets" is switched: draw the discs afresh */
 function pockReset(){ if(pockGrp){ map.removeLayer(pockGrp.grp); pockGrp=null; } if(POCK) POCK.k.forEach(k=>{ k.f=null; k.px=null; }); drawPockets(); }
 function drawPockets(){
   if(!map) return;
-  if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp.grp); [pockItems,pockLab].forEach(g=>{ if(g) map.removeLayer(g); }); pockItems=pockLab=null; return; }
+  if(!U.ui.pockets){ if(pockGrp) map.removeLayer(pockGrp.grp); [pockItems,pockLab,pockMid].forEach(g=>{ if(g) map.removeLayer(g); }); pockItems=pockLab=pockMid=null; return; }
   if(!POCK){ pockLoad(); return; }
   if(!lineCanvas){ map.createPane('lines').style.zIndex=380; lineCanvas=L.canvas({pane:'lines',tolerance:7}); }
   if(!pockGrp){ pockGrp=viewDots(); if(!map._pockOn){ map._pockOn=true; map.on('moveend',()=>{ pockZoom(); pockDetail(); }); } }
@@ -1324,7 +1336,7 @@ function pockLabels(){
   if(pockLab){ map.removeLayer(pockLab); pockLab=null; }
   const z=map.getZoom(); if(!U.ui.pockets||!POCK||z<10) return;
   const b=map.getBounds(), cap=z>=13?22:14, g=L.layerGroup(), put=[]; let n=0;
-  for(const k of POCK.k){ if(!pockC(k)||n>=cap) break; if(z<pockFrom(k)||!b.contains([k[0],k[1]])) continue;
+  for(const k of POCK.k){ if(!pockC(k)||n>=cap) break; if(k.thin||z<pockFrom(k)||!b.contains([k[0],k[1]])) continue;
     const pt=map.latLngToContainerPoint([k[0],k[1]]), r=Math.round(pockPx(k,z)+2), w=k[7].length*6.6+8, box=[pt.x-w/2,pt.y-r-15,pt.x+w/2,pt.y-r];
     if(put.some(q=>box[0]<q[2]&&box[2]>q[0]&&box[1]<q[3]&&box[3]>q[1])) continue; put.push(box); n++;
     L.marker([k[0],k[1]],{interactive:false,keyboard:false,icon:L.divIcon({className:'pocklab',iconSize:[0,0],html:el('span',{style:'transform:translate(-50%,calc(-100% - '+r+'px))',text:k[7]})})}).addTo(g); }
@@ -1353,19 +1365,17 @@ function pockDetail(){
 function pockCounts(k){ const a=[]; if(k[3]) a.push(k[3]+' historical marker'+(k[3]>1?'s':'')+(k[9]&&k[9]*1.5<k[3]?' at '+k[9]+' spot'+(k[9]>1?'s':''):'')); if(k[4]) a.push(k[4]+' listed place'+(k[4]>1?'s':'')); if(k[5]) a.push(k[5]+' historic district'+(k[5]>1?'s':'')+(k[6]?' ('+k[6]+' buildings)':'')); return a.join(' · '); }
 function pockPopup(k,latlng){
   const tc=pockC(k);
+  /* a small box: the name, what it is and its score, the counts, one button (it used to fill a phone's screen) */
   const box=el('div',{class:'ctx'},el('b',{text:k[7]}),
-    el('span',{style:'color:#5b6660',text:(tc?'Old town centre'+(PKS[k[13]]?' ('+PKS[k[13]]+')':''):'A pocket of markers and listings')+' · score '+Math.round(k[11])}),
-    el('span',{style:'color:#5b6660',text:pockCounts(k)}));
-  if(k[12]) box.append(el('span',{style:'color:#5b6660',text:'Its dated plaques mostly speak of the '+k[12]+'.'}));
-  box.append(el('span',{style:'color:#5b6660',text:tc?'Ranked by how much still stands on the National Register and how old the plaques are. A guide to where to walk, not a promise.':'Many plaques mark something that is gone, so walk it and look.'}),
-    el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); map.setView([k[0],k[1]],Math.max(map.getZoom(),16)); }},'Zoom in to see each one'));
-  scoutLinks({lat:k[0],lon:k[1]}).slice(0,2).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
-  L.popup({maxWidth:270}).setLatLng(latlng||[k[0],k[1]]).setContent(box).openOn(map); }
+    el('span',{style:'color:#5b6660',text:(tc?'Old town centre'+(PKS[k[13]]?' ('+PKS[k[13]]+')':''):'Pocket of markers and listings')+' · score '+Math.round(k[11])}),
+    el('span',{style:'color:#5b6660',text:pockCounts(k)}),
+    el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); map.setView([k[0],k[1]],Math.max(map.getZoom(),16)); }},'Zoom in'));
+  L.popup({maxWidth:250}).setLatLng(latlng||[k[0],k[1]]).setContent(box).openOn(map); }
 function pockItemPopup(t,x){
   const pt={lat:x[0],lon:x[1]}, name=x[3]||'Unnamed';
   const box=el('div',{class:'ctx'},el('b',{text:name}));
-  if(t==='m'){ box.append(el('span',{style:'color:#5b6660',text:'Historical marker. From HMdb.org, the Historical Marker Database.'}), ext('https://www.hmdb.org/m.asp?m='+x[2],'Read the marker on HMdb.org','btn sm')); }
-  else { box.append(el('span',{style:'color:#5b6660',text:'National Register of Historic Places: '+(PKK[x[4]]||'listing')+(x[6]?', listed '+x[6]:'')+(x[5]>1?', '+x[5]+' contributing buildings':'')+'. The position is approximate and the listing may no longer stand.'}), ext('https://npgallery.nps.gov/AssetDetail/NRIS/'+x[2],'National Park Service record','btn sm')); }
+  if(t==='m'){ box.append(el('span',{style:'color:#5b6660',text:'Historical marker · HMdb.org'}), ext('https://www.hmdb.org/m.asp?m='+x[2],'Read the marker on HMdb.org','btn sm')); }
+  else { box.append(el('span',{style:'color:#5b6660',text:'National Register of Historic Places: '+(PKK[x[4]]||'listing')+(x[6]?', listed '+x[6]:'')+(x[5]>1?', '+x[5]+' contributing buildings':'')+'. Position approximate; it may be gone.'}), ext('https://npgallery.nps.gov/AssetDetail/NRIS/'+x[2],'National Park Service record','btn sm')); }
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); openForm({lat:x[0],lon:x[1],name:name,story:(t==='m'?'From a historical marker listed on HMdb.org (marker '+x[2]+').':'From a National Register listing (reference '+x[2]+').')+' Not checked yet.'}); }},'+ Add to my places'));
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(pt)},'Whose land is it?'));
   L.popup({maxWidth:270}).setLatLng([x[0],x[1]]).setContent(box).openOn(map); }
@@ -1473,18 +1483,23 @@ function gpsFilter(c,t){
 function locate(){
   const mark=on=>{ const b=$('#lb-loc'); if(b) b.setAttribute('aria-pressed',String(on)); if(!on) geo.acc=null; setTimeout(()=>nmDraw(true),0); };
   if(geo.id!==null){
-    if(rec){ if(geo.ll) map.setView(geo.ll,Math.max(map.getZoom(),16)); banner('Location stays on while a field log is recording.',false,4000); return; }
+    if(rec){ if(geo.ll){ geo.fol=true; geo.auto=true; map.setView(geo.ll,Math.max(map.getZoom(),16)); } banner('Location stays on while a field log is recording.',false,4000); return; }
+    /* the map had let go of the dot (you moved it away): this tap takes hold again. A tap while it is holding switches location off. */
+    if(geo.fol===false&&geo.ll){ geo.fol=true; geo.auto=true; map.panTo(geo.ll,{animate:true,duration:0.5}); banner('Back on your dot, and following it. Tap Me once more to switch location off.',false,5000); return; }
     navigator.geolocation.clearWatch(geo.id); geo.id=null; geo.f=null; geo.ll=null; mark(false); nearMoved();
     if(U.last){ placeDot(U.last.ll,false); saveNow(); banner('Location off. The grey dot marks where you last were.',false,4000); }
     return; }
   const fail=msg=>{ if(geo.id!==null){ try{ navigator.geolocation.clearWatch(geo.id); }catch(e){} } geo.id=null; geo.f=null; geo.ll=null; mark(false); nearMoved(); if(geo.dot&&U.last) placeDot(U.last.ll,false); banner(msg,true,12000); if(rec&&!NATIVE) stopLog(); };
   if(!navigator.geolocation){ fail('This browser has no location service.'); return; }
   geo.first=true; geo.f=null; mark(true); banner('Finding you…',false,6000);
+  if(!map._folOn){ map._folOn=true; map.on('moveend',()=>{ if(geo.id!==null&&geo.ll&&geo.fol&&!geo.auto&&!map.getBounds().pad(-0.12).contains(geo.ll)) geo.fol=false; geo.auto=false; }); }
   try{ geo.id=navigator.geolocation.watchPosition(g=>{ const c=g.coords, t=g.timestamp||Date.now(), p=gpsFilter(c,t); if(!p) return;
       const was=geo.ll; geo.ll=p; U.last={ll:[+p[0].toFixed(6),+p[1].toFixed(6)],t:Date.now()}; saveSlow(); placeDot(p,true); nearMoved(); recPoint(p,c.accuracy||50,t); geo.acc=c.accuracy||50; nmFix(p,geo.acc);
-      /* follow: if the dot was on screen and has now walked off it, bring the map along */
-      if(pref('follow')&&!geo.first&&was&&!dragging){ const inner=map.getBounds().pad(-0.12); if(!inner.contains(p)&&map.getBounds().contains(was)) map.panTo(p,{animate:true,duration:0.6}); }
-      if(geo.first){ geo.first=false; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,geo.wide?10:Math.max(map.getZoom(),16)); geo.wide=false; }
+      /* follow: while the map has hold of the dot (geo.fol) and the dot walks off the screen, bring the map along. The map
+         lets go the moment you move it so that the dot is at the edge or off it, by a drag or by tapping a place, and stays
+         let go until you tap Me: before November 20, 2026 the next fix dragged the map back while you were looking elsewhere. */
+      if(pref('follow')&&geo.fol&&!geo.first&&was&&!dragging){ if(!map.getBounds().pad(-0.12).contains(p)){ geo.auto=true; map.panTo(p,{animate:true,duration:0.6}); } }
+      if(geo.first){ geo.first=false; geo.fol=true; geo.auto=true; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,geo.wide?10:Math.max(map.getZoom(),16)); geo.wide=false; }
     },e=>{ if(e&&e.code===1){ fail(LOCAL||HOSTED?'Location was refused. Allow it for this page in your browser settings, then tap again.':'This online copy is not allowed to use your location. It works when the Atlas is opened as a file or from your own web address.'); return; }
       if(geo.f) return;   /* a passing timeout after we already had a fix: keep listening */
       fail('Could not get a GPS fix. Step into the open and try again.'); },
