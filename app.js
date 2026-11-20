@@ -62,7 +62,7 @@ const debounce=(f,ms)=>{ let t; return function(){ const a=arguments; clearTimeo
 
 /* ---------- your saved data (this browser only) ---------- */
 const LS='lost-hidden-atlas-v1';
-const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:true,canal:true,rail:false}}});
+const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],mute:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:false,canal:false,rail:false}}});
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
@@ -726,6 +726,7 @@ const ICON={
   land:'<path d="M12 3l5 7h-3l4 6H6l4-6H7zM12 16v5"/>',
   lots:'<path d="M4 4h16v16H4zM4 11h16M11 4v7M15 11v9"/>',
   leads:'<path d="M12 21s-6-5.500-6-10a6 6 0 1 1 12 0c0 4.500-6 10-6 10z"/><path d="M12 8v3.500M12 14h.01"/>',
+  pock:'<circle cx="12" cy="12" r="8.500"/><path d="M8.500 15.500v-5l3.500-2.500 3.500 2.500v5zM11 15.500v-2.500h2v2.500"/>',
   cmp:'<path d="M12 3v18M4 6h5v12H4zM15 6h5v12h-5z"/>',
   who:'<circle cx="9" cy="8" r="3.500"/><path d="M3 20c0-3.500 2.500-6 6-6 1.500 0 2.800.400 3.800 1.200M17 13v.01M17 16v5M14.500 9.500a2.500 2.500 0 1 1 3.500 2.300"/>',
   opt:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',
@@ -735,13 +736,13 @@ const ICON={
 };
 function ico(k){ const s=document.createElement('span'); s.className='ic'; s.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>'; return s; }
 const BAR=[['streets','Streets','Street map'],['leaf','Leaf-off','Leaf-off aerial: spring flights with bare trees'],['lidar','LiDAR','LiDAR terrain: bare ground with the trees stripped off'],['sat','Satellite','Satellite imagery'],['topo','Topo','Current USGS topo map'],['oldtopo','Old topo','USGS paper maps, 1940s to 1980s'],
-  ['rails','Old rails','Old railroad and trolley lines'],['canal','Canals','Canals, old and current'],['hist','Old map','Lay the old survey sheet over the selected place'],['land','Public land','Shade public and protected land by access'],['lots','Lot lines','Property lines (New York and Massachusetts, zoom in close)'],['leads','Leads','Unchecked ruins, mines and kilns from OpenStreetMap'],
+  ['rails','Old rails','Old railroad and trolley lines'],['canal','Canals','Canals, old and current'],['hist','Old map','Lay the old survey sheet over the selected place'],['land','Public land','Shade public and protected land by access'],['lots','Lot lines','Property lines (New York and Massachusetts, zoom in close)'],['leads','Leads','Yellow dots: ruins and old sites mapped on OpenStreetMap that nobody has checked for the Atlas. Vanished places and old mines are separate switches under More'],['pock','Old towns','Purple discs: old town centres and other pockets of listed buildings and historical markers. Zoom in to street level for the single buildings'],
   ['cmp','Compare','Compare two layers: tap for a divider to drag, again to lay one over the other, again to stop'],['who','Owner?','Tap the map to see whose land it is']];
 let asking=false, lotLayer=null;
 function barState(k){
   if(LD[k]) return !schematic&&U.ui.base===k;
   if(k==='rails') return !!U.ui.lines.oldrail; if(k==='canal') return !!U.ui.lines.canal;
-  if(k==='hist') return !!U.ui.hist; if(k==='land') return !!U.ui.land; if(k==='lots') return !!U.ui.lots; if(k==='leads') return !!U.ui.leads;
+  if(k==='hist') return !!U.ui.hist; if(k==='land') return !!U.ui.land; if(k==='lots') return !!U.ui.lots; if(k==='leads') return !!U.ui.leads; if(k==='pock') return !!U.ui.pockets;
   if(k==='cmp') return cmp.on; if(k==='who') return asking; return false; }
 function barTap(k){
   if(!map) return;
@@ -755,6 +756,7 @@ function barTap(k){
   else if(k==='land'){ U.ui.land=!U.ui.land; save(); drawLand(); if(U.ui.land) banner(map.getZoom()<11?'Public land is on. Zoom in to see it.':'Green is open to the public, amber is restricted, red is closed. Purple has no access on record.',false,7000); }
   else if(k==='lots'){ U.ui.lots=!U.ui.lots; save(); drawLots(); if(U.ui.lots) banner(map.getZoom()<15?'Lot lines are on. Zoom in close to see them. New York and Massachusetts.':'Orange lines are property lines. Tap Owner? and then a lot to see who owns it.',false,7000); }
   else if(k==='leads'){ U.ui.leads=!U.ui.leads; save(); drawLeads(); if(U.ui.leads) banner(map.getZoom()<LEADZ?'Leads are on. Zoom in to see them: yellow dots, unchecked ruins and old sites from OpenStreetMap.':'Yellow dots are unchecked ruins, mines, kilns and quarries from OpenStreetMap. Tap one.',false,7000); }
+  else if(k==='pock'){ U.ui.pockets=!U.ui.pockets; save(); drawPockets(); if(U.ui.pockets) banner(map.getZoom()<POCKZ?'Old town centres are on. Zoom in to see them: purple discs, from about the 20-mile scale.':'Purple discs are old town centres and other pockets of listed buildings. Tap one, or zoom in to street level.',false,7000); }
   else if(k==='cmp'){ cmpTap(); }
   else if(k==='who'){ setAsking(!asking); }
   syncBar(); }
@@ -837,6 +839,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     tog('quietGone','No buzz for places with nothing to see','Places marked "Nothing visible" or "Marker only" are still listed in the Near tab, but do not buzz.'),
     tog('buzzVanished','Buzz for vanished places too','The orange dots: places the federal names file marks as gone. Off, they are listed in the Near tab but never buzz. Turn it on when you want to go and see whether anything is left.'),
     el('small',{class:'snote',text:'Which kinds count (places, leads, vanished places, mines, town centres) is chosen with the chips at the top of the Near tab.'}),
+    el('div',{class:'field setrow'},el('span',{id:'set-muted',text:(U.mute&&U.mute.length?U.mute.length+(U.mute.length===1?' place is':' places are')+' silenced: listed in the Near tab, never buzzing.':'No single place is silenced. To silence one (the one by your house, say), tap it in the Near tab, then "Never buzz here".')}),U.mute&&U.mute.length?el('button',{class:'btn sm',id:'set-unmute',type:'button',onclick:()=>{ U.mute=[]; saveNow(); NM.ver++; NM.in.clear(); nmPush(true); showSettings(true); }},'Let them all buzz again'):null),
     H('Field log'),
     pick('detail','Track detail',[['fine','Fine: a point every 2 m'],['normal','Normal: every 4 m'],['coarse','Coarse: every 10 m']],NATIVE?'Coarse also checks GPS less often, which saves some battery on long days. Takes effect on the next recording.':'Takes effect on the next recording.'),
     NATIVE?tog('buzz','Vibrate on "Mark here"','A short buzz so you know the pin was dropped without looking.'):null,
@@ -857,10 +860,9 @@ function buildSheet(){
   if(sheetMode==='set') return;
   const lb=$('#sheet-b'), keep=lb.scrollTop; lb.textContent=''; lb.classList.remove('guide'); lb.classList.toggle('tips',!!U.ui.tips);
   /* the sheet lists every switch and nothing else; the small print under each shows only when asked for */
-  lb.append(el('button',{class:'btn sm',id:'sheet-tips',type:'button','aria-pressed':String(!!U.ui.tips),onclick:()=>{ U.ui.tips=!U.ui.tips; save(); buildSheet(); }},U.ui.tips?'Hide the explanations':'What do these do?'));
+  lb.append(el('button',{class:'btn sm '+(U.ui.tips?'on':'pri'),id:'sheet-tips',type:'button','aria-pressed':String(!!U.ui.tips),onclick:()=>{ U.ui.tips=!U.ui.tips; save(); buildSheet(); }},U.ui.tips?'Hide the explanations':'What do these do?'));
   const H=t=>el('h3',{text:t}), note=t=>el('small',{class:'snote',text:t});
-  lb.append(el('div',{class:'legend pinkey'},el('span',null,el('span',{class:'dot star',style:'--c:var(--mute)'}),'Standing'),el('span',null,el('span',{class:'dot',style:'--c:var(--mute)'}),'Ruins or traces'),el('span',null,el('span',{class:'dot hollow',style:'--c:var(--mute)'}),'Nothing left'),el('span',{class:'lkhint',text:'Colour: the kind of place'})));
-  const ck=(id,on,label,sub,fn)=>el('label',{class:'lopt',for:id},el('input',{type:'checkbox',id:id,checked:!!on,onchange:e=>fn(e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null));
+  const ck=(id,on,label,sub,fn)=>el('label',Object.assign({class:'lopt',for:id},sub?{title:sub}:{}),el('input',{type:'checkbox',id:id,checked:!!on,onchange:e=>fn(e.target.checked)}),el('span',null,label,sub?el('small',null,sub):null));
   if(schematic){ lb.append(el('p',{style:'margin:8px 0 0',text:LOCAL?'Live imagery could not load, so the map is showing a built-in outline. Old-map overlays and every scouting link still work. Reload when you are back online.':'This online copy cannot load live imagery, so the map is a built-in outline. Old-map overlays and every scouting link still work. Open the Atlas file, or host it, for satellite, leaf-off, LiDAR, public land and owner lookups.'})); }
   else {
     lb.append(H('Leaf-off aerial'));
@@ -893,16 +895,18 @@ function buildSheet(){
     lb.append(note('Tap Owner? on the bar, then tap the map, to see the public-land unit and the parcel owner at that spot. Long-press the map for the same thing. Massachusetts is covered statewide; in New York not every county shares owner names.'));
   }
   lb.append(H('Leads'));
-  lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Ruins, mines, kilns, quarries and old farms mapped by OpenStreetMap volunteers. Nobody has checked them for the Atlas',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); if(v&&map&&map.getZoom()<LEADZ) banner('Zoom in to see them: they show from about state level.',false,5000); }));
-  lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone. Orange dots, from town level in. Nine Northeast states, Missouri and Kansas',v=>{ xlSet('vanished',v); buildSheet(); }));
+  lb.append(ck('leads-on',U.ui.leads,'Unchecked leads','Yellow dots: ruins, abandoned buildings, kilns, quarries and old farms that OpenStreetMap volunteers have mapped. Nobody has checked them for the Atlas, so one may be a fine ruin or nothing at all. Every state and province',v=>{ U.ui.leads=v; save(); drawLeads(); syncBar(); if(v&&map&&map.getZoom()<LEADZ) banner('Zoom in to see them: they show from about state level.',false,5000); }));
+  lb.append(ck('xl-vanished',xlOn('vanished'),'Vanished places','Hamlets, churches, forts, airfields, hospitals and post offices the federal names file marks as gone: usually nothing is left, sometimes a cellar hole or a cemetery. Orange dots, from town level in. Every state; nobody has checked them',v=>{ xlSet('vanished',v); buildSheet(); }));
   if(xlOn('vanished')) lb.append(ck('xl-schools',U.ui.xl&&U.ui.xl.schools,'Old school sites too','Mostly one-room schoolhouses. There are thousands, so they are off unless you ask',v=>xlSet('schools',v)));
-  lb.append(ck('xl-mines',xlOn('mines'),'Old mines and quarries','Iron mines, quarries, clay pits and prospects from the U.S. Geological Survey. Grey dots, from town level in. Positions are rough',v=>xlSet('mines',v)));
+  lb.append(ck('xl-mines',xlOn('mines'),'Old mines and quarries','Iron mines, quarries, clay pits and prospects from U.S. Geological Survey records, most long closed. Grey dots, from town level in. Positions are rough and nobody has checked them; a separate kind of hunting from old buildings',v=>xlSet('mines',v)));
   lb.append(H('Found on LiDAR'));
   lb.append(ck('walls-on',U.ui.walls,'Stone walls','Low straight ridges a program picked out of the LiDAR ground model: field walls, yard walls, walled lanes. Zoom in to street level to see each one; zoomed out, shaded squares show where they are thick, which is where the old farms were. Only pieces that line up into a run, a corner or a yard are drawn; stray short pieces are left out, and so is everything on ground too rough to trust. Unchecked: some are ditch banks or old road edges, and many walls are missed. Only on the public land that has been swept so far'+(WALLS?' ('+WALLS.units.length+' forests and parks, '+WALLS.km+' km of wall)':''),v=>{ U.ui.walls=v; save(); drawWalls(); buildSheet(); }));
   if(U.ui.walls||U.ui.tips) lb.append(el('div',{class:'lkeys'},el('span',{class:'lkey'},el('span',{class:'sw',style:'--c:#ff7a1a'}),'A wall found on LiDAR'),el('span',{class:'lkey'},el('span',{class:'sw',style:'--c:#c2410c;opacity:.5;height:9px'}),'Ground with many walls')));
   lb.append(H('Places with history'));
-  lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Old town centres, and other places where historical markers and National Register listings bunch together. Purple discs; zoom in to see each marker and listing',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); }));
+  lb.append(ck('pock-on',U.ui.pockets,'Historic pockets','Purple discs: old town centres, and other places where historical markers and National Register listings bunch together. They show from the 20-mile scale in; zoom in to street level for the single buildings',v=>{ U.ui.pockets=v; save(); drawPockets(); buildSheet(); syncBar(); }));
   if(U.ui.pockets&&POCK){ const all=pockNear(pockList.mode), other=pockList.mode==='other';
+    lb.append(ck('pock-r',U.ui.pockR!==false,'Listed buildings','White dots at street level: buildings and sites on the National Register of Historic Places. Tap one for its name',v=>{ U.ui.pockR=v; save(); pockDetail(); }));
+    lb.append(ck('pock-m',U.ui.pockM,'Historical markers','Purple dots at street level: roadside plaques from HMdb.org. Many mark something that is gone, so they are off unless you ask',v=>{ U.ui.pockM=v; save(); pockDetail(); }));
     lb.append(ck('pock-c',U.ui.pockC,'Old town centres only','Hide the other pockets: estates, mill sites, battlefields, campuses',v=>{ U.ui.pockC=v; save(); pockReset(); }));
     const seg=el('div',{class:'pockseg'}); [['rich','Richest'],['near','Nearest'],['other','Other pockets']].forEach(m=>seg.append(el('button',{class:'btn sm'+(pockList.mode===m[0]?' on':''),type:'button','aria-pressed':String(pockList.mode===m[0]),onclick:()=>{ pockList={mode:m[0],n:8}; buildSheet(); }},m[1])));
     const from=homePicked()?'your start place':'the middle of the map';
@@ -1275,6 +1279,7 @@ const pockC=k=>k[10]==='c';
 const pockColor=k=>{ const s=k[11]; return !pockC(k)?'#8d86ad':s>=40?'#3b1a9e':s>=25?'#5b3fd6':s>=14?'#7a62e8':'#9d8bf2'; };
 function pockPx(k,z){ const real=k[2]/(156543.03392*Math.cos(rad(k[0]))/Math.pow(2,z)); return Math.max(real,pockC(k)?5+Math.min(8,k[11]/6):3.5+Math.min(4,k[11]/9)); }
 /* Zoomed out, only the richest show, or a state full of old villages is one purple smear: each disc has a zoom it appears from. */
+const POCKZ=8;      /* no disc wider than the 20-mile scale: out there the grouped pins already say where the places are */
 const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8?10:11):(s>=25?9:s>=15?10:11); };
 /* The discs on the map are only those in or near the view, from the zoom each appears at (viewDots, above, says why: there
    are some four thousand). Plain pockets lie underneath and the richest town centres on top: the rows come best first, so
@@ -1283,7 +1288,7 @@ const pockFrom=k=>{ const s=k[11]; return pockC(k)?(s>=30?0:s>=22?8:s>=14?9:s>=8
 function pockZoom(){ if(!U.ui.pockets||!pockGrp||!POCK) return; const z=map.getZoom(), f=z>=16?0.03:z>=14?0.12:0.3;
   const b=map.getBounds().pad(0.3), S=b.getSouth(), N=b.getNorth(), W=b.getWest(), E=b.getEast(), only=U.ui.pockC, want=[];
   for(let i=POCK.k.length-1;i>=0;i--){ const k=POCK.k[i], r=k[2]/70000;                      /* its radius in degrees, generously */
-    if(z<pockFrom(k)||k[0]+r<S||k[0]-r>N||k[1]+r<W||k[1]-r>E||(only&&!pockC(k))) continue; want.push(k); }
+    if(z<POCKZ||z<pockFrom(k)||k[0]+r<S||k[0]-r>N||k[1]+r<W||k[1]-r>E||(only&&!pockC(k))) continue; want.push(k); }
   const had=pockGrp.on.size, added=viewSync(pockGrp,want,k=>{ const tc=pockC(k), c=pockColor(k); k.px=k.f=null;
     const m=L.circleMarker([k[0],k[1]],{pane:'lines',renderer:lineCanvas,radius:pockPx(k,z),color:tc?c:'#6d6790',weight:tc?2:1.2,dashArray:tc?null:'3 4',opacity:0.95,fillColor:c,fillOpacity:tc?0.3:0.12,bubblingMouseEvents:false});
     m.on('click',e=>{ if(adding||pickingHome||asking){ onMapClick(e); return; } pockPopup(k,e.latlng); }); return m; });
@@ -1324,11 +1329,11 @@ function pockFetch(key){ const d=pockDet[key]; if(d&&(d==='wait'||d.m||Date.now(
 function pockDetail(){
   pockLabels();
   if(pockItems){ map.removeLayer(pockItems); pockItems=null; }
-  if(!U.ui.pockets||!POCK||map.getZoom()<15) return;
+  if(!U.ui.pockets||!POCK||map.getZoom()<15||(!U.ui.pockM&&U.ui.pockR===false)) return;
   const c=map.getCenter(), need={}; POCK.k.forEach(k=>{ if(!need[k[8]]&&Math.abs(k[0]-c.lat)<0.25&&Math.abs(k[1]-c.lng)<0.35) need[k[8]]=1; }); Object.keys(need).forEach(pockFetch);
   const b=map.getBounds().pad(0.15), g=L.layerGroup(); let n=0;
   for(let i=Math.floor(b.getSouth()*50);i<=Math.floor(b.getNorth()*50);i++) for(let j=Math.floor(b.getWest()*50);j<=Math.floor(b.getEast()*50);j++) (pockIdx[i+','+j]||[]).forEach(q=>{ const x=q[1];
-    if(q[0]==='d'){ L.polygon(x[2][1],{pane:'lines',renderer:lineCanvas,color:'#5b3fd6',weight:1.5,dashArray:'5 5',fill:false,interactive:false}).addTo(g); return; }
+    if(q[0]==='d'||(q[0]==='m'?!U.ui.pockM:U.ui.pockR===false)) return;      /* district outlines are no longer drawn: a box round half a city told nobody anything */
     if(n>700||!b.contains([x[0],x[1]])) return; n++;
     const mk=q[0]==='m'?L.circleMarker([x[0],x[1]],{pane:'lines',renderer:lineCanvas,radius:4.5,color:'#ffffff',weight:1.5,fillColor:'#5b3fd6',fillOpacity:1,bubblingMouseEvents:false})
                        :L.circleMarker([x[0],x[1]],{pane:'lines',renderer:lineCanvas,radius:5.5,color:'#3b1a9e',weight:2,fillColor:'#ffffff',fillOpacity:1,bubblingMouseEvents:false});
@@ -1573,16 +1578,19 @@ function nmDraw(now){ if(view!=='near') return; const v=$('#v-near'); if(!v||!v.
   const g=$('#near-goal'), G=NM.goal; g.textContent=''; g.hidden=!G;
   if(G){ const far=o?hav(o.p[0],o.p[1],G.la,G.lo):null, b=o?brg(o.p[0],o.p[1],G.la,G.lo):0;
     g.append(...[o?nmArrow(b,true):null,el('div',null,el('b',{class:'nmbig',text:o?nmDist(far)+' '+dirTxt(b):'Waiting for your position'}),el('span',{text:G.n}),el('small',{text:G.t})),
-      el('div',{class:'nmgo'},btn('Details',()=>nmOpen(G)),btn('Stop',()=>nmGoal(null)))].filter(Boolean)); nmGoalDraw(); }
+      el('div',{class:'nmgo'},btn('Details',()=>nmOpen(G)),G.k==='c'?null:el('button',{class:'btn sm'+(nmMuted(G.id)?' on':''),id:'near-mute',type:'button','aria-pressed':String(nmMuted(G.id)),title:'A silenced place stays in this list but never sets off the alert. For the one beside your own house.',onclick:()=>{ const on=!nmMuted(G.id); nmMute(G.id,on); banner(on?'Silenced: '+G.n+' will not buzz again. Undo it here or in Settings.':G.n+' can buzz again.',false,5000); }},nmMuted(G.id)?'Silenced: undo':'Never buzz here'),btn('Stop',()=>nmGoal(null)))].filter(Boolean)); nmGoalDraw(); }
   if(o&&!all.length) ul.append(el('li',{class:'empty pad',text:Object.keys(wait).some(k=>S.k[k]&&wait[k])?'Loading the lead lists…':'Nothing on file within '+nmLab(NMR,S.r)+'. Try a wider circle, or switch on more kinds above.'}));
   const cap=NM.more?400:60, frag=document.createDocumentFragment();
   all.slice(0,cap).forEach(x=>frag.append(el('li',null,el('button',{class:'item pad nmitem'+(G&&G.id===x.id?' cur':''),type:'button','data-id':x.id,onclick:()=>nmGoal(x,true)},
-    nmArrow(x.b),el('span',null,el('b',{text:x.n}),el('small',null,el('span',{class:'sw',style:'--c:'+NMK[x.k][1]}),x.t)),el('span',{class:'mins'},nmDist(x.mi),el('i',{text:dirTxt(x.b)}))))));
+    nmArrow(x.b),el('span',null,el('b',{text:x.n}),el('small',null,el('span',{class:'sw',style:'--c:'+NMK[x.k][1]}),x.t+(nmMuted(x.id)?' · silenced':''))),el('span',{class:'mins'},nmDist(x.mi),el('i',{text:dirTxt(x.b)}))))));
   ul.append(frag); if(all.length>cap) ul.append(el('li',{class:'pad',style:'padding-block:10px'},btn('Show all '+all.length,()=>{ NM.more=true; nmDraw(true); })));
   v.scrollTop=top; }
 /* every GPS fix comes through here: refresh the list, and alert when something has come within range */
 /* may this target buzz? Town centres never; places with nothing to see and vanished places only when Settings say so */
-const nmBuzzes=x=>x.k!=='c'&&!(x.k==='p'&&pref('quietGone')&&nothingToSee(x.o))&&!(x.k==='v'&&!pref('buzzVanished'));
+/* one target silenced for good (the place beside your own house): U.mute holds its Near id. It stays in the list. */
+const nmMuted=id=>Array.isArray(U.mute)&&U.mute.indexOf(id)>=0;
+function nmMute(id,on){ U.mute=(Array.isArray(U.mute)?U.mute:[]).filter(x=>x!==id); if(on) U.mute.push(id); saveNow(); NM.ver++; NM.in.delete(id); nmPush(true); if(view==='near') nmDraw(true); }
+const nmBuzzes=x=>!nmMuted(x.id)&&x.k!=='c'&&!(x.k==='p'&&pref('quietGone')&&nothingToSee(x.o))&&!(x.k==='v'&&!pref('buzzVanished'));
 function nmFix(p,acc){ nmDraw(NM.org==='me'&&NM.how!=='live'); if(NM.goal) nmGoalDraw(); const S=nmSet(); if(!S.al) return; nmEnsure(); if(NATIVE&&rec) nmPush(false); if(acc>35) return;
   let hit=null, more=0; nmCands(p).forEach(x=>{ if(!nmBuzzes(x)) return; const m=hav(p[0],p[1],x.la,x.lo)*1609.344;
     if(m<=S.al){ if(!NM.in.has(x.id)){ NM.in.add(x.id); if(!hit||m<hit.m){ if(hit) more++; hit={x:x,m:m}; } else more++; } } else if(m>S.al*2+30) NM.in.delete(x.id); });
@@ -2040,8 +2048,8 @@ function syncMarkers(){
   if(sig===clusSig&&(!sig||clusLayer)) return; clusSig=sig;
   if(clusLayer){ map.removeLayer(clusLayer); clusLayer=null; }
   if(plan&&plan.groups.length){ clusLayer=L.layerGroup();
-    plan.groups.forEach(c=>{ const n=c.ids.length, d=n<10?30:n<40?36:42;
-      const m=L.marker([c.la/n,c.lo/n],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'clus',html:String(n),iconSize:[d,d],iconAnchor:[d/2,d/2]})});
+    plan.groups.forEach(c=>{ const n=c.ids.length, st=n<10?0:n<30?1:n<100?2:n<300?3:4, d=[30,36,42,46,52][st];      /* colour and size by count, cool to hot (app.css, .clus.c0 to .c4) */
+      const m=L.marker([c.la/n,c.lo/n],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'clus c'+st,html:String(n),iconSize:[d,d],iconAnchor:[d/2,d/2]})});
       m.bindTooltip(n+' places. Tap to zoom in',{direction:'top',offset:[0,-d/2]});
       m.on('click',()=>{ if(adding||pickingHome) return; dblFrom={t:Date.now(),z:map.getZoom()}; map.fitBounds(L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25),{maxZoom:Math.max(map.getZoom()+2,CLUSZ+1)}); });
       m.on('dblclick',()=>{ if(adding||pickingHome) return; dblGroup(L.latLngBounds([c.a,c.c],[c.b,c.d]),m.getLatLng()); });
