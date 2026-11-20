@@ -11,7 +11,6 @@ Fifteen places spread across Virginia, which had only Belle Isle: Bacon's Castle
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Catherine Furnace | near Newport, Page County, VA (38.55778, -78.63583) | 32-foot pyramidal iron furnace of 1836 in the George Washington National Forest, abandoned 1885 (Wikipedia) | A Forest Service page for access and parking; a look at the pin |
 | Poplar Springs Church (Original Site) and Parsonage Ruins | Henrico County, VA (37.46981, -77.26072; 37.41906, -77.247) | OpenStreetMap leads listed by `start.py` | Any source at all, and the owner |
 
 ## Tips
