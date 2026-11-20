@@ -61,9 +61,14 @@ COMMON=set('the and of at on in new old north south east west upper lower great 
 def fold(t):
     import unicodedata
     return unicodedata.normalize('NFD',str(t or '').lower()).encode('ascii','ignore').decode()
-def name_words(name):
-    """the telling words of a place's name: not 'the', 'house', 'church' and the like"""
-    return [w for w in re.split(r'[^a-z0-9]+',fold(re.sub(r'\(.*?\)','',str(name or '')))) if len(w)>=3 and w not in COMMON]
+def name_words(name,town=None):
+    """the telling words of a place's name: not 'the', 'house', 'church' and the like. When nothing is left but the town's own name
+    ("Charlottetown City Hall"), the plain words stay too, or every photograph of the town would count as naming the place"""
+    allw=[w for w in re.split(r'[^a-z0-9]+',fold(re.sub(r'\(.*?\)','',str(name or '')))) if len(w)>=3]
+    nw=[w for w in allw if w not in COMMON]
+    tw=set(re.split(r'[^a-z0-9]+',fold(town or ''))) if town else set()
+    if town and not [w for w in nw if w not in tw]: return [w for w in allw if w not in('the','and')]
+    return nw
 def names_it(text,nw,town):
     """does a file's name and description name this place: the town, and every telling word of the place's name"""
     t=' '+re.sub(r'[^a-z0-9]+',' ',fold(text))+' '
@@ -87,11 +92,33 @@ def merge(p,pics,ids):
         if k not in ids or not v or not v[0] or out.get(k): continue
         out[k]=[v[0],v[1],v[2],v[3],v[4],v[5],'']
     return out
+def _day(v): return str(v[1] if not v[0] else v[6])
 def all_pics(folder=None):
+    """every recorded choice. Where two files answer for one place the later day wins (a picture found after an earlier "none", or a
+    "none" that takes a wrong picture away); on the same day a picture wins over "none"."""
     P={}; folder=folder or HERE
-    sys.path.insert(0,folder)
-    for f in sorted(glob.glob(os.path.join(folder,'pics_*.py'))): P.update(importlib.import_module(os.path.basename(f)[:-3]).PICS)
+    import ast
+    for f in sorted(glob.glob(os.path.join(folder,'pics_*.py'))):
+        for n in ast.parse(open(f,encoding='utf-8').read()).body:
+            if not(isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='PICS'): continue
+            for k,v in ast.literal_eval(n.value).items():
+                o=P.get(k)
+                if o is None or _day(v)>_day(o) or (_day(v)==_day(o) and (v[0] or not o[0])): P[k]=tuple(v)
     return P
+WIDENED='2026-11-21'      # from this day the finder always asks for photographs that name the place, not only ones taken at the pin
+def asked_again(v):
+    """a "none" recorded before the search was widened is offered once more: the wider search may now have a picture for it"""
+    return bool(v) and not v[0] and str(v[1])<WIDENED
+def rank(C,nw,town):
+    """candidates in the order shown: those whose own name and description name the place first (taken at the pin before those with no
+    position), then the rest, nearest first"""
+    def key(c):
+        named=names_it(str(c.get('title') or '')+' '+str(c.get('desc') or ''),nw,town)
+        return (0 if named else 1, 0 if c.get('m') is not None else 1, c.get('m') or 0)
+    return sorted(C,key=key)
+def id_ok(i,ids):
+    """may a pics file answer for this id: a place in a place list, or a landmark pin (lm-...), which build_sites.py makes and no list holds"""
+    return i in ids or bool(re.fullmatch(r'lm-[a-z0-9-]+',str(i)))
 # ---------------------------------------------------------------- the commands
 def _sites():
     os.chdir(W)
@@ -107,13 +134,21 @@ def _waiting(S):
     wiki=lambda s:any('en.wikipedia.org/wiki/' in str(l[1] if isinstance(l,(list,tuple)) and len(l)>1 else l) for l in (s.get('links') or []))
     # waiting: its own article gave no usable picture (0 in photos.json), or it has no article at all. A place with an article that
     # tools/photos.py has not asked about yet is left for that tool first.
+    done={k for k,v in done.items() if not asked_again(v)}
     return [s for s in S if not s.get('mine') and s['st']!='gone' and s['id'] not in done and (ph.get(s['id'])==0 or (s['id'] not in ph and not wiki(s)))]
+def refused(j):
+    """Commons answered, but with an error in place of results. That is not the same as finding nothing"""
+    return isinstance(j,dict) and 'error' in j
 def _get(params,tries=8):
     import requests
     for k in range(tries):
         r=requests.get(API,params=dict(params,format='json',formatversion='2'),headers=UA,timeout=60)
         if r.status_code==429 or r.status_code>=500: time.sleep(min(90,int(r.headers.get('Retry-After') or 0) or 8*(k+1))); continue
-        r.raise_for_status(); return r.json()
+        r.raise_for_status(); j=r.json()
+        if refused(j):
+            if k>=3: raise SystemExit('Wikimedia Commons answered with an error: %s. Nothing was recorded; run the same command again later.'%str(j['error'].get('code') if isinstance(j['error'],dict) else j['error'])[:80])
+            time.sleep(8*(k+1)); continue        # an error inside a 200 reply (too busy, too many requests): never read it as "nothing here"
+        return j
     raise SystemExit('Wikimedia Commons keeps refusing (too many requests). Wait a few minutes and run the same command again.')
 def _hav(a,b,c,d):
     p=math.pi/180; h=math.sin((c-a)*p/2)**2+math.cos(a*p)*math.cos(c*p)*math.sin((d-b)*p/2)**2
@@ -136,10 +171,13 @@ def look(s):
         if usable(c) or not c['src'] or not c['page'] or c['m'] is None or c['m']>reach: continue
         C.append(c)
     C.sort(key=lambda c:c['m']); C=C[:12]
-    # Second, when few were taken near the pin: photographs that NAME the place. Many carry no camera position, so the tool asks
-    # for the file's name and description to hold the town and every telling word of the place's name before it offers one.
-    if len(C)<4:
-        nw=name_words(s.get('name')); town=fold((s.get('town') or '').split(',')[0].split('(')[0]).strip(); have={c['title'] for c in C}
+    town=fold((s.get('town') or '').split(',')[0].split('(')[0]).strip(); nw=name_words(s.get('name'),town)
+    # Second, always (since November 20, 2026; before that only when fewer than four were taken near the pin, and the first batch showed
+    # why that was wrong: a ranch and a city hall each had four poor photographs nearby and good ones elsewhere on Commons that were never
+    # asked for): photographs that NAME the place. Many carry no camera position, so the tool asks for the file's name and description to
+    # hold the town and every telling word of the place's name before it offers one.
+    if True:
+        have={c['title'] for c in C}
         if nw and town:
             j=_get(dict(action='query',generator='search',gsrnamespace='6',gsrlimit='30',gsrsearch='%s %s'%(re.sub(r'\(.*?\)','',s['name']).strip(),(s.get('town') or '').split(',')[0]),
                         prop='imageinfo|coordinates',coprimary='all',iiprop='url|size|mime|extmetadata',iiurlwidth='900',iiextmetadatafilter='LicenseShortName|Artist|ImageDescription|DateTimeOriginal'))
@@ -154,7 +192,8 @@ def look(s):
                     c['m']=round(_hav(s['lat'],s['lon'],co['lat'],co['lon']))
                     if c['m']>1500: continue          # it carries a position, and the position is somewhere else: a namesake
                 C.append(c)
-            C=C[:12]
+    C=rank(C,nw,town) if nw and town else C
+    named=[c for c in C if nw and town and names_it(c['title']+' '+c['desc'],nw,town)][:8]; C=named+[c for c in C if c not in named][:12-len(named)]
     print('\n== %s  |  %s, %s  |  %s  |  %s pin'%(s['id'],s['name'],s.get('town',''),s.get('years',''),s.get('prec','')))
     print('   '+_plain(s.get('story') or s.get('note') or '',300))
     os.makedirs('research',exist_ok=True)
@@ -162,10 +201,12 @@ def look(s):
     if not C: print('   No free photograph on Commons was taken within %d m of the pin, and none names the place.  ->  python3 tools/photo_find.py set %s none "nothing on Commons within %d m"'%(reach,s['id'],reach)); return
     tiles=[]
     for n,c in enumerate(C,1):
-        try:
-            r=requests.get(re.sub(r'/\d+px-','/330px-',c['src'].split('?')[0]),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB')
-        except Exception:
-            im=Image.new('RGB',(330,220),(90,90,90))
+        im=None
+        for k in range(3):          # a refused download (429) is tried again; a grey tile hides a candidate from whoever chooses
+            try:
+                r=requests.get(re.sub(r'/\d+px-','/330px-',c['src'].split('?')[0]),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB'); break
+            except Exception: time.sleep(6*(k+1))
+        if im is None: im=Image.new('RGB',(330,220),(90,90,90)); c['grey']=True
         im.thumbnail((330,250)); t=Image.new('RGB',(340,286),(255,255,255)); t.paste(im,((340-im.width)//2,30+(250-im.height)//2)); d=ImageDraw.Draw(t); d.text((6,4),'%d   %s'%(n,('%d m from the pin'%c['m']) if c['m'] is not None and not c.get('byname') else 'BY NAME ONLY'+(' (%d m)'%c['m'] if c['m'] is not None else ', no position')),fill=(0,0,0) if not c.get('byname') else (170,0,0)); d.text((6,17),c['title'][5:60],fill=(0,70,160)); tiles.append(t)
         print('  %2d  %s  %s  |  %s  |  %s, %s%s'%(n,('%3d m'%c['m']) if not c.get('byname') else 'by name'+(' %d m'%c['m'] if c['m'] is not None else ''),c['title'][5:75],c['desc'][:110] or '(no description)',credit(c['artist']),c['lic'],', '+c['when'][:4] if c['when'] else ''))
         time.sleep(0.4)
