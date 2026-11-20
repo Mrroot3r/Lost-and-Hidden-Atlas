@@ -60,6 +60,15 @@ if a[:1]==['--human']:
     if same: print('Already waiting: #%d %s'%(same[0]['number'],same[0]['title'])); sys.exit(0)
     r=gh('-X','POST','repos/%s/issues'%REPO,'--input','-',inp=json.dumps({'title':title,'body':body,'labels':[HUMAN]}))
     print('Filed #%d for a person to look at: %s'%(r['number'],r['html_url'])); sys.exit(0)
+# ---- a check.py warning that was looked at and stands: record it, so it is not printed every day (tools/checked_ok.json)
+#   python3 tools/unchecked.py --ok <place id> "<what you looked at and why the entry is right as it is>"
+if a[:1]==['--ok']:
+    import os
+    if len(a)<3 or len(a[2].strip())<15: sys.exit('Give the place id and a sentence: what you looked at and why the entry is right as it is.')
+    W=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); f=os.path.join(W,'tools','checked_ok.json')
+    d=json.load(open(f,encoding='utf-8')) if os.path.exists(f) else {}
+    d[a[1]]=a[2].strip(); json.dump(d,open(f,'w',encoding='utf-8'),indent=1,ensure_ascii=False,sort_keys=True)
+    print('Recorded. check.py will not repeat that warning for %s. The file goes out with your pull request (tools/publish.sh).'%a[1]); sys.exit(0)
 if a[:1]==['--done']: relabel(a[1:2],'double-checked','0e8a16','Research reviewed in full: sources opened, every pin looked at'); sys.exit(0)
 if a[:1]==['--sampled']: relabel(a[1:],'sample-checked','1d76db','Research that passed the automated checks, with one pin drawn at random looked at on the aerial'); sys.exit(0)
 prs=[]; pg=1
@@ -72,9 +81,23 @@ if a[:1]==['--sample']:
     import os,re,random,glob
     W=os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sj=os.path.join(W,'build','sites.json')
     if not os.path.exists(sj): sys.exit('Run this from the working folder after build_sites.py: build/sites.json is not there.')
-    S=json.load(open(sj)); rnd=random.Random(a[1] if len(a)>1 else None); picks=[]; none=[]
+    S=json.load(open(sj)); rnd=random.Random(a[1] if len(a)>1 else None); picks=[]; none=[]; hrs=[]; hnone=[]
     for i in prs:
-        fs=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/data_')]
+        allf=[f['filename'].split('/')[-1] for f in gh('repos/%s/pulls/%d/files?per_page=100'%(REPO,i['number'])) if f['filename'].startswith('source/tools/')]
+        fs=[f for f in allf if f.startswith('data_')]
+        if not fs and any(f.startswith('hours_') for f in allf):      # a batch of looked-up hours has no pin: one of its rows is drawn, to be read against the page it came from
+            import ast
+            rows=[]
+            for f in allf:
+                if not f.startswith('hours_'): continue
+                try:
+                    t=ast.parse(open(os.path.join(W,'tools',f),encoding='utf-8').read())
+                    for n in t.body:
+                        if isinstance(n,ast.Assign) and getattr(n.targets[0],'id','')=='HOURS': rows+=[(k,v) for k,v in ast.literal_eval(n.value).items() if v and v[0] not in('','?')]
+                except (OSError,ValueError,SyntaxError): pass
+            if rows: k,v=rnd.choice(rows); hrs.append((i['number'],k,v[0],v[2] if len(v)>2 else ''))
+            else: hnone.append(i['number'])
+            continue
         keys=[]
         for f in fs:
             try: keys+=re.findall(r"BATCH\s*=\s*\{\s*'key'\s*:\s*'([^']+)'",open(os.path.join(W,'tools',f),encoding='utf-8').read())
@@ -88,6 +111,11 @@ if a[:1]==['--sample']:
     print('\nLook at them (sheets of twelve in research/):\n  python3 tools/pincheck.py '+' '.join(pid for n,pid in picks))
     print('Then, for the batches whose pin is on its building, ruin or site:\n  python3 tools/unchecked.py --sampled '+' '.join(str(n) for n,pid in picks))
     print('A pin that is off: fix it in a pull request first (GUIDE.md section 14), and leave that batch for a full review.')
+    if hrs:
+        print('\n%d batch(es) of looked-up hours; one row drawn from each. Open the page and see that it gives these times for this building:'%len(hrs))
+        for n,k,txt,url in hrs: print('  #%d  %s\n       recorded: %s\n       python3 tools/hours.py page %s'%(n,k,txt,url))
+        print('For each one the page bears out:  python3 tools/unchecked.py --sampled <its number>. One it does not: correct the row with tools/hours.py set, and leave the batch.')
+    if hnone: print('\nBatches of hours in which nothing was found for any place (nothing to read against a page), which can be marked as they are:\n  python3 tools/unchecked.py --sampled '+' '.join(str(n) for n in hnone))
     print('A pin you cannot tell either way (trees, a new roof, nothing to match the description): do not guess and do not mark the batch.\n  python3 tools/unchecked.py --human <place id> "<what you looked at and why it could not be told>"\nfiles it for a person to look at; leave that batch waiting.')
     sys.exit(0)
 if not prs: print('Nothing is waiting for a second look.'); sys.exit(0)
