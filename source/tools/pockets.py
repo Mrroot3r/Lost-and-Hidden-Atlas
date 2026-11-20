@@ -31,7 +31,7 @@ Like the lines and leads, this rebuilds only the states whose raw files are pres
 build/pockets.json. Sources and their terms are in tools/hmdb_state.py and tools/nrhp_state.py."""
 import json,os,math,re,hashlib
 from collections import Counter,defaultdict
-KEYS=['ny','ma','vt','ct','nh','nj','pa','ri','me','md','de','dc','va','oh','wv','tx','la','az','ca','il','mo','ks','hi']   # states to build when their raw files are present
+KEYS=['ny','ma','vt','ct','nh','nj','pa','ri','me','md','de','dc','va','oh','wv','tx','la','az','ca','il','mo','ks','hi','tn','nc','ga','fl']   # states to build when their raw files are present
 LINK=220               # metres: two things closer than this belong to the same chain
 MIN=5                  # a plain pocket needs at least this weight (a marker spot 1, a listed place 2, a district 3 to 30)
 SPLIT=900              # metres: a leftover chain longer than this is cut into blocks of CELL metres
