@@ -18,6 +18,21 @@ const { chromium, devices } = require('playwright');
   ok('Map options: explanations hidden by default',(await shown('#sheet-b .lopt small'))===0&&(await shown('#sheet-b .snote'))===0);
   ok('Map options: the switches are all there',(await shown('#sheet-b #hist-on'))===1&&(await shown('#sheet-b #leads-on'))===1&&(await shown('#sheet-b #xl-mines'))===1&&(await shown('#sheet-b #pock-on'))===1&&(await shown('#sheet-b #land-on'))===1);
   await p.screenshot({path:'/tmp/set_1_options.png'});
+  ok('Map options: no small legend of pin shapes (the Legend button has the whole one)',(await p.locator('#sheet-b .pinkey').count())===0);
+  const tips=await p.evaluate(()=>[...document.querySelectorAll('#sheet-b .lopt')].map(l=>({id:l.getAttribute('for'),small:(l.querySelector('small')||{}).textContent||'',title:l.getAttribute('title')||''})));
+  ok('Map options: every switch that has an explanation gives it as a tooltip too',tips.filter(t=>t.small).length>6&&tips.filter(t=>t.small).every(t=>t.title===t.small),tips.filter(t=>t.small&&t.title!==t.small).map(t=>t.id).join(' ')||tips.filter(t=>t.small).length+' switches');
+  ok('Map options: the three lead switches say what they turn on',['leads-on','xl-vanished','xl-mines'].every(id=>((tips.find(t=>t.id===id)||{}).title||'').length>60));
+  const tb=await p.evaluate(()=>{ const a=document.querySelector('#sheet-tips'), o=document.querySelector('#sheet-b .btn.sm:not(#sheet-tips)')||document.querySelector('.btn.sm:not(#sheet-tips)'); return {a:getComputedStyle(a).backgroundColor,o:o?getComputedStyle(o).backgroundColor:'',top:a.getBoundingClientRect().top<innerHeight}; });
+  ok('Map options: "What do these do?" stands out from the plain buttons',tb.top&&tb.a!==tb.o&&tb.a!=='rgba(0, 0, 0, 0)',JSON.stringify(tb));
+  { const pb=await p.evaluate(()=>{ const n=document.querySelector('#lb-pock'); return n?{t:n.getAttribute('title')||'',on:n.getAttribute('aria-pressed')}:null; });
+    ok('the bar has a button for the old town centres, off to begin with',!!pb&&pb.on==='false'&&/town centres/i.test(pb.t),JSON.stringify(pb));
+    await p.click('#sheet-x'); if(pb) await p.evaluate(()=>document.querySelector('#lb-pock').click()); await p.waitForTimeout(500);
+    const on=await p.evaluate(()=>({u:JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'),a:(document.querySelector('#lb-pock')||{getAttribute(){}}).getAttribute('aria-pressed')}));
+    if(pb) await p.evaluate(()=>document.querySelector('#lb-pock').click()); await p.waitForTimeout(1200);
+    const off=await p.evaluate(()=>({p:JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}').ui.pockets,a:(document.querySelector('#lb-pock')||{getAttribute(){}}).getAttribute('aria-pressed')}));
+    ok('a tap switches the town centres on and the button shows it; another tap switches them off',on.a==='true'&&off.a==='false'&&!off.p,JSON.stringify([on.a,off]));
+    await p.click('#lb-opt'); await p.waitForTimeout(300); }
+  ok('the Leads button on the bar says what it shows when the pointer rests on it',/nobody has checked/i.test(await p.getAttribute('#lb-leads','title')),await p.getAttribute('#lb-leads','title'));
   await p.click('#sheet-tips'); await p.waitForTimeout(250);
   ok('Map options: "What do these do?" shows the explanations',(await shown('#sheet-b .lopt small'))>5&&(await shown('#sheet-b .snote'))>1);
   await p.waitForTimeout(900); ok('Map options: the choice is remembered',(await U()).ui.tips===true);
@@ -104,6 +119,16 @@ const { chromium, devices } = require('playwright');
   ok('the "point me there" ring takes the track colour, over a white casing, and follows a change',tk.before.join()==='#fff,#2563eb'&&tk.after.join()==='#fff,#7c3aed',JSON.stringify(tk));
   const src=await p.evaluate(()=>[...document.styleSheets].map(ss=>{ try{ return [...ss.cssRules].map(r=>r.cssText).join(''); }catch(e){ return ''; } }).join(''));
   ok('no pink left in the styles',!/e11d74|225,\s*29,\s*116/i.test(src));
+  // ---- a new reader: no old rail lines or canals drawn until asked for (they are a tool for hunting leads, not the first thing to see)
+  { const c5=await b.newContext(Object.assign({},devices['Pixel 7'])); const p5=await c5.newPage(); p5.on('pageerror',e=>errs.push(e.message)); const got=[];
+    p5.on('request',r=>{ if(/\/data\/lines/.test(r.url())) got.push(r.url().replace(/^.*\/data\//,'')); });
+    await p5.goto(process.argv[2]||'http://localhost:8766/index.html'); await p5.waitForFunction(()=>window.__atlasMap); await p5.evaluate(()=>{ window.__atlasMap.setView([42.6526,-73.7562],13,{animate:false}); }); await p5.waitForTimeout(2500);
+    const d=await p5.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.casing) n++; }); const u=JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'); return {n:n,ui:(u.ui||{})}; });
+    await p5.click('#lb-opt'); await p5.waitForTimeout(300);
+    const ck5=await p5.evaluate(()=>['ln-oldrail','ln-canal','ln-rail','leads-on','xl-vanished','xl-mines','pock-on'].map(i=>{ const n=document.querySelector('#'+i); return n?n.checked:null; }));
+    ok('a new reader: old rails, canals, leads, vanished places, mines and pockets all start switched off',ck5.every(v=>v===false),JSON.stringify(ck5));
+    ok('a new reader: no line is drawn and no line file is fetched',d.n===0&&got.length===0,d.n+' line layers; fetched '+got.join(' '));
+    await c5.close(); }
   const c2=await b.newContext(Object.assign({},devices['Pixel 7'])); const p2=await c2.newPage();
   await p2.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},set:{trk:'#e11d74'}})); });
   await p2.goto(process.argv[2]||'http://localhost:8766/index.html'); await p2.waitForFunction(()=>window.__atlasMap); await p2.waitForTimeout(300);
@@ -126,7 +151,7 @@ const { chromium, devices } = require('playwright');
       return {z:m.getZoom(),off:Math.round(m.getCenter().distanceTo([s.lat,s.lon])),open:(document.querySelector('#v-detail h2')||{}).textContent===s.name}; });
     ok('a double tap on a pin opens its page and goes to street level, on the pin',!!pin&&pin.z===17&&pin.off<30&&pin.open,JSON.stringify(pin));
     const grp=await p4.evaluate(async()=>{ const N=window.__atlasNM, m=window.__atlasMap; m.setView([42.652,-73.755],9,{animate:false}); N.syncMarkers(); await new Promise(r=>setTimeout(r,300));      /* Albany from far enough out to be one tight disc */
-      const discs=[]; m.eachLayer(l=>{ if(l.options&&l.options.icon&&l.options.icon.options.className==='clus') discs.push(l); }); if(!discs.length) return null;
+      const discs=[]; m.eachLayer(l=>{ if(l.options&&l.options.icon&&/^clus\b/.test(l.options.icon.options.className||'')) discs.push(l); }); if(!discs.length) return null;
       const d=discs.sort((x,y)=>x.getLatLng().distanceTo([42.652,-73.755])-y.getLatLng().distanceTo([42.652,-73.755]))[0], n=+d.options.icon.options.html; d.fire('click',{latlng:d.getLatLng()}); await new Promise(r=>setTimeout(r,120)); d.fire('dblclick',{latlng:d.getLatLng()}); await new Promise(r=>setTimeout(r,1100)); return {n,z:m.getZoom()}; });      /* as a real double tap arrives: a tap, then the double tap */
     ok('a double tap on a numbered disc goes three steps in from where the map stood, toward the disc (a single tap goes two)',!!grp&&grp.z===12,JSON.stringify(grp));
     await p4.click('#lb-opt'); await p4.waitForTimeout(250); await p4.evaluate(()=>{ const g=[...document.querySelectorAll('#sheet button')].find(x=>/settings/i.test(x.getAttribute('aria-label')||x.textContent)); if(g) g.click(); }); await p4.waitForTimeout(300);

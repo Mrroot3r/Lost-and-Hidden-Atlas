@@ -76,6 +76,40 @@ const { chromium } = require('playwright');
   await go(39.5,-98,5); s=await snap(); ok('lead dots: none at zoom 5 either',s.leads===0&&s.leadsDataIn>300,s.leads+' on the map, '+s.leadsDataIn+' in view');
   await go(41.5,-75,6); s=await snap(); ok('lead dots: back at zoom 6, and no more than the Northeast held before',s.leadsIn===s.leadsDataIn&&s.leadsIn>500&&s.leads<3000,s.leadsIn+' of '+s.leadsDataIn+' in view, '+s.leads+' on the map');
   await go(42.75,-73.9,12);
+  // ---- historic pockets (the owner's notes, November 19, 2026): no outlines round districts; the discs start at the
+  //      20-mile scale (zoom 8); zoomed in, listed buildings (white dots) show and plain markers (purple dots) only when asked for
+  { const c4=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c4.newPage(); q.on('pageerror',e=>errs.push(e.message));
+    await c4.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await q.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},ui:{base:'streets',view:[42.6526,-73.7562,16],hist:false,pockets:true,lines:{oldrail:false,canal:false,rail:false}}})); }catch(e){} });
+    await q.goto(url); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(3500);
+    const pk=()=>q.evaluate(()=>{ let boxes=0, white=0, purple=0, discs=0; window.__atlasMap.eachLayer(l=>{ const o=l.options||{}; if(o.pane!=='lines') return;
+      if(!l.getRadius){ if(l.getLatLngs&&o.dashArray==='5 5') boxes++; return; }
+      if(o.fillColor==='#ffffff'&&o.fillOpacity===1) white++; else if(o.fillColor==='#5b3fd6'&&o.fillOpacity===1) purple++; else if(o.fillOpacity<=0.3) discs++; }); return {boxes,white,purple,discs,z:window.__atlasMap.getZoom()}; });
+    let k=await pk();
+    ok('pockets, downtown Albany at street level: the listed buildings are there as white dots',k.white>10,JSON.stringify(k));
+    ok('no dashed outline is drawn round a district',k.boxes===0,k.boxes+' outlines');
+    ok('the plain markers (purple dots) are not shown until asked for',k.purple===0,k.purple+' purple dots');
+    await q.click('#lb-opt'); await q.waitForTimeout(300);
+    const sw=await q.evaluate(()=>{ const m=document.querySelector('#pock-m'), r=document.querySelector('#pock-r'); return m&&r?{m:m.checked,r:r.checked}:null; });
+    ok('Map options has a switch for each kind of dot: listed buildings on, markers off',!!sw&&sw.r===true&&sw.m===false,JSON.stringify(sw));
+    if(sw) await q.evaluate(()=>document.querySelector('#pock-m').click()); await q.waitForTimeout(700); k=await pk();
+    ok('markers switched on: the purple dots come',k.purple>10&&k.white>10,JSON.stringify(k));
+    if(sw) await q.evaluate(()=>{ document.querySelector('#pock-m').click(); document.querySelector('#pock-r').click(); }); await q.waitForTimeout(700); k=await pk();
+    ok('both switched off: no dots, and the discs stay',k.purple===0&&k.white===0&&k.discs>0,JSON.stringify(k));
+    await q.click('#sheet-x').catch(()=>{});
+    await q.evaluate(()=>{ window.__atlasMap.setView([42.65,-73.75],7,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
+    ok('at the 50-mile scale (zoom 7) no pocket disc is drawn',k.discs===0,JSON.stringify(k));
+    await q.evaluate(()=>{ window.__atlasMap.setZoom(8,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
+    ok('at the 20-mile scale (zoom 8) the best town centres show',k.discs>0&&k.discs<200,JSON.stringify(k));
+    await c4.close(); }
+  // ---- grouped pins are coloured by how many places they stand for, cool to hot, and the biggest are a little larger
+  { await go(42.9,-75.5,6); await p.waitForTimeout(400);
+    const cl=await p.evaluate(()=>[...document.querySelectorAll('.leaflet-marker-pane .clus')].map(e=>({n:+e.textContent,c:(/\bc(\d)\b/.exec(e.className)||[])[1],bg:getComputedStyle(e).backgroundColor,w:e.offsetWidth})).sort((a,b)=>a.n-b.n));
+    const lo=cl[0], hi=cl[cl.length-1], step=n=>n<10?0:n<30?1:n<100?2:n<300?3:4;
+    ok('grouped pins: each disc carries the step its count belongs to',cl.length>3&&cl.every(x=>+x.c===step(x.n)),cl.map(x=>x.n+':c'+x.c).join(' '));
+    ok('grouped pins: the smallest and the biggest are different colours, and the biggest is larger',!!lo&&!!hi&&hi.n>=300&&lo.bg!==hi.bg&&hi.w>lo.w,lo&&hi?lo.n+' '+lo.bg+' '+lo.w+'px; '+hi.n+' '+hi.bg+' '+hi.w+'px':'');
+    const cols=new Set(cl.map(x=>x.bg)); ok('grouped pins: as many colours as steps in view',cols.size===new Set(cl.map(x=>x.c)).size&&cols.size>=3,[...cols].join(' | '));
+    await go(42.75,-73.9,12); }
   // ---- Native American sites and leads on reservation land are their own category: a second file that nobody is sent
   //      until they switch it on under the gear (Settings, "nativeLeads"). Off, nothing of it is fetched, drawn or listed.
   { const c3=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const q=await c3.newPage(); const got=[]; q.on('pageerror',e=>errs.push(e.message));
