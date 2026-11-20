@@ -1,0 +1,100 @@
+# November 20, 2026: southern and eastern Rensselaer County (North Greenbush, the City of Rensselaer, Sand Lake, Nassau
+# and Grafton), with Riders Mills just over the line in Columbia County, the old town centre choose.py offered. Drawn at
+# random by tools/choose.py --state ny (region renss). The earlier batches renss_osux and renss_irek worked the north,
+# the middle and most of the Register list; this one takes what they left. Sources opened in this session: HMdb marker
+# pages and nearby lists (tools/page.py), Wikipedia as raw text (tools/wiki_raw.py), the Town of North Greenbush
+# historian's columns (townofng.com PDFs), the Sand Lake Historical Society's marker and Cotton House pages, the
+# Newton-Taber-Marvin Farm Register form (NPGallery, text layer), and historypointer.com's copy of the Register
+# summaries for the Clark-Dearstyne-Miller Inn and East Nassau Central School (NPGallery has only placeholders for both).
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+BATCH={'key':'renss_acet','label':'Rensselaer County: Wynantskill, Bath, Sand Lake, Nassau and Grafton','added':'2026-11-20 05:39'}
+def HM(n,t): return L('HMdb: '+t,'https://www.hmdb.org/m.asp?m=%d'%n)
+SLHS=L('Sand Lake Historical Society: roadside historical markers','https://sandlakehistory.org/historical-markers/index.html')
+NG1=L('Town of North Greenbush historian: Growing Pains at the Wynantskill Reformed Church (part 1)','https://www.townofng.com/sites/default/files/2024-05/NGN_20120125_GrowingPainsAtWynantskillChurch1.pdf')
+NG2=L('Town of North Greenbush historian: Growing Pains at the Wynantskill Reformed Church (part 2)','https://townofng.com/sites/default/files/2024-05/NGN_20120125_GrowingPainsAtWynantskillChurch2.pdf')
+PLACES=[
+N('first-reformed-church-wynantskill','First Reformed Church of Wynantskill','Wynantskill','renss','worship','standing',42.69330,-73.63337,'exact','view','drive','','1793',
+  'A Dutch Reformed congregation formed in the 1790s by members of the Albany Dutch church built its church at Main Avenue and Church Street in Wynantskill. The state\'s roadside marker calls it the oldest church building in Rensselaer County, put up in 1793. In the 1830s a split produced a rival "True Dutch Reformed Church" across the street (where the fire station now stands); by 1841 the old church was down to 37 communicants, deep in debt and in need of repairs, and its pastor wrote to the Collegiate Churches of New York City for help. It survived; the rival church is long gone.',
+  'The church on the corner of Main Avenue (NY 66) and Church Street, with the state marker at the corner. The town historian wrote in 2012 that the congregation still worships in the building. How much of the 1793 fabric survives under later changes, and the interior, were not checked.',
+  'The oldest church building in the county, and the schism it outlived.',
+  'Active church at 411 Main Avenue (the address OpenStreetMap gives the building). No page of the church\'s own was found, so service times were not checked; look from the street. Street parking; no lot was checked.',
+  [HM(135075,'Wynantskill (First Reformed Church marker)'),NG1,NG2],
+  brick='?',hours='?'),
+N('clark-dearstyne-miller-inn','Clark–Dearstyne–Miller Inn (Miller Hotel)','Rensselaer','renss','hotel','standing',42.65682,-73.73511,'exact','view','drive','hotels','c. 1791',
+  'A timber-framed inn of about 1791 in what was the village of Bath, on the east bank of the Hudson. It served travellers off the North Ferry and passengers from the Bath railroad station in front of it, and tenant farmers who came to pay their rents to the Van Rensselaer agent next door; at times it also held offices of the village of Bath and the town of North Greenbush. James Dearstyne kept it from 1839 to 1867, the family until the late 1890s (the Dearstyne Miller Hotel), and it was the Miller Hotel into at least the 1920s. Local tradition holds that Lincoln\'s body rested here in 1865 while waiting for the ferry to Albany. A neighbourhood tavern from the 1950s, it was abandoned in the 1980s and was empty when it was listed on the National Register in 2008.',
+  'A two-and-a-half-storey gabled frame building on a fieldstone base, with an ornate bracketed raised porch added about 1880, at 11 to 13 Forbes Avenue, beside the Patroon Agent\'s House. Its present state and use were not checked: the most recent source read (the Register form, 2008) calls it vacant.',
+  'The riverside inn that tradition says held Lincoln\'s coffin overnight.',
+  'Private; look from Forbes Avenue. Street parking. Whether it has been restored, sold or reopened since 2008 was not checked.',
+  [L('historypointer.com: Clark-Dearstyne-Miller Inn (Register summary, quoting the 2008 form)','https://historypointer.com/nris/resource/07001369'),W('Clark–Dearstyne–Miller Inn')],
+  brick='?',conf='mixed'),
+N('cotton-ice-cream-parlor-sand-lake','Jim Cotton\'s Ice-Cream Parlor (the Cotton House)','Sand Lake','renss','civic','standing',42.63772,-73.54033,'site','view','drive','','c. 1915',
+  'A one-room ice-cream parlor that the carpenter James Cotton built about 1915 next to his sister Aurillia Horton\'s house on Taborton Road, across from A. E. Horton\'s grocery. He opened it in season, with a dozen café tables and three flavours (vanilla, chocolate and strawberry), and later sold penny candy; travellers, teenagers and the knitting-mill workers stopped there. It became a house for the Dobert family from the 1940s to the 1970s and then a store shed. In 2008 Girl Scout Troop 1181 restored it as a Gold Award project with volunteers and contractors. The marker calls it the only parlor of its kind from the 1900s known to be left in New York.',
+  'The small restored building and its marker on Taborton Road (NY 43) just east of Miller Hill Road, in the hamlet of Sand Lake. Inside not checked; no source read says it opens.',
+  'A 1915 penny-candy and ice-cream stand, saved by a scout troop.',
+  'Owner not checked; look from the road. The Miller Hill Road lot 100 m north-west (parking.py) is not on mapped public land and belongs to whoever runs it; not checked.',
+  [HM(311779,'Jim Cotton\'s Ice-Cream Parlor'),L('Sand Lake Historical Society: the Cotton House, a Very Sweet History','https://sandlakehistory.org/cottonhs.htm')],
+  brick='?'),
+N('sand-lake-union-cemetery','Sand Lake Union Cemetery (Big Thunder\'s grave)','Averill Park','renss','burial','standing',42.63444,-73.54026,'site','public','walk','cemeteries','1807–',
+  'A cemetery formed in 1841 by joining the burying grounds of the Rensselaer Glass Factory and Woodbine. Its earliest marked stone is from 1807, and it holds Revolutionary and Civil War graves. Dr. Smith Boughton lies here: as "Big Thunder" he led the disguised tenant farmers of the Anti-Rent War against the Van Rensselaer leases. James Averill\'s horse Moscow is buried on the Averill plot, and the family marked the grave.',
+  'The cemetery on NY 66 at Glass Lake, with the association\'s sign near the road. Look for Boughton\'s grave and the horse\'s marker on the Averill plot; where they lie in the grounds was not checked.',
+  'The grave of "Big Thunder", leader of the Anti-Rent War, and a horse named Moscow.',
+  'Run by the Sand Lake Union Cemetery Association, which put up the sign (HMdb, Sand Lake Historical Society); not on mapped public land. Visit in daylight; the association\'s hours and rules were not found. Where to park inside the gate was not checked.',
+  [HM(135069,'Sand Lake Union'),SLHS],
+  brick='?'),
+N('grafton-inn-ny','Grafton Inn (Abel Owen house)','Grafton','renss','hotel','standing',42.77281,-73.43383,'site','view','drive','hotels','1795',
+  'A house built in 1795 by Abel Owen, Grafton\'s first settler. In 1830 Lemuel Steward had it dragged to its present spot by sixteen yoke of oxen. It opened as Moon\'s Mountain Top House, an inn, in 1923, and became the Grafton Inn bed and breakfast in 1987.',
+  'The house at 2242 NY 2 with the Grafton Historical Society\'s marker. Present use and interior not checked.',
+  'A 1795 house moved by sixteen yoke of oxen.',
+  'Private; look from NY 2. Whether it still takes guests was not checked.',
+  [HM(137019,'Grafton Inn')],
+  brick='?',conf='mixed'),
+N('riders-mills-hamlet','Riders Mills: the flooded mill hamlet and its 1795 schoolhouse','Malden Bridge','hud','town','standing',42.47461,-73.56327,'area','view','drive','','c. 1795–1869',
+  'A mill hamlet on Kinderhook Creek, just south of the Rensselaer County line in the town of Chatham, largely wiped out by a flood in 1869. What is left is a Register district of 20 buildings, eight structures and a site, mostly early and mid-19th-century houses in Georgian and Greek Revival styles, with a schoolhouse, a bridge and eight known archaeological sites, mostly mill and house foundations. The one-room school was built about 1795 on land given by Jonathan Rider and taught children for the next 160 years.',
+  'The schoolhouse and its marker at Riders Mills Road and Drowne Road, the bridge, and the houses along the road. Which foundations can be seen, and from where, was not checked: the archaeological sites may be on private land.',
+  'A hamlet the creek took in 1869, and the schoolhouse that kept going 160 years.',
+  'Houses are private; look from Riders Mills Road. No public parking was checked.',
+  [HM(158848,'Riders Mills Schoolhouse'),W('Riders Mills Historic District')],
+  brick='?'),
+N('newton-taber-marvin-farm','Newton–Taber–Marvin Farm (Reilly\'s Farm)','Nassau','renss','landmark','standing',42.57982,-73.57788,'site','view','drive','','late 1700s',
+  'A farm of about 100 acres on Clarks Chapel Road in the hills of the town of Nassau, first settled and farmed in the 18th century. Its core is a story-and-a-half timber-frame house of about 1810 and later, with a kitchen ell, and a scribe-rule English threshing barn of the late 18th or early 19th century, with a smaller barn, milk house, chicken coop and outhouse, stone field walls and a stone-lined well. When it was nominated part of it was a Christmas-tree farm, run as Reilly\'s Farm. Listed on the National Register in 2016. (Wikipedia\'s county list calls it the Newton–Taber–Martin Farm; the form says Marvin.)',
+  'The house facing the road behind low rubble walls, the big English barn behind it, and the stone-walled fields, from Clarks Chapel Road east of Slivko Road. Interior not checked.',
+  '',
+  'Private working farm; the entrance drive is a private road. Look from Clarks Chapel Road. Whether it sells trees to the public was not checked.',
+  [L('National Register form, Newton-Taber-Marvin Farm (NPGallery)','https://npgallery.nps.gov/NRHP/GetAsset/NRHP/16000752_text')],
+  brick='no',conf='mixed'),
+N('east-nassau-central-school','East Nassau Central School','East Nassau','renss','civic','standing',42.50920,-73.50470,'site','view','drive','','1930',
+  'A two-storey Classical Revival school of 1930 in East Nassau, built of steel frame and concrete block with a brick veneer on a raised concrete base, with a flat roof behind a low parapet and a small brick entrance portico with concrete trim and a wrought-iron balustrade. It was District 8\'s central school. Listed on the National Register in 1997.',
+  'The brick front and portico. Present use and interior not checked.',
+  '',
+  'Owner and present use not checked; look from the road.',
+  [W('East Nassau Central School'),L('historypointer.com: East Nassau Central School (Register summary)','https://historypointer.com/nris/resource/97000418')],
+  brick='?',conf='mixed'),
+N('van-rensselaer-high-school','Van Rensselaer High School (Doane Stuart School)','Rensselaer','renss','civic','standing',42.65956,-73.72703,'site','view','drive','','1930–1939',
+  'The City of Rensselaer\'s Art Deco high school, built in 1930–31 and enlarged in 1938–39, to designs by Clarence H. Gardinier and Howard O. Fullerton. City voters approved its sale to the Doane Stuart School in May 2008; the private school bought it that September for $4 million, renovated it for a year and moved in. Listed on the National Register in 2012. In June 2026 Doane Stuart announced that it would close for lack of pupils.',
+  'The Art Deco school building. Interior not checked; what becomes of it after the school\'s closing was not checked.',
+  '',
+  'Private school property; look from the street. Parking not checked.',
+  [W('Doane Stuart School')],
+  brick='?',conf='mixed'),
+N('brainard-rural-cemetery','Brainard Rural Cemetery','Brainard','renss','burial','standing',42.49595,-73.52045,'site','view','walk','cemeteries','c. 1815',
+  'The burying ground of Nassau\'s early settlers, begun about 1815, beside US 20 at Brainard. It holds veterans of the Revolution and the Civil War. The town put up a marker at the entrance in 2013.',
+  'The fenced cemetery on US 20 and the town marker just inside the fence by the entrance. Which stones are the veterans\' was not checked.',
+  '',
+  'On US 20 about 0.4 mile west of Firehouse Road (the marker\'s directions). Owner and visiting rules not checked (the Town of Nassau put up the marker), so it is marked look-from-the-road; where to pull off was not checked.',
+  [HM(138145,'Brainard Rural')],
+  brick='?'),
+]
+PIN_NOTES={
+ 'first-reformed-church-wynantskill':'OpenStreetMap place of worship named First Reformed Church of Wynantskill, 411 Main Avenue (nom.py), matching the ArcGIS PointAddress; the HMdb marker is 30 m away at the Church Street corner.',
+ 'clark-dearstyne-miller-inn':'ArcGIS PointAddress for 11 Forbes Avenue (the Register address is 11 to 13), next to the Patroon Agent\'s House at 15.',
+ 'cotton-ice-cream-parlor-sand-lake':'HMdb marker position (Taborton Road east of Miller Hill Road); the parlor stands by its marker.',
+ 'sand-lake-union-cemetery':'OpenStreetMap cemetery area named Sand Lake Union Cemetery (nom.py); the HMdb sign is on NY 66.',
+ 'grafton-inn-ny':'ArcGIS PointAddress for 2242 NY 2, the marker\'s address.',
+ 'riders-mills-hamlet':'ArcGIS PointAddress for 112 Riders Mills Road, the schoolhouse marker\'s address; area pin for the district. On the aerial it falls by the road among trees; which building is the schoolhouse was not made out.',
+ 'newton-taber-marvin-farm':'Register list coordinate (Wikipedia county list).',
+ 'east-nassau-central-school':'Wikipedia coordinate.',
+ 'van-rensselaer-high-school':'Moved with pix.py from the Wikipedia point (on the circular drive in front) 75 m north onto the large school building on the leaf-off aerial.',
+ 'brainard-rural-cemetery':'HMdb marker position, at the cemetery entrance on US 20. The leaf-off aerial shows the road and woods; the stones could not be made out, so the pin is the entrance.',
+}
