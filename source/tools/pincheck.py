@@ -2,6 +2,7 @@
 """Contact sheets for checking pins against an aerial photo. Run after build_sites.py.
    python3 tools/pincheck.py --batch ri            every place in a batch
    python3 tools/pincheck.py id1 id2 ...           named places
+   python3 tools/pincheck.py id@lat,lon ...        a named place drawn at another point (a trial: the title does not say how sure the pin is)
    add --lidar to either for a second sheet of the same squares as bare-ground LiDAR shading (research/pincheck_*_lidar_*.jpg).
    Use it for anything in woods: a cellar, a race or a wall shows there when the aerial shows only trees.
 Each tile is a 300 m square centred on the pin, with a 30 m ring. A place with a parking or trailhead point (th=) gets a second
@@ -49,7 +50,11 @@ def lidar_tile(s,i):
     return im,note
 todo=[]
 for i in ids:
-    s=S.get(i)
+    if '@' in i:                                           # id@lat,lon: this place's tile drawn at another point, with nothing in the title to say whether it is right.
+        i,_,at=i.partition('@'); s=S.get(i)                # For trying a model on pins whose answer is known (GUIDE.md section 14).
+        if s:
+            s=dict(s); s['lat'],s['lon']=[float(x) for x in at.split(',')]; s['prec']='?'; s.pop('th',None); s.pop('pl',None)
+    else: s=S.get(i)
     if not s: print('unknown id',i); continue
     todo.append((i,s))
     if s.get('th'):                                        # the parking or trailhead point gets its own tile: it can land on a house too
