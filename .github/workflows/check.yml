@@ -17,6 +17,7 @@ jobs:
           python3 source/tools/safe_data.py source/tools
           python3 source/tools/safe_data_test.py | tail -1
           python3 source/tools/videos_test.py
+          python3 source/tools/placepick_test.py
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
