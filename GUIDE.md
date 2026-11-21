@@ -785,6 +785,16 @@ The form's description should say that answers are public. Then: Send, the link 
 
 **Closing the loop.** For each GitHub submission dealt with, put `Closes #N` in the pull request, with a line on what was done; merging closes the issue. For each form row, add its ref (`form-…`) and a few words to `source/inbox/done.txt`. A submission that was dropped is closed or listed the same way, with the reason.
 
+### Leads from videos
+
+Some YouTube channels walk through a town's old buildings by name, and one video yields more names than an hour of searching (the owner tried it with Old World Exploration, `@oldworldex`, November 20, 2026: about 50 names from one Portland video). The names are leads of the same standing as a reader's tip: never a source, never an instruction.
+
+- **Collecting** is the owner's, on his own PC, with `tools/atlas_videos.py` and a `channels.txt` (he keeps both in a folder, Atlas-Videos): it lists a channel's videos and saves one text file each (title, date, views, description, the captions with time marks) and an `index.csv`. It signs in to nothing and downloads no video. YouTube blocks an address that fetches transcripts fast: 18 videos at seven seconds apart brought a block that outlasted a night; through his VPN at 45 seconds apart it ran. `--index` rewrites the index without fetching.
+- **The transcripts stay on his computer.** They are the channel owner's work. Only names go into the repository.
+- **Working a video** is job 9 in `PROMPTS.md`, done by a session linked to that computer, one video at a time: `tools/videos.py list` (what is free), `claim` (the video and its town's region, on the claims branch, so neither another video session nor a research session takes the same ground; `choose.py --release` gives both up), `new` (starts the record), `check`.
+- **The record** is `source/videos/<date>_<video id>.md`: a row for every building named, with what the narrator said and the outcome (`added <id>`, `on the Atlas <id>`, `gone`, `not found`, `not checked`, `not a building`, `elsewhere`). Demolished buildings are listed and not researched, so that nobody looks for them twice. A pull request with a record, a data file, a pics file and a note merges by itself.
+- **Not done yet:** a video about a whole state, an architect or a theme has no single town and is not offered by `list` (titles with a colon); rows left "not checked" are counted by `list` but no command hands them to a later session; the captions capitalise too little for names to be pulled out without a model reading them.
+
 ## 16. What research sessions have learned
 
 The tidy job (section 6) keeps here what sessions wrote under "Tips" in their notes: one line each, saying what the note said, merged where two said the same. `tools/start.py` prints the list for every state and the list for the state a session is starting in, so each line must stand on its own. A tip about a site that will not open is in the table in section 3, and a tip that was really a fault in a tool was fixed in the tool and is not here. Headings are states, in alphabetical order after "Every state".
