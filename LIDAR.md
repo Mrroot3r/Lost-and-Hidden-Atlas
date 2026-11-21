@@ -60,6 +60,12 @@ python3 tools/lidar.py sweep "Burnt-Rossman Hills State Forest"
 - Sweep only units whose access column says OA or RA.
 - `find` and `near` list units in New York and Massachusetts alike; `find "name" --state ma` searches one state. `sweep` works out which state a unit is in and says so. A unit in any other state is refused.
 
+### Sweeping on the owner's own computer
+
+The sweep is the half of this work that needs no model: it downloads the ground model, finds pits and walls, and reads the old survey sheets. The owner can run it on his own PC for as long as he likes, at no cost in usage, with `tools/atlas_sweep.py` (November 20, 2026). It is a single file that he keeps in a folder of its own with a `units.txt` (one unit name on each line): each time it starts it fetches the current LiDAR tools and the ledger from GitHub, then calls `lidar.py sweep` on each unit over and over until the tool says DONE. It writes `STATUS.txt` as it goes and `FINISHED.txt` at the end, and it carries on where it stopped. `python atlas_sweep.py near <lat> <lon> <miles>` and `find "<name>"` list units, as `lidar.py` does.
+
+When the owner says a sweep is finished, bring its results in from that folder: copy `work/lidar/units/*.json` and `work/lidar/walls/*.json` out of it, then in the workspace `python3 tools/lidar.py pull <the copied units folder>` and add the wall files to `lidar/walls/` (never over an existing one). Then go on at section 3. It was tried on Linux here and in the Linux box on the owner's PC; it had not been run on Windows itself when this was written. Why not through Claude's link to the PC: a command sent that way is cut off after three minutes, nothing keeps running between commands, and the box gets two processor cores.
+
 ## 3. Look at the candidates, 36 at a time
 
 ```bash
