@@ -13,10 +13,8 @@ Places you read about and could not finish. One row each.
 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Captain John Potter monument and tavern, Potter Hill | Hoosick, NY (HMdb 290218 panel at the Potter Hill Barn, 42.84889, -73.41101) | Hoosick "Eye on History" panel: three-sided monument in a gully by the creek near the NY 7 / NY 22 junction to Potter, killed in 1806 when a cider barrel fell on him; his house and tavern stand at NY 7 and Spicer Road; a stone schoolhouse built by the Tibbits family at NY 22 and NY 7 | A position for the monument (the junction is 5 km east of the panel) and whether it can be reached from a public road |
 | Sampson Station, Grafton Lakes State Park | Grafton, NY (OpenStreetMap ruin lead 42.79453, -73.44664) | Only the OpenStreetMap name; the park's master-plan PDFs on parks.ny.gov answer 404 | What it was and what is left |
 | Arlington Hotel (Elkhorn) | West Sand Lake, NY (3532 NY 43, 42.64573, -73.59460) | Pomeroy marker 2024 (HMdb 284354): stop 22 on the Troy & New England trolley | Whether the building stands; the marker is in the past tense |
-| Log Meeting House Cemetery | North Schodack Road at Sagendorf Road, East Schodack, NY (HMdb 148941) | Marker: restored 1991 by the Historical Society of Esquatak | The meeting house's date and what is in the cemetery |
 | Craver Farmstead | Craver Road, East Greenbush, NY (Wikipedia 42.62306, -73.64361) | Wikipedia: Federal farmhouse of before 1790 and barn, NRHP 1996; the article reads like a family history | An independent source and whether the house shows from the road |
 
 ## Tips
