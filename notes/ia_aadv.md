@@ -15,8 +15,6 @@ Places you read about and could not finish. One row each; delete the example row
 |---|---|---|---|
 | Buxton townsite ruins | Monroe County, IA, east of Lovilia (Wikipedia 41.15833, -92.82111) | National Register 1983; Wikipedia says a few structures remain as ruins, land mostly forest or farm | Owner and any public way in; which ruins and where (the Register form, ref 83000392, was not read) |
 | Kate Shelley High Bridge (Boone Viaduct, 1901) | West of Boone, IA | Wikipedia: Union Pacific built a new bridge beside the old span in 2006 to 2009 | Whether the 1901 bridge still stands and where it can be seen from legally (Kate Shelley park, Moingona) |
-| Amana Colonies | Iowa County, IA | Not read in this session | Everything; a strong candidate for a second Iowa batch |
-| Hotel Manning | Keosauqua, IA | Named in the Van Buren courthouse article as built by Edwin Manning, on the Register | Its own source, status and hours |
 
 ## Tips
 - Iowa DNR park pages (`iowadnr.gov/...`) and history.iowa.gov read in full with `page.py --all`; both give hours plainly.
