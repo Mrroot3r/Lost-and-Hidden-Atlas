@@ -1,0 +1,9 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen)   or   ('', day, why none fits)
+PICS={
+ 'biloxi-lighthouse':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3e/Biloxi_Lighthouse_2010.jpg/960px-Biloxi_Lighthouse_2010.jpg', 900, 1200, 'Woodlot', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Biloxi_Lighthouse_2010.jpg', '2026-11-21'),
+ 'bryants-grocery-money':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Bryant%27s_Grocery_and_Meat_Market_Ruins%2C_Money%2C_MS.jpg/960px-Bryant%27s_Grocery_and_Meat_Market_Ruins%2C_Money%2C_MS.jpg', 900, 506, 'Mikehelms', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Bryant%27s_Grocery_and_Meat_Market_Ruins,_Money,_MS.jpg', '2026-11-21'),
+ 'grenada-confederate-fort':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Confederate_Fort_Grenada_County_Mississippi_2.jpg/960px-Confederate_Fort_Grenada_County_Mississippi_2.jpg', 900, 600, 'Fredlyfish4', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Confederate_Fort_Grenada_County_Mississippi_2.jpg', '2026-11-21'),
+ 'montrose-holly-springs':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/EAST_HOLLY_SPRINGS_HISTORIC_DISTRICT%2C_MARSHALL_COUNTY%2C_MS.jpg/960px-EAST_HOLLY_SPRINGS_HISTORIC_DISTRICT%2C_MARSHALL_COUNTY%2C_MS.jpg', 900, 584, 'Jerrye & Roy Klotz, MD', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:EAST_HOLLY_SPRINGS_HISTORIC_DISTRICT,_MARSHALL_COUNTY,_MS.jpg', '2026-11-21'),
+ 'tishomingo-state-park-ccc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Swinging_Bridge_Tishomingo_State_Park_1.jpg/960px-Swinging_Bridge_Tishomingo_State_Park_1.jpg', 900, 600, 'Fredlyfish4', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Swinging_Bridge_Tishomingo_State_Park_1.jpg', '2026-11-21'),
+}
