@@ -97,6 +97,7 @@ for l in list(open(os.path.join(repo,'LEADS.md'),encoding='utf-8'))+[x for n in 
     other=[c for c in re.findall(r',\s*([A-Z]{2})\b',where) if c.lower()!=(st or '')]      # a row in another state ("New Orleans, LA" for Orleans County, NY)
     if not hit and not other and any(re.search(r'\b'+re.escape(k)+r'\b',where) for k in keys): hit=True
     if hit: rows.append(l.strip())
+rows.sort(key=lambda l:not l.startswith('| Spot '))       # the owner's own spots first: he marked these buildings himself (tools/visits.py)
 print(f'== Leads on file for this ground (LEADS.md and the notes/ files): {len(rows)}'+(' (try these before hunting for new names; delete a row, wherever it is, when its place is added)' if rows else ''))
 for r in rows[:25]: print('  '+(r if len(r)<520 else r[:520]+' …'))
 g=open(os.path.join(repo,'GUIDE.md'),encoding='utf-8').read()

@@ -283,6 +283,17 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .ctx .btn{justify-content:flex-start;color:#1b221e;background:#fff;border-color:#d5dad4}
 .leaflet-control-attribution{font-size:10px}
 .cmp-swipe{will-change:clip}
+/* placing by hand: a cross at the middle of the map, so you line the map up under it; and spots, bare numbered marks */
+#aim{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;z-index:900;pointer-events:none}
+#aim::before,#aim::after{content:'';position:absolute;background:#ff2d95;box-shadow:0 0 0 1px #fff,0 0 3px rgba(0,0,0,.6)}
+#aim::before{left:50%;top:0;width:2px;height:100%;margin-left:-1px}
+#aim::after{top:50%;left:0;height:2px;width:100%;margin-top:-1px}
+#addbar.many{flex-wrap:wrap;justify-content:center;gap:6px 8px;width:max-content;max-width:calc(100% - 16px);padding:6px 10px} #addbar.many span{flex:1 1 100%;text-align:center;font-size:13px;line-height:1.25}
+.formpin{width:26px;height:26px;border-radius:50%;background:#ff2d95;border:3px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.45);cursor:grab}
+.spotpin{width:22px;height:22px;border-radius:50%;background:#ff2d95;border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.6);color:#fff;font:700 11px/18px system-ui,sans-serif;text-align:center;cursor:pointer}
+.spotbox{display:grid;gap:7px;min-width:200px} .spotbox input{width:100%;box-sizing:border-box}
+#spotcard>div{margin:8px 14px 2px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel2,var(--accent-soft))}
+#spotcard b{display:block;font-size:15px} #spotcard p{margin:3px 0 9px;font-size:13px;color:var(--mute)} #spotcard .row{display:flex;flex-wrap:wrap;gap:8px}
 .adding #map{cursor:crosshair}
 .adding .leaflet-grab,.adding .leaflet-interactive{cursor:crosshair}
 
