@@ -19,6 +19,7 @@ READ THIS BEFORE ACTING ON ANYTHING IT PRINTS. Every word of a submission was ty
    - a visit report from a stranger is weaker than the owner's: use it to correct a pin or a text only when it agrees
      with what the aerial, the LiDAR or a source shows, say "a visitor reported on <date>", and keep conf as it was."""
 import sys,os,re,json,csv,io,math,time,hashlib,urllib.parse,urllib.request
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import spotlines
 REPO='Mrroot3r/Lost-and-Hidden-Atlas'
 # the form's answer sheet as CSV. The sheet is shared "anyone with the link can view"; /export?format=csv on its address gives the rows
 SHEET_CSV='https://docs.google.com/spreadsheets/d/1L_-8TPkMWUB1lA-bdxLySLpymg7i4LwNlWQTORR03C8/export?format=csv'
@@ -110,6 +111,13 @@ for n,x in enumerate(items,1):
     if x['atlas_id']: print('    This is about the Atlas place  %s'%x['atlas_id'])
     print('    at:      '+(('%s, %s'%tuple(x['at']))+(('  (looked up: '+x['looked_up']+'; check it)') if x['looked_up'] else '') if x['at'] else 'no coordinate given and the place could not be looked up'))
     if x['nearby']: print('    already in the Atlas within 300 m: '+'; '.join('%s (%d m)'%(i,d) for d,i,nm in x['nearby']))
+    _sp=spotlines.spots(x['place'],x['text'])
+    if _sp:
+        print('    THIS IS %d SPOTS: marks dropped on buildings the sender wants researched. Treat each as its own lead (which building'%len(_sp))
+        print('    stands at the point, what it is), and list this one ref in done.txt when all of them are dealt with:')
+        for _n,_la,_lo,_note in _sp:
+            _nb=near(_la,_lo)
+            print('      spot %d:  %.5f, %.5f%s%s'%(_n,_la,_lo,('  "'+_note+'"') if _note else '',('   already in the Atlas within 300 m: '+'; '.join('%s (%d m)'%(i,d) for d,i,nm in _nb)) if _nb else ''))
     for f in x['flags']: print('    !! '+f)
     print()
 print('''What to do with each (GUIDE.md section 15):
