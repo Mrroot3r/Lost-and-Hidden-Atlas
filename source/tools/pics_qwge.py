@@ -1,0 +1,11 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen)   or   ('', day, why none fits)
+PICS={
+ 'dh-canal-neversink-aqueduct-cuddebackville':('', '2026-11-21', 'nothing on Commons within 250 m'),
+ 'erie-depot-port-jervis':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Erie_Depot_Port_Jervis_entrance.jpg/960px-Erie_Depot_Port_Jervis_entrance.jpg', 900, 533, 'Beyond My Ken', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Erie_Depot_Port_Jervis_entrance.jpg', '2026-11-21'),
+ 'erie-turntable-port-jervis':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Port_Jervis_Turntable.jpg/960px-Port_Jervis_Turntable.jpg', 900, 597, 'Eden, Janine and Jim from New York City', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Port_Jervis_Turntable.jpg', '2026-11-21'),
+ 'gumaer-cemetery-godeffroy':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/Gumaer_Cemetery%2C_Godeffroy%2C_NY.jpg/960px-Gumaer_Cemetery%2C_Godeffroy%2C_NY.jpg', 900, 548, 'Daniel Case', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Gumaer_Cemetery,_Godeffroy,_NY.jpg', '2026-11-21'),
+ 'hillside-cemetery-middletown':('https://thumb.wikimedia.org/wikipedia/commons/thumb/8/87/Hillside_Cemetery%2C_Middletown%2C_NY_2.jpg/960px-Hillside_Cemetery%2C_Middletown%2C_NY_2.jpg', 900, 645, 'Daniel Case', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Hillside_Cemetery,_Middletown,_NY_2.jpg', '2026-11-21'),
+ 'ow-station-middletown':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/Former_O%26W_station%2C_Middletown%2C_NY.jpg/960px-Former_O%26W_station%2C_Middletown%2C_NY.jpg', 900, 612, 'Daniel Case', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Former_O%26W_station,_Middletown,_NY.jpg', '2026-11-21'),
+ 'primitive-baptist-church-brookfield':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Primitive_Baptist_Church_of_Brookfield.jpg/960px-Primitive_Baptist_Church_of_Brookfield.jpg', 900, 1382, 'Daniel Case', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Primitive_Baptist_Church_of_Brookfield.jpg', '2026-11-21'),
+}
