@@ -158,7 +158,8 @@ function nearFrom(){ const g=(typeof geo==='object'&&geo)?geo.ll:null; if(g){ if
 function dtl(s){ if(!nearAt) return dt(s); const d=dest(s), r=roughMin(hav(nearAt[0],nearAt[1],d.lat,d.lon)); return {min:r.min,mi:r.mi,est:true,live:true}; }
 /* called when the position moves or is switched off: redo the list if its origin has changed */
 /* A place page that is open is left alone (it may hold a half-written visit report); it shows the new origin when next opened. */
-function nearMoved(){ const was=nearAt, now=nearFrom(); if(was===now) return; if(F.max&&view!=='detail') refresh(); else if(view==='list') renderList(); }
+function nearMoved(){ const was=nearAt, now=nearFrom(); if(was===now) return; if(view==='trip'){ trip.real=null; renderTrip(); }      /* the estimate starts where the reader is */
+  if(F.max&&view!=='detail') refresh(); else if(view==='list') renderList(); }
 async function fetchDT(){
   const H=homeObj(),key=homeKey(),all=sites(),t={};
   try{
@@ -793,7 +794,7 @@ function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme();
   if(k==='cluster') syncMarkers();
   if(k==='nativeLeads'){ if(v&&LEADS) leadsMore(); drawLeads(); NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(view==='near') nmDraw(true); }
   if(k==='hideGone'||k==='quietGone'||k==='buzzVanished'){ NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(k==='hideGone') refresh(); if(view==='near') nmDraw(true); }
-  if(k==='trk'){ if(rec) drawRec(); if(NM.ring) NM.ring.setStyle({color:v}); if(NM.line) NM.line.setStyle({color:v}); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
+  if(k==='trk'){ if(rec) drawRec(); if(NM.ring&&NM.ring._icon) NM.ring._icon.style.setProperty('--trk',v); if(NM.line) NM.line.setStyle({color:v}); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
   if(k==='units'){ const nv=$('#v-near'); if(nv) nv.textContent=''; if(view==='near') renderNear(); nmPush(true); }
   if(k==='units'||k==='clock'){ renderList(); if(sel&&view==='detail') renderDetail(sel); if(view==='log') renderLog(); if(view==='trip') renderTrip(); syncRec(); } }
 function showSettings(on){ sheetMode=on?'set':'map'; $('#sheet-t').textContent=on?'Settings':'Map options'; const g=$('#sheet-set'); g.setAttribute('aria-label',on?'Back to map options':'Settings'); g.classList.toggle('back',!!on);
@@ -2028,18 +2029,20 @@ function dblGroup(b,ll){ const n=Math.max(1,Math.min(4,+pref('dbl')||3)), z0=Dat
   if(map._animatingZoom) map.once('zoomend',()=>setTimeout(go,0)); else go(); }      /* the first tap's zoom is still running: a view set now would be undone when it lands */
 /* markers */
 const STARD='M12.00,1.60 L14.76,8.80 L22.46,9.20 L16.47,14.05 L18.47,21.50 L12.00,17.30 L5.53,21.50 L7.53,14.05 L1.54,9.20 L9.24,8.80Z';
-function pinIcon(s){
+function pinIcon(s,far,dx,dy){      /* far: a favourite while the numbered discs are showing, drawn small; dx,dy: pixels it is pushed aside, off a disc */
   const star=s.st==='standing'&&!s.mine;      /* a place of the reader's own stays a diamond: .pin.mine */
   const c=['pin']; if(HOLLOW[s.st]) c.push('hollow'); if(star) c.push('sq'); if(s.now) c.push('now'); if(s.mine) c.push('mine');
-  const my=U.status[s.id]; if(my) c.push('my-'+my); if(isFav(s.id)) c.push('fav'); if(sel&&sel.id===s.id) c.push('sel');
+  const my=U.status[s.id]; if(my) c.push('my-'+my); if(isFav(s.id)) c.push('fav'); if(far) c.push('far'); if(sel&&sel.id===s.id) c.push('sel');
+  const anc=[11-(dx||0),11-(dy||0)];
   const col=(CAT[s.cat]||CAT.landmark)[1];
   /* a standing place is a star (an outline drawn under the fill, so it reads on any aerial); the rest are round */
-  if(star) return L.divIcon({className:'pinwrap',html:'<svg class="'+c.join(' ')+'" viewBox="0 0 24 24" style="--c:'+col+'">'+(s.now?'<path class="p" d="'+STARD+'"/>':'')+'<path class="o" d="'+STARD+'"/><path class="f" d="'+STARD+'"/></svg>',iconSize:[22,22],iconAnchor:[11,11]});      /* .p is the "changing now" pulse */
-  return L.divIcon({className:'pinwrap',html:'<span class="'+c.join(' ')+'" style="--c:'+col+'"></span>',iconSize:[22,22],iconAnchor:[11,11]});
+  if(star) return L.divIcon({className:'pinwrap',html:'<svg class="'+c.join(' ')+'" viewBox="0 0 24 24" style="--c:'+col+'">'+(s.now?'<path class="p" d="'+STARD+'"/>':'')+'<path class="o" d="'+STARD+'"/><path class="f" d="'+STARD+'"/></svg>',iconSize:[22,22],iconAnchor:anc});      /* .p is the "changing now" pulse */
+  return L.divIcon({className:'pinwrap',html:'<span class="'+c.join(' ')+'" style="--c:'+col+'"></span>',iconSize:[22,22],iconAnchor:anc});
 }
 /* Zoomed out to town level or wider, pins that would sit on top of each other are replaced by one numbered disc.
    A cell of the screen with four or more pins becomes a disc; the selected place always keeps its own pin. */
 const CLUSZ=9, CLUSPX=58, CLUSMIN=4;
+const clusSize=n=>{ const st=n<10?0:n<30?1:n<100?2:n<300?3:4; return [st,[30,36,42,46,52][st]]; };      /* a disc's colour step and width by its count */
 function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return null;
   const z=map.getZoom(), cells=new Map();
   sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
@@ -2062,8 +2065,14 @@ function syncMarkers(){
     if((sel&&sel.id===s.id)||(p.lat>=S&&p.lat<=N&&p.lon>=W&&p.lon<=E)) want.set(s.id,s); });
   markers.forEach((m,id)=>{ if(!want.has(id)){ map.removeLayer(m); markers.delete(id); } });
   if(pinPool.size>all.length){ const ids=new Set(all.map(s=>s.id)); pinPool.forEach((m,id)=>{ if(!ids.has(id)) pinPool.delete(id); }); }      /* a place of your own that was deleted */
+  /* While the numbered discs are showing, a favourite still has its own pin, but smaller, and a pin that would sit on a disc is
+     drawn just off its rim: on top of a disc it hid the number (the owner, November 21, 2026). The discs on the screen: */
+  const discs=plan&&plan.groups.length?plan.groups.map(c=>{ const n=c.ids.length, q=map.latLngToLayerPoint([c.la/n,c.lo/n]); return {x:q.x,y:q.y,r:clusSize(n)[1]/2}; }):null;
   want.forEach(s=>{
-    const p=pos(s), ic=pinIcon(s), sig=ic.options.html; let m=pinPool.get(s.id);
+    const p=pos(s), far=!!plan&&isFav(s.id)&&!(sel&&sel.id===s.id); let dx=0, dy=0;
+    if(discs&&!(sel&&sel.id===s.id)){ const q=map.latLngToLayerPoint([p.lat,p.lon]); for(const g of discs){ const ex=q.x+dx-g.x, ey=q.y+dy-g.y, d=Math.hypot(ex,ey), need=g.r+13;      /* 13: a pin's half width and a gap. Any pin that stands alone is moved off a disc, favourite or not */
+        if(d<need){ const ux=d<1?0.7071:ex/d, uy=d<1?-0.7071:ey/d; dx+=Math.round(ux*(need-d)); dy+=Math.round(uy*(need-d)); } } }
+    const ic=pinIcon(s,far,dx,dy), sig=ic.options.html+(dx||dy?'|'+dx+','+dy:''); let m=pinPool.get(s.id);
     if(!m){ m=L.marker([p.lat,p.lon],{icon:ic,keyboard:false,riseOnHover:true}); m._sig=sig;
       const tip=el('span',{text:s.name}); m.bindTooltip(tip,{direction:'top',offset:[0,-9]});
       m.on('click',()=>{ if(adding||pickingHome) return; select(byId(s.id)||s,false); });
@@ -2072,14 +2081,14 @@ function syncMarkers(){
       pinPool.set(s.id,m); }
     else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
     if(!markers.has(s.id)){ m.addTo(map); markers.set(s.id,m); }
-    const zo=sel&&sel.id===s.id?1000:isFav(s.id)?600:(s.cat==='landmark'?-200:0); if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
+    const zo=sel&&sel.id===s.id?1000:far?-20000:isFav(s.id)?600:(s.cat==='landmark'?-200:0);      /* a small favourite goes under the discs */ if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
   });
   /* the grouped pins are made again only when the groups change, not each time the map is nudged */
   const sig=plan?map.getZoom()+'|'+plan.groups.map(c=>c.ids.length+':'+c.la.toFixed(3)+':'+c.lo.toFixed(3)).join():'';
   if(sig===clusSig&&(!sig||clusLayer)) return; clusSig=sig;
   if(clusLayer){ map.removeLayer(clusLayer); clusLayer=null; }
   if(plan&&plan.groups.length){ clusLayer=L.layerGroup();
-    plan.groups.forEach(c=>{ const n=c.ids.length, st=n<10?0:n<30?1:n<100?2:n<300?3:4, d=[30,36,42,46,52][st];      /* colour and size by count, cool to hot (app.css, .clus.c0 to .c4) */
+    plan.groups.forEach(c=>{ const n=c.ids.length, cs=clusSize(n), st=cs[0], d=cs[1];      /* colour and size by count, cool to hot (app.css, .clus.c0 to .c4) */
       const m=L.marker([c.la/n,c.lo/n],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'clus c'+st,html:String(n),iconSize:[d,d],iconAnchor:[d/2,d/2]})});
       m.bindTooltip(n+' places. Tap to zoom in',{direction:'top',offset:[0,-d/2]});
       m.on('click',()=>{ if(adding||pickingHome) return; dblFrom={t:Date.now(),z:map.getZoom()}; map.fitBounds(L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25),{maxZoom:Math.max(map.getZoom()+2,CLUSZ+1)}); });
@@ -2541,7 +2550,12 @@ function visitExport(){ const out=[]; Object.keys(U.visits||{}).forEach(id=>{ co
     out.push({id:id,name:s.name,town:s.town||'',cat:s.cat,pin:[b.lat,b.lon],mine:!!s.mine,reports:U.visits[id]}); }); return out; }
 
 /* ---------- trip ---------- */
-let trip={round:true,real:null,t0:'',day:''};
+let trip={real:null,t0:'',day:''};
+/* Where the Atlas's own time estimate for a trip begins: the reader's position while it is on, otherwise the start place if one
+   was chosen, otherwise nowhere (the estimate is then between the stops only). The route handed to Google Maps names no start at
+   all, so Google begins at the phone's position and offers Start; and nothing goes back to anywhere (the owner, November 21, 2026:
+   the way home is one tap in Google Maps, and a route that began at fixed coordinates only offered a preview). */
+function tripFrom(){ const a=nearFrom(); if(a) return {lat:a[0],lon:a[1],name:'where you are',live:true}; if(homePicked()){ const H=homeObj(); return {lat:H.lat,lon:H.lon,name:H.name}; } return null; }
 /* sunrise and sunset for a calendar day at a place (the NOAA sunrise equation; good to a couple of minutes) */
 function sunTimes(day,lat,lon){ const d=new Date(day+'T12:00:00'), J=Math.floor(d.getTime()/86400000)+2440587.5, n=Math.ceil(J-2451545.0+0.0008), js=n-lon/360, M=rad((357.5291+0.98560028*js)%360);
   const C=1.9148*Math.sin(M)+0.02*Math.sin(2*M)+0.0003*Math.sin(3*M), lam=rad((M*180/Math.PI+C+180+102.9372)%360), jt=2451545.0+js+0.0053*Math.sin(M)-0.0069*Math.sin(2*lam);
@@ -2550,58 +2564,54 @@ function sunTimes(day,lat,lon){ const d=new Date(day+'T12:00:00'), J=Math.floor(
 /* the day by the clock: when you reach each stop, when you are done, and whether that is before sunset */
 function tripClock(pts,st){ const d0=new Date(), pad=n=>String(n).padStart(2,'0'), today=d0.getFullYear()+'-'+pad(d0.getMonth()+1)+'-'+pad(d0.getDate());
   if(!trip.day) trip.day=today; if(!trip.t0){ const q=new Date(Math.ceil((d0.getTime()+5*60000)/900000)*900000); trip.t0=pad(q.getHours())+':'+pad(q.getMinutes()); }
-  const stay=+pref('tripStop')||45, start=new Date(trip.day+'T'+trip.t0+':00'), legs=[]; for(let i=1;i<pts.length;i++) legs.push(trip.real&&trip.real.legs&&trip.real.legs.length===pts.length-1?trip.real.legs[i-1]:roughMin(hav(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon)).min);
-  const at=[]; let t=start.getTime(); st.forEach((s,i)=>{ t+=legs[i]*60000; at.push(new Date(t)); t+=stay*60000; }); if(trip.round) t+=legs[legs.length-1]*60000;
+  const stay=+pref('tripStop')||45, start=new Date(trip.day+'T'+trip.t0+':00'), legs=[], off=pts.length-st.length; for(let i=1;i<pts.length;i++) legs.push(trip.real&&trip.real.legs&&trip.real.legs.length===pts.length-1?trip.real.legs[i-1]:roughMin(hav(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon)).min);
+  const at=[]; let t=start.getTime(); st.forEach((s,i)=>{ const k=i-1+off; if(k>=0) t+=legs[k]*60000; at.push(new Date(t)); t+=stay*60000; });      /* off is 1 when the list begins with a starting point, 0 when it is the stops alone */
   const last=st[st.length-1], lp=pos(last), sun=sunTimes(trip.day,lp.lat,lp.lon); let late=-1; if(sun) at.forEach((a,i)=>{ if(late<0&&a.getTime()+stay*60000>sun.set.getTime()) late=i; });
   return {at:at,end:new Date(t),sun:sun,late:late,stay:stay,real:!!(trip.real&&trip.real.legs)}; }
 const hm=d=>d.toLocaleTimeString([],{hour12:H12(),hour:'numeric',minute:'2-digit'});
 function tripStops(){ return U.trip.map(byId).filter(Boolean); }
 function legMiles(pts){ let m=0; for(let i=1;i<pts.length;i++) m+=hav(pts[i-1].lat,pts[i-1].lon,pts[i].lat,pts[i].lon); return m; }
 function bestOrder(){
-  const H=homeObj(), st=tripStops(); if(st.length<3){ return; }
-  const P=st.map(dest), n=P.length, used=new Array(n).fill(false); let cur=H, ord=[];
+  const H=tripFrom(), st=tripStops(); if(st.length<3){ return; }
+  const P=st.map(dest), n=P.length, used=new Array(n).fill(false); let cur=H||P[0], ord=[];      /* with no starting point the first stop stays first */
   for(let k=0;k<n;k++){ let b=-1,bd=1e9; for(let i=0;i<n;i++){ if(used[i]) continue; const d=hav(cur.lat,cur.lon,P[i].lat,P[i].lon); if(d<bd){bd=d;b=i;} } used[b]=true; ord.push(b); cur=P[b]; }
-  const len=o=>legMiles([H].concat(o.map(i=>P[i])).concat(trip.round?[H]:[]));
+  const len=o=>legMiles((H?[H]:[]).concat(o.map(i=>P[i])));
   let improved=true, guard=0;
   while(improved&&guard++<60){ improved=false;
     for(let i=0;i<n-1;i++) for(let j=i+1;j<n;j++){ const o2=ord.slice(0,i).concat(ord.slice(i,j+1).reverse(),ord.slice(j+1)); if(len(o2)+1e-6<len(ord)){ ord=o2; improved=true; } } }
   U.trip=ord.map(i=>st[i].id); save(); trip.real=null;
 }
 function gmapsLinks(){
-  const H=homeObj(), P=tripStops().map(dest), out=[]; if(!P.length) return out;
-  const pts=[H].concat(P).concat(trip.round?[H]:[]), f=p=>p.lat.toFixed(5)+','+p.lon.toFixed(5);
-  for(let i=0;i<pts.length-1;i+=10){ const seg=pts.slice(i,i+11); if(seg.length<2) break;
-    const way=seg.slice(1,-1).map(f).join('|');
-    out.push('https://www.google.com/maps/dir/?api=1&origin='+f(seg[0])+'&destination='+f(seg[seg.length-1])+(way?'&waypoints='+encodeURIComponent(way):'')+'&travelmode=driving'); }
+  const P=tripStops().map(dest), out=[], f=p=>p.lat.toFixed(5)+','+p.lon.toFixed(5);
+  for(let i=0;i<P.length;i+=10){ const seg=P.slice(i,i+10), way=seg.slice(0,-1).map(f).join('|');      /* ten stops a link: nine on the way and the last as the destination */
+    out.push('https://www.google.com/maps/dir/?api=1&destination='+f(seg[seg.length-1])+(way?'&waypoints='+encodeURIComponent(way):'')+'&travelmode=driving'); }
   return out;
 }
 function renderTrip(){
-  const v=$('#v-trip'); v.textContent=''; trip.round=U.ui.round!==false; const st=tripStops(), H=homeObj();
+  const v=$('#v-trip'); v.textContent=''; const st=tripStops(), H=tripFrom();
   const box=el('div',{class:'pad',style:'padding-block:12px'}); v.append(box);
   box.append(el('h2',{style:'font-size:22px',text:'Trip builder'}),el('p',{style:'color:var(--mute);margin:4px 0 10px',text:'Add places from their pages, put them in order, then hand the route to Google Maps for live traffic and turn-by-turn.'}));
   if(!st.length){ box.append(el('p',{class:'empty',text:'No stops yet. Open a place and choose "Add to trip".'})); return; }
-  if(!homePicked()){ box.append(el('p',{style:'margin:0 0 4px',text:'A trip starts from your start place, and you have not chosen one yet.'}),startCard(true)); return; }
-  const ul=el('ol',{class:'stops'}), pts0=[H].concat(st.map(dest)).concat(trip.round?[H]:[]), ck=tripClock(pts0,st);
+  const ul=el('ol',{class:'stops'}), pts0=(H?[H]:[]).concat(st.map(dest)), ck=tripClock(pts0,st);
   st.forEach((s,i)=>{ const mv=d=>()=>{ const j=i+d; if(j<0||j>=U.trip.length) return; const a=U.trip; const t=a[i]; a[i]=a[j]; a[j]=t; trip.real=null; save(); renderTrip(); };
     ul.append(el('li',null,el('span',null,el('button',{type:'button',style:'background:none;border:0;padding:0;font-weight:600;text-align:left;color:var(--ink)',onclick:()=>select(s,true)},s.name),el('small',{text:[s.town,EFF[s.eff],ACC[s.acc]].filter(Boolean).join(' · ')}),el('small',{class:'stop-at'+(ck.late>=0&&i>=ck.late?' late':''),text:'there about '+hm(ck.at[i])})),
       el('span',{class:'mv'},el('button',{class:'btn sm',type:'button','aria-label':'Move up',disabled:i===0,onclick:mv(-1)},'↑'),el('button',{class:'btn sm',type:'button','aria-label':'Move down',disabled:i===st.length-1,onclick:mv(1)},'↓'),el('button',{class:'btn sm',type:'button','aria-label':'Remove',onclick:()=>{U.trip.splice(i,1);trip.real=null;save();refresh();}},'✕')))); });
   box.append(ul);
-  const pts=[H].concat(st.map(dest)).concat(trip.round?[H]:[]), r=roughMin(legMiles(pts));
-  const sum=el('p',{style:'margin:10px 0'});
-  if(trip.real) sum.append(el('b',{class:'mono',text:fmtMin(trip.real.min)}),' driving, '+miTxt(trip.real.mi)+' by road, before stops and traffic.');
-  else sum.append(el('b',{class:'mono',text:'~'+fmtMin(r.min)}),' driving, about '+miTxt(Math.round(r.mi))+'. Rough estimate from straight-line distance.');
+  const pts=pts0, r=roughMin(legMiles(pts)), frm=H?' from '+H.name:' between the stops';
+  const sum=el('p',{id:'trip-sum',style:'margin:10px 0'});
+  if(trip.real) sum.append(el('b',{class:'mono',text:fmtMin(trip.real.min)}),' driving'+frm+', '+miTxt(trip.real.mi)+' by road, before stops and traffic.');
+  else if(pts.length<2) sum.append('One stop and no starting point yet: turn on Me, or add a second stop, for a drive time.');
+  else sum.append(el('b',{class:'mono',text:'~'+fmtMin(r.min)}),' driving'+frm+', about '+miTxt(Math.round(r.mi))+'. Rough estimate from straight-line distance.');
   box.append(sum);
   /* the clock */
   const dayI=el('input',{type:'date',id:'trip-day','aria-label':'Day of the trip',onchange:e=>{ if(e.target.value){ trip.day=e.target.value; renderTrip(); } }}), t0I=el('input',{type:'time',id:'trip-t0','aria-label':'Leaving at',onchange:e=>{ if(e.target.value){ trip.t0=e.target.value; renderTrip(); } }});
   dayI.value=trip.day; t0I.value=trip.t0;
   const stS=el('select',{id:'trip-stop','aria-label':'Time at each stop',onchange:e=>{ setPref('tripStop',+e.target.value); renderTrip(); }},[20,30,45,60,90,120].map(m=>el('option',{value:String(m),text:fmtMin(m)+' at each stop'}))); stS.value=String(ck.stay);
   const clk=el('div',{id:'trip-clock'},el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Day'}),dayI),el('label',{class:'field'},el('span',{text:'Leave at'}),t0I)),el('div',{class:'row',style:'margin-top:6px'},stS),
-    el('p',{style:'margin:8px 0 0'},(trip.round?'Back at '+H.name+' about ':'Done about '),el('b',{class:'mono',text:hm(ck.end)}),ck.sun?'. Sunset at the last stop is '+hm(ck.sun.set)+'.':'.',ck.real?'':' Times use rough drive estimates until you tap "Get real drive time".'));
+    el('p',{style:'margin:8px 0 0'},'Done about ',el('b',{class:'mono',text:hm(ck.end)}),ck.sun?'. Sunset at the last stop is '+hm(ck.sun.set)+'.':'.',ck.real?'':' Times use rough drive estimates until you tap "Get real drive time".'));
   if(ck.late>=0) clk.append(el('p',{class:'pn trip-warn',text:(ck.at[ck.late].getTime()>ck.sun.set.getTime()?'You would reach '+st[ck.late].name+' after sunset.':'Sunset comes while you are at '+st[ck.late].name+'.')+' Leave earlier, shorten the stops or drop a stop.'}));
   box.append(clk);
-  const rt=el('input',{type:'checkbox',id:'trip-round',checked:trip.round,onchange:e=>{U.ui.round=trip.round=e.target.checked;save();trip.real=null;renderTrip();}});
-  box.append(el('label',{class:'lopt',for:'trip-round'},rt,el('span',null,'Round trip from '+H.name)));
-  const real=el('button',{class:'btn',type:'button',onclick:async()=>{ real.disabled=true; real.textContent='Checking…';
+  const real=el('button',{class:'btn',type:'button',disabled:pts.length<2,onclick:async()=>{ real.disabled=true; real.textContent='Checking…';
     try{ const c=pts.map(p=>p.lon.toFixed(5)+','+p.lat.toFixed(5)).join(';'); const j=await (await fetch('https://router.project-osrm.org/route/v1/driving/'+c+'?overview=false')).json(); if(j.code!=='Ok') throw 0;
       trip.real={min:Math.round(j.routes[0].duration/60),mi:Math.round(j.routes[0].distance/1609.34),legs:(j.routes[0].legs||[]).map(l=>l.duration/60)}; renderTrip(); }
     catch(e){ real.disabled=false; real.textContent='Routing service unreachable. Use Google Maps'; } }},'Get real drive time');
