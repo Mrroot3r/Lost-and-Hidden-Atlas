@@ -1,0 +1,17 @@
+{"name": "Muller Hill State Forest", "code": "mhsf", "st": "ny", "state": "done", "tiles": 30, "swept": "2026-11-20", "buildings": 59, "sheets": ["NY_Cazenovia_122873_1897_62500_geo.tif", "NY_Pitcher_129030_1904_62500_geo.tif", "NY_Norwich_128803_1903_62500_geo.tif"], "walls": 2066, "wall_m": 55959,
+"cands":[
+{"id":"mhsf1","lat":42.770786,"lon":-75.779436,"depth":1.19,"size":[8,7],"dist":74,"blat":42.77027,"blon":-75.77886,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf2","lat":42.76912,"lon":-75.782593,"depth":0.81,"size":[10,8],"dist":24,"blat":42.7692,"blon":-75.78287,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf3","lat":42.731449,"lon":-75.766896,"depth":0.78,"size":[12,7],"dist":19,"blat":42.73159,"blon":-75.76676,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mhsf4","lat":42.766798,"lon":-75.796486,"depth":1.0,"size":[6,7],"dist":69,"blat":42.76691,"blon":-75.79565,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf5","lat":42.772349,"lon":-75.797256,"depth":0.91,"size":[8,5],"dist":61,"blat":42.77188,"blon":-75.79765,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf6","lat":42.769318,"lon":-75.782275,"depth":0.62,"size":[8,6],"dist":50,"blat":42.7692,"blon":-75.78287,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf7","lat":42.770009,"lon":-75.779876,"depth":0.81,"size":[10,8],"dist":88,"blat":42.77027,"blon":-75.77886,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf8","lat":42.772403,"lon":-75.796968,"depth":0.77,"size":[9,11],"dist":81,"blat":42.77188,"blon":-75.79765,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf9","lat":42.732271,"lon":-75.767147,"depth":0.71,"size":[13,8],"dist":82,"blat":42.73159,"blon":-75.76676,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mhsf10","lat":42.72765,"lon":-75.775466,"depth":0.66,"size":[7,13],"dist":84,"blat":42.72837,"blon":-75.77514,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mhsf11","lat":42.76333,"lon":-75.80015,"depth":0.63,"size":[7,11],"dist":66,"blat":42.76362,"blon":-75.80085,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf12","lat":42.729886,"lon":-75.770589,"depth":0.6,"size":[6,5],"dist":87,"blat":42.72936,"blon":-75.77138,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mhsf13","lat":42.780848,"lon":-75.796105,"depth":0.69,"size":[4,5],"dist":84,"blat":42.78111,"blon":-75.79514,"sheet":"NY_Cazenovia_122873_1897_62500_geo.tif","year":1897,"status":"new"},
+{"id":"mhsf14","lat":42.748216,"lon":-75.769893,"depth":0.65,"size":[4,8],"dist":72,"blat":42.74873,"blon":-75.77042,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"}
+]}

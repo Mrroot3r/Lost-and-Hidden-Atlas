@@ -1,0 +1,21 @@
+{"name": "Mallet Pond State Forest", "code": "mpsf", "st": "ny", "state": "done", "tiles": 22, "swept": "2026-11-20", "buildings": 68, "sheets": ["NY_Richmondville_136445_1904_62500_geo.tif", "NY_Schoharie_129441_1900_62500_geo.tif"], "walls": 1330, "wall_m": 44761,
+"cands":[
+{"id":"mpsf1","lat":42.576075,"lon":-74.507857,"depth":1.17,"size":[7,8],"dist":33,"blat":42.57632,"blon":-74.50762,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf2","lat":42.59268,"lon":-74.511926,"depth":1.1,"size":[6,11],"dist":18,"blat":42.59263,"blon":-74.51214,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf3","lat":42.579866,"lon":-74.515501,"depth":0.96,"size":[8,12],"dist":29,"blat":42.58001,"blon":-74.5152,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf4","lat":42.572958,"lon":-74.503472,"depth":1.19,"size":[12,12],"dist":52,"blat":42.57342,"blon":-74.50335,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf5","lat":42.584312,"lon":-74.532453,"depth":1.12,"size":[13,8],"dist":57,"blat":42.58468,"blon":-74.53293,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf6","lat":42.594279,"lon":-74.52204,"depth":0.76,"size":[8,7],"dist":41,"blat":42.59453,"blon":-74.52167,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf7","lat":42.586935,"lon":-74.501166,"depth":1.07,"size":[6,10],"dist":69,"blat":42.5872,"blon":-74.50041,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf8","lat":42.5793,"lon":-74.491588,"depth":0.73,"size":[8,10],"dist":37,"blat":42.57925,"blon":-74.49114,"sheet":"NY_Schoharie_129441_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"mpsf9","lat":42.588063,"lon":-74.52129,"depth":0.88,"size":[9,13],"dist":78,"blat":42.58761,"blon":-74.52056,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf10","lat":42.592905,"lon":-74.5265,"depth":0.84,"size":[5,7],"dist":82,"blat":42.59219,"blon":-74.52626,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf11","lat":42.576852,"lon":-74.507796,"depth":0.79,"size":[5,9],"dist":61,"blat":42.57632,"blon":-74.50762,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf12","lat":42.588162,"lon":-74.52057,"depth":0.79,"size":[7,9],"dist":61,"blat":42.58761,"blon":-74.52056,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf13","lat":42.592757,"lon":-74.526957,"depth":0.79,"size":[12,8],"dist":85,"blat":42.59219,"blon":-74.52626,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf14","lat":42.572899,"lon":-74.503661,"depth":0.73,"size":[5,5],"dist":63,"blat":42.57342,"blon":-74.50335,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf15","lat":42.579524,"lon":-74.491948,"depth":0.64,"size":[5,6],"dist":73,"blat":42.57925,"blon":-74.49114,"sheet":"NY_Schoharie_129441_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"mpsf16","lat":42.581663,"lon":-74.502025,"depth":0.61,"size":[5,6],"dist":76,"blat":42.5813,"blon":-74.50281,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf17","lat":42.586051,"lon":-74.53981,"depth":0.77,"size":[7,15],"dist":20,"blat":42.58588,"blon":-74.53974,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"mpsf18","lat":42.567855,"lon":-74.498798,"depth":0.82,"size":[10,14],"dist":77,"blat":42.56772,"blon":-74.49972,"sheet":"NY_Schoharie_129441_1900_62500_geo.tif","year":1900,"status":"new"}
+]}

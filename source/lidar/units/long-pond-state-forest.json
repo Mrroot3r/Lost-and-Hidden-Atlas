@@ -1,0 +1,18 @@
+{"name": "Long Pond State Forest", "code": "lpsf", "st": "ny", "state": "done", "tiles": 23, "swept": "2026-11-20", "buildings": 149, "sheets": ["NY_Greene_129608_1904_62500_geo.tif"], "walls": 1579, "wall_m": 45582,
+"cands":[
+{"id":"lpsf1","lat":42.421599,"lon":-75.830447,"depth":0.91,"size":[11,7],"dist":35,"blat":42.42177,"blon":-75.8308,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf2","lat":42.41597,"lon":-75.832753,"depth":0.9,"size":[10,10],"dist":28,"blat":42.4158,"blon":-75.83301,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf3","lat":42.43612,"lon":-75.823268,"depth":0.85,"size":[7,6],"dist":26,"blat":42.43613,"blon":-75.82358,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf4","lat":42.425272,"lon":-75.804922,"depth":0.65,"size":[6,9],"dist":25,"blat":42.42546,"blon":-75.80508,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf5","lat":42.423427,"lon":-75.804333,"depth":0.64,"size":[13,10],"dist":36,"blat":42.42375,"blon":-75.80435,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf6","lat":42.41951,"lon":-75.852771,"depth":1.24,"size":[14,14],"dist":26,"blat":42.41974,"blon":-75.85278,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf7","lat":42.421284,"lon":-75.831323,"depth":0.62,"size":[13,13],"dist":29,"blat":42.42105,"blon":-75.83118,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf8","lat":42.422524,"lon":-75.840724,"depth":0.69,"size":[6,9],"dist":85,"blat":42.4218,"blon":-75.84107,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf9","lat":42.400847,"lon":-75.847617,"depth":0.65,"size":[5,11],"dist":78,"blat":42.40154,"blon":-75.84779,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf10","lat":42.422995,"lon":-75.805239,"depth":0.61,"size":[8,8],"dist":79,"blat":42.42266,"blon":-75.80439,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf11","lat":42.423148,"lon":-75.805051,"depth":0.61,"size":[7,6],"dist":77,"blat":42.42266,"blon":-75.80439,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf12","lat":42.41726,"lon":-75.832187,"depth":1.15,"size":[11,15],"dist":77,"blat":42.41665,"blon":-75.83174,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf13","lat":42.424419,"lon":-75.804728,"depth":0.7,"size":[16,13],"dist":27,"blat":42.42425,"blon":-75.80449,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf14","lat":42.424594,"lon":-75.804035,"depth":0.89,"size":[14,10],"dist":54,"blat":42.42425,"blon":-75.80449,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lpsf15","lat":42.43289,"lon":-75.843169,"depth":0.71,"size":[4,5],"dist":57,"blat":42.43239,"blon":-75.843,"sheet":"NY_Greene_129608_1904_62500_geo.tif","year":1904,"status":"new"}
+]}
