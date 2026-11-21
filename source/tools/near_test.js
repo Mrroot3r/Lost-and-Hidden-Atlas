@@ -43,6 +43,10 @@ const { chromium, devices } = require('playwright');
   const goal=(await p.innerText('#near-goal')).replace(/\s+/g,' ');
   ok('tapping a row gives one big arrow and distance',/0\.25 mi N/.test(goal)&&goal.includes(T[2])&&/Details/.test(goal)&&/Stop/.test(goal),goal.slice(0,110));
   ok('and a dashed line on the map',await p.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.dashArray==='7 7') n++; }); return n===1; }));
+  // the ring on the target is a marker like the pins, not a shape in the drawing layer: a shape there is stretched with the
+  // map while two fingers zoom, so from far out a 13-pixel ring became a huge blue circle sliding about the screen
+  const ring=await p.evaluate(()=>{ let svg=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.radius===13&&l._path) svg++; }); const e=document.querySelectorAll('.leaflet-marker-pane .nmring'); const b=e.length?e[0].getBoundingClientRect():{width:0}; return {svg:svg,n:e.length,w:Math.round(b.width)}; });
+  ok('the ring on the target is one small marker, not a shape that stretches when the map is pinched',ring.svg===0&&ring.n===1&&ring.w>=20&&ring.w<=34,JSON.stringify(ring));
   await p.screenshot({path:'/tmp/near_2.png'});
   // compass: the phone lying flat with its top pointing west (alpha 90) turns a north arrow to the right
   await p.evaluate(()=>{ const e=new Event('deviceorientationabsolute'); e.absolute=true; e.alpha=90; e.beta=0; e.gamma=0; window.dispatchEvent(e); }); await p.waitForTimeout(500);
@@ -69,7 +73,7 @@ const { chromium, devices } = require('playwright');
   await p.selectOption('#near-al','0'); await at(400); await at(70); ok('alert off: silent',(await p.evaluate(()=>window.__buzz.length))===2&&!/Buzzes/.test(await p.innerText('#near-note')));
   // stop pointing
   await p.getByRole('button',{name:'Stop',exact:true}).click(); await p.waitForTimeout(400);
-  ok('Stop removes the big arrow and the line',await p.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.dashArray==='7 7') n++; }); return n===0&&document.getElementById('near-goal').hidden; }));
+  ok('Stop removes the big arrow and the line',await p.evaluate(()=>{ let n=0; window.__atlasMap.eachLayer(l=>{ if(l.options&&l.options.dashArray==='7 7') n++; }); return n===0&&document.getElementById('near-goal').hidden&&!document.querySelector('.nmring'); }));
   // the middle of the map
   await p.getByRole('button',{name:'Use map centre'}).click(); await p.evaluate(()=>{ window.__atlasMap.setView([42.6526,-73.7562],13,{animate:false}); }); await p.waitForTimeout(2200);
   r=await rows(); ok('middle of the map: the list follows the map to Albany',/From the middle of the map/.test(await p.innerText('#near-st'))&&r.length>10&&r[0][0]!==T[2],r.slice(0,3).map(x=>x[0]+' '+x[1]).join(' | '));
