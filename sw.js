@@ -2,7 +2,7 @@
    Three stores: the page and its scripts (thrown away at each new build), old survey maps, and the old rail and canal lines.
    The lines come one state to a file (data/lines/), each address carrying a stamp of the file's content, so a state is
    fetched again only when its lines change, not at every build; the copy it replaces is dropped then. */
-const V='2611210254', SHELL='atlas-shell-'+V, KEEP='atlas-topo', LINES='atlas-lines';
+const V='2611210325', SHELL='atlas-shell-'+V, KEEP='atlas-topo', LINES='atlas-lines';
 self.addEventListener('install',e=>{ self.skipWaiting();
   e.waitUntil(caches.open(SHELL).then(c=>c.addAll(['./','app.js?v='+V,'leaflet.js?v=1.9.4'])).catch(()=>{})); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==SHELL&&k!==KEEP&&k!==LINES).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
