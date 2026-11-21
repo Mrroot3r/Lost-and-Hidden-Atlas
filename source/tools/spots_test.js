@@ -98,6 +98,32 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   ok('the spots are still there, and on the map, after the page is opened again',((await U(p)).spots||[]).length===2&&(await p.locator('.spotpin').count())>=1);
   await p.click('#tab-list'); await p.waitForTimeout(200); await p.click('#spots-clear'); await p.waitForTimeout(150); await p.click('#spots-clear'); await p.waitForTimeout(300);
   ok('Clear asks twice, then empties them and takes the card away',((await U(p)).spots||[]).length===0&&(await p.locator('.spotpin').count())===0&&!(await vis(p,'#spotcard')));
+  // ---- a long press on the map: a short box that fits the map on a phone, the other maps folded away (the owner, November 21, 2026)
+  await p.click('#tab-list'); await p.waitForTimeout(200);
+  await p.evaluate(()=>{ const m=window.__atlasMap; m.closePopup(); m.fire('contextmenu',{latlng:m.getCenter()}); }); await p.waitForTimeout(500);
+  const cx2=await p.evaluate(()=>{ const pop=document.querySelector('.leaflet-popup'), m=document.querySelector('#map').getBoundingClientRect(), r=pop.getBoundingClientRect(), d=pop.querySelector('details');
+    const vis=t=>[...pop.querySelectorAll('a,button')].some(b=>b.textContent.trim()===t&&b.offsetParent!==null&&b.getBoundingClientRect().height>0&&!(d&&d.contains(b)&&!d.open));
+    return {fits:r.top>=m.top-1&&r.bottom<=m.bottom+1,h:Math.round(r.height),mh:Math.round(m.height),add:vis('+ Add to my places'),send:vis('Send this spot to the public Atlas'),gm:vis('Google Maps'),folded:!!d&&!d.open&&[...d.querySelectorAll('a')].some(a=>a.textContent.trim()==='Google Maps')}; });
+  ok('a long press opens a box that fits inside the map, with Add and Send showing and the other maps folded away',cx2.fits&&cx2.add&&cx2.send&&!cx2.gm&&cx2.folded,JSON.stringify(cx2));
+  await p.evaluate(()=>window.__atlasMap.closePopup());
+  // ---- a place of your own: the button that sends it to the public Atlas is at the top of its page
+  const mineId=await p.evaluate(()=>{ const u=JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')); return (u.custom||[]).slice(-1)[0].id; });
+  await p.evaluate(id=>{ location.hash='#'+id; },mineId); await p.waitForTimeout(500);
+  const ls=await p.evaluate(()=>{ const b=document.querySelector('#lead-send'), v=document.querySelector('#v-detail'), n=document.querySelectorAll('#lead-send').length; if(!b) return null; return {top:Math.round(b.getBoundingClientRect().top-v.getBoundingClientRect().top+v.scrollTop),n:n,t:b.textContent.trim()}; });
+  ok('its page has one "Send to the public Atlas" button, near the top',!!ls&&ls.n===1&&ls.top<260&&/Send to the public Atlas/.test(ls.t),JSON.stringify(ls));
+  await p.click('#lead-send'); await p.waitForTimeout(300);
+  ok('which opens the three ways to send it',(await p.locator('.sharebox .share-form').count())===1);
+  // ---- no two pins for one place: once the public Atlas has a reader's place, the reader's own copy of it steps aside
+  const tw=await p.evaluate(()=>{ const N=window.__atlasNM, t=N.sites().find(x=>x.tip&&!x.mine); if(!t) return null;
+    N.addMine({id:'my-twin1',mine:true,name:'My copy of it',name2:'',town:'',years:'',reg:'',cat:'landmark',st:'standing',prec:'exact',acc:'view',eff:'walk',conf:'lead',lat:t.lat+0.0002,lon:t.lon,tags:[],story:'',look:'',hook:'',accn:'',links:[],now:false}); return {id:t.id,lat:t.lat,lon:t.lon}; });
+  ok('the Atlas has a place sent in by a reader to try this on',!!tw);
+  if(tw){ await p.waitForTimeout(500);
+    let t2=await p.evaluate(()=>({listed:window.__atlasNM.sites().some(x=>x.id==='my-twin1'),kept:window.__atlasNM.custom().some(x=>x.id==='my-twin1')}));
+    ok('my own copy, 22 m from it, is no longer on the map or in the list, but is still kept',!t2.listed&&t2.kept,JSON.stringify(t2));
+    await p.evaluate(id=>{ location.hash='#'+id; },tw.id); await p.waitForTimeout(500);
+    ok('the public place says so and offers to show my copy again',/My copy of it/.test(await p.innerText('#twin-note'))&&(await p.locator('#twin-show').count())===1,(await p.locator('#twin-note').count())?(await p.innerText('#twin-note')).slice(0,140):'no note');
+    await p.click('#twin-show'); await p.waitForTimeout(400); t2=await p.evaluate(()=>window.__atlasNM.sites().some(x=>x.id==='my-twin1'));
+    ok('"Show my copy" brings it back',t2===true); }
   ok('no script errors on the phone',errs.length===0,errs.join(' | '));
   await c.close();
 
