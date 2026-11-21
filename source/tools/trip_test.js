@@ -6,7 +6,7 @@ const { chromium, devices } = require('playwright');
   const b=await chromium.launch({proxy:{server:process.env.HTTPS_PROXY||'http://x',bypass:'localhost,127.0.0.1'}});
   const c=await b.newContext(Object.assign({},devices['Pixel 7'],{timezoneId:'America/New_York',locale:'en-US'})); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   const TRIP=['lidar-high-knob-walled-yard','lidar-rossman-hill-road-house-site','lidar-ccc-road-pits'];
-  await c.addInitScript(t=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({trip:t,home:{id:'alb',by:1}})); },TRIP);      // a trip needs a start place (places_test.js covers a reader who has none)
+  await c.addInitScript(t=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({trip:t,home:{id:'alb',by:1}})); },TRIP);      // a start place only sets where the time estimate begins
   await p.goto(process.argv[2]||'http://localhost:8766/index.html'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600);
   const U=()=>p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')||'{}'));
   const mins=s=>{ const m=/(\d{1,2}):(\d\d)\s*(AM|PM)/i.exec(s||''); if(!m) return null; return (+m[1]%12+(/pm/i.test(m[3])?12:0))*60+ +m[2]; };
@@ -26,6 +26,24 @@ const { chromium, devices } = require('playwright');
   const s2=mins((/Sunset[^\d]*(\d{1,2}:\d\d\s*[AP]M)/i.exec(sum)||[])[1]); ok('and for the longest day about 8:35 PM',s2!==null&&s2>=20*60+25&&s2<=20*60+45,String(s2));
   await p.selectOption('#trip-stop','90'); await p.waitForTimeout(1200);
   ok('the time at each stop is remembered as a setting',((await U()).set||{}).tripStop===90);
+  // ---- the route handed to Google Maps: no start in it (Google then begins at the phone's own position and offers Start), and no way back
+  const links=await p.evaluate(()=>[...document.querySelectorAll('#v-trip a[href*="google.com/maps/dir"]')].map(a=>a.href));
+  const q=links.length?new URL(links[0]).searchParams:null;
+  ok('one Google Maps link, with no origin in it',links.length===1&&!!q&&!q.has('origin'),links[0]||'none');
+  ok('it ends at the last stop and passes the other two on the way',!!q&&/^-?\d+\.\d+,-?\d+\.\d+$/.test(q.get('destination')||'')&&(q.get('waypoints')||'').split('|').length===2&&(q.get('waypoints')||'').indexOf(q.get('destination'))<0,q?q.toString().slice(0,160):'');
+  const tv=await p.innerText('#v-trip');
+  ok('nothing about a round trip or going back',!/round trip|back at|back to/i.test(tv)&&(await p.locator('#trip-round').count())===0,(/[^.\n]*(round trip|back at|back to)[^.\n]*/i.exec(tv)||[''])[0]);
+  ok('the estimate says where it starts from',/from Albany/i.test(await p.innerText('#trip-sum')),(await p.locator('#trip-sum').count())?(await p.innerText('#trip-sum')).slice(0,120):'no #trip-sum');
+  // a reader with no start place and no position still gets a trip: times between the stops, the first stop at the leaving time
+  { const c2=await b.newContext(Object.assign({},devices['Pixel 7'],{timezoneId:'America/New_York',locale:'en-US'})); const p2=await c2.newPage(); p2.on('pageerror',e=>errs.push(e.message));
+    await c2.addInitScript(t=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({trip:t})); },TRIP);
+    await p2.goto(process.argv[2]||'http://localhost:8766/index.html'); await p2.waitForFunction(()=>window.__atlasMap); await p2.waitForTimeout(600);
+    await p2.click('#tab-trip'); await p2.waitForTimeout(300);
+    const has=await p2.locator('#trip-t0').count(); if(has){ await p2.fill('#trip-day','2026-12-21'); await p2.fill('#trip-t0','09:00'); await p2.waitForTimeout(400); }
+    const at2=await p2.evaluate(()=>[...document.querySelectorAll('.stops .stop-at')].map(n=>n.textContent)), l2=await p2.evaluate(()=>[...document.querySelectorAll('#v-trip a[href*="google.com/maps/dir"]')].map(a=>a.href));
+    ok('with no start place the Trip tab still works',has===1&&at2.length===3&&l2.length===1&&!/origin=/.test(l2[0]),at2.join(' | '));
+    ok('and the first stop is at the leaving time, with the estimate saying it is between the stops',mins(at2[0])===9*60&&/between/i.test(has?await p2.innerText('#trip-sum'):''),at2[0]);
+    await c2.close(); }
   // ---- save the map view for offline
   await p.evaluate(()=>{ window.__atlasMap.setView([42.4276,-74.3184],9,{animate:false}); }); await p.waitForTimeout(400);
   await p.click('#lb-opt'); await p.waitForTimeout(250); await p.click('#view-off'); await p.waitForTimeout(300);

@@ -59,12 +59,6 @@ const { chromium, devices } = require('playwright');
   await p.selectOption('#near-al','50'); await p.waitForTimeout(200); await p.click('#near-set'); await p.waitForTimeout(350);
   ok('Near tab: its Settings link opens the gear at Near me',(await p.innerText('#sheet-t')).trim().toLowerCase()==='settings'&&(await p.inputValue('#set-nm-al'))==='50');
   await p.click('#sheet-x');
-  // ---- Trip: the round-trip tick is remembered
-  await p.click('#tab-trip'); await p.waitForTimeout(250);
-  await p.evaluate(()=>{ const n=document.querySelector('#trip-round'); if(n.checked) n.click(); }); await p.waitForTimeout(1200);
-  ok('Trip: "round trip" off is remembered',(await U()).ui.round===false);
-  await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.click('#tab-trip'); await p.waitForTimeout(250);
-  ok('Trip: and still off after a reload',(await p.evaluate(()=>document.querySelector('#trip-round').checked))===false);
   // ---- the search box: names first, accents and capitals ignored, a long list shown in two steps
   await p.click('#tab-list'); await p.waitForTimeout(200);
   const rowsN=()=>p.evaluate(()=>document.querySelectorAll('#list .item').length), total=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.length);
@@ -112,11 +106,11 @@ const { chromium, devices } = require('playwright');
   }
   // ---- the track colour: no pink anywhere, and the Near tab's "point me there" ring and line follow it
   const tk=await p.evaluate(()=>{ const N=window.__atlasNM, s=N.sites().find(x=>x.st==='standing'), m=window.__atlasMap;
-        N.nmGoal({k:'p',id:'p:'+s.id,o:s,la:s.lat,lo:s.lon},false); const col=()=>{ const c=[]; m.eachLayer(l=>{ if(l instanceof L.CircleMarker&&l.options.radius===13&&!l.options.fill) c.push(l.options.color); }); return c; };      /* white casing first, then the colour */
+        N.nmGoal({k:'p',id:'p:'+s.id,o:s,la:s.lat,lo:s.lon},false); const col=()=>{ const e=document.querySelector('.leaflet-marker-pane .nmring'); if(!e) return []; const g=getComputedStyle(e); return [g.borderTopColor,/255, 255, 255/.test(g.boxShadow)?'white casing':'no casing']; };      /* the ring is a marker (near_test.js says why): its border is the colour, its shadow the white casing */
     const before=col(); N.setPref('trk','#7c3aed'); const after=col(); N.nmGoal(null); N.setPref('trk','#2563eb');
     return {before,after,css:getComputedStyle(document.documentElement).getPropertyValue('--trk').trim()}; });
   ok('track colours offered: no pink',swatches.length>=4&&!swatches.some(x=>/pink/i.test(x)),swatches.join(','));
-  ok('the "point me there" ring takes the track colour, over a white casing, and follows a change',tk.before.join()==='#fff,#2563eb'&&tk.after.join()==='#fff,#7c3aed',JSON.stringify(tk));
+  ok('the "point me there" ring takes the track colour, over a white casing, and follows a change',tk.before.join()==='rgb(37, 99, 235),white casing'&&tk.after.join()==='rgb(124, 58, 237),white casing',JSON.stringify(tk));
   const src=await p.evaluate(()=>[...document.styleSheets].map(ss=>{ try{ return [...ss.cssRules].map(r=>r.cssText).join(''); }catch(e){ return ''; } }).join(''));
   ok('no pink left in the styles',!/e11d74|225,\s*29,\s*116/i.test(src));
   // ---- a new reader: no old rail lines or canals drawn until asked for (they are a tool for hunting leads, not the first thing to see)
