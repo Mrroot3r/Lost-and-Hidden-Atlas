@@ -1,0 +1,12 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen)   or   ('', day, why none fits)
+PICS={
+ 'alexandra-bridge-bc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Old_Alexandra_bridge_facing_the_east_bank.jpg/960px-Old_Alexandra_bridge_facing_the_east_bank.jpg', 900, 651, 'Kissmykumbaya', 'CC0', 'https://commons.wikimedia.org/wiki/File:Old_Alexandra_bridge_facing_the_east_bank.jpg', '2026-11-21'),
+ 'barkerville':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Barkerville_Historic_Town_02_%287921716618%29.jpg/960px-Barkerville_Historic_Town_02_%287921716618%29.jpg', 900, 675, 'Mike from Vancouver, Canada', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Barkerville_Historic_Town_02_(7921716618).jpg', '2026-11-21'),
+ 'britannia-mill-3':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Britannia_Mines_Concentrator.JPG/960px-Britannia_Mines_Concentrator.JPG', 900, 518, 'Greenhyena', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Britannia_Mines_Concentrator.JPG', '2026-11-21'),
+ 'fort-st-james':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/FORT_ST._JAMES_NATIONAL_HISTORIC_SITE_%2C_BRITISH_COLUMBIA.jpg/960px-FORT_ST._JAMES_NATIONAL_HISTORIC_SITE_%2C_BRITISH_COLUMBIA.jpg', 900, 604, 'JERRYE AND ROY KLOTZ MD', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:FORT_ST._JAMES_NATIONAL_HISTORIC_SITE_,_BRITISH_COLUMBIA.jpg', '2026-11-21'),
+ 'fort-steele':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Fort_Steele-27527-1.jpg/960px-Fort_Steele-27527-1.jpg', 900, 563, 'Ken Thomas', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Fort_Steele-27527-1.jpg', '2026-11-21'),
+ 'hat-creek-ranch':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Hat_Creek_House.jpg/960px-Hat_Creek_House.jpg', 900, 675, 'David Stanley', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Hat_Creek_House.jpg', '2026-11-21'),
+ 'loop-brook-pillars':('', '2026-11-21', 'no freely licensed photograph found near the pin or by name'),
+ 'st-john-the-divine-yale':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Historic_Yale_Church.jpg/960px-Historic_Yale_Church.jpg', 900, 1354, 'Darren Kirby', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Historic_Yale_Church.jpg', '2026-11-21'),
+}
