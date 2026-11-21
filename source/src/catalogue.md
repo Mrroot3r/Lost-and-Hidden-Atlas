@@ -895,11 +895,11 @@ Most entries above came from overlaying an old map on today's street grid and th
 
 **Five tells of a lost building**
 
-- Odd street widths, like Erie Boulevard, mark filled canals.
+- A street much wider than its neighbours often marks a filled canal or a lifted railroad.
 - Dead-end stubs and orphaned curbs mark streets cut by highways or plazas.
-- Bridge abutments that line up across a river mark vanished crossings, as at Washington Avenue in Schenectady.
+- Bridge abutments that line up across a river mark a vanished crossing.
 - Brick fragments stamped with a maker's name on a shoreline mark a brickyard.
-- A small, oddly shaped park downtown often marks a burned or razed civic building, as at Barker Park in Troy.
+- A small, oddly shaped park downtown often marks a burned or razed civic building.
 
 ## Video idea bank
 
