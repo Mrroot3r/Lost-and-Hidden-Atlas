@@ -202,7 +202,6 @@ function match0(s){
   if(F.acc.size&&!F.acc.has(s.acc)) return false;
   if(F.eff.size&&!F.eff.has(s.eff)) return false;
   if(F.max&&fromOK()&&dtl(s).min>F.max) return false;
-  if(F.tag&&(s.tags||[]).indexOf(F.tag)<0) return false;
   if(F.now&&!s.now) return false;
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
@@ -225,9 +224,9 @@ function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.y
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
   YEAR.set(s.id,y); return y; }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.tag?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.tag='';F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.fav=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.fav=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 const BATCHES=D.batches||[];
 const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
@@ -265,13 +264,11 @@ function buildFilters(){
   fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Region'}),reg),el('label',{class:'field'},el('span',{text:'Drive time'}),max)));
   fb.append(chipGroup('Access',ACC,F.acc));
   fb.append(chipGroup('Effort',EFF,F.eff));
-  const ser=el('select',{id:'f-tag',onchange:e=>{F.tag=e.target.value;refresh();}},el('option',{value:'',text:'Any series'}),D.series.map(s=>el('option',{value:s.tag,text:s.title})));
-  ser.value=F.tag;
   const my=el('select',{id:'f-my',onchange:e=>{F.my=e.target.value;refresh();}},el('option',{value:'any',text:'Any'}),Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})),el('option',{value:'mine',text:'Places I added'}));
   my.value=F.my;
   const bef=el('select',{id:'f-before',onchange:e=>{F.before=+e.target.value;refresh();}},[[0,'Any age'],[1700,'Before 1700'],[1750,'Before 1750'],[1800,'Before 1800'],[1850,'Before 1850'],[1900,'Before 1900']].map(o=>el('option',{value:String(o[0]),text:o[1]})));
   bef.value=String(F.before);
-  fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Video series'}),ser),el('label',{class:'field'},el('span',{text:'My progress'}),my)));
+  fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'My progress'}),my)));
   fb.append(el('label',{class:'field'},el('span',{text:'Dates from'}),bef));
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
@@ -2703,8 +2700,6 @@ function renderGuide(){
       el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it for the public Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later. A place that began this way carries the badge "Sent in by a reader", and Filters can show only those. No name is ever shown.'})),
     el('div',{id:'share-blank'},el('p',{class:'snote',style:'display:block;margin-top:8px',text:'Or send a place without a pin:'}),shareBox('lead',{place:'',where:'',text:'',source:'',access:''})),
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
-  const ser=el('div',{class:'series'}); D.series.forEach(s=>{ const n=BASE.filter(x=>(x.tags||[]).indexOf(s.tag)>=0).length;
-    ser.append(el('button',{type:'button',onclick:()=>{ clearF(); $('#q').value=''; F.tag=s.tag; showView('list'); refresh(); fitVisible(); }},el('b',{text:s.title+' · '+n+' stops'}),el('small',{text:s.note}))); });
   v.append(sec('Near me: what is close, and a buzz when you pass it',false,[
     P('The Near tab lists everything on file within a few miles of where you stand, nearest first: the places, the unchecked leads, vanished places, old mines and quarries, and old town centres. Each row has an arrow, a distance and a compass direction. Tap a row and the top of the tab turns into one big arrow and distance for that spot, with a dashed line to it on the map. Tap Stop to let it go.'),
     P('If the phone has a compass the arrows turn as you turn, so the arrow points the way to walk from the top of the phone. Without one, arrows are map directions: up is north, the same as the map.'),
@@ -2719,7 +2714,6 @@ function renderGuide(){
       el('li',{text:'The whole kit as one text file, with the time inside each clip where each place, photo and note falls.'}),
       el('li',{text:'A route map picture, 1920 by 1080, with the stops numbered. It is drawn on the USGS base map, which is in the public domain, so it is safe to put in a video.'})),
     P('The picture and the distance respect "Trim the ends of a shared walk" in Settings, so they need not show where you parked. Clips and photos are matched to a walk only in the Android app.')]));
-  v.append(sec('Video series ideas',false,[P('Each one filters the map to its stops. Timing assumes leaf-off months, November to April, for anything in the woods.'),ser]));
   const air=el('div',{class:'tk'}); D.aerial.forEach(t=>air.append(el('div',null,ext(t[2],t[0]),el('span',{text:t[1]}))));
   v.append(sec('Old air photos and maps',false,[P('No free service streams 1940s–50s air photos for this region as a map layer, so the Atlas builds in what can be streamed (state flights back to the 1990s, LiDAR, and scanned USGS sheets) and links out for the rest. Every place page has an "Old air photos" button that opens the spot in Historic Aerials.'),air]));
   const tk=el('div',{class:'tk'}); D.toolkit.forEach(t=>tk.append(el('div',null,ext(t[2],t[0]),el('span',{text:t[1]}))));
