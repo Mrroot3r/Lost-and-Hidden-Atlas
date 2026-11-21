@@ -1554,10 +1554,13 @@ function nmGoal(t,fit){ NM.goal=t||null; nmGoalDraw();
   nmDraw(true); }
 function nmGoalDraw(){ if(!map) return; const t=NM.goal, o=t&&nmOrigin();
   const drop=k=>{ if(NM[k]){ map.removeLayer(NM[k]); NM[k]=null; } };
-  if(!t){ ['line','lineBg','ring','ringBg'].forEach(drop); return; }
+  if(!t){ ['line','lineBg','ring'].forEach(drop); return; }
   /* each is drawn twice, white underneath, as the field-log track is: one colour alone is lost on some aerial or other */
-  if(!NM.ring){ NM.ringBg=L.circleMarker([t.la,t.lo],{radius:13,color:'#fff',opacity:0.85,weight:6,fill:false,interactive:false}).addTo(map); NM.ring=L.circleMarker([t.la,t.lo],{radius:13,color:pref('trk'),weight:3,fill:false,interactive:false}).addTo(map); }
-  else { NM.ringBg.setLatLng([t.la,t.lo]); NM.ring.setLatLng([t.la,t.lo]); }
+  /* the ring is a marker like the pins, not a shape in the drawing layer: a shape there is stretched with the map while two
+     fingers zoom, so from far out the 13-pixel ring grew into a huge blue circle that slid about the screen (the owner, November 21, 2026) */
+  if(!NM.ring) NM.ring=L.marker([t.la,t.lo],{interactive:false,keyboard:false,zIndexOffset:-50,icon:L.divIcon({className:'nmring',html:'',iconSize:[26,26],iconAnchor:[13,13]})}).addTo(map);
+  else NM.ring.setLatLng([t.la,t.lo]);
+  if(NM.ring._icon) NM.ring._icon.style.setProperty('--trk',pref('trk'));
   if(o&&o.how!=='map'){ const ll=[o.p,[t.la,t.lo]];
     if(!NM.line){ NM.lineBg=L.polyline(ll,{color:'#fff',opacity:0.7,weight:5.5,interactive:false}).addTo(map); NM.line=L.polyline(ll,{color:pref('trk'),weight:2.5,dashArray:'7 7',interactive:false}).addTo(map); }
     else { NM.lineBg.setLatLngs(ll); NM.line.setLatLngs(ll); } }
