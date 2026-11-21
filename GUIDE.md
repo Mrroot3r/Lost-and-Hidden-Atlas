@@ -783,7 +783,7 @@ The form's description should say that answers are public. Then: Send, the link 
 
 **The reader tag** (November 19, 2026; `tip` in the place lists, `s.tip` in the app; test: `tools/places_test.js`). `N(..., tip='2026-11-18')` puts the day in the place; `build_sites.py` passes it on; `check.py` wants a real day not after the batch's own date. In `app.js`: the badge in `renderDetail()` (`.tag.tipd`, outlined so it does not read as a warning), "from a reader" in the list row, `F.tip` and the "Sent in by readers" chip under "Only show", and the words "sent in by a reader" in the search text.
 
-**Closing the loop.** For each GitHub submission dealt with, put `Closes #N` in the pull request, with a line on what was done; merging closes the issue. For each form row, add its ref (`form-…`) and a few words to `source/inbox/done.txt`. A submission that was dropped is closed or listed the same way, with the reason.
+**Closing the loop.** For each GitHub submission dealt with, put `Closes #N` in the pull request, with a line on what was done; merging closes the issue. For each form row, add its ref (`form-…`) and a few words to `source/inbox/done.txt`. A submission that was dropped is closed or listed the same way, with the reason. A pull request that holds only place lists, notes, `LEADS.md` rows and `source/inbox/done.txt` merges by itself (November 21, 2026), so the owner's daily scheduled task "Atlas inbox" can clear the inbox unattended: it looks first, from a bare clone (`python3 source/tools/inbox.py`), and stops when nothing waits or when an earlier inbox pull request is still open.
 
 ### Leads from videos
 
