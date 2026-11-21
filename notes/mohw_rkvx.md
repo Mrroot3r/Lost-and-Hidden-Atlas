@@ -12,7 +12,6 @@ Twenty-one places in Rome and the north of Oneida County, New York (region `mohw
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Mappa Hall | Barneveld, Town of Trenton, Oneida County, NY (Wikipedia 43.27306, -75.18944 falls in trees between houses) | Wikipedia: limestone Federal house of 1801–1809 for Adam G. Mappa, private home; Register 1982 | The building's position (no address found; geocoder and OpenStreetMap had nothing) |
-| Utica | Oneida County, NY | Atlas has nothing within 10 km of downtown; the Oneida County Register list has about 40 Utica rows: Union Station, Utica State Hospital (Old Main), Stanley Theater, Globe Woolen Mills, Fountain Elms, Rutger-Steuben Park | A session of its own |
 | Delta drawdown remains | Delta Lake, Town of Western, NY | WIBX feature shows stone foundations and roads exposed when the lake was drained about 60 years ago | Whether anything shows at low water, and where |
 
 ## Tips
