@@ -1,0 +1,12 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen)   or   ('', day, why none fits)
+PICS={
+ 'barron-flour-mill':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Oakesdale_Flour_Mill.jpg/960px-Oakesdale_Flour_Mill.jpg', 900, 675, 'Jon Roanhaus', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Oakesdale_Flour_Mill.jpg', '2026-11-21'),
+ 'dayton-depot-wa':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Dayton_WA_-_historic_railroad_depot.jpg/960px-Dayton_WA_-_historic_railroad_depot.jpg', 900, 675, 'Robert Ashworth', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Dayton_WA_-_historic_railroad_depot.jpg', '2026-11-21'),
+ 'liberty-wa':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Storefront_and_buildings_in_the_Liberty_Historic_District.jpg/960px-Storefront_and_buildings_in_the_Liberty_Historic_District.jpg', 900, 506, 'Washington Our Home', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Storefront_and_buildings_in_the_Liberty_Historic_District.jpg', '2026-11-21'),
+ 'monte-cristo-wa':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/Monte_Cristo_townsite_looking_northeast_2014-05-31.jpg/960px-Monte_Cristo_townsite_looking_northeast_2014-05-31.jpg', 900, 675, 'Junkyardsparkle', 'CC0', 'https://commons.wikimedia.org/wiki/File:Monte_Cristo_townsite_looking_northeast_2014-05-31.jpg', '2026-11-21'),
+ 'northern-state-hospital':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Whitewater_Dorm%2C_Old_Northern_State_Hospital_Campus%2C_Sedro-Woolley%2C_WA.jpg/960px-Whitewater_Dorm%2C_Old_Northern_State_Hospital_Campus%2C_Sedro-Woolley%2C_WA.jpg', 900, 600, 'Singalto1', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Whitewater_Dorm,_Old_Northern_State_Hospital_Campus,_Sedro-Woolley,_WA.jpg', '2026-11-21'),
+ 'old-molson-wa':('', '2026-11-21', 'nothing on Commons near the pin or by name'),
+ 'roslyn-cemeteries':('', '2026-11-21', 'nothing on Commons near the pin or by name'),
+ 'roslyn-historic-district':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Roslyn%2C_WA._%2810900218995%29.jpg/960px-Roslyn%2C_WA._%2810900218995%29.jpg', 900, 600, 'Robert Ashworth from Bellingham, WA., USA', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Roslyn,_WA._(10900218995).jpg', '2026-11-21'),
+}
