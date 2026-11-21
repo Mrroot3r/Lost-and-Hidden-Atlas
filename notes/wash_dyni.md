@@ -18,7 +18,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Old meeting house of 1787, Easton | Meeting House Road in the Easton Rural Cemetery, NY (state marker HMdb 58511 at 42.99028, -73.54) | Easton Library: the 1787 South Meetinghouse still stands and is used for summer worship (227 Meetinghouse Road, New York Yearly Meeting) | A pin on the building and a Register or other source for its fabric |
 | Coila United Presbyterian Church | NY 372, Coila, Town of Cambridge (HMdb 156240, 43.03489, -73.40026) | 1938 marker: congregation organised 1785, present building 1833 | Any second source; a picture to confirm it stands as built |
 | Whiteside Church | Center Cambridge Road, Town of Cambridge (HMdb 58526, 42.98573, -73.48593) | Marker: built 1800 by the community, rebuilt 1825 | Whether it stands; owner |
-| Kilmer Mill and stone arch bridge, Argyle | Argyle, NY (HMdb 58533 and 129535) | Unchanged from LEADS.md: the bridge was rebuilt in 1870 over an older one | Not tried on the aerial this session |
 
 ## Tips
 - HMdb nearby lists with `Miles=4` reach well into Vermont from eastern Washington County and still return about a hundred markers each; a short loop over `page.py --all` cutting each marker page between "Inscription." and "Touch for map" read 35 markers in one go.
