@@ -80,6 +80,14 @@ if [ -d "$W/lidar" ]; then
   for f in "$W"/lidar/walls/*.json; do [ -f "$f" ] && cp "$f" source/lidar/walls/; done        # walls are added to, never removed: another session's units stay
 fi
 git add -A
+# A last guard: nothing here may take another session's place list, pictures, hours or brick file off the map. If the
+# workspace lacks one that the base has (it was set up, or marked as caught up, without it), the file is put back, in the
+# branch and in the workspace, and the publish goes on (the maintainer lost two files this way on November 21, 2026,
+# before anything merged, by marking a workspace as caught up by hand).
+for f in $(git diff --cached --name-only --diff-filter=D -- source/tools | grep -E '^source/tools/((data|pics|hours|bricks)_[a-z0-9_]+\.py|checked_ok\.json)$' || true); do
+  if git cat-file -e "$BASE:$f" 2>/dev/null; then git checkout -q "$BASE" -- "$f"; cp "$f" "$W/${f#source/}"; echo "Put back $f: the workspace did not have it, and publishing would have deleted it."; fi
+done
+git add -A
 python3 "$W/tools/note.py" --new "$REPO" && git add -A      # an empty note file for a new batch (notes/<batch key>.md)
 echo "--- staged on branch $BR ---"; git status --short | awk '{print $1}' | sort | uniq -c
 echo "--- checks ---"; if [ -n "$FULL" ]; then python3 source/tools/check.py "$REPO"; else python3 source/tools/check.py "$REPO" --sources; fi

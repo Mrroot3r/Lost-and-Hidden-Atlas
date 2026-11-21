@@ -26,10 +26,36 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   const c0=await centre(p); await p.click('#add-centre'); await p.waitForTimeout(400);
   const at=await p.evaluate(()=>{ const t=document.querySelector('#f-at'); return t?t.textContent:''; });
   const got=(at.match(/-?\d+\.\d+/g)||[]).map(Number);
-  ok('"Place here" opens the form at the middle of the map',/Add a place/.test(await p.innerText('#v-detail'))&&got.length===2&&near(got,c0,2),at);
+  ok('"Place here" opens the quick card at the middle of the map',/What is it/.test(await p.innerText('#v-detail'))&&got.length===2&&near(got,c0,2),at);
+  // the quick card: one row of four taps, nothing to type (the owner, November 21, 2026: the full form was too much to look at while filming)
+  const qa=await p.evaluate(()=>{ const b=[...document.querySelectorAll('#qa-what button')], r=b.map(x=>x.getBoundingClientRect()); return {t:b.map(x=>x.textContent.trim()),oneRow:r.length>0&&r.every(x=>Math.abs(x.top-r[0].top)<2),fits:r.every(x=>x.right<=innerWidth+1&&x.width>=44),inputs:document.querySelectorAll('#v-detail input, #v-detail select, #v-detail textarea').length,more:!!document.querySelector('#qa-more')}; });
+  ok('it is one row of four choices, with nothing to type and a way to the full form',qa.t.join('|')==='Standing|Ruin|Trace|Odd find'&&qa.oneRow&&qa.fits&&qa.inputs===0&&qa.more,JSON.stringify(qa));
+  const pv=await p.evaluate(()=>{ const f=document.querySelector('.formpin').getBoundingClientRect(), m=document.querySelector('#map').getBoundingClientRect(); return {dx:Math.round(f.left+f.width/2-(m.left+m.width/2)),dy:Math.round(f.top+f.height/2-(m.top+m.height/2)),h:Math.round(m.height)}; });
+  ok('the pin is in the middle of the map that is still showing',Math.abs(pv.dx)<=20&&Math.abs(pv.dy)<=20&&pv.h>120,JSON.stringify(pv));
   ok('the crosshair goes away and a pin you can still drag stands on the spot',!(await vis(p,'#aim'))&&(await p.locator('.formpin').count())===1);
   await p.click('#v-detail button:has-text("Cancel")'); await p.waitForTimeout(250);
   ok('Cancel takes that pin off again',(await p.locator('.formpin').count())===0);
+  // one tap saves
+  await p.click('#add-place'); await p.waitForTimeout(250); const c1=await centre(p); await p.click('#add-centre'); await p.waitForTimeout(400);
+  await p.click('#qa-what button[data-w="ruins"]'); await p.waitForTimeout(500);
+  let cu1=((await U(p)).custom||[]).slice(-1)[0]||{};
+  ok('a tap on Ruin saves the place there and then: a ruin, named so it can be told apart, no pin left over',cu1.st==='ruins'&&/^Unnamed ruin/.test(cu1.name||'')&&near([cu1.lat,cu1.lon],c1,2)&&(await p.locator('.formpin').count())===0&&!(await vis(p,'#qa-what')),JSON.stringify([cu1.name,cu1.st,cu1.cat]));
+  await p.click('#add-place'); await p.waitForTimeout(250); await p.click('#add-centre'); await p.waitForTimeout(400);
+  await p.click('#qa-what button[data-w="curio"]'); await p.waitForTimeout(500); cu1=((await U(p)).custom||[]).slice(-1)[0]||{};
+  ok('Odd find saves it under the kind for curiosities and relics',cu1.cat==='curio'&&/^Odd find/.test(cu1.name||''),JSON.stringify([cu1.name,cu1.st,cu1.cat]));
+  await p.evaluate(id=>{ location.hash='#'+id; },cu1.id); await p.waitForTimeout(500);
+  ok('and its page names that kind',/Curiosities & relics/.test(await p.innerText('#v-detail')));
+  await p.click('#tab-list'); await p.waitForTimeout(200); await p.click('#add-place'); await p.waitForTimeout(250); await p.click('#add-centre'); await p.waitForTimeout(400);
+  await p.click('#qa-more'); await p.waitForTimeout(300);
+  ok('"More details" opens the full form at the same spot, pin still there',await vis(p,'#f-name')&&(await p.locator('.formpin').count())===1&&/Add a place/.test(await p.innerText('#v-detail')));
+  await p.click('#v-detail button:has-text("Cancel")'); await p.waitForTimeout(250);
+  // the setting: the quick card can ask the kind, the year and the name as well
+  await p.evaluate(()=>window.__atlasNM.setPref('addMore',true)); await p.click('#add-place'); await p.waitForTimeout(250); await p.click('#add-centre'); await p.waitForTimeout(400);
+  const qm=await p.evaluate(()=>({kinds:[...document.querySelectorAll('#qa-kind button')].map(x=>x.textContent.trim()),year:!!document.querySelector('#qa-year'),yearPad:(document.querySelector('#qa-year')||{}).inputMode,name:!!document.querySelector('#qa-name')}));
+  ok('with the setting on it also offers kinds to tap, a year on a number pad and a name',qm.kinds.length>=5&&qm.kinds.indexOf('Church')>=0&&qm.year&&qm.yearPad==='numeric'&&qm.name,JSON.stringify(qm));
+  await p.click('#qa-kind button:has-text("Church")'); await p.fill('#qa-year','1890'); await p.click('#qa-what button[data-w="standing"]'); await p.waitForTimeout(500); cu1=((await U(p)).custom||[]).slice(-1)[0]||{};
+  ok('Church, 1890, Standing: saved as a standing place of worship of 1890, named Unnamed church',cu1.cat==='worship'&&cu1.st==='standing'&&cu1.years==='1890'&&/^Unnamed church/.test(cu1.name||''),JSON.stringify([cu1.name,cu1.st,cu1.cat,cu1.years]));
+  await p.evaluate(()=>window.__atlasNM.setPref('addMore',false));
 
   /* spots */
   await p.click('#add-place'); await p.waitForTimeout(200);
@@ -57,6 +83,10 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   await p.evaluate(()=>window.__spotOpen(0)); await p.waitForTimeout(250);
   await p.fill('#spot-note','brick warehouse, arched windows'); await p.click('#spot-save'); await p.waitForTimeout(200);
   ok('a spot can be given a few words, and does not need them',((await U(p)).spots||[])[0].note==='brick warehouse, arched windows'&&!((await U(p)).spots||[])[1].note);
+  // spots can go to the public Atlas through the form, like a place, so anybody can send them (the owner, November 21, 2026)
+  const send=await p.evaluate(()=>[...document.querySelectorAll('#spotcard a.spots-send')].map(x=>x.href));
+  const sq=send.length?new URL(send[0]).searchParams:null, body=sq?[...sq.values()].find(v=>/^1\. -?\d+\.\d+, -?\d+\.\d+/.test(v))||'':'';
+  ok('the card has one link that sends both spots through the form, a numbered line each with its note',send.length===1&&/docs\.google\.com\/forms/.test(send[0])&&body.split('\n').length===2&&/brick warehouse, arched windows/.test(body)&&[...sq.values()].some(v=>/^Spots: 2/.test(v)),body.replace(/\n/g,' / ').slice(0,140));
   await p.click('#spots-copy'); await p.waitForTimeout(300);
   const clip=await p.evaluate(()=>navigator.clipboard.readText()).catch(()=>'');
   let J=null; try{ J=JSON.parse(clip); }catch(e){}
@@ -88,7 +118,7 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   await q.mouse.move(pin.x+pin.width/2,pin.y+pin.height/2); await q.mouse.down(); await q.mouse.move(pin.x+pin.width/2+40,pin.y+pin.height/2+30,{steps:6}); await q.mouse.up(); await q.waitForTimeout(400);
   const after=await q.evaluate(()=>document.querySelector('#f-at').textContent);
   ok('a click places a single pin too, and dragging that pin changes where the place will be saved',/\d/.test(before)&&before!==after,before+' -> '+after);
-  await q.fill('#f-name','Test place'); await q.click('#v-detail button[type=submit]'); await q.waitForTimeout(400);
+  await q.click('#qa-more'); await q.waitForTimeout(300); await q.fill('#f-name','Test place'); await q.click('#v-detail button[type=submit]'); await q.waitForTimeout(400);
   const cu=((await U(q)).custom||[]).slice(-1)[0]||{}, av=(after.match(/-?\d+\.\d+/g)||[]).map(Number);
   ok('the place is saved where the pin was dragged to, and the loose pin is gone',av.length===2&&near([cu.lat,cu.lon],av,2)&&(await q.locator('.formpin').count())===0,JSON.stringify([cu.lat,cu.lon])+' '+after);
   ok('no script errors on the desktop',errs2.length===0,errs2.join(' | '));

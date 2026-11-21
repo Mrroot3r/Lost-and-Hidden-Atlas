@@ -15,7 +15,7 @@ function topoWarm(list){ if(!HOSTED) return; list.forEach(x=>{ if(AT){ topoSrc(x
 
 /* The kinds of place. This line is the one list: tools/check.py and tools/export.py read the codes, names and colours from it.
    What belongs in each kind is set out for research sessions in GUIDE.md section 4. */
-const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Railroads & trolleys','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],worship:['Places of worship','#9b1b45'],burial:['Burial grounds','#6b4fa0'],town:['Ghost, drowned & historic towns','#2e9e4a'],civic:['Civic & downtown buildings','#5c6bc0'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Houses, bridges & landmarks','#f2b705'],lidar:['LiDAR finds, unverified','#00a88f']};
+const CAT={amuse:['Amusement & trolley parks','#d6338a'],hotel:['Hotels & resorts','#c8322b'],canal:['Canal works','#2f8fd0'],rail:['Railroads & trolleys','#4b4f54'],industry:['Mills, iron, brick & ice','#b4691f'],worship:['Places of worship','#9b1b45'],burial:['Burial grounds','#6b4fa0'],town:['Ghost, drowned & historic towns','#2e9e4a'],civic:['Civic & downtown buildings','#5c6bc0'],fort:['Forts & depots','#7a6a1e'],water:['Water works & buried creeks','#19a3b3'],inst:['Estates, institutions & parks','#1f4e79'],light:['Lighthouses','#f08a24'],landmark:['Houses, bridges & landmarks','#f2b705'],curio:['Curiosities & relics','#8db600'],lidar:['LiDAR finds, unverified','#00a88f']};
 const ST={ruins:'Ruins you can see',traces:'Traces: grades, piers, earthworks',standing:'Still standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STS={ruins:'Ruins',traces:'Traces',standing:'Standing',marker:'Marker only',gone:'Nothing visible',water:'Under water'};
 const STRANK={ruins:0,standing:1,traces:2,marker:3,gone:4,water:5};
@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -815,6 +815,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     pick('theme','Colours',[['auto','Follow the phone: light by day, dark by night'],['light','Always light'],['dark','Always dark']]),
     pick('themeL','Light colours',THEMES.filter(t=>t[2]==='l')),
     pick('themeD','Dark colours',THEMES.filter(t=>t[2]==='d')),
+    tog('addMore','Adding a place also asks its kind, year and name','Off: one tap on Standing, Ruin, Trace or Odd find saves the place. "More details" on that card always opens the full form.'),
     tog('wikiPhotos','Photos from Wikipedia on place pages','Fetched from the place\'s Wikipedia article when you open it, with the photographer\'s credit. Off saves data on a weak signal.'),
     pick('units','Distances',[['mi','Miles and feet'],['km','Kilometres and metres']]),
     pick('clock','Clock',[['auto','Follow the phone'],['12','12-hour (2:30 PM)'],['24','24-hour (14:30)']]),
@@ -2136,7 +2137,7 @@ function onContext(e){
   const cb=el('button',{class:'btn sm',type:'button'},ll(p)); cb.addEventListener('click',()=>copy(ll(p),cb)); box.append(cb);
   scoutLinks(p).slice(0,5).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
   if(!schematic) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(p)},'Whose land is it?'));
-  box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); openForm({lat:+p.lat.toFixed(6),lon:+p.lon.toFixed(6)}); }},'+ Add to my places'));
+  box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); quickAdd({lat:+p.lat.toFixed(6),lon:+p.lon.toFixed(6)}); }},'+ Add to my places'));
   box.append(spotLink('',p.lat,p.lon,'')); box.lastChild.title='Opens a short form with these coordinates filled in. You say what is there; it is researched later.'; box.append(WHICH());
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); pickingHome=true; onMapClick(e); }},'Measure drive times from here'));
   L.popup({maxWidth:260}).setLatLng(e.latlng).setContent(box).openOn(map);
@@ -2395,7 +2396,32 @@ function addBar(){ const on=adding||spotting, n=(U.spots||[]).length;
   else if(adding) $('#addbar span').textContent='Put the cross on the place, or '+(finePointer()?'click':'tap')+' it.';
   $('#addbar').classList.toggle('many',on); aimShow(on); clearInterval(aimWait); aimWait=null;
   if(on&&!geo.ll) aimWait=setInterval(()=>{ if(!(adding||spotting)){ clearInterval(aimWait); aimWait=null; } else if(geo.ll){ clearInterval(aimWait); aimWait=null; $('#add-here').hidden=false; } },700); }
-function placeAt(lat,lon){ adding=false; stage.classList.remove('adding'); $('#addbar').hidden=true; addBar(); openForm({lat:+(+lat).toFixed(6),lon:+(+lon).toFixed(6)}); }
+function placeAt(lat,lon){ adding=false; stage.classList.remove('adding'); $('#addbar').hidden=true; addBar(); quickAdd({lat:+(+lat).toFixed(6),lon:+(+lon).toFixed(6)}); }
+/* The quick card (the owner, November 21, 2026). Standing in front of something with a camera running, the full form was too
+   much to look at and to type: what you know there is what it is, and little else. So a new place gets one row of four taps,
+   and a tap saves it. The setting addMore adds the kind, the year and the name above that row for whoever wants them; "More
+   details" opens the full form. The map is moved so the pin is in the middle of what still shows of it. */
+const QWHAT=[['standing','Standing','building'],['ruins','Ruin','ruin'],['traces','Trace','trace'],['curio','Odd find','']];
+const QKIND=[['landmark','House','house'],['worship','Church','church'],['industry','Mill','mill'],['civic','Public building','public building'],['rail','Railroad','railroad building'],['landmark','Other','']];
+function quickAdd(seed){
+  const s={lat:seed.lat,lon:seed.lon}, v=$('#v-detail'), more=!!pref('addMore'); v.textContent=''; showView('detail'); dropFormPin();
+  const atText=()=>s.lat.toFixed(5)+', '+s.lon.toFixed(5)+(map?' \u00b7 drag the pink pin to adjust':'');
+  if(map){ formPin=L.marker([s.lat,s.lon],{draggable:true,keyboard:false,zIndexOffset:900,icon:L.divIcon({className:'formpin',html:'',iconSize:[26,26],iconAnchor:[13,13]})}).addTo(map);
+    formPin.on('drag dragend',()=>{ const ll=formPin.getLatLng(); s.lat=+ll.lat.toFixed(6); s.lon=+ll.lng.toFixed(6); const t=$('#f-at'); if(t) t.textContent=atText(); });
+    setTimeout(()=>{ if(!formPin) return; map.invalidateSize(); map.panTo([s.lat,s.lon],{animate:false}); },60); }
+  let kind=-1; const kinds=el('div',{class:'qa-chips',id:'qa-kind'}), year=el('input',{type:'text',id:'qa-year',inputMode:'numeric',maxLength:4,placeholder:'Year, if you know it',autocomplete:'off'}), name=el('input',{type:'text',id:'qa-name',placeholder:'Name, if you know it',maxLength:80,autocomplete:'off'});
+  QKIND.forEach((k,i)=>{ const b=el('button',{type:'button',class:'chip','aria-pressed':'false'},k[1]); b.addEventListener('click',()=>{ kind=kind===i?-1:i; [...kinds.children].forEach((c,j)=>c.setAttribute('aria-pressed',String(j===kind))); }); kinds.append(b); });
+  const keep=w=>{ const k=more&&kind>=0?QKIND[kind]:null, odd=w==='curio', noun=(k&&k[2])||(odd?'':QWHAT.find(x=>x[0]===w)[2]);
+    const day=new Date().toLocaleDateString([],{month:'short',day:'numeric'}), typed=more?name.value.trim():'', y=more?(year.value.match(/\d{3,4}/)||[''])[0]:'';
+    const nm=typed||((odd?'Odd find':'Unnamed '+noun+(k&&k[2]&&w!=='standing'?' ('+QWHAT.find(x=>x[0]===w)[2]+')':''))+' ('+day+')');
+    const o={id:'my-'+Date.now().toString(36),mine:true,name:nm,name2:'',town:'',years:y,reg:'',cat:odd?'curio':(k?k[0]:'landmark'),st:odd?'standing':w,prec:'exact',acc:'view',eff:'walk',conf:'lead',lat:s.lat,lon:s.lon,tags:[],story:'',look:'',hook:'',accn:'',links:[],now:false};
+    U.custom.push(o); save(); dropFormPin(); deselect(); refresh(); banner('Saved: '+nm+'. Tap its pin to add details or send it in.',false,5000); };
+  const what=el('div',{id:'qa-what'}); QWHAT.forEach(w=>{ const b=el('button',{type:'button',class:'btn','data-w':w[0]},w[1]); b.addEventListener('click',()=>keep(w[0])); what.append(b); });
+  v.append(el('div',{class:'pad',id:'quickadd',style:'padding-block:12px'},
+    el('div',{class:'row',style:'justify-content:space-between'},el('button',{class:'btn sm',type:'button',onclick:()=>deselect()},'\u2190 Cancel'),el('button',{class:'btn sm',id:'qa-more',type:'button',onclick:()=>openForm({lat:s.lat,lon:s.lon})},'More details')),
+    el('p',{class:'mono',id:'f-at',style:'color:var(--mute);margin:8px 0 0',text:atText()}),
+    more?kinds:null, more?el('div',{class:'row',style:'margin-top:8px'},year,name):null,
+    el('p',{class:'qa-q',text:'What is it? One tap saves it.'}),what)); }
 function dropFormPin(){ if(formPin){ formPin.remove(); formPin=null; } }
 function spotStart(){ if(!map) return; asking=false; pickingHome=false; adding=false; spotting=true; stage.classList.add('adding'); $('#addbar').hidden=false; addBar(); }
 function spotDrop(lat,lon){ if(!Array.isArray(U.spots)) U.spots=[]; U.spots.push({lat:+(+lat).toFixed(6),lon:+(+lon).toFixed(6),t:Date.now()}); saveNow(); drawSpots(); addBar(); }
@@ -2416,9 +2442,16 @@ function spotCard(){ const c=$('#spotcard'); if(!c) return; const S=U.spots||[],
   const mo=el('button',{class:'btn sm',type:'button'},'Add more'); mo.addEventListener('click',spotStart);
   const cl=el('button',{class:'btn sm',id:'spots-clear',type:'button'},'Clear'); let armed=false;
   cl.addEventListener('click',()=>{ if(!armed){ armed=true; cl.textContent='Tap again to clear all'; setTimeout(()=>{ armed=false; cl.textContent='Clear'; },3500); return; } U.spots=[]; saveNow(); drawSpots(); if(spotting) addBar(); });
+  /* through the form, like a place, so that anybody can send them (the owner, November 21, 2026): one line a spot in the form's text,
+     which holds about 1,500 characters, so a long list goes as several links (tools/spotlines.py reads them back) */
+  const lines=S.map((x,i)=>(i+1)+'. '+x.lat.toFixed(5)+', '+x.lon.toFixed(5)+(x.note?' '+x.note:'')), parts=[]; let cur=[];
+  lines.forEach((l,i)=>{ if(cur.length&&cur.map(j=>lines[j]).join('\n').length+l.length+1>1400){ parts.push(cur); cur=[]; } cur.push(i); }); if(cur.length) parts.push(cur);
+  const send=el('div',{class:'row',style:'margin-bottom:8px'}); parts.forEach(pt=>{ const a=S[pt[0]], L=shareLinks('lead',{place:'Spots: '+pt.length+' marked for research',where:a.lat.toFixed(5)+', '+a.lon.toFixed(5),text:pt.map(j=>lines[j]).join('\n'),source:'I was there',access:''});
+    send.append(ext(L.form||L.gh,parts.length>1?'Send spots '+(pt[0]+1)+' to '+(pt[pt.length-1]+1):'Send to the public Atlas','btn sm pri spots-send')); });
+  cp.classList.remove('pri');
   c.append(el('div',{},el('b',{text:S.length+(S.length===1?' spot':' spots')+' to research'}),
-    el('p',{text:'Marks you dropped on buildings worth looking into'+(noted?', '+noted+' with a note':'')+'. Copy them for Claude and they go to the front of the research queue; clear them once they are sent.'}),
-    el('div',{class:'row'},cp,sh,mo,cl))); }
+    el('p',{text:'Marks you dropped on buildings worth looking into'+(noted?', '+noted+' with a note':'')+'. Send them to the public Atlas to have them researched (a page opens, filled in; press Submit there), then clear them.'}),
+    send,el('div',{class:'row'},cp,sh,mo,cl))); }
 function openForm(seed){
   const editing=!!seed.id, s=editing?seed:{lat:seed.lat,lon:seed.lon,name:seed.name||'',town:'',years:'',cat:'industry',st:'ruins',prec:'site',acc:seed.story?'ask':'public',eff:'walk',story:seed.story||'',link:'',from:seed.from};
   const v=$('#v-detail'); v.textContent=''; showView('detail'); dropFormPin();

@@ -17,7 +17,7 @@ N('759-madison-avenue-albany','759 Madison Avenue: Queen Anne mansion, empty sin
   'An 1889 mansion, forty years empty, that a passer-by says is down to a shell.',
   'Private property (the foundation speaks of "the current owner" and does not name one). See it from the public sidewalk only; do not go onto the lot. Park on the street where the signs allow.',
   [HAF],conf='mixed',brick='?',tip='2026-11-18'),
-N('washington-park-buried-brick-walk','Buried brick walk, Washington Park','Albany','alb','inst','traces',42.65814,-73.77545,'exact','public','walk','','',
+N('washington-park-buried-brick-walk','Buried brick walk, Washington Park','Albany','alb','curio','traces',42.65814,-73.77545,'exact','public','walk','','',
   'A reader walking in Washington Park on November 18, 2026 found a brick walkway, mostly buried, on the wooded rise just north of the tennis courts at the west end of the lake. Nothing in print about it has been found yet. The ground it lies in was the house and landscaped grounds of John Taylor, the last part of the park to be bought, in 1882; tennis courts have stood on that ground since 1889. Whether the brick belongs to the Taylor grounds or to an early park path is not known.',
   'Brick showing through soil and leaves near where a paved path from the Madison Avenue side ends in a strip of trees, north of the tennis courts. Easiest to find when the leaves are down. Leave it as it lies.',
   'A brick path nobody has written down, under the leaves beside the tennis courts.',
