@@ -15,7 +15,6 @@ Places you read about and could not finish. One row each; delete the example row
 |---|---|---|---|
 | Rice Building | Troy, NY (First Street at River Street) | Central Troy Historic District article: 1871 five-storey flatiron building by Frederick Clarke Withers, now RPI's | A coordinate and a second source |
 | Rensselaer County Courthouse | Troy, NY (80 Second Street; HMdb 261939 at 42.72886, -73.69199 is the first courthouse marker in front of it) | Central Troy Historic District article: Classical Revival courthouse by Marcus and Frederick Cummings, the third on the site | Its year and whether visitors may go in |
-| First Baptist Church of Troy | Troy, NY (82 Third Street, HMdb 261944) | Uncle Sam Memorial Foundation marker: Samuel Wilson was a trustee 1808–1817 and E. & S. Wilson made the brick for the original church | Whether the present building is that church or a later one, and its services |
 | Neemes Foundry | Troy, NY (Register list 42.7229, -73.6946) | Register list only (100010631) | Any description; the NPGallery form was not tried |
 
 ## Tips
