@@ -13,7 +13,6 @@ Places you read about and could not finish. One row each; delete the example row
 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Ashcroft ghost town | Castle Creek Road, 10 mi south of Aspen, CO (Wikipedia 39.0536, -106.7998) | Wikipedia: silver camp of 1880, Register 1975, a few buildings stand; the Aspen Historical Society runs it (aspenhistory.org/ashcroft-ghost-town/) | Hours and fees from the society's page, pin check |
 | Cokedale coke camp | Cokedale, Las Animas County, CO (Register district 37.14222, -104.61944) | Wikipedia: ASARCO company coal camp of 1906, 92 contributing buildings, houses of coke-and-cement block | Which buildings or ovens are worth a pin, and access |
 | Fort Lyon | Las Animas, CO (Register 38.077222, -103.132778) | Register list only (also Fort Lyon National Cemetery) | A source on what stands and whether visitors may go in |
 | Old Ladore School | Browns Park NWR, CO (Register 40.78, -108.8929) | Register list: 1911 school, social centre of Browns Park | What it is now and access |
