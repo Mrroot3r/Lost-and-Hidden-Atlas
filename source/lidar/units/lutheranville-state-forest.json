@@ -1,0 +1,12 @@
+{"name": "Lutheranville State Forest", "code": "lsf", "st": "ny", "state": "done", "tiles": 16, "swept": "2026-11-20", "buildings": 13, "sheets": ["NY_Richmondville_136445_1904_62500_geo.tif"], "walls": 784, "wall_m": 26959,
+"cands":[
+{"id":"lsf1","lat":42.610718,"lon":-74.624665,"depth":1.49,"size":[11,7],"dist":44,"blat":42.61065,"blon":-74.62414,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf2","lat":42.612973,"lon":-74.63908,"depth":1.2,"size":[5,9],"dist":19,"blat":42.61303,"blon":-74.63886,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf3","lat":42.610161,"lon":-74.61877,"depth":1.01,"size":[13,13],"dist":26,"blat":42.61013,"blon":-74.61846,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf4","lat":42.596574,"lon":-74.598069,"depth":1.24,"size":[7,10],"dist":74,"blat":42.59716,"blon":-74.59849,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf5","lat":42.612088,"lon":-74.617751,"depth":1.6,"size":[14,16],"dist":33,"blat":42.61226,"blon":-74.61742,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf6","lat":42.612209,"lon":-74.617537,"depth":0.71,"size":[7,7],"dist":11,"blat":42.61226,"blon":-74.61742,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf7","lat":42.611873,"lon":-74.616567,"depth":0.64,"size":[12,6],"dist":44,"blat":42.61204,"blon":-74.61706,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf8","lat":42.610094,"lon":-74.618917,"depth":0.61,"size":[7,6],"dist":38,"blat":42.61013,"blon":-74.61846,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lsf9","lat":42.599575,"lon":-74.618764,"depth":0.75,"size":[16,12],"dist":47,"blat":42.59925,"blon":-74.61913,"sheet":"NY_Richmondville_136445_1904_62500_geo.tif","year":1904,"status":"new"}
+]}
