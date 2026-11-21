@@ -163,12 +163,13 @@ if not SRC_ONLY:
             elif hashlib.md5(open(pth,'rb').read()).hexdigest()[:8]!=v.get('h'): err.append(f'data/lines/{k}.json is not the file the page was built with (rebuild needed)')
         if lx.get('s') and not os.path.exists(os.path.join(REPO,'data','lines','wide.json')): err.append('data/lines/wide.json is missing (rebuild needed)')
 # ---- hours looked up later (tools/hours_*.py, written by tools/hours.py) ----
+def _lm_ok(i,ids): return i in ids or bool(re.fullmatch(r'lm-[a-z0-9-]+',str(i)))
 for f in sorted(glob.glob(os.path.join(T,'hours_*.py'))):
     nm=os.path.basename(f)[:-3]
     try: HR=importlib.import_module(nm).HOURS
     except Exception as ex: err.append(f'{nm}: cannot be read ({str(ex)[:60]})'); continue
     for i,v in HR.items():
-        if i not in ids: err.append(f'{nm}: {i} is not a place id')
+        if not _lm_ok(i,ids): err.append(f'{nm}: {i} is not a place id')      # a landmark pin (lm-...) is in no place list; tools/hours.py offers them
         elif not(isinstance(v,(list,tuple)) and len(v) in (3,4) and isinstance(v[0],str) and 0<len(v[0].strip())<=180 and re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',str(v[1])) and re.match(r'https?://[^\s<>"]+$',str(v[2])) and (len(v)==3 or isinstance(v[3],bool))): err.append(f"{nm}: {i} must be ('days and times, 180 characters at most, or ?', 'YYYY-MM-DD', 'https://the page they were read on'[, True if the place opens to visitors])")
 # ---- pictures found on Wikimedia Commons (tools/pics_*.py, written by tools/photo_find.py): only Commons, only a free licence, a credit, no address of a person ----
 import photo_find
