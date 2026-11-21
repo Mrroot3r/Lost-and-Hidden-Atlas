@@ -12,8 +12,6 @@ Seventeen places spread over Manitoba, which had one (the Old Pinawa Dam): in Wi
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Quarry Superintendent's House ruins | Garson, MB (50.07879, -96.69302, MHS coordinate) | Limestone-block house of 1916 for the Wallace Sandstone Company's superintendent; disused after the mill burned January 22, 1917; wall remnants stand (MHS page `quarryhouse`, photos 2019) | The coordinate is in woods beside the highway with nothing visible on the aerial; owner and any public way in not found |
-| Riel House | Winnipeg, MB (49.81902, -97.13605, MHS coordinate) | 1880–81 Red River frame house of Joseph Riel's family; Louis Riel lay in state here in December 1885; restored to spring 1886 (MHS page `rielhouse`) | Left out only to keep Winnipeg from crowding the first batch; needs the operator's hours page |
-| St. Andrew's Rectory | St. Andrews, MB (374 River Road) | Parks Canada National Historic Site across the road from St. Andrew's on the Red; free admission, self-guided grounds (Parks Canada visit page) | MHS page `standrewsrectory` not read; build date and what is shown inside |
 
 ## Tips
 - The Manitoba Historical Society's "Historic Sites of Manitoba" pages (`https://mhs.mb.ca/docs/sites/<slug>.shtml`) read well with `page.py --all -n 30000` and give a "Site Coordinates (lat/long): N.., W.." line; the slug is often guessable (`lowerfortgarry`, `rielhouse`) and `page.py` returns "MHS Page not found" when it is not, so a `site:mhs.mb.ca` web search finds the rest. Two of seventeen MHS coordinates were off the building (Lower Fort Garry on the riverbank, Inglis on grass); Lower Fort Garry's page also lists each building's coordinate.
