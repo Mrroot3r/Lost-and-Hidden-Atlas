@@ -131,7 +131,7 @@ const USBOX=[[24.5,-125],[49.5,-66.5]];                  /* the first view for s
 function startView(){ const v=U.ui.view, H=homeObj();
   if(pref('start')!=='home'&&v&&inMap(v[0],v[1])) return {c:[v[0],v[1]],z:Math.max(3,Math.min(20,v[2]||9))};
   if(!homePicked()) return {b:USBOX};
-  if(H.id==='alb') return {c:[42.82,-73.86],z:9}; return {c:[H.lat,H.lon],z:H.id==='custom'?11:10}; }
+  return {c:[H.lat,H.lon],z:H.id==='custom'?11:10}; }
 function setSpot(la,lo,name){ U.home={id:'custom',lat:+(+la).toFixed(5),lon:+(+lo).toFixed(5),by:1}; if(name) U.home.name=String(name).slice(0,60); save(); buildHome(); drawHome(); refresh(); banner('Working out drive times from '+(name||'your spot')+'…',false);
   fetchDT().then(ok=>{ banner(ok?'Drive times updated from '+(name||'your spot')+'.':'Could not reach the routing service, so times are rough estimates (marked ~).',!ok,5000); refresh(); }); }
 /* A typed start place: "lat, lon" is read directly, anything else is looked up with OpenStreetMap's Nominatim. */
@@ -1442,7 +1442,7 @@ function whoPopup(p){ const box=el('div',{class:'ctx who'}); const pop=L.popup({
   lookup(p,box).then(()=>{ try{ pop.update(); }catch(e){} }); }
 /* permission letter, after the sample in the field manual */
 function letterText(s){ const me=U.me||{}, f=(k,d)=>(me[k]&&me[k].trim())||d;
-  return 'Dear [owner\'s name],\n\nMy name is '+f('name','[your name]')+'. I produce '+f('chan','[channel name]')+', a history-focused YouTube channel ('+f('link','[channel link]')+') documenting the lost buildings and industries of the Capital Region, Catskills and Adirondacks. I am researching '+s.name+(s.town?' in '+s.town:'')+', which I understand you own. I would like permission for a one-time daytime visit of about two hours with one partner to photograph and film what remains.\n\n'+
+  return 'Dear [owner\'s name],\n\nMy name is '+f('name','[your name]')+'. I produce '+f('chan','[channel name]')+', a history-focused YouTube channel ('+f('link','[channel link]')+') documenting lost buildings and old industries. I am researching '+s.name+(s.town?' in '+s.town:'')+', which I understand you own. I would like permission for a one-time daytime visit of about two hours with one partner to photograph and film what remains.\n\n'+
     'We will: not disclose the address or how to reach it; not move, take or alter anything; stay out of any areas you specify; carry signed proof of permission; and sign a release holding you harmless. I am happy to share all photos for your use, credit you or keep you anonymous, and let you review the video before release.\n\n'+
     'I can be reached at '+f('contact','[phone or email]')+'. Thank you for considering it.\n\n'+f('name','[your name]'); }
 function letterBox(s){
@@ -2066,11 +2066,12 @@ function syncMarkers(){
   markers.forEach((m,id)=>{ if(!want.has(id)){ map.removeLayer(m); markers.delete(id); } });
   if(pinPool.size>all.length){ const ids=new Set(all.map(s=>s.id)); pinPool.forEach((m,id)=>{ if(!ids.has(id)) pinPool.delete(id); }); }      /* a place of your own that was deleted */
   /* While the numbered discs are showing, a favourite still has its own pin, but smaller, and a pin that would sit on a disc is
-     drawn just off its rim: on top of a disc it hid the number (the owner, November 21, 2026). The discs on the screen: */
+     drawn on its rim, over it: in the middle it hid the number, and pushed clear of the disc it was not plain where the place
+     was (the owner, November 21, 2026). The discs on the screen: */
   const discs=plan&&plan.groups.length?plan.groups.map(c=>{ const n=c.ids.length, q=map.latLngToLayerPoint([c.la/n,c.lo/n]); return {x:q.x,y:q.y,r:clusSize(n)[1]/2}; }):null;
   want.forEach(s=>{
     const p=pos(s), far=!!plan&&isFav(s.id)&&!(sel&&sel.id===s.id); let dx=0, dy=0;
-    if(discs&&!(sel&&sel.id===s.id)){ const q=map.latLngToLayerPoint([p.lat,p.lon]); for(const g of discs){ const ex=q.x+dx-g.x, ey=q.y+dy-g.y, d=Math.hypot(ex,ey), need=g.r+13;      /* 13: a pin's half width and a gap. Any pin that stands alone is moved off a disc, favourite or not */
+    if(discs&&!(sel&&sel.id===s.id)){ const q=map.latLngToLayerPoint([p.lat,p.lon]); for(const g of discs){ const ex=q.x+dx-g.x, ey=q.y+dy-g.y, d=Math.hypot(ex,ey), need=g.r+(far?2:4);      /* its middle goes just outside the rim, so it sits on the disc's edge like a badge, on the side its place is on, clear of the number. Any pin that stands alone, favourite or not */
         if(d<need){ const ux=d<1?0.7071:ex/d, uy=d<1?-0.7071:ey/d; dx+=Math.round(ux*(need-d)); dy+=Math.round(uy*(need-d)); } } }
     const ic=pinIcon(s,far,dx,dy), sig=ic.options.html+(dx||dy?'|'+dx+','+dy:''); let m=pinPool.get(s.id);
     if(!m){ m=L.marker([p.lat,p.lon],{icon:ic,keyboard:false,riseOnHover:true}); m._sig=sig;
@@ -2081,7 +2082,7 @@ function syncMarkers(){
       pinPool.set(s.id,m); }
     else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
     if(!markers.has(s.id)){ m.addTo(map); markers.set(s.id,m); }
-    const zo=sel&&sel.id===s.id?1000:far?-20000:isFav(s.id)?600:(s.cat==='landmark'?-200:0);      /* a small favourite goes under the discs */ if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
+    const zo=sel&&sel.id===s.id?1000:isFav(s.id)?600:(dx||dy)?300:(s.cat==='landmark'?-200:0);      /* a pin moved to a disc's rim is drawn over the disc */ if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
   });
   /* the grouped pins are made again only when the groups change, not each time the map is nudged */
   const sig=plan?map.getZoom()+'|'+plan.groups.map(c=>c.ids.length+':'+c.la.toFixed(3)+':'+c.lo.toFixed(3)).join():'';
@@ -2692,7 +2693,7 @@ function renderGuide(){
     P('Every pin carries an honest rating. "Pin on the spot" means it sits on the structure or marker. "Pin within the site" means it is inside the footprint. "Pin approximate" means the right vicinity only, and the dashed ring on the map shows how far off it could be.'),
     el('ul',null,
       el('li',{text:'Pick a place, then tick "Lay the old USGS map over the pin." Sheets from the 1890s to 1930s draw the hotels, trolley spurs and villages that are gone.'}),
-      el('li',{text:'Switch the map to Leaf-off aerial. New York flies in early spring, so foundations and cellar holes show through bare trees.'}),
+      el('li',{text:'Switch the map to Leaf-off aerial. Where a state flies in early spring, foundations and cellar holes show through bare trees.'}),
       el('li',{text:'Switch to LiDAR, zoom in, and change the light direction under More. Walls, canal prisms, rail grades and coaster footings stand out as straight lines no forest makes.'}),
       el('li',{text:'Tap Compare to swipe aerial against LiDAR. Turn on Public land and tap Owner? to see whose ground it is before you go.'}),
       el('li',{text:'Follow the lines. Old railroads, trolley lines and canals are drawn on the map; stations, mills, hotels and locks sat right beside them. Click a line to list the Atlas places along it in order, then walk the rest of it on LiDAR looking for platforms and foundations.'}),
@@ -2749,7 +2750,7 @@ function renderGuide(){
     P('Check the unit\'s own page before each trip. The Public land layer and the "Land" line on a place page tell you which unit you are on.')]));
   v.append(sec('Safety checklist',false,[
     UL(['Never go alone. Leave a written plan with the site, the parking spot and a check-in time.',
-      'Expect no signal in much of the Adirondacks and Catskills. Save the area offline from the place page and carry a satellite messenger.',
+      'Expect no signal in the mountains and deep woods. Save the area offline from the place page and carry a satellite messenger.',
       'Stay out of mines, adits, tanks and other confined spaces.',
       'Indoors, with permission: test floors near the walls, stay off roofs and stairs, and assume asbestos, lead paint, mold and guano. Wear a P100 half-face respirator, not a dust mask.',
       'Check DEC remediation listings before visiting old industrial sites.',
