@@ -660,7 +660,7 @@ function initMap(){
   setBase(U.ui.base,true); if(cmp.on){ cmp.lap=0; setCmp(); }      /* a comparison left on is on again, the way it was */
   map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
   map.on('move zoom zoomend moveend resize viewreset',clipCmp);
-  map.on('click',onMapClick);
+  map.on('click',onMapClick); drawSpots();
   /* A double tap. Leaflet's own goes in one step, which is slow work with one thumb, most of all with the map full screen:
      on open map it goes in as many steps as Settings says (three unless changed; Shift and a double click goes out); on a
      pin it goes to street level; on a numbered disc it goes at least that many steps toward the disc (dblPin, dblGroup below). */
@@ -738,7 +738,7 @@ function ico(k){ const s=document.createElement('span'); s.className='ic'; s.inn
 const BAR=[['streets','Streets','Street map'],['leaf','Leaf-off','Leaf-off aerial: spring flights with bare trees'],['lidar','LiDAR','LiDAR terrain: bare ground with the trees stripped off'],['sat','Satellite','Satellite imagery'],['topo','Topo','Current USGS topo map'],['oldtopo','Old topo','USGS paper maps, 1940s to 1980s'],
   ['rails','Old rails','Old railroad and trolley lines'],['canal','Canals','Canals, old and current'],['hist','Old map','Lay the old survey sheet over the selected place'],['land','Public land','Shade public and protected land by access'],['lots','Lot lines','Property lines (New York and Massachusetts, zoom in close)'],['leads','Leads','Yellow dots: ruins and old sites mapped on OpenStreetMap that nobody has checked for the Atlas. Vanished places and old mines are separate switches under More'],['pock','Old towns','Purple discs: old town centres and other pockets of listed buildings and historical markers. Zoom in to street level for the single buildings'],
   ['cmp','Compare','Compare two layers: tap for a divider to drag, again to lay one over the other, again to stop'],['who','Owner?','Tap the map to see whose land it is']];
-let asking=false, lotLayer=null;
+let asking=false, lotLayer=null, spotting=false;
 function barState(k){
   if(LD[k]) return !schematic&&U.ui.base===k;
   if(k==='rails') return !!U.ui.lines.oldrail; if(k==='canal') return !!U.ui.lines.canal;
@@ -768,7 +768,7 @@ function cmpTap(){ const other=m=>m==='swipe'?'fade':'swipe', now=Date.now();
   else { cmp.on=false; cmp.lap=0; if(now-(cmp.since||0)<1500&&cmp.home) cmp.mode=cmp.home; }
   setCmp(); cmpSave();
   if(cmp.on&&cmp.mode==='swipe'&&!cmp.lap) banner('Swipe: drag the divider. Tap again to lay '+LD[cmp.key].n+' over the map instead.',false,4500); else banner(''); }      /* nothing is said over Overlay: its slider sits where the words would */
-function setAsking(on){ asking=on; adding=false; pickingHome=false; $('#add-here').hidden=true; stage.classList.toggle('adding',on); $('#addbar').hidden=!on; if(on) $('#addbar span').textContent='Tap the map to see whose land it is.'; syncBar(); }
+function setAsking(on){ asking=on; adding=false; spotting=false; pickingHome=false; addBar(); $('#add-here').hidden=true; stage.classList.toggle('adding',on); $('#addbar').hidden=!on; if(on) $('#addbar span').textContent='Tap the map to see whose land it is.'; syncBar(); }
 function buildBar(){
   const sc=$('#lscroll'), fx=$('#lfix'); sc.textContent=''; fx.textContent='';
   BAR.forEach((b,i)=>{ if(schematic&&(LD[b[0]]||b[0]==='cmp'||b[0]==='lots'||b[0]==='land'||b[0]==='who')) return;
@@ -2103,9 +2103,10 @@ function showHist(){
     histLayer=L.imageOverlay(src,[[b[0],b[1]],[b[2],b[3]]],{pane:'hist',opacity:U.ui.histOp,interactive:false}).addTo(map); });
 }
 function onMapClick(e){
+  if(spotting){ if(finePointer()) spotDrop(e.latlng.lat,e.latlng.lng); return; }      /* on a phone only the Drop button drops: a slip of the thumb is not a spot */
   if(asking){ setAsking(false); whoPopup({lat:e.latlng.lat,lon:e.latlng.lng}); return; }
   if(pickingHome){ pickingHome=false; stage.classList.remove('adding'); $('#addbar').hidden=true; setSpot(e.latlng.lat,e.latlng.lng); return; }
-  if(adding){ adding=false; stage.classList.remove('adding'); $('#addbar').hidden=true; $('#add-here').hidden=true; openForm({lat:+e.latlng.lat.toFixed(6),lon:+e.latlng.lng.toFixed(6)}); }
+  if(adding) placeAt(e.latlng.lat,e.latlng.lng);
 }
 function scoutLinks(p,town){
   const c=p.lat.toFixed(5)+','+p.lon.toFixed(5);
@@ -2133,14 +2134,14 @@ function onContext(e){
 
 /* ---------- views ---------- */
 let view='list';
-function showView(v){ view=v; if(v==='list'&&listFrom!==nearFrom()){ if(F.max) refresh(); else renderList(); }      /* the position changed while another tab was open */
+function showView(v){ view=v; if(v!=='detail') dropFormPin(); if(v==='list'&&listFrom!==nearFrom()){ if(F.max) refresh(); else renderList(); }      /* the position changed while another tab was open */
   ['list','detail','trip','log','guide','near'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
   $('#tab-list').setAttribute('aria-selected',String(v==='list'||v==='detail')); $('#tab-trip').setAttribute('aria-selected',String(v==='trip')); $('#tab-guide').setAttribute('aria-selected',String(v==='guide')); $('#tab-log').setAttribute('aria-selected',String(v==='log')); $('#tab-near').setAttribute('aria-selected',String(v==='near'));
   nmCompass(v==='near'); if(v==='near'){ nmEnsure(true); renderNear(); if(NM.org==='me'&&geo.id===null&&U.last&&map) locate(); }
   if(v==='trip') renderTrip(); if(v==='guide') renderGuide(); if(v==='log') renderLog(); }
-function refresh(){ buildFilters(); renderList(); syncMarkers(); $('#trip-n').textContent=U.trip.length; if(view==='trip') renderTrip(); }
+function refresh(){ buildFilters(); renderList(); spotCard(); syncMarkers(); $('#trip-n').textContent=U.trip.length; if(view==='trip') renderTrip(); }
 function select(s,fly){
-  sel=s; renderDetail(s); showView('detail'); syncMarkers(); drawSel(); showHist();
+  dropFormPin(); sel=s; renderDetail(s); showView('detail'); syncMarkers(); drawSel(); showHist();
   document.querySelectorAll('#list .item.cur').forEach(n=>n.classList.remove('cur'));
   if(map&&fly!==null){ const p=pos(s), z=Math.max(map.getZoom(),s.prec==='area'?14:15); if(fly) map.flyTo([p.lat,p.lon],z,{duration:0.8}); else map.panTo([p.lat,p.lon]); }
   try{ history.replaceState(null,'','#'+s.id); }catch(e){ try{ location.hash=s.id; }catch(x){} }
@@ -2369,9 +2370,52 @@ function delBtn(s){ const b=el('button',{class:'btn sm',type:'button'},'Delete')
   return b; }
 
 /* add / edit your own place */
+/* ---------- placing by hand, and spots ----------
+   + Add puts a cross at the middle of the map: you move the map under it and press "Place here" (a click or tap on the spot
+   works too). The form then opens with a pin you can still drag until you save. "Spot many" is the quick way to hand over a
+   whole street of buildings for research: every press of Drop leaves a bare numbered mark, with no form. Spots are U.spots,
+   [{lat,lon,t,note?}], shown on the map and counted on the Places tab until they are copied out and cleared. */
+const finePointer=()=>{ try{ return matchMedia('(pointer:fine)').matches; }catch(e){ return true; } };
+let formPin=null, spotLayer=null, aimWait=null;
+function aimShow(on){ let a=$('#aim'); if(!a&&map){ a=el('div',{id:'aim','aria-hidden':'true'}); a.hidden=true; map.getContainer().append(a); } if(a) a.hidden=!on; }
+function addBar(){ const on=adding||spotting, n=(U.spots||[]).length;
+  $('#add-centre').hidden=!on; $('#add-many').hidden=!adding; $('#spot-undo').hidden=!(spotting&&n); $('#add-here').hidden=!(on&&geo.ll);
+  $('#add-centre').textContent=spotting?'Drop':'Place here'; $('#add-cancel').textContent=spotting?'Done':'Cancel';
+  if(spotting) $('#addbar span').textContent=n+(n===1?' spot':' spots')+'. Put the cross on a building'+(finePointer()?', or click one.':'.');
+  else if(adding) $('#addbar span').textContent='Put the cross on the place, or '+(finePointer()?'click':'tap')+' it.';
+  $('#addbar').classList.toggle('many',on); aimShow(on); clearInterval(aimWait); aimWait=null;
+  if(on&&!geo.ll) aimWait=setInterval(()=>{ if(!(adding||spotting)){ clearInterval(aimWait); aimWait=null; } else if(geo.ll){ clearInterval(aimWait); aimWait=null; $('#add-here').hidden=false; } },700); }
+function placeAt(lat,lon){ adding=false; stage.classList.remove('adding'); $('#addbar').hidden=true; addBar(); openForm({lat:+(+lat).toFixed(6),lon:+(+lon).toFixed(6)}); }
+function dropFormPin(){ if(formPin){ formPin.remove(); formPin=null; } }
+function spotStart(){ if(!map) return; asking=false; pickingHome=false; adding=false; spotting=true; stage.classList.add('adding'); $('#addbar').hidden=false; addBar(); }
+function spotDrop(lat,lon){ if(!Array.isArray(U.spots)) U.spots=[]; U.spots.push({lat:+(+lat).toFixed(6),lon:+(+lon).toFixed(6),t:Date.now()}); saveNow(); drawSpots(); addBar(); }
+function drawSpots(){ if(spotLayer){ spotLayer.remove(); spotLayer=null; } const S=U.spots||[];
+  if(map&&S.length) spotLayer=L.layerGroup(S.map((x,i)=>{ const m=L.marker([x.lat,x.lon],{keyboard:false,zIndexOffset:300,icon:L.divIcon({className:'spotpin',html:String(i+1),iconSize:[22,22],iconAnchor:[11,11]})}); m.on('click',()=>spotOpen(i)); return m; })).addTo(map);
+  spotCard(); }
+function spotOpen(i){ const x=(U.spots||[])[i]; if(!x||!map) return; const inp=el('input',{type:'text',id:'spot-note',placeholder:'A few words, if you like',maxlength:'140',autocomplete:'off'}); inp.value=x.note||'';
+  const box=el('form',{class:'spotbox',onsubmit:e=>{ e.preventDefault(); const v=inp.value.trim(); if(v) x.note=v; else delete x.note; saveNow(); map.closePopup(); spotCard(); }},
+    el('b',{text:'Spot '+(i+1)}),inp,el('div',{class:'row'},el('button',{class:'btn sm pri',id:'spot-save',type:'submit'},'Save'),
+      el('button',{class:'btn sm',type:'button',onclick:()=>{ U.spots.splice(i,1); saveNow(); map.closePopup(); drawSpots(); if(spotting) addBar(); }},'Remove')));
+  L.popup({maxWidth:250}).setLatLng([x.lat,x.lon]).setContent(box).openOn(map); }
+window.__spotOpen=spotOpen;
+/* spots as they go to Claude: a number, a point, the day, and the few words if any (tools/visits.py reads this) */
+function spotExport(){ return (U.spots||[]).map((x,i)=>({n:i+1,lat:x.lat,lon:x.lon,note:x.note||'',t:new Date(x.t||Date.now()).toISOString().slice(0,10)})); }
+function spotCard(){ const c=$('#spotcard'); if(!c) return; const S=U.spots||[], noted=S.filter(x=>x.note).length; c.textContent=''; c.hidden=!S.length; if(!S.length) return;
+  const cp=el('button',{class:'btn sm pri',id:'spots-copy',type:'button'},'Copy for Claude'); cp.addEventListener('click',()=>copy(JSON.stringify({spots:spotExport()},null,1),cp));
+  const sh=el('button',{class:'btn sm',type:'button'},'Show on map'); sh.addEventListener('click',()=>{ if(map) map.fitBounds(L.latLngBounds(S.map(x=>[x.lat,x.lon])).pad(0.3),{maxZoom:17}); });
+  const mo=el('button',{class:'btn sm',type:'button'},'Add more'); mo.addEventListener('click',spotStart);
+  const cl=el('button',{class:'btn sm',id:'spots-clear',type:'button'},'Clear'); let armed=false;
+  cl.addEventListener('click',()=>{ if(!armed){ armed=true; cl.textContent='Tap again to clear all'; setTimeout(()=>{ armed=false; cl.textContent='Clear'; },3500); return; } U.spots=[]; saveNow(); drawSpots(); if(spotting) addBar(); });
+  c.append(el('div',{},el('b',{text:S.length+(S.length===1?' spot':' spots')+' to research'}),
+    el('p',{text:'Marks you dropped on buildings worth looking into'+(noted?', '+noted+' with a note':'')+'. Copy them for Claude and they go to the front of the research queue; clear them once they are sent.'}),
+    el('div',{class:'row'},cp,sh,mo,cl))); }
 function openForm(seed){
   const editing=!!seed.id, s=editing?seed:{lat:seed.lat,lon:seed.lon,name:seed.name||'',town:'',years:'',cat:'industry',st:'ruins',prec:'site',acc:seed.story?'ask':'public',eff:'walk',story:seed.story||'',link:'',from:seed.from};
-  const v=$('#v-detail'); v.textContent=''; showView('detail');
+  const v=$('#v-detail'); v.textContent=''; showView('detail'); dropFormPin();
+  const atText=()=>s.lat.toFixed(5)+', '+s.lon.toFixed(5)+(editing||!map?'':' \u00b7 drag the pink pin on the map to adjust');
+  if(!editing&&map){      /* the pin stays movable until the place is saved */
+    formPin=L.marker([s.lat,s.lon],{draggable:true,keyboard:false,zIndexOffset:900,icon:L.divIcon({className:'formpin',html:'',iconSize:[26,26],iconAnchor:[13,13]})}).addTo(map);
+    formPin.on('drag dragend',()=>{ const ll=formPin.getLatLng(); s.lat=+ll.lat.toFixed(6); s.lon=+ll.lng.toFixed(6); const t=$('#f-at'); if(t) t.textContent=atText(); }); }
   const f=(id,label,node)=>el('label',{class:'field',for:id,style:'margin-top:8px'},el('span',{text:label}),node);
   const opt=(map,val,id)=>{ const x=el('select',{id:id},Object.keys(map).map(k=>el('option',{value:k,text:Array.isArray(map[k])?map[k][0]:map[k]}))); x.value=val; return x; };
   const name=el('input',{type:'text',id:'f-name',required:true}); name.value=s.name;
@@ -2390,7 +2434,7 @@ function openForm(seed){
     save(); refresh(); select(o,false); }},
     el('button',{class:'btn sm',type:'button',onclick:()=>{ if(editing) select(seed,false); else deselect(); }},'← Cancel'),
     el('h2',{style:'font-size:22px;margin-top:8px',text:editing?'Edit your place':'Add a place'}),
-    el('p',{class:'mono',style:'color:var(--mute);margin:2px 0 0',text:s.lat.toFixed(5)+', '+s.lon.toFixed(5)}),
+    el('p',{class:'mono',id:'f-at',style:'color:var(--mute);margin:2px 0 0',text:atText()}),
     f('f-name','Name',name),el('div',{class:'row'},f('f-town','Town',town),f('f-years','Years',years)),
     el('div',{class:'row'},f('f-cat','Kind of place',cat),f('f-st',"What's left",st)),
     el('div',{class:'row'},f('f-acc','Access',acc),f('f-eff','Effort',eff)),
@@ -2579,7 +2623,7 @@ function dataSections(v){
   const dump=()=>JSON.stringify(U);
   const b1=el('button',{class:'btn sm',type:'button'},'Copy backup'); b1.addEventListener('click',()=>{ out.value=dump(); copy(out.value,b1); });
   const b2=el('button',{class:'btn sm',type:'button',onclick:()=>{ out.value=dump(); try{ const a=el('a',{href:URL.createObjectURL(new Blob([out.value],{type:'application/json'})),download:'lost-hidden-atlas-backup.json'}); document.body.append(a); a.click(); a.remove(); }catch(e){} }},'Save backup file');
-  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status,visits:visitExport()},null,1); out.value=t; copy(t,b3); });
+  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status,visits:visitExport(),spots:spotExport()},null,1); out.value=t; copy(t,b3); });
   const inp=el('textarea',{id:'bk-in',placeholder:'Paste a backup here',style:'min-height:60px;font-family:var(--fm);font-size:11.5px'});
   const msg=el('span',{class:'note-saved'});
   const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; aliasMigrate(); save(); applyTheme(); drawScale(); pushPrefs(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
@@ -2746,14 +2790,17 @@ $('#filt-btn').addEventListener('click',()=>{ const d=$('#filters'); d.open=!d.o
 $('#sort').addEventListener('change',e=>{ U.ui.sort=e.target.value; save(); renderList(); });
 $('#sort').value=U.ui.sort||'time';
 document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{ const v=b.getAttribute('data-view'); if(v==='list'&&sel&&view!=='detail'){ showView('detail'); } else if(v==='list'){ if(sel) deselect(); else showView('list'); } else showView(v); }));
-$('#add-here').addEventListener('click',()=>{ if(!geo.ll) return; adding=false; stage.classList.remove('adding'); $('#addbar').hidden=true; $('#add-here').hidden=true; openForm({lat:+geo.ll[0].toFixed(6),lon:+geo.ll[1].toFixed(6)}); });
-$('#add-place').addEventListener('click',()=>{ if(!map) return; asking=false; adding=true; $('#add-here').hidden=!geo.ll; stage.classList.add('adding'); $('#addbar').hidden=false; $('#addbar span').textContent='Click the map where the place is.'; });
+$('#add-here').addEventListener('click',()=>{ if(!geo.ll) return; if(spotting) spotDrop(geo.ll[0],geo.ll[1]); else placeAt(geo.ll[0],geo.ll[1]); });
+$('#add-centre').addEventListener('click',()=>{ if(!map) return; const c=map.getCenter(); if(spotting) spotDrop(c.lat,c.lng); else if(adding) placeAt(c.lat,c.lng); });
+$('#add-many').addEventListener('click',spotStart);
+$('#spot-undo').addEventListener('click',()=>{ if(U.spots&&U.spots.length){ U.spots.pop(); saveNow(); drawSpots(); addBar(); } });
+$('#add-place').addEventListener('click',()=>{ if(!map) return; asking=false; spotting=false; adding=true; stage.classList.add('adding'); $('#addbar').hidden=false; addBar(); });
 $('#rec-note').addEventListener('click',()=>{ const f=$('#rec-form'); f.hidden=!f.hidden; if(!f.hidden){ $('#rec-text').value=''; try{ $('#rec-text').focus(); }catch(e){} } });
 $('#rec-form').addEventListener('submit',e=>{ e.preventDefault(); addNote($('#rec-text').value); $('#rec-form').hidden=true; });
 { const b=$('#rec-stop'); let armed=false; b.addEventListener('click',()=>{ if(!armed){ armed=true; b.textContent='Tap again to stop'; setTimeout(()=>{ armed=false; b.textContent='Stop'; },3500); return; } armed=false; b.textContent='Stop'; stopLog(); }); }
-$('#add-cancel').addEventListener('click',()=>{ adding=false; pickingHome=false; asking=false; stage.classList.remove('adding'); $('#addbar').hidden=true; syncBar(); });
+$('#add-cancel').addEventListener('click',()=>{ adding=false; spotting=false; pickingHome=false; asking=false; stage.classList.remove('adding'); $('#addbar').hidden=true; addBar(); syncBar(); });
 $('#sheet-x').addEventListener('click',closeSheet); $('#sheet-set').addEventListener('click',()=>showSettings(sheetMode!=='set')); $('#scrim').addEventListener('click',closeSheet);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('#sheet').hidden){ closeSheet(); } else if(adding||pickingHome||asking){ $('#add-cancel').click(); } else if(view==='detail'&&sel&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))) deselect(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('#sheet').hidden){ closeSheet(); } else if(adding||spotting||pickingHome||asking){ $('#add-cancel').click(); } else if(view==='detail'&&sel&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))) deselect(); } });
 if(window.matchMedia('(min-width:821px)').matches) $('#filters').open=false;
 
 buildHome(); buildFilters(); renderList(); $('#trip-n').textContent=U.trip.length;
@@ -2765,7 +2812,7 @@ if(HOSTED&&!AT&&'serviceWorker' in navigator&&(location.protocol==='https:'||loc
 /* the phone's Back button, in the app: close whatever is open; returning false lets Android put the app in the background */
 window.atlasBack=()=>{
   if(!$('#sheet').hidden){ closeSheet(); return true; }
-  if(adding||pickingHome||asking){ $('#add-cancel').click(); return true; }
+  if(adding||spotting||pickingHome||asking){ $('#add-cancel').click(); return true; }
   if(!$('#rec-form').hidden){ $('#rec-form').hidden=true; return true; }
   if(map&&map._popup&&map._popup.isOpen&&map._popup.isOpen()){ map.closePopup(); return true; }
   if($('#app').classList.contains('mapbig')){ $('#app').classList.remove('mapbig'); buildBar(); setTimeout(()=>map&&map.invalidateSize(),60); return true; }
