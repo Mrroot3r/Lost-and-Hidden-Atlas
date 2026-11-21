@@ -1,0 +1,10 @@
+{"name": "Bearpen Mountain State Forest", "code": "bmsf", "st": "ny", "state": "done", "tiles": 26, "swept": "2026-11-20", "buildings": 74, "sheets": ["NY_Gilboa_129520_1901_62500_geo.tif", "NY_Phoenicia_128980_1900_62500_geo.tif", "NY_Hobart_129876_1904_62500_geo.tif"], "walls": 411, "wall_m": 13610,
+"cands":[
+{"id":"bmsf1","lat":42.290841,"lon":-74.461599,"depth":1.19,"size":[8,7],"dist":70,"blat":42.29144,"blon":-74.46133,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"bmsf2","lat":42.272978,"lon":-74.469702,"depth":0.8,"size":[9,6],"dist":22,"blat":42.27315,"blon":-74.46958,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"bmsf3","lat":42.24615,"lon":-74.440397,"depth":0.78,"size":[9,9],"dist":45,"blat":42.24655,"blon":-74.44032,"sheet":"NY_Phoenicia_128980_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"bmsf4","lat":42.245077,"lon":-74.446281,"depth":1.54,"size":[16,12],"dist":44,"blat":42.24469,"blon":-74.44617,"sheet":"NY_Phoenicia_128980_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"bmsf5","lat":42.251477,"lon":-74.451456,"depth":0.65,"size":[11,9],"dist":62,"blat":42.25105,"blon":-74.45193,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"},
+{"id":"bmsf6","lat":42.245167,"lon":-74.44477,"depth":0.64,"size":[5,4],"dist":48,"blat":42.24475,"blon":-74.44494,"sheet":"NY_Phoenicia_128980_1900_62500_geo.tif","year":1900,"status":"new"},
+{"id":"bmsf7","lat":42.251738,"lon":-74.451845,"depth":0.7,"size":[15,9],"dist":77,"blat":42.25105,"blon":-74.45193,"sheet":"NY_Gilboa_129520_1901_62500_geo.tif","year":1901,"status":"new"}
+]}

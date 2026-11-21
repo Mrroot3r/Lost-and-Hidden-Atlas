@@ -1,0 +1,20 @@
+{"name": "Lincklaen State Forest", "code": "lisf", "st": "ny", "state": "done", "tiles": 37, "swept": "2026-11-20", "buildings": 50, "sheets": ["NY_Pitcher_129030_1904_62500_geo.tif"], "walls": 2758, "wall_m": 76048,
+"cands":[
+{"id":"lisf1","lat":42.678061,"lon":-75.838553,"depth":1.13,"size":[8,7],"dist":45,"blat":42.67766,"blon":-75.83853,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf2","lat":42.678227,"lon":-75.854441,"depth":1.09,"size":[8,6],"dist":48,"blat":42.67797,"blon":-75.85491,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf3","lat":42.677702,"lon":-75.825336,"depth":1.52,"size":[12,9],"dist":52,"blat":42.67781,"blon":-75.82595,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf4","lat":42.681295,"lon":-75.839005,"depth":0.97,"size":[6,5],"dist":35,"blat":42.68117,"blon":-75.8394,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf5","lat":42.663886,"lon":-75.832597,"depth":0.96,"size":[5,5],"dist":32,"blat":42.66374,"blon":-75.83294,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf6","lat":42.613481,"lon":-75.860611,"depth":1.16,"size":[6,7],"dist":59,"blat":42.61299,"blon":-75.86034,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf7","lat":42.643656,"lon":-75.858162,"depth":0.78,"size":[5,7],"dist":31,"blat":42.64359,"blon":-75.85853,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf8","lat":42.655774,"lon":-75.827504,"depth":1.02,"size":[7,11],"dist":69,"blat":42.65548,"blon":-75.82824,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf9","lat":42.679435,"lon":-75.838895,"depth":1.02,"size":[6,7],"dist":63,"blat":42.67888,"blon":-75.83904,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf10","lat":42.678079,"lon":-75.848391,"depth":0.99,"size":[7,7],"dist":64,"blat":42.67759,"blon":-75.84881,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf11","lat":42.678398,"lon":-75.854984,"depth":0.64,"size":[5,8],"dist":48,"blat":42.67797,"blon":-75.85491,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf12","lat":42.664326,"lon":-75.814661,"depth":0.63,"size":[10,9],"dist":84,"blat":42.66493,"blon":-75.81528,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf13","lat":42.655909,"lon":-75.827369,"depth":0.62,"size":[5,7],"dist":86,"blat":42.65548,"blon":-75.82824,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf14","lat":42.68368,"lon":-75.839152,"depth":0.85,"size":[4,4],"dist":18,"blat":42.68372,"blon":-75.83937,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf15","lat":42.660481,"lon":-75.839676,"depth":0.75,"size":[4,5],"dist":15,"blat":42.6606,"blon":-75.83975,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf16","lat":42.677935,"lon":-75.849289,"depth":0.72,"size":[4,7],"dist":55,"blat":42.67759,"blon":-75.84881,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"lisf17","lat":42.626471,"lon":-75.857553,"depth":0.62,"size":[15,9],"dist":61,"blat":42.62607,"blon":-75.85705,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"}
+]}

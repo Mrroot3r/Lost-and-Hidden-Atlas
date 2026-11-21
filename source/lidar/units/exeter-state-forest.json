@@ -1,0 +1,14 @@
+{"name": "Exeter State Forest", "code": "esf", "st": "ny", "state": "done", "tiles": 18, "swept": "2026-11-20", "buildings": 81, "sheets": ["NY_Winfield_140354_1907_62500_geo.tif"], "walls": 636, "wall_m": 21643,
+"cands":[
+{"id":"esf1","lat":42.8076,"lon":-75.104301,"depth":1.53,"size":[12,11],"dist":36,"blat":42.80729,"blon":-75.10441,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf2","lat":42.837352,"lon":-75.089167,"depth":1.53,"size":[13,9],"dist":28,"blat":42.8371,"blon":-75.08919,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf3","lat":42.836624,"lon":-75.093865,"depth":1.16,"size":[10,7],"dist":10,"blat":42.83664,"blon":-75.09374,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf4","lat":42.832083,"lon":-75.077152,"depth":1.02,"size":[13,8],"dist":84,"blat":42.83165,"blon":-75.07799,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf5","lat":42.830974,"lon":-75.079327,"depth":0.67,"size":[6,9],"dist":14,"blat":42.8311,"blon":-75.07933,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf6","lat":42.800557,"lon":-75.097202,"depth":0.65,"size":[5,5],"dist":19,"blat":42.80057,"blon":-75.09697,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf7","lat":42.832079,"lon":-75.08,"depth":0.7,"size":[6,5],"dist":72,"blat":42.83143,"blon":-75.08005,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf8","lat":42.841053,"lon":-75.099305,"depth":0.68,"size":[8,9],"dist":65,"blat":42.84147,"blon":-75.09986,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf9","lat":42.842064,"lon":-75.100487,"depth":0.66,"size":[15,10],"dist":43,"blat":42.84169,"blon":-75.10037,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf10","lat":42.82898,"lon":-75.076119,"depth":0.62,"size":[4,7],"dist":32,"blat":42.8287,"blon":-75.07621,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"},
+{"id":"esf11","lat":42.834828,"lon":-75.084962,"depth":0.64,"size":[4,7],"dist":76,"blat":42.83442,"blon":-75.08422,"sheet":"NY_Winfield_140354_1907_62500_geo.tif","year":1907,"status":"new"}
+]}

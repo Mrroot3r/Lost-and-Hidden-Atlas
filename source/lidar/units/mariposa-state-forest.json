@@ -1,0 +1,15 @@
+{"name": "Mariposa State Forest", "code": "masf", "st": "ny", "state": "done", "tiles": 28, "swept": "2026-11-20", "buildings": 51, "sheets": ["NY_Pitcher_129030_1904_62500_geo.tif"], "walls": 1593, "wall_m": 44903,
+"cands":[
+{"id":"masf1","lat":42.717478,"lon":-75.863264,"depth":1.41,"size":[11,8],"dist":44,"blat":42.71721,"blon":-75.86366,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf2","lat":42.740326,"lon":-75.797528,"depth":1.23,"size":[12,11],"dist":20,"blat":42.74015,"blon":-75.79759,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf3","lat":42.730032,"lon":-75.892814,"depth":1.01,"size":[6,7],"dist":16,"blat":42.72995,"blon":-75.89298,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf4","lat":42.728078,"lon":-75.852966,"depth":0.99,"size":[9,12],"dist":39,"blat":42.72773,"blon":-75.85294,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf5","lat":42.72475,"lon":-75.843006,"depth":0.88,"size":[6,5],"dist":19,"blat":42.72468,"blon":-75.84322,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf6","lat":42.733823,"lon":-75.850465,"depth":1.2,"size":[6,9],"dist":58,"blat":42.73332,"blon":-75.8503,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf7","lat":42.725751,"lon":-75.858989,"depth":1.12,"size":[14,14],"dist":26,"blat":42.72575,"blon":-75.85867,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf8","lat":42.724458,"lon":-75.84218,"depth":0.75,"size":[7,12],"dist":89,"blat":42.72468,"blon":-75.84322,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf9","lat":42.723505,"lon":-75.829096,"depth":1.4,"size":[9,16],"dist":78,"blat":42.72327,"blon":-75.83,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf10","lat":42.714648,"lon":-75.850283,"depth":0.87,"size":[4,4],"dist":39,"blat":42.71497,"blon":-75.85048,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf11","lat":42.72788,"lon":-75.852477,"depth":0.74,"size":[5,4],"dist":41,"blat":42.72773,"blon":-75.85294,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"},
+{"id":"masf12","lat":42.723784,"lon":-75.829677,"depth":0.71,"size":[16,10],"dist":63,"blat":42.72327,"blon":-75.83,"sheet":"NY_Pitcher_129030_1904_62500_geo.tif","year":1904,"status":"new"}
+]}
