@@ -1,0 +1,11 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen)   or   ('', day, why none fits)
+PICS={
+ 'fresno-brewing-company-office':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Fresno_Brewing_Company_Office_and_Warehouse.JPG/960px-Fresno_Brewing_Company_Office_and_Warehouse.JPG', 900, 675, 'R&sbwn', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Fresno_Brewing_Company_Office_and_Warehouse.JPG', '2026-11-21'),
+ 'hotel-californian-fresno':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Hotel_Californian._view_from_Van_Ness.JPG/960px-Hotel_Californian._view_from_Van_Ness.JPG', 900, 1068, 'R&sbwn', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Hotel_Californian._view_from_Van_Ness.JPG', '2026-11-21'),
+ 'kearney-mansion-fresno':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Kearney_Park_Mansion.JPG/960px-Kearney_Park_Mansion.JPG', 900, 675, 'R&sbwn', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Kearney_Park_Mansion.JPG', '2026-11-21'),
+ 'liberty-theatre-fresno':('', '2026-11-21', 'the Hotel Californian, a Holiday Inn, the Bank of Italy and a person with a sign; none shows the theatre'),
+ 'mattei-building-fresno':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Mattei_Building_-_Fresno%2C_CA_-_DSC00268.jpg/960px-Mattei_Building_-_Fresno%2C_CA_-_DSC00268.jpg', 900, 1350, 'Daderot', 'CC0', 'https://commons.wikimedia.org/wiki/File:Mattei_Building_-_Fresno,_CA_-_DSC00268.jpg', '2026-11-21'),
+ 'rowell-building-fresno':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Rowell_Building%2C_Fresno%2C_CA_2024-02-26.jpg/960px-Rowell_Building%2C_Fresno%2C_CA_2024-02-26.jpg', 900, 901, 'Xnatedawgx', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Rowell_Building,_Fresno,_CA_2024-02-26.jpg', '2026-11-21'),
+ 'southern-pacific-depot-fresno':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ed/Southern_Pacific_Passenger_Depot.JPG/960px-Southern_Pacific_Passenger_Depot.JPG', 900, 591, 'R&sbwn', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Southern_Pacific_Passenger_Depot.JPG', '2026-11-21'),
+}
