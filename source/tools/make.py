@@ -21,6 +21,8 @@ for line in md.split('## Research toolkit')[1].split('**Five tells')[0].split('\
     if m and m.group(1)!='Resource': tk.append([m.group(1),m.group(2),m.group(4)])
 tells=[re.sub(r'^- ','',l) for l in md.split('**Five tells of a lost building**')[1].split('## ')[0].strip().split('\n') if l.startswith('- ')]
 rules=[re.sub(r'^- ','',l) for l in md.split('**Access and legal notes**')[1].split('## ')[0].strip().split('\n') if l.startswith('- ')]
+# The owner's early episode ideas. The app no longer shows them (November 21, 2026: the Guide tab's list and the filter went),
+# but places still carry these tags and tools/check.py reads the allowed tags from this list, so it stays.
 series=[
  ['now','Watch it disappear: 2026','Now. The Central Warehouse demolition runs through this winter.'],
  ['trolleyparks','Trolley parks','Summer, to match the old postcards. Scout the woods in leaf-off months first. Now includes Whalom, Norumbega, Mountain Park and Lincoln Park in Massachusetts.'],
@@ -48,7 +50,7 @@ aerial=[
 V=os.environ.get('ATLAS_V') or datetime.datetime.now().strftime('%y%m%d%H%M')     # ATLAS_V: build under a given version, to see whether anything but the stamp changed
 import sys; sys.path.insert(0,R+'tools')
 from states import STATES
-data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':(os.environ.get('ATLAS_BUILT') or datetime.date.today().strftime('%B %-d, %Y')),'sites':S,'hubs':HUBS,'series':[{'tag':a,'title':b,'note':c} for a,b,c in series],'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules,'alias':(json.load(open(R+'build/alias.json')) if os.path.exists(R+'build/alias.json') else {})}
+data={'v':V,'states':[{'k':s['k'],'name':s['name'],'legal':s['legal'],'regions':[list(r) for r in s['regions']]} for s in STATES],'outlines':json.load(open(R+'build/states.json')),'batches':json.load(open(R+'build/batches.json')),'built':(os.environ.get('ATLAS_BUILT') or datetime.date.today().strftime('%B %-d, %Y')),'sites':S,'hubs':HUBS,'aerial':aerial,'toolkit':tk,'tells':tells,'rules':rules,'alias':(json.load(open(R+'build/alias.json')) if os.path.exists(R+'build/alias.json') else {})}
 # The old rail and canal lines, cut up for the hosted copy: one file for each state, a thinned picture of them all, and
 # the index of both, which goes in the page data (tools/lines_split.py). The app uses the index only on the hosted copy.
 import lines_split

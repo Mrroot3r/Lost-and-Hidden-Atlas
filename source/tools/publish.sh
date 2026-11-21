@@ -31,11 +31,25 @@ fi
 # must be the same in the workspace. If one is not, stop and say how to catch up.
 BASE="${BASE:-origin/main}"; SC=$(cat "$W/.setup_commit" 2>/dev/null || true)
 if [ -n "$SC" ] && git cat-file -e "$SC^{commit}" 2>/dev/null && git rev-parse -q --verify "$BASE" >/dev/null; then
-  STALE=""
+  STALE=""; CAUGHT=0
   for f in $(git diff --name-only "$SC" "$BASE" -- source/tools source/src); do
     git cat-file -e "$BASE:$f" 2>/dev/null || continue
-    if [ ! -e "$W/${f#source/}" ] || ! git show "$BASE:$f" | cmp -s - "$W/${f#source/}"; then STALE="$STALE $f"; fi
+    w="$W/${f#source/}"
+    if [ -e "$w" ] && git show "$BASE:$f" | cmp -s - "$w"; then continue; fi
+    # Another session's place list, pictures, hours or brick file (or the list of settled warnings) that this session never
+    # touched is simply taken into the workspace: no stop, no resync, no rebuild. Research batches merge every few minutes,
+    # and stopping for each one cost a session about four minutes a time (the sessions' notes, November 2026). The site this
+    # workspace built does not show those places, which does not matter: the branch carries sources, GitHub builds the site,
+    # and check.py below reads all of them together. Anything else that changed (the app, a tool) still stops.
+    if echo "$f" | grep -q -E '^source/tools/((data|pics|hours|bricks)_[a-z0-9_]+\.py|checked_ok\.json)$' && { [ ! -e "$w" ] || { git cat-file -e "$SC:$f" 2>/dev/null && git show "$SC:$f" | cmp -s - "$w"; }; }; then
+      git show "$BASE:$f" > "$w"; CAUGHT=$((CAUGHT+1)); continue
+    fi
+    STALE="$STALE $f"
   done
+  if [ -z "$STALE" ] && [ "$CAUGHT" -gt 0 ]; then
+    git rev-parse "$BASE" > "$W/.setup_commit"
+    echo "Caught up by itself: $CAUGHT data file(s) other sessions merged while you worked were taken into the workspace. Nothing of yours was touched and nothing needs rebuilding."
+  fi
   if [ -n "$STALE" ]; then
     echo "STOP: these files changed in the repository after this workspace was set up, and publishing now would undo that:"; for f in $STALE; do echo "  $f"; done
     echo "Catch up (it keeps your own new work), then publish again:"

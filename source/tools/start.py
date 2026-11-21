@@ -24,14 +24,19 @@ name=''; words=[]
 if len(a)>=2 and num(a[0]) and num(a[1]): la,lo=float(a[0]),float(a[1]); km=float(a[2]) if len(a)>2 else 15.0
 else:
     name=a[0]; km=float(a[1]) if len(a)>1 and num(a[1]) else 15.0
-    u='https://nominatim.openstreetmap.org/search?'+urllib.parse.urlencode({'q':name,'format':'jsonv2','limit':1,'countrycodes':'us,ca'})
+    u='https://nominatim.openstreetmap.org/search?'+urllib.parse.urlencode({'q':name,'format':'jsonv2','limit':8,'countrycodes':'us,ca'})
     j=None
     for k in range(3):
         try: j=json.load(urllib.request.urlopen(urllib.request.Request(u,headers={'User-Agent':'lost-hidden-atlas-research/1.0 (personal research tool)'}),timeout=30)); break
         except Exception as e: time.sleep(2+2*k)
     if not j: sys.exit(f'Could not find "{name}". Give it as "Town, State", or give a latitude and longitude.')
-    la,lo=float(j[0]['lat']),float(j[0]['lon']); words=[w.strip() for w in j[0]['display_name'].split(',')][:4]
-    print(f'== {name}: {la:.5f}, {lo:.5f}  ({j[0]["display_name"][:90]})')
+    import placepick      # several places share a name: stay in the state named, and take a town before a county (tools/placepick.py)
+    best,others=placepick.pick(j,name)
+    la,lo=float(best['lat']),float(best['lon']); words=[w.strip() for w in best['display_name'].split(',')][:4]
+    print(f'== {name}: {la:.5f}, {lo:.5f}  ({best["display_name"][:90]})')
+    if others:
+        print('   CHECK THAT THIS IS THE PLACE YOU MEAN. Others of that name:')
+        for o in others[:4]: print(f'     {o["display_name"][:80]}:   python3 tools/start.py {float(o["lat"]):.4f} {float(o["lon"]):.4f}')
 os.chdir(W)
 if not os.path.exists('build/sites.json'): subprocess.run([sys.executable,'tools/build_sites.py'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
 def d(p,q): return math.hypot((p-la)*111.32,(q-lo)*111.32*math.cos(math.radians(la)))
