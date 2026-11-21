@@ -1,0 +1,21 @@
+# Hours, looked up after the places were written (tools/hours.py set). id: (hours or ?, day read, page, [opens to visitors])
+HOURS={
+ 'calvary-episcopal-utica':('?', '2026-11-21', 'https://igoarchusa.orthodoxws.com/divineworship'),
+ 'chemung-canal-bank-elmira':('?', '2026-11-21', 'https://chemungvalleymuseum.org/'),
+ 'christ-church-wellsburg':('?', '2026-11-21', 'https://episcopalassetmap.org/node/1967'),
+ 'first-presbyterian-utica':('?', '2026-11-21', 'https://en.wikipedia.org/wiki/First_Presbyterian_Church_(Utica,_New_York)'),
+ 'grant-cottage-mount-mcgregor':('Closed for the season, reopening May 2027 (no grounds access meanwhile); in season guided tours every 30 min, last at 3:30', '2026-11-21', 'https://www.grantcottage.org/visit', True),
+ 'hallockville-museum-farm-northville':('Homestead tours Sat 10-3 (May 1-Oct 31); grounds sunup-sundown year-round; shop Mon-Fri 10-3', '2026-11-21', 'https://hallockville.org/hours-tours/', True),
+ 'hill-hold-campbell-hall':('?', '2026-11-21', 'https://www.hillholdandbrickhouse.org/'),
+ 'midway-congregational-church':('Church opening not stated; the Midway Museum opposite gives guided tours Tue-Sat 10-4 (last tour 3)', '2026-11-21', 'https://www.themidwaymuseum.org/midway-church/'),
+ 'mount-saviour-monastery':('?', '2026-11-21', 'https://msaviour.org/'),
+ 'old-fort-niagara':('Daily 10-4 (Apr-Jun, Sep-Oct 15), daily 10-5 (Jul-Aug); Wed-Sun 10-4 (Oct 15-Mar); daily Dec 26-31; closed Thanksgiving, Christmas, New Year', '2026-11-21', 'https://www.oldfortniagara.org/plan-your-visit', True),
+ 'old-stone-house-library-fort-ann':('Fort Ann Historical Society gives open hours Tue 4-5:30, Wed 8:30-10:30, Thu 1-3 (Lakes to Locks Passage page says Tue-Thu 3-5)', '2026-11-21', 'https://fortannhistory.org/research/', True),
+ 'second-house-museum-montauk':('?', '2026-11-21', 'https://montaukhistoricalsociety.org/'),
+ 'sharon-temple':('Museum closed for the season (read Nov 2026); office Tue-Fri 10-4 for inquiries and scheduled visits', '2026-11-21', 'https://www.sharontemple.ca/visit-the-museum', True),
+ 'skene-library-fleischmanns':('Tue-Fri 11-4, Sat 10-2; closed Mon', '2026-11-21', 'https://skenelib.org/', True),
+ 'st-stephens-new-hartford':('Sun 10 am worship (Episcopal); office by appointment', '2026-11-21', 'https://ststephens-newhartford.org/', True),
+ 'staatsburgh-mills-mansion':('Mansion by guided tour (reserve online); closed Oct 31-Thanksgiving for decorating; grounds free sunrise-sunset year-round', '2026-11-21', 'https://parks.ny.gov/historic-sites/staatsburgh/details.aspx', True),
+ 'tabernacle-baptist-utica':('?', '2026-11-21', 'https://abhsarchives.org/tabernacle-baptist-church-utica-ny-celebrated-200-years'),
+ 'trinity-church-elmira':('?', '2026-11-21', 'https://www.aol.com/elmira-church-transformed-one-kind-101444110.html'),
+}
