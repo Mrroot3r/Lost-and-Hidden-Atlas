@@ -119,6 +119,14 @@ const { chromium } = require('playwright');
     await p.click('.dtop .btn'); await p.waitForTimeout(400);     // Back
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
     ok('zoomed out again, the favourite has its own pin, ringed; its neighbour is still in the disc',!!v.a&&v.a.fav&&!v.b&&v.discs>0&&v.favs===1,JSON.stringify(v));
+    // while the numbered discs are showing, a favourite is a small mark beside a disc, never on top of its number (the owner, November 21, 2026)
+    const clear=()=>p.evaluate(()=>{ const f=document.querySelector('.leaflet-marker-pane .pin.fav'); if(!f) return null; const b=f.getBoundingClientRect(), fx=b.left+b.width/2, fy=b.top+b.height/2; let gap=1e9;
+      document.querySelectorAll('.clus').forEach(c=>{ const r=c.getBoundingClientRect(); gap=Math.min(gap,Math.hypot(fx-(r.left+r.width/2),fy-(r.top+r.height/2))-r.width/2); }); return {far:f.classList.contains('far'),w:Math.round(b.width),gap:Math.round(gap)}; });
+    let fc=await clear(); ok('with discs on the map the favourite is a smaller mark, clear of every disc so its number can be read',!!fc&&fc.far&&fc.w<=21&&fc.gap>=2,JSON.stringify(fc));
+    const cov=await p.evaluate(()=>{ const D=[...document.querySelectorAll('.clus')].map(c=>c.getBoundingClientRect()); let n=0, on=0; document.querySelectorAll('.leaflet-marker-pane .pin').forEach(f=>{ const b=f.getBoundingClientRect(), x=b.left+b.width/2, y=b.top+b.height/2; n++; if(D.some(r=>Math.hypot(x-(r.left+r.width/2),y-(r.top+r.height/2))<r.width/2-2)) on++; }); return {pins:n,on:on}; });
+    ok('no pin that stands alone sits on a disc, favourite or not',cov.pins>0&&cov.on===0,JSON.stringify(cov));
+    await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],14,{animate:false}),two[0]); await p.waitForTimeout(700); fc=await clear();
+    ok('zoomed in past the discs it is full size again',!!fc&&!fc.far&&fc.w>=20,JSON.stringify(fc));
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],5,{animate:false}),two[0]); v=await seen();
     ok('and at the scale of half a continent it is still there',!!v.a&&v.a.fav,'zoom '+v.zoom);
     await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(250);
@@ -247,7 +255,7 @@ const { chromium } = require('playwright');
     ok('"Not now" is remembered on the next visit',!s.card&&s.mins===0);
     ok('"Not now": no script errors',A.errs.length===0,A.errs.join(' | ').slice(0,200)); await A.c.close();
     A=await mk(null,{v:1,trip:['joliet-iron-works'],ui:{noStart:1}}); await A.p.click('#tab-trip'); await A.p.waitForTimeout(300);
-    ok('a trip with no start place asks for one and does not plan from a city nobody chose',await A.p.evaluate(()=>{ const v=document.querySelector('#v-trip'); return !!v.querySelector('#startcard')&&!v.querySelector('#sc-no')&&!v.querySelector('#trip-day')&&!/Albany/.test(v.textContent); }));
+    ok('a trip with no start place still plans, from nowhere: it names no city nobody chose and its Google Maps link has no start',await A.p.evaluate(()=>{ const v=document.querySelector('#v-trip'), l=v.querySelector('a[href*="google.com/maps/dir"]'); return !!v.querySelector('#trip-day')&&!/Albany/.test(v.textContent)&&!!l&&!/origin=/.test(l.href); }));
     ok('a trip with no start place: no script errors',A.errs.length===0,A.errs.join(' | ').slice(0,200)); await A.c.close();
     A=await mk({latitude:39.0997,longitude:-94.5786,accuracy:15}); await A.p.click('#sc-me'); await A.p.waitForFunction(()=>document.querySelector('#sort').options[0].textContent==='Nearest to you',null,{timeout:9000}).catch(()=>{}); await A.p.waitForTimeout(400); s=await state(A.p);
     ok('"Use my location" (in Kansas City): the card goes and the list counts from where you are',!s.card&&s.mins>0&&s.label==='Nearest to you','"'+s.label+'", '+s.mins+' times');

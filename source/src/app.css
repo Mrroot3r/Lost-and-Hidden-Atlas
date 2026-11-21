@@ -263,6 +263,9 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .pin.fav{box-shadow:0 0 0 3px #fff,0 0 0 4.5px rgba(0,0,0,.8),0 2px 5px rgba(0,0,0,.6)}
 .pin.sq.fav{box-shadow:none;transform:scale(1.25);filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 1.5px #000)}
 .pin.sq.fav .o{stroke:#fff;stroke-width:8}
+/* while the numbered discs are showing a favourite is a small mark beside them (syncMarkers) */
+.pin.fav.far{transform:scale(.8)}
+.pin.sq.fav.far{transform:scale(.85)}
 .pin.sq.fav.sel{filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 3px var(--accent))}
 .btn.favb{min-width:36px;padding-inline:8px;font-size:16px;line-height:1}.btn.favb.on{color:#e11d48}
 .pin.my-filmed,.pin.my-skip{opacity:.45}
