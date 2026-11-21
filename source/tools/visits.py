@@ -19,6 +19,16 @@ def metres(a,b,c,d): return math.hypot((c-a)*111320,(d-b)*111320*math.cos(math.r
 a=[x for x in sys.argv[1:] if not x.startswith('--')]
 if not a: print(__doc__); sys.exit(0)
 j=json.load(open(a[0],encoding='utf-8')); vs=j.get('visits') if isinstance(j,dict) else j
+# Spots: bare marks the owner dropped on buildings he wants researched ("Spot many" in the app). He can tell what is old at a
+# glance and place a mark in a second, so these come before any other lead. Each is printed as a LEADS.md row; start.py finds a
+# row by the coordinate in it and lists the owner's spots first.
+sp=(j.get('spots') if isinstance(j,dict) else None) or []
+if sp:
+    print('SPOTS: %d building(s) the owner marked for research. Put these rows at the top of the table in LEADS.md; delete a row when its place is added.'%len(sp))
+    for x in sp:
+        note=str(x.get('note') or '').replace('|','/').strip()
+        print('| Spot %s (owner, %s) | %.5f, %.5f | The owner marked this building as old and worth researching%s | Everything: work out which building stands at this point, then research it |'%(x.get('n','?'),x.get('t','?'),x['lat'],x['lon'],(': "'+note+'"') if note else ''))
+    print()
 if not vs: print('No visit reports in that file.'); sys.exit(0)
 ledger='--ledger' in sys.argv; L=None
 if ledger:
