@@ -248,7 +248,8 @@ const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{
   ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
   ['Standing, from before 1800',()=>{ F.st.add('standing'); F.before=1800; }],
   ['Red brick',()=>{ F.brick=true; }],
-  ['Within 30 min',()=>{ F.max=30; }],
+  /* with no start place there is nothing to count 30 minutes from: it used to switch on, show "Filters 1" and leave every place in the list */
+  ['Within 30 min',()=>{ if(!fromOK()){ banner('Say where you start first: "Use my location" or "Choose a place" on the Places tab. Drive times count from there.',true,8000); return; } F.max=30; }],
   ['Changing now',()=>{ F.now=true; }],
   ['Places of worship',()=>{ F.cat.add('worship'); }],
   ['Houses, bridges & landmarks',()=>{ F.cat.add('landmark'); }],
@@ -826,7 +827,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
   const ks=el('textarea',{id:'set-kitSign',rows:'2',placeholder:'More walks: youtube.com/@yourchannel'}); ks.value=pref('kitSign'); ['change','blur'].forEach(ev=>ks.addEventListener(ev,()=>{ if(ks.value.trim()!==pref('kitSign')) setPref('kitSign',ks.value.trim()); }));
   const add=(...a)=>a.forEach(x=>{ if(x) lb.append(x); });      /* Element.append(null) would print the word "null" */
   add(H('Look and units'),
-    pick('theme','Colours',[['auto','Follow the phone: light by day, dark by night'],['light','Always light'],['dark','Always dark']]),
+    pick('theme','Colours',[['auto','Follow the phone'],['light','Always light'],['dark','Always dark']]),
     pick('themeL','Light colours',THEMES.filter(t=>t[2]==='l')),
     pick('themeD','Dark colours',THEMES.filter(t=>t[2]==='d')),
     tog('addMore','Adding a place also asks its kind, year and name','Off: one tap on Standing, Ruin, Trace or Odd find saves the place. "More details" on that card always opens the full form.'),
@@ -1512,7 +1513,7 @@ function locate(){
          lets go the moment you move it so that the dot is at the edge or off it, by a drag or by tapping a place, and stays
          let go until you tap Me: before November 20, 2026 the next fix dragged the map back while you were looking elsewhere. */
       if(pref('follow')&&geo.fol&&!geo.first&&was&&!dragging){ if(!map.getBounds().pad(-0.12).contains(p)){ geo.auto=true; map.panTo(p,{animate:true,duration:0.6}); } }
-      if(geo.first){ geo.first=false; geo.fol=true; geo.auto=true; nearHome(p,true); banner('You are the blue dot, good to about '+Math.round(c.accuracy)+' m. Tap Me again to stop.',false,6000); map.setView(p,geo.wide?10:Math.max(map.getZoom(),16)); geo.wide=false; }
+      if(geo.first){ geo.first=false; geo.fol=true; geo.auto=true; nearHome(p,true); banner('You are the blue dot, good to about '+accFmt(c.accuracy)+'. Tap Me again to stop.',false,6000); map.setView(p,geo.wide?10:Math.max(map.getZoom(),16)); geo.wide=false; }
     },e=>{ if(e&&e.code===1){ fail(LOCAL||HOSTED?'Location was refused. Allow it for this page in your browser settings, then tap again.':'This online copy is not allowed to use your location. It works when the Atlas is opened as a file or from your own web address.'); return; }
       if(geo.f) return;   /* a passing timeout after we already had a fix: keep listening */
       fail('Could not get a GPS fix. Step into the open and try again.'); },
@@ -1535,6 +1536,8 @@ function nmSet(){ const o=U.ui.nm||{}; return {r:+o.r||3,al:o.al!=null?+o.al:100
 function nmSave(ch){ const S=nmSet(); Object.assign(S,ch); U.ui.nm=S; save(); NM.ver++; NM.cand=null; NM.more=false; nmEnsure(true); nmPush(true); nmDraw(true); }
 const brg=(a,b,c,d)=>{ const y=Math.sin(rad(d-b))*Math.cos(rad(c)), x=Math.cos(rad(a))*Math.sin(rad(c))-Math.sin(rad(a))*Math.cos(rad(c))*Math.cos(rad(d-b)); return (Math.atan2(y,x)*180/Math.PI+360)%360; };
 const dirTxt=b=>['N','NE','E','SE','S','SW','W','NW'][Math.round(b/45)%8];
+/* how good a fix is, in the reader's own units (it said metres to a reader who had chosen miles and feet) */
+const accFmt=m=>KM()?Math.round(m)+' m':Math.max(5,Math.round(m*3.28084/5)*5)+' ft';
 const nmDist=mi=>{ if(KM()){ const m=mi*1609.344; return m<950?Math.max(10,Math.round(m/10)*10)+' m':(m/1000).toFixed(m<20000?1:0)+' km'; } const f=mi*5280; return f<1000?Math.max(10,Math.round(f/10)*10)+' ft':mi.toFixed(mi<1?2:mi<10?1:0)+' mi'; };
 /* fetch whichever lead files the chosen kinds need; each tells nmLoaded() when it arrives */
 function leadsLoad(quiet){ if(LEADS) return; const n=document.getElementById('d-leads');
@@ -1601,7 +1604,7 @@ function nmCompass(on){ if(on===NM.cmp) return; NM.cmp=on; const f=on?'addEventL
 function nmAgo(t){ const m=Math.round((Date.now()-t)/60000); return m<2?'just now':m<90?m+' min ago':m<2880?Math.round(m/60)+' h ago':Math.round(m/1440)+' days ago'; }
 function renderNear(){ const v=$('#v-near'); if(!v) return;
   if(!v.firstChild){   /* the controls are built once; nmDraw() fills in what changes */
-    const S=nmSet(), rs=el('select',{id:'near-r','aria-label':'How far to look'},NMR.map(c=>el('option',{value:String(c[0]),text:'Within '+(KM()?c[2]:c[1])}))), as=el('select',{id:'near-al','aria-label':'Alert me when this close'},NMA.map(c=>el('option',{value:String(c[0]),text:c[0]?'Alert within '+(KM()?c[2]:c[1]):'No alert'})));
+    const S=nmSet(), rs=el('select',{id:'near-r','aria-label':'How far to look'},NMR.map(c=>el('option',{value:String(c[0]),text:'Within '+(KM()?c[2]:c[1])}))), as=el('select',{id:'near-al','aria-label':'Alert me when this close'},NMA.map(c=>el('option',{value:String(c[0]),text:c[0]?'Alert at '+(KM()?c[2]:c[1]):'No alert'})));
     rs.value=String(S.r); as.value=String(S.al); rs.addEventListener('change',()=>nmSave({r:+rs.value})); as.addEventListener('change',()=>nmSave({al:+as.value}));
     v.append(el('div',{class:'pad nmtop'},el('div',{id:'near-st'}),el('div',{class:'nmrow'},rs,as,el('button',{class:'btn sm',id:'near-set',type:'button','aria-label':'Near me settings',title:'Near me settings',onclick:()=>openSettings('Near me')},$('#sheet-set svg')?$('#sheet-set svg').cloneNode(true):'Settings')),el('div',{class:'presets',id:'near-k'}),el('p',{class:'nmnote',id:'near-note'})),el('div',{id:'near-goal',hidden:''}),el('ul',{id:'near-list'}));
     ['pointerdown','touchstart'].forEach(k=>v.addEventListener(k,()=>{ NM.touch=Date.now(); },{passive:true})); }
@@ -1613,7 +1616,7 @@ function nmDraw(now){ if(view!=='near') return; const v=$('#v-near'); if(!v||!v.
   const useMap=btn(NM.org==='map'?'Use where I am':'Use map centre',()=>{ NM.org=NM.org==='map'?'me':'map'; NM.cand=null; if(NM.org==='me'&&geo.id===null&&map) locate(); nmDraw(true); });
   const find=()=>btn('Find me',()=>{ if(map) locate(); nmDraw(true); },'pri');
   if(!o) st.append(...[el('b',{text:geo.id!==null?'Finding you…':'Near me needs to know where you are.'}),geo.id!==null?null:find(),useMap].filter(Boolean));
-  else st.append(...[el('b',{text:o.how==='live'?'From where you are'+(geo.acc?', good to '+Math.round(geo.acc)+' m':''):o.how==='map'?'From the middle of the map':geo.id!==null?'Finding you… Showing where you last were':'From where you last were, '+nmAgo(U.last.t)}),o.how==='last'&&geo.id===null?find():null,useMap].filter(Boolean));
+  else st.append(...[el('b',{text:o.how==='live'?'From where you are'+(geo.acc?', good to '+accFmt(geo.acc):''):o.how==='map'?'From the middle of the map':geo.id!==null?'Finding you… Showing where you last were':'From where you last were, '+nmAgo(U.last.t)}),o.how==='last'&&geo.id===null?find():null,useMap].filter(Boolean));
   const kb=$('#near-k'); kb.textContent=''; let all=[];
   if(o){ all=nmCands(o.p).map(x=>{ x.mi=hav(o.p[0],o.p[1],x.la,x.lo); x.b=brg(o.p[0],o.p[1],x.la,x.lo); return x; }).filter(x=>x.mi<=S.r).sort((a,b)=>a.mi-b.mi); }
   const wait={l:!LEADS,v:!XL.vanished.data,m:!XL.mines.data,c:!POCK};
@@ -2060,7 +2063,17 @@ function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return nul
   sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
     let c=cells.get(k); if(!c){ c={ids:[],la:0,lo:0,a:90,b:-90,c:180,d:-180}; cells.set(k,c); }
     c.ids.push(s.id); c.la+=p.lat; c.lo+=p.lon; if(p.lat<c.a)c.a=p.lat; if(p.lat>c.b)c.b=p.lat; if(p.lon<c.c)c.c=p.lon; if(p.lon>c.d)c.d=p.lon; });
-  const single=new Set(), groups=[]; cells.forEach(c=>{ if(c.ids.length<CLUSMIN) c.ids.forEach(i=>single.add(i)); else groups.push(c); });
+  const single=new Set(); let groups=[]; cells.forEach(c=>{ if(c.ids.length<CLUSMIN) c.ids.forEach(i=>single.add(i)); else groups.push(c); });
+  /* A disc is drawn at the middle of its places, not of its square, so two neighbouring squares could put their discs on top of each
+     other: on the opening map New York's 1,830 hid New England's 917. Discs that would overlap are joined, the larger taking the
+     smaller, until none do. A few hundred discs at most, so the pairs are cheap to try. */
+  const where=g=>{ const n=g.ids.length, q=map.project([g.la/n,g.lo/n],z); g.x=q.x; g.y=q.y; g.rad=clusSize(n)[1]/2; };
+  groups.forEach(where);
+  for(let pass=0;pass<5;pass++){ let joined=false; groups.sort((a,b)=>b.ids.length-a.ids.length);
+    for(let i=0;i<groups.length;i++){ const a=groups[i]; if(!a) continue;
+      for(let j=i+1;j<groups.length;j++){ const b=groups[j]; if(!b||Math.hypot(a.x-b.x,a.y-b.y)>=(a.rad+b.rad)*0.94) continue;
+        a.ids=a.ids.concat(b.ids); a.la+=b.la; a.lo+=b.lo; if(b.a<a.a)a.a=b.a; if(b.b>a.b)a.b=b.b; if(b.c<a.c)a.c=b.c; if(b.d>a.d)a.d=b.d; where(a); groups[j]=null; joined=true; } }
+    groups=groups.filter(Boolean); if(!joined) break; }
   if(sel) single.add(sel.id); (U.fav||[]).forEach(i=>{ if(show.has(i)) single.add(i); });      /* a favourite stands alone at every zoom */
   return {single:single,groups:groups}; }
 /* Pins are on the map only in and around the view, a screen's width beyond each edge. With every place on the map,
@@ -2104,7 +2117,9 @@ function syncMarkers(){
     plan.groups.forEach(c=>{ const n=c.ids.length, cs=clusSize(n), st=cs[0], d=cs[1];      /* colour and size by count, cool to hot (app.css, .clus.c0 to .c4) */
       const m=L.marker([c.la/n,c.lo/n],{keyboard:false,zIndexOffset:-100,icon:L.divIcon({className:'clus c'+st,html:String(n),iconSize:[d,d],iconAnchor:[d/2,d/2]})});
       m.bindTooltip(n+' places. Tap to zoom in',{direction:'top',offset:[0,-d/2]});
-      m.on('click',()=>{ if(adding||pickingHome) return; dblFrom={t:Date.now(),z:map.getZoom()}; map.fitBounds(L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25),{maxZoom:Math.max(map.getZoom()+2,CLUSZ+1)}); });
+      m.on('click',()=>{ if(adding||pickingHome) return; const z0=map.getZoom(), B=L.latLngBounds([c.a,c.c],[c.b,c.d]).pad(0.25); dblFrom={t:Date.now(),z:z0};
+        /* a tap always goes closer. A disc that took in its neighbours can cover ground as wide as the view, and fitting that would not move the map at all */
+        if(map.getBoundsZoom(B)>z0) map.fitBounds(B,{maxZoom:Math.max(z0+2,CLUSZ+1)}); else map.setView(m.getLatLng(),z0+1); });
       m.on('dblclick',()=>{ if(adding||pickingHome) return; dblGroup(L.latLngBounds([c.a,c.c],[c.b,c.d]),m.getLatLng()); });
       m.addTo(clusLayer); });
     clusLayer.addTo(map); }
