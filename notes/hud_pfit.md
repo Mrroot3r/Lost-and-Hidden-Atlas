@@ -17,7 +17,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Turtle House (Joab Center House) | Greenport, NY (Register point 42.26056, -73.76778 lands on a house in a modern subdivision) | Wikipedia: Federal house of about 1820 with a lozenge-shaped block and two semicircular porticoes; HABS drawings | Its street address, to be sure the pin is on the right house |
 | Railway Steel Spring Company foundry and sand house | Hudson, NY (42.2519, -73.7985) | Register list: 1905, the last rail-related building near the station | Any source beyond the list line; owner |
 | Hudson Community Theatre | Hudson, NY (OpenStreetMap ruin lead 42.24834, -73.7828) | Mapped as a ruin in OpenStreetMap | Any source at all |
-| Copake Railroad Depot | Copake, NY (42.0952, -73.5443) | Register list (100009779, 2023) | A source on its date and use, and a picture |
 | Jacob Rutsen Van Rensselaer House and Mill Complex | Claverack, NY (42.22111, -73.71083) | Wikipedia: brick house of about 1805 by Pierre Pharoux, an 18th-century mill, early waterworks; a private home | Whether the mill can be seen from NY 23 (not looked at on the aerial this session) |
 
 ## Tips
