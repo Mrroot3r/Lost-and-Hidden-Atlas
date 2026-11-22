@@ -17,7 +17,6 @@ Thirteen places in western and northern Washington County (region `wash`, drawn 
 | Granville Friends Meeting House | Quaker Street, Granville, NY (HMdb 131742, 43.40596, -73.26566) | 1932 marker: built 1806 beside the site of a log school, later a district school | Whether the building stands and what it is now |
 | South Argyle United Presbyterian Church | County Route 49 at Lohret Road, Argyle, NY (HMdb 58529, 43.19063, -73.46145) | 1935 marker: first pastor Thomas Beveridge, church on the 160-acre glebe from the Argyle Patent | When the present building was put up, and service times from the church's own page |
 | First Church and Manse of Argyle | NY 40 south of Brennan Road, Argyle, NY (HMdb 306094, 43.22424, -73.48911) | 2022 town historian's marker: built 1792 a short way east | Whether anything is left; probably a site only |
-| Adamsville Baptist Church | Adamsville, Town of Kingsbury, NY (HMdb 181681, 43.32073, -73.47312) | 1999 town marker: the church is all that remains of the hamlet (c. 1825) | Building date and any source on the church itself |
 | Maxwell Farm | Jackson, NY (Wikipedia 43.10528, -73.40361) | Register 2012: house c. 1815, main barn c. 1790, corn crib c. 1815 | Whether the barns can be seen from a public road; position not checked |
 | Hiram Congdon House | Putnam, NY (Wikipedia 43.69944, -73.43111) | Register 1997: house of about 1848 | Left out as an ordinary private house unless a source gives more |
 
