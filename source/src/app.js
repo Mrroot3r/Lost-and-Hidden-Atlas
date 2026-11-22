@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={heat:false,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -803,7 +803,7 @@ function drawScale(){ if(!map) return; if(drawScale.c) map.removeControl(drawSca
 /* send the recorder's settings to the phone; it reads them when a recording starts and when a mark is dropped */
 function pushPrefs(){ if(NATIVE) AT.call('configure',{units:pref('units'),step:STEP(),every:({fine:1000,normal:2000,coarse:5000})[pref('detail')]||2000,buzz:!!pref('buzz')}).catch(()=>{}); }
 function setPref(k,v){ if(!U.set) U.set={}; U.set[k]=v; saveNow(); applyTheme(); drawScale(); pushPrefs();
-  if(k==='cluster') syncMarkers();
+  if(k==='cluster'||k==='heat') syncMarkers();
   if(k==='nativeLeads'){ if(v&&LEADS) leadsMore(); drawLeads(); NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(view==='near') nmDraw(true); }
   if(k==='hideGone'||k==='quietGone'||k==='buzzVanished'){ NM.ver++; NM.cand=null; NM.in.clear(); nmPush(true); if(k==='hideGone') refresh(); if(view==='near') nmDraw(true); }
   if(k==='trk'){ if(rec) drawRec(); if(NM.ring&&NM.ring._icon) NM.ring._icon.style.setProperty('--trk',v); if(NM.line) NM.line.setStyle({color:v}); const sl=shownLog&&logById(shownLog); if(sl) showLog(sl,false); }
@@ -838,6 +838,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     H('Map'),
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
+    tog('heat','Zoomed out, show a heat map instead of numbered discs (a trial)','Colour shows where places are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in.'),
     pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
     tog('nativeLeads','Show Native American sites among the leads','Mounds, pueblos, rock art, heiau and other sites mapped on OpenStreetMap, and old sites on reservation land: turquoise dots when Unchecked leads is on, and rows in the Near tab. Off unless you switch it on here. Many are sacred, protected by law or closed: go only where whoever looks after the place invites visitors.'),
@@ -2059,6 +2060,7 @@ function pinIcon(s,far,dx,dy){      /* far: a favourite while the numbered discs
 const CLUSZ=9, CLUSPX=58, CLUSMIN=4;
 const clusSize=n=>{ const st=n<10?0:n<30?1:n<100?2:n<300?3:4; return [st,[30,36,42,46,52][st]]; };      /* a disc's colour step and width by its count */
 function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return null;
+  if(pref('heat')) return heatPlan(show);
   const z=map.getZoom(), cells=new Map();
   sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
     let c=cells.get(k); if(!c){ c={ids:[],la:0,lo:0,a:90,b:-90,c:180,d:-180}; cells.set(k,c); }
@@ -2076,6 +2078,54 @@ function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return nul
     groups=groups.filter(Boolean); if(!joined) break; }
   if(sel) single.add(sel.id); (U.fav||[]).forEach(i=>{ if(show.has(i)) single.add(i); });      /* a favourite stands alone at every zoom */
   return {single:single,groups:groups}; }
+/* The heat map, a trial (the owner, November 22, 2026: the discs make it "a little harder to find the clusters of pins", and he asked for
+   "a smooth thing by colour"). Zoomed out, the places are counted in squares of HEATPX screen pixels, as the discs count them in
+   squares of CLUSPX, and each square is painted as a soft blob whose strength goes with the logarithm of its count; the blobs run
+   together, and the strength is turned into colour by the same steps as the discs, blue for a few to red for many. It is ONE
+   picture laid on the map (an image overlay a screen and a half wide, so a drag shows no edge and a zoom animates it), made again
+   when the zoom, the filters or the ground change. A favourite and the chosen place keep their pins. A tap on colour says about
+   how many places are there; the map's own double-tap goes closer. */
+const HEATPX=16; let heatLayer=null, heatSig='', heatNow=null;
+function heatPlan(show){
+  const z=map.getZoom(), cells=new Map(), single=new Set(); let total=0, max=0, hot=null;
+  sites().forEach(s=>{ if(!show.has(s.id)) return; if((sel&&sel.id===s.id)||isFav(s.id)){ single.add(s.id); return; }
+    const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/HEATPX)+','+Math.floor(q.y/HEATPX);
+    let c=cells.get(k); if(!c){ c={n:0,x:0,y:0}; cells.set(k,c); } c.n++; c.x+=q.x; c.y+=q.y; total++; });
+  cells.forEach(c=>{ if(c.n>max){ max=c.n; hot=c; } });
+  /* what counts as "full": not the one fullest square (Albany's, which left the rest of the continent a grey wash) but the count that
+     nine squares in ten fall under, and never less than three */
+  const ns=[]; cells.forEach(c=>ns.push(c.n)); ns.sort((a,b)=>a-b); const ref=Math.max(3,ns.length?ns[Math.floor(ns.length*0.9)]:3);
+  return {single:single,groups:[],heat:{z:z,cells:cells,total:total,max:max,ref:ref,hot:hot?map.unproject([hot.x/hot.n,hot.y/hot.n],z):null}}; }
+const HEATSTOPS=[[0,[58,110,200]],[0.3,[40,170,170]],[0.55,[240,200,60]],[0.78,[240,130,40]],[1,[205,40,30]]];      /* blue for a few, through teal, yellow and orange, to red for many: the discs' purple and rose went muddy over the map */
+let heatPal=null;
+function heatPalette(){ if(heatPal) return heatPal; heatPal=new Uint8ClampedArray(256*3);
+  for(let i=0;i<256;i++){ const t=i/255; let a=HEATSTOPS[0], b=HEATSTOPS[HEATSTOPS.length-1]; for(let j=1;j<HEATSTOPS.length;j++) if(t<=HEATSTOPS[j][0]){ a=HEATSTOPS[j-1]; b=HEATSTOPS[j]; break; }
+    const u=b[0]===a[0]?0:(t-a[0])/(b[0]-a[0]); for(let k=0;k<3;k++) heatPal[i*3+k]=a[1][k]+(b[1][k]-a[1][k])*u; }
+  return heatPal; }
+function drawHeat(h){
+  if(!h||!h.total){ if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; } heatSig=''; heatNow=null; return; }
+  heatNow=h; const vb=map.getBounds(), sig=h.z+'|'+h.cells.size+'|'+h.total+'|'+h.max+'|'+h.ref;
+  if(heatLayer&&sig===heatSig&&heatLayer.getBounds().contains(vb)) return;      /* the same heat, and the view is still inside the picture */
+  if(!map.getPane('heat')){ const pn=map.createPane('heat'); pn.style.zIndex=390; pn.style.pointerEvents='none'; }
+  const B=vb.pad(0.75), nw=map.project(B.getNorthWest(),h.z), se=map.project(B.getSouthEast(),h.z), S=0.5;      /* half size: it is a blur, and a quarter of the pixels to colour */
+  const W=Math.max(8,Math.round((se.x-nw.x)*S)), H=Math.max(8,Math.round((se.y-nw.y)*S)), cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const g=cv.getContext('2d'), R=HEATPX*1.45*S;
+  h.cells.forEach(c=>{ const x=(c.x/c.n-nw.x)*S, y=(c.y/c.n-nw.y)*S; if(x<-R||y<-R||x>W+R||y>H+R) return;
+    /* strength by the count's share of the fullest square, lifted so that one place still shows and a few hundred are not all the same red.
+       Neighbouring blobs lie over each other and add up to about twice one blob's middle, so each is painted at half strength */
+    const t=0.14+0.86*Math.pow(Math.min(1,c.n/h.ref),0.6), gr=g.createRadialGradient(x,y,0,x,y,R); gr.addColorStop(0,'rgba(0,0,0,'+(0.5*t).toFixed(3)+')'); gr.addColorStop(0.55,'rgba(0,0,0,'+(0.2*t).toFixed(3)+')'); gr.addColorStop(1,'rgba(0,0,0,0)');
+    g.fillStyle=gr; g.fillRect(x-R,y-R,R*2,R*2); });
+  const im=g.getImageData(0,0,W,H), d=im.data, pal=heatPalette();
+  for(let i=0;i<d.length;i+=4){ const a=d[i+3]; if(!a) continue; const k=a*3; d[i]=pal[k]; d[i+1]=pal[k+1]; d[i+2]=pal[k+2]; d[i+3]=a<16?a*8:Math.min(215,128+a*0.4); }      /* a soft edge, then see-through enough to read the map under it, more so where places are few */
+  g.putImageData(im,0,0);
+  const url=cv.toDataURL('image/png');
+  if(heatLayer){ heatLayer.setUrl(url); heatLayer.setBounds(B); } else heatLayer=L.imageOverlay(url,B,{pane:'heat',interactive:false,className:'heatimg'}).addTo(map);
+  heatSig=sig; }
+/* a tap on the heat: about how many places are within a thumb's width of it */
+function heatTap(ll){ const h=heatNow; if(!h||map.getZoom()!==h.z) return false; const q=map.project(ll,h.z), cx=Math.floor(q.x/HEATPX), cy=Math.floor(q.y/HEATPX); let n=0;
+  for(let i=-1;i<=1;i++) for(let j=-1;j<=1;j++){ const c=h.cells.get((cx+i)+','+(cy+j)); if(c) n+=c.n; }
+  if(!n) return false; banner((n===1?'One place':n<10?n+' places':'About '+(n<100?Math.round(n/5)*5:Math.round(n/10)*10)+' places')+' around here. Double-tap to zoom in.',false,3500); return true; }
+try{ window.__atlasHeat=()=>heatNow&&heatLayer?{cells:heatNow.cells.size,total:heatNow.total,max:heatNow.max,hot:heatNow.hot?[heatNow.hot.lat,heatNow.hot.lng]:null}:null; }catch(e){}
 /* Pins are on the map only in and around the view, a screen's width beyond each edge. With every place on the map,
    each zoom step moved 800 pins and took a mid-range phone about 80 ms; it took 16 ms with none. A pin that has been made
    is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
@@ -2109,6 +2159,7 @@ function syncMarkers(){
     if(!markers.has(s.id)){ m.addTo(map); markers.set(s.id,m); }
     const zo=sel&&sel.id===s.id?1000:isFav(s.id)?600:(dx||dy)?300:(s.cat==='landmark'?-200:0);      /* a pin moved to a disc's rim is drawn over the disc */ if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
   });
+  drawHeat(plan&&plan.heat||null);
   /* the grouped pins are made again only when the groups change, not each time the map is nudged */
   const sig=plan?map.getZoom()+'|'+plan.groups.map(c=>c.ids.length+':'+c.la.toFixed(3)+':'+c.lo.toFixed(3)).join():'';
   if(sig===clusSig&&(!sig||clusLayer)) return; clusSig=sig;
@@ -2146,7 +2197,8 @@ function onMapClick(e){
   if(spotting){ if(finePointer()) spotDrop(e.latlng.lat,e.latlng.lng); return; }      /* on a phone only the Drop button drops: a slip of the thumb is not a spot */
   if(asking){ setAsking(false); whoPopup({lat:e.latlng.lat,lon:e.latlng.lng}); return; }
   if(pickingHome){ pickingHome=false; stage.classList.remove('adding'); $('#addbar').hidden=true; setSpot(e.latlng.lat,e.latlng.lng); return; }
-  if(adding) placeAt(e.latlng.lat,e.latlng.lng);
+  if(adding){ placeAt(e.latlng.lat,e.latlng.lng); return; }
+  if(pref('heat')&&pref('cluster')&&map.getZoom()<=CLUSZ) heatTap(e.latlng);
 }
 function scoutLinks(p,town){
   const c=p.lat.toFixed(5)+','+p.lon.toFixed(5);
