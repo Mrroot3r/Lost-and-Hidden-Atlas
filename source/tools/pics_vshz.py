@@ -1,0 +1,12 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'bellamy-mansion':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0a/Bellamy_Mansion_Negro_House_in_Wilmington%2C_North_Carolina.jpg/960px-Bellamy_Mansion_Negro_House_in_Wilmington%2C_North_Carolina.jpg', 900, 613, 'Jhhwikicommon', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Bellamy_Mansion_Negro_House_in_Wilmington,_North_Carolina.jpg', '2026-11-22', 'pin+name'),
+ 'fort-branch-hamilton':('', '2026-11-22', 'Brooklyn libraries, a Bay Ridge railway and brush fires elsewhere', 2),
+ 'fort-dobbs':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Fort_Dobbs_front_door.jpg/960px-Fort_Dobbs_front_door.jpg', 900, 600, 'Cdtew', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Fort_Dobbs_front_door.jpg', '2026-11-22', 'name'),
+ 'newbold-white-house':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Newbold-White_House_%281730%29.JPG/960px-Newbold-White_House_%281730%29.JPG', 900, 675, 'Harvey Harrison', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Newbold-White_House_(1730).JPG', '2026-11-22', 'category'),
+ 'old-burke-county-courthouse':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Historic_Burke_County_Courthouse_-_Morganton%2C_NC.jpg/960px-Historic_Burke_County_Courthouse_-_Morganton%2C_NC.jpg', 900, 675, 'Upstateherd', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Historic_Burke_County_Courthouse_-_Morganton,_NC.jpg', '2026-11-22', 'pin+name'),
+ 'old-orange-county-courthouse':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/75/Old_Orange_County_Courthouse_-_panoramio.jpg/960px-Old_Orange_County_Courthouse_-_panoramio.jpg', 900, 1258, 'Larry Lamb', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Old_Orange_County_Courthouse_-_panoramio.jpg', '2026-11-22', 'pin+name'),
+ 'roanoke-canal-trail':('', '2026-11-22', 'only a Greetings from Roanoke Rapids postcard of the town', 2),
+ 'tryon-palace':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Exterior%2C_Tryon_Palace.jpg/960px-Exterior%2C_Tryon_Palace.jpg', 900, 1200, 'Willthacheerleader18', 'CC0', 'https://commons.wikimedia.org/wiki/File:Exterior,_Tryon_Palace.jpg', '2026-11-22', 'name'),
+}
