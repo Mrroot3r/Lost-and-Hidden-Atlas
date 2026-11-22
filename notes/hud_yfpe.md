@@ -12,7 +12,6 @@ Twenty places in inland Columbia County, New York, the first pass there (region 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Jacob Rutsen Van Rensselaer House and Mill Complex | Claverack, NY (42.22111, -73.71083) | Wikipedia (Register summary): 18th-century mill, remains of early waterworks, cooperage or store, brick house by Pierre Pharoux; sold to a developer in the 1960s | Owner and whether the mill can be seen from NY 23; likely private |
-| Mellenville station | Mellenville, Claverack, NY (42.25306, -73.66806) | Wikipedia: Boston and Albany station of about 1900, a Grange hall since the 1930s | Present use and a picture |
 | Burden iron mines | Livingston and Greenport, NY (Mount Tom, about 42.166, -73.829) | The USGS mines layer lists Burden No. 2 and No. 3 carbonate iron mines and Mount Tom | Any source on what is left and who owns it |
 
 ## Tips
