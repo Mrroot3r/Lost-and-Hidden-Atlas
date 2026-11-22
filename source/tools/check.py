@@ -127,7 +127,9 @@ if not SRC_ONLY:
     if not mm: err.append('index.html has no d-sites block')
     else:
         D=json.loads(mm.group(1).replace('<\\/','</')); built={s['id'] for s in D['sites']}
-        miss=sorted(set(ids)-built); extra=sorted(i for i in built-set(ids) if not i.startswith('lm-'))
+        miss=sorted(set(ids)-built-set(WAS)); extra=sorted(i for i in built-set(ids) if not i.startswith('lm-'))
+        # a place another entry replaces (was=) is rightly absent from the built site, whether it was a landmark pin or, like
+        # Quindaro's first entry, a place in a list
         if miss: err.append('in the place lists but not in the built site (rebuild needed): '+', '.join(miss[:12]))
         if extra: err.append('in the built site but not in the place lists: '+', '.join(extra[:12]))
         for s in D['sites']:
