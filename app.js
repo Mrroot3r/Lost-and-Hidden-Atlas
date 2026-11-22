@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={heat:true,pinchStand:false,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={heat:true,pinchStand:true,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -849,7 +849,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('cluster','Zoomed out, stand in for the pins','The heat map below, or numbered discs, in place of hundreds of pins. Off: every pin at every zoom, which is slow where places are thick.'),
     tog('heat','Zoomed out, show a heat map','Colour shows where places are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in. Off: numbered discs instead, each standing for the pins under it.'),
-    tog('pinchStand','Trial: smoother pinch','While two fingers are down the pins are shown as one picture that stretches with the map, and they come back when you let go. A trial: say whether pinching feels better with it on.'),
+    tog('pinchStand','Smooth pinching','While two fingers are down the pins are shown as one picture that stretches with the map, and they come back when you let go. Off: every pin is moved on its own, which is slow where places are thick.'),
     pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
     tog('nativeLeads','Show Native American sites among the leads','Mounds, pueblos, rock art, heiau and other sites mapped on OpenStreetMap, and old sites on reservation land: turquoise dots when Unchecked leads is on, and rows in the Near tab. Off unless you switch it on here. Many are sacred, protected by law or closed: go only where whoever looks after the place invites visitors.'),
@@ -1360,8 +1360,8 @@ function drawPockets(){
    would sit on top of one already placed is left out. */
 function pockLabels(){
   if(pockLab){ map.removeLayer(pockLab); pockLab=null; }
-  const z=map.getZoom(); if(!U.ui.pockets||!POCK||z<10) return;
-  const b=map.getBounds(), cap=z>=13?22:14, g=L.layerGroup(), put=[]; let n=0;
+  const z=map.getZoom(); if(!U.ui.pockets||!POCK||z<POCKZ) return;      /* from the zoom the discs start at (it was zoom 10): zoomed out the street map's own town names are too small to read, and a name is how the right town is found (the owner, November 22, 2026) */
+  const b=map.getBounds(), cap=z>=13?22:z>=10?14:18, g=L.layerGroup(), put=[]; let n=0;
   for(const k of POCK.k){ if(!pockC(k)||n>=cap) break; if(k.thin||z<pockFrom(k)||!b.contains([k[0],k[1]])) continue;
     const pt=map.latLngToContainerPoint([k[0],k[1]]), r=Math.round(pockPx(k,z)+2), w=k[7].length*6.6+8, box=[pt.x-w/2,pt.y-r-15,pt.x+w/2,pt.y-r];
     if(put.some(q=>box[0]<q[2]&&box[2]>q[0]&&box[1]<q[3]&&box[3]>q[1])) continue; put.push(box); n++;
@@ -2117,7 +2117,7 @@ function drawHeat(h){
   if(!h||!h.total){ if(heatLayer){ map.removeLayer(heatLayer); heatLayer=null; } heatSig=''; heatNow=null; return; }
   heatNow=h; const vb=map.getBounds(), sig=h.z+'|'+h.cells.size+'|'+h.total+'|'+h.max+'|'+h.ref;
   if(heatLayer&&sig===heatSig&&heatLayer.getBounds().contains(vb)) return;      /* the same heat, and the view is still inside the picture */
-  if(!map.getPane('heat')){ const pn=map.createPane('heat'); pn.style.zIndex=390; pn.style.pointerEvents='none'; }
+  if(!map.getPane('heat')){ const pn=map.createPane('heat'); pn.style.zIndex=370; pn.style.pointerEvents='none'; }      /* under the pane the old lines, the lead dots and the old town centres are drawn in (380): over them it tinted the towns' discs and they looked odd (the owner, November 22, 2026) */
   const B=vb.pad(0.75), nw=map.project(B.getNorthWest(),h.z), se=map.project(B.getSouthEast(),h.z), S=0.5;      /* half size: it is a blur, and a quarter of the pixels to colour */
   const W=Math.max(8,Math.round((se.x-nw.x)*S)), H=Math.max(8,Math.round((se.y-nw.y)*S)), cv=document.createElement('canvas'); cv.width=W; cv.height=H;
   const g=cv.getContext('2d'), R=HEATPX*1.45*S;
@@ -2142,43 +2142,61 @@ try{ window.__atlasHeat=()=>heatNow&&heatLayer?{cells:heatNow.cells.size,total:h
    is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
    the list, the filters or the chosen place change. */
 const pinPool=new Map(); let clusSig='', pinGen=0; const PINFIRST=80, PINLOT=30;
-/* The pinch trial (a setting, pinchStand, off unless switched on; the owner, November 22, 2026). A one-finger drag slides the
-   whole map as one sheet. A pinch does not: at every frame Leaflet moves each pin on the map separately, and round Albany
-   that is 800 pins, so the map crawls while two fingers are down. The heat map, which is one picture stretched, pinches
-   smoothly on his phone. So for the length of a pinch the pins are hidden and one picture of them, drawn here, is stretched
-   with the map in their place; when the fingers lift it is taken away and the pins, which Leaflet has kept up to date all
-   the while, are shown again. The price is that the pins grow and shrink with the map during the pinch. pinDraw() draws a
-   pin as app.css does (.pin, .zfar .pin, .pin.sq, .hollow, .mine, .fav, .sel); the status rings and the pulse are not drawn. */
+/* Two fingers on the map (the setting pinchStand, on unless switched off; the owner, November 22, 2026). A one-finger drag
+   slides the whole map as one sheet. A pinch does not: at every frame Leaflet moves each pin on the map separately, and round
+   Albany that is 800 pins, so the map crawled while two fingers were down. The heat map, which is one picture stretched,
+   pinched smoothly on his phone. So for the length of a pinch the place pins are hidden and one picture of them, drawn here,
+   is stretched with the map in their place; when the fingers lift it is taken away and the pins, which Leaflet has kept up
+   to date all the while, are shown again. Tried as a trial on his phone and kept: "that completely 100% fixed how it feels".
+   The pins grow and shrink with the map during the pinch. A picture stretched far goes soft (he saw it on the stars after a
+   long pinch), and one shrunk far no longer reaches the edges, so pinchPaint() draws it again whenever it has been stretched
+   past 1.4 or shrunk under 0.7, at the size the pins have by then (mag): nothing jumps, it is only sharp again.
+   pinDraw() draws one pin as app.css does (.pin, .zfar .pin, .pin.sq, .hollow, .mine, .fav, .sel, .my-ok, .my-asked, the
+   faded .my-filmed and .my-skip); a pulsing pin (.now) is drawn with a steady ring, as it is for a reader who has asked for
+   less motion. A change to how a pin looks in app.css needs the same change here. */
 let pinchSt=null, pinStar=null;
 function pinDraw(g,s,x,y,far,ring,accent){
-  const col=(CAT[s.cat]||CAT.landmark)[1], star=s.st==='standing'&&!s.mine, fav=isFav(s.id), my=U.status[s.id], disc=(r,c)=>{ g.beginPath(); g.arc(x,y,r,0,6.2832); g.fillStyle=c; g.fill(); };
-  g.globalAlpha=(my==='filmed'||my==='skip')?0.45:1; let r;
-  if(star){ const k=(far?15:22)/24*(fav?1.25:1); r=12*k; g.save(); g.translate(x-12*k,y-12*k); g.scale(k,k); g.lineJoin='round'; if(!pinStar) pinStar=new Path2D(STARD);
-    g.lineWidth=fav?8:5; g.strokeStyle=fav?'#fff':'rgba(0,0,0,.65)'; g.stroke(pinStar); g.lineWidth=2; g.strokeStyle=ring; g.fillStyle=col; g.fill(pinStar); g.stroke(pinStar); g.restore(); }
-  else if(s.mine){ r=far?5:8; g.save(); g.translate(x,y); g.rotate(0.7854); g.fillStyle='rgba(0,0,0,.6)'; g.fillRect(-r-1,-r-1,2*r+2,2*r+2); g.fillStyle=ring; g.fillRect(-r,-r,2*r,2*r); const b=far?1.5:2; g.fillStyle=col; g.fillRect(-r+b,-r+b,2*(r-b),2*(r-b)); g.restore(); }
-  else { r=far?5:8; const hol=!!HOLLOW[s.st], b=hol?(far?2.5:3.5):(far?1.5:2);
-    if(fav){ disc(r+4.5,'rgba(0,0,0,.8)'); disc(r+3,'#fff'); } else disc(r+1,'rgba(0,0,0,.6)');
-    disc(r,hol?col:ring); disc(r-b,hol?'#fff':col); }
-  if(sel&&sel.id===s.id){ g.beginPath(); g.arc(x,y,r+4.5,0,6.2832); g.lineWidth=3; g.strokeStyle=accent; g.stroke(); }
-  g.globalAlpha=1;
+  const col=(CAT[s.cat]||CAT.landmark)[1], star=s.st==='standing'&&!s.mine, fav=isFav(s.id), my=U.status[s.id], chosen=!!sel&&sel.id===s.id;
+  const halo=my==='ok'?[26,150,65]:my==='asked'?[224,138,0]:null, disc=(r,c)=>{ g.beginPath(); g.arc(x,y,r,0,6.2832); g.fillStyle=c; g.fill(); };
+  if(star){ const k=(far?15:22)/24*(fav?1.25:1); g.save(); g.translate(x-12*k,y-12*k); g.scale(k,k); g.lineJoin='round'; if(!pinStar) pinStar=new Path2D(STARD);
+    const line=(w,c)=>{ g.lineWidth=w; g.strokeStyle=c; g.stroke(pinStar); }, ow=fav?8:halo?7:5;
+    if(chosen) line(ow+6/k,accent);
+    if(s.now) line(9,'rgba(240,120,30,.6)');
+    if(fav) line(8+2.4/k,'rgba(0,0,0,.5)');      /* the soft dark edge the page gives a favourite star */
+    line(ow,fav?'#fff':halo?'rgba('+halo+',.9)':'rgba(0,0,0,.65)'); g.fillStyle=col; g.fill(pinStar); line(2,ring); g.restore(); }
+  else { const r=far?5:8;
+    if(chosen){ g.beginPath(); g.arc(x,y,r+4.5,0,6.2832); g.lineWidth=3; g.strokeStyle=accent; g.stroke(); }
+    if(s.mine){ g.save(); g.translate(x,y); g.rotate(0.7854); const b=far?1.5:2; g.fillStyle='rgba(0,0,0,.6)'; g.fillRect(-r-1,-r-1,2*r+2,2*r+2); g.fillStyle=ring; g.fillRect(-r,-r,2*r,2*r); g.fillStyle=col; g.fillRect(-r+b,-r+b,2*(r-b),2*(r-b)); g.restore(); }
+    else { const hol=!!HOLLOW[s.st], b=hol?(far?2.5:3.5):(far?1.5:2);
+      if(halo){ disc(r+4,'rgba('+halo+',.75)'); disc(r+1,'rgba(0,0,0,.6)'); }
+      else if(fav){ disc(r+4.5,'rgba(0,0,0,.8)'); disc(r+3,'#fff'); }
+      else { if(s.now) disc(r+4,'rgba(240,120,30,.6)'); disc(r+1,'rgba(0,0,0,.6)'); }
+      disc(r,hol?col:ring); disc(r-b,hol?'#fff':col); } }
 }
-function pinchBegin(){
-  if(pinchSt||!pref('pinchStand')||!markers.size) return;
-  const css=getComputedStyle(map.getContainer()), ring=(css.getPropertyValue('--pinring')||'#fff').trim()||'#fff', accent=(css.getPropertyValue('--accent')||'#2563eb').trim()||'#2563eb', far=map.getContainer().classList.contains('zfar');
-  const vb=map.getBounds().pad(0.5), nwLL=vb.getNorthWest(), nw=map.latLngToLayerPoint(nwLL), se=map.latLngToLayerPoint(vb.getSouthEast()), w=Math.round(se.x-nw.x), h=Math.round(se.y-nw.y), k=Math.min(2,window.devicePixelRatio||1);
+/* the picture for the map as it stands now, with the pins drawn mag times their size; it takes the place of any picture before it */
+function pinchPaint(mag){
+  const css=getComputedStyle(map.getContainer()), ring=(css.getPropertyValue('--pinring')||'').trim()||'#fff', accent=(css.getPropertyValue('--accent')||'').trim()||'#2563eb', far=map.getContainer().classList.contains('zfar');
+  const vb=map.getBounds().pad(0.35), nwLL=vb.getNorthWest(), nw=map.latLngToLayerPoint(nwLL), se=map.latLngToLayerPoint(vb.getSouthEast()), w=Math.round(se.x-nw.x), h=Math.round(se.y-nw.y), k=Math.min(2.5,window.devicePixelRatio||1), edge=20*mag;
   const cv=document.createElement('canvas'); cv.className='pinstand leaflet-zoom-animated'; cv.width=Math.round(w*k); cv.height=Math.round(h*k); cv.style.width=w+'px'; cv.style.height=h+'px';
   const g=cv.getContext('2d'); g.scale(k,k); const list=[];
-  markers.forEach((m,id)=>{ const t=byId(id); if(!t) return; const q=map.latLngToLayerPoint(m.getLatLng()), x=q.x-nw.x, y=q.y-nw.y; if(x<-20||y<-20||x>w+20||y>h+20) return;
+  markers.forEach((m,id)=>{ const t=byId(id); if(!t) return; const q=map.latLngToLayerPoint(m.getLatLng()), x=q.x-nw.x, y=q.y-nw.y; if(x<-edge||y<-edge||x>w+edge||y>h+edge) return;
     list.push([(sel&&sel.id===id?2e6:isFav(id)?1e6:t.cat==='landmark'?-1e6:0)+y,t,x,y]); });      /* the order the pins are stacked in: down the screen, favourites and the chosen place on top */
-  list.sort((a,b)=>a[0]-b[0]).forEach(a=>pinDraw(g,a[1],a[2],a[3],far,ring,accent));
+  /* a faded pin (one marked filmed or skipped) is drawn whole on a scrap first and laid down faint: drawn faint part by part, its ring showed through its middle */
+  const T=Math.ceil(48*mag*k), scrap=document.createElement('canvas'), sg=scrap.getContext('2d'); scrap.width=scrap.height=T;
+  list.sort((a,b)=>a[0]-b[0]).forEach(a=>{ const my=U.status[a[1].id];
+    if(my==='filmed'||my==='skip'){ sg.setTransform(1,0,0,1,0,0); sg.clearRect(0,0,T,T); sg.setTransform(k*mag,0,0,k*mag,T/2,T/2); pinDraw(sg,a[1],0,0,far,ring,accent); g.globalAlpha=0.45; g.drawImage(scrap,a[2]-T/k/2,a[3]-T/k/2,T/k,T/k); g.globalAlpha=1; return; }
+    g.save(); g.translate(a[2],a[3]); g.scale(mag,mag); pinDraw(g,a[1],0,0,far,ring,accent); g.restore(); });
   let pane=map.getPane('pinstand'); if(!pane){ pane=map.createPane('pinstand'); pane.style.zIndex=600; pane.style.pointerEvents='none'; }
-  pane.appendChild(cv); L.DomUtil.setTransform(cv,nw,1); map.getPane('markerPane').classList.add('pinch-on');
-  pinchSt={cv:cv,nwLL:nwLL,z0:map.getZoom(),w:w,h:h};
+  pane.appendChild(cv); L.DomUtil.setTransform(cv,nw,1); if(pinchSt) pinchSt.cv.remove(); else map.getPane('markerPane').classList.add('pinch-on');
+  pinchSt={cv:cv,nwLL:nwLL,z0:map.getZoom(),w:w,h:h,mag:mag};
 }
-function pinchFrame(e){ if(!e||!e.pinch) return; if(!pinchSt) pinchBegin(); if(pinchSt) L.DomUtil.setTransform(pinchSt.cv,map.latLngToLayerPoint(pinchSt.nwLL),map.getZoomScale(map.getZoom(),pinchSt.z0)); }
+function pinchFrame(e){ if(!e||!e.pinch) return;
+  if(!pinchSt){ if(!pref('pinchStand')||!markers.size) return; pinchPaint(1); return; }
+  const k=map.getZoomScale(map.getZoom(),pinchSt.z0); if(k>1.4||k<0.7){ pinchPaint(pinchSt.mag*k); return; }
+  L.DomUtil.setTransform(pinchSt.cv,map.latLngToLayerPoint(pinchSt.nwLL),k); }
 function pinchAnim(e){ if(pinchSt) L.DomUtil.setTransform(pinchSt.cv,map._latLngToNewLayerPoint(pinchSt.nwLL,e.zoom,e.center),map.getZoomScale(e.zoom,pinchSt.z0)); }      /* the fingers lift: Leaflet glides to a whole zoom step, and the picture glides with it */
 function pinchEnd(){ if(!pinchSt) return; pinchSt.cv.remove(); pinchSt=null; map.getPane('markerPane').classList.remove('pinch-on'); }
-try{ window.__atlasPinch=()=>pinchSt?{nw:[pinchSt.nwLL.lat,pinchSt.nwLL.lng],z0:pinchSt.z0,w:pinchSt.w,h:pinchSt.h}:null; }catch(e){}
+try{ window.__atlasPinch=()=>pinchSt?{nw:[pinchSt.nwLL.lat,pinchSt.nwLL.lng],z0:pinchSt.z0,w:pinchSt.w,h:pinchSt.h,mag:pinchSt.mag}:null; }catch(e){}
 function syncMarkers(){
   if(!map) return;
   const show=new Set(visible.map(s=>s.id)); if(sel) show.add(sel.id);
