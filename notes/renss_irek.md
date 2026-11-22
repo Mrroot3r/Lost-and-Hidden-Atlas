@@ -13,11 +13,9 @@ Places you read about and could not finish. One row each.
 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Joachim Staats House and Gerrit Staats ruin | Papscanee Island, Schodack, NY (Wikipedia 42.57083, -73.74944) | Wikipedia: 1696 stone house, Staats family owned; the 1758 Gerrit Staats house burned in 1973 and nothing of it is visible | Whether the house can be seen from a public road or the county's Papscanee Island preserve |
 | Evangelical Lutheran Church of West Berlin | Dutch Church Road at Bly Hollow Road, Berlin, NY (HMdb 135102, 42.65568, -73.40684) | HMdb has the marker but no inscription text | A source on the church's date and what stands |
-| Arlington Hotel (Elkhorn) | West Sand Lake, NY (HMdb 284354, 42.64562, -73.59467) | Marker: stop 22 on the Troy & New England trolley, 1895–1925 | Whether the building stands and its use |
 | Fred's Falls mill | Cropseyville, Brunswick, NY | Rensselaer Land Trust: a mill that still stands beside the falls on the Quacken Kill, with some original works inside; private | A coordinate, the owner, whether it can be seen from a road |
-| Sharpe Homestead, Van Alen House, Elmbrook Farm, Blink Bonnie, John Carner Jr. House | Defreestville, Schodack and East Greenbush, NY (Register list points) | Wikipedia: farmhouses of about 1740 to 1850, all private | Whether each is worth a pin and can be seen from the road |
+| Sharpe Homestead, Elmbrook Farm, Blink Bonnie, John Carner Jr. House | Defreestville, Schodack and East Greenbush, NY (Register list points) | Wikipedia: farmhouses of about 1740 to 1850, all private | Whether each is worth a pin and can be seen from the road |
 
 ## Tips
 - `start.py "Nassau, New York"` geocodes to Nassau County on Long Island; give a latitude and longitude for the Rensselaer County town.
