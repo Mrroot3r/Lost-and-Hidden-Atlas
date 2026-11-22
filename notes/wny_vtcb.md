@@ -14,7 +14,6 @@ Seventeen places, the first pass in Yates County, New York (region `wny`, drawn 
 | Keuka Outlet locks 18–20 | Milo, NY, just upstream (west) of Seneca Mills Falls on the Outlet Trail | Dumas (Crooked Lake Review, April 1990) says they are easy to find where the canal ditch deepens between wetlands | A position: the LiDAR sheet at Seneca Mills shows the ditch; a session could read it with `look.py` and the trail's sign positions |
 | Mays Mill, Milo Mill, Shutt's Mill, Fox's Mill sites | Keuka Outlet Trail between Penn Yan and Seneca Mills | Dumas's series has a history of each (crookedlakereview.com, 1989–1990); Shutt's paper mill burned on Halloween 1933; a few stones of Lock 25 lie east of the Fox's Mill road crossing | What is left today and a pin for each; the trail's interpretive signs are not on HMdb |
 | Unnamed mapped ruin | 1.3 km east of Penn Yan (42.66028, -77.03776), on the Outlet | An OpenStreetMap ruin lead | A name and source: probably one of the Outlet mills |
-| Seneca Army Depot | Romulus, NY (HMdb 96333 at 42.74396, -76.83391) | Munitions depot next to Sampson; HMdb marker | Who may visit now and what can be seen from the road |
 | Italy Valley Methodist Church, St. Luke's Episcopal (Branchport), Middlesex Center Methodist Church | Yates County | Register listings (Wikipedia stubs) | Anything beyond the stub: what survives inside, services |
 | Penn Yan, Keuka Park & Branchport trolley depot site | Branchport, NY (42.59932, -77.15134) | Pomeroy marker: electric trolley 1897–1927 | Whether anything of the depot or line survives |
 
