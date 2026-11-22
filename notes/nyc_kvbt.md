@@ -12,7 +12,7 @@ The first 22 places in the Bronx (region `nyc` drawn at random by `choose.py --s
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Seton Hospital grotto (exact spot) | Bronx, NY, behind the Seton Park tennis courts (about 40.8860, -73.9160) | Riverdale Press, August 2021: a small rock grotto, the last piece of Seton Hospital, behind the tennis courts | A coordinate seen on the aerial; whether it was restored |
-| Bronx General Post Office | Bronx, NY, Grand Concourse at East 149th Street | Welcome2TheBronx (2024) says the landmark post office was for sale for $75 million | Wikipedia article not read; murals, present use, hours |
+| Bronx General Post Office | Bronx, NY (address not checked) | Welcome2TheBronx (2024) says the landmark post office was for sale for $75 million | Wikipedia article not read; murals, present use, hours |
 | Hunts Point station (NYW&B) | Bronx, NY (40.8197, -73.8899) | On the Register list (100007684) as Hunts Point Rail Station | Article not read; whether the station house is open or restored |
 | Old Croton Aqueduct in the Bronx (Van Cortlandt Park, Aqueduct Walk) | Bronx, NY | The aqueduct runs through Riverdale, Van Cortlandt Park, Kingsbridge and University Heights (Register list) | A point and a source for what can be seen (weirs, vent towers) on the Bronx stretch |
 | St. Ann's and St. Peter's service times | Bronx, NY | Both active Episcopal parishes (added in this batch) | Their own pages' service times for `tools/hours.py` |
