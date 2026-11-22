@@ -102,7 +102,7 @@ const { chromium } = require('playwright');
   //      filter, is kept when the page is opened again, and is never folded into a grey group disc however far out the map is.
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
-    await p.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); }catch(e){} });
+    await p.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1},set:{heat:false}})); }catch(e){} });      // heat off: these checks are of a favourite beside the numbered discs
     await p.goto(url); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(500);
     // two places in the thick of Albany, where pins are grouped when the map is zoomed out
     const two=await p.evaluate(()=>window.__atlasNM.sites().filter(s=>!s.mine&&s.st==='standing'&&Math.abs(s.lat-42.652)<0.012&&Math.abs(s.lon+73.755)<0.012).slice(0,2).map(s=>({id:s.id,lat:s.lat,lon:s.lon})));
@@ -283,7 +283,7 @@ const { chromium } = require('playwright');
     t=await top(); ok('location switched off again: back to the start place',t.label==='Nearest to Boston'&&!/Buffalo/.test(t.town),t.label+' | '+t.town);
     ok('location: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the numbered bubbles do not sit on top of one another (the opening view is the first thing on camera: the owner's reveal, November 2026)
-  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); await c.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({set:{heat:false}})); }catch(e){} }); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(2500);
     const over=()=>p.evaluate(()=>{ const D=[...document.querySelectorAll('.clus')].map(n=>{ const r=n.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2,n:+n.textContent}; }); const bad=[];
       for(let i=0;i<D.length;i++) for(let j=i+1;j<D.length;j++){ const d=Math.hypot(D[i].x-D[j].x,D[i].y-D[j].y); if(d<(D[i].r+D[j].r)*0.8) bad.push(D[i].n+'/'+D[j].n+' '+Math.round(d)+'px'); }
@@ -307,15 +307,13 @@ const { chromium } = require('playwright');
     const st=await p.evaluate(()=>({ban:(document.querySelector('#banner')||{}).hidden===false?document.querySelector('#banner').textContent:'', btn:document.querySelector('#filt-btn').textContent.trim()}));
     ok('no start place: "Within 30 min" asks for one and switches no filter on',/where you start/i.test(st.ban)&&!/\d/.test(st.btn),st.btn+' | '+st.ban.slice(0,60));
     ok('30 minutes: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
-  // ---- the heat map (a trial, November 22, 2026): zoomed out, colour instead of numbered discs. The owner: the discs make it "a little harder to find the clusters of pins"
+  // ---- the heat map (the owner, November 22, 2026: "switch the heat map to the main setting. You can leave the bubbles as a backup").
+  //      Zoomed out, colour instead of numbered discs; pins come in one zoom step earlier than they do after the discs.
   { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(2000);
     const st=()=>p.evaluate(()=>({clus:document.querySelectorAll('.leaflet-marker-pane .clus').length,pins:document.querySelectorAll('.leaflet-marker-pane .pin').length,img:document.querySelectorAll('img.heatimg').length,h:window.__atlasHeat?window.__atlasHeat():null,z:window.__atlasMap.getZoom()}));
-    let a=await st(); ok('heat: off to begin with, the numbered discs show',a.clus>=8&&a.img===0,JSON.stringify(a).slice(0,120));
-    await p.click('#lb-opt'); await p.click('#sheet-set'); await p.waitForTimeout(250); ok('heat: Settings has the switch',await p.evaluate(()=>!!document.querySelector('#set-heat')));
-    await p.evaluate(()=>{ const x=document.querySelector('#set-heat'); if(x) x.click(); }); await p.waitForTimeout(400); await p.click('#sheet-x'); await p.waitForTimeout(700);
-    a=await st(); const all=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent); return (D.sites||D).length; });
-    ok('heat on, zoomed out: no discs, one picture of the heat, and no crowd of pins',a.clus===0&&a.img===1&&a.pins<=5,JSON.stringify({clus:a.clus,img:a.img,pins:a.pins}));
+    let a=await st(); const all=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent); return (D.sites||D).length; });
+    ok('heat: it is what a first visit shows zoomed out: no discs, one picture of the heat, and no crowd of pins',a.clus===0&&a.img===1&&a.pins<=5,JSON.stringify({clus:a.clus,img:a.img,pins:a.pins}));
     ok('heat: every place is counted in it',a.h&&Math.abs(a.h.total+a.pins-all)<=2,a.h&&(a.h.total+' + '+a.pins+' of '+all));
     const painted=await p.evaluate(async()=>{ const im=document.querySelector('img.heatimg'); if(!im) return -1; if(!im.complete) await new Promise(r=>{ im.onload=r; }); const cv=document.createElement('canvas'); cv.width=im.naturalWidth; cv.height=im.naturalHeight; const g=cv.getContext('2d'); g.drawImage(im,0,0); const d=g.getImageData(0,0,cv.width,cv.height).data; let n=0,red=0; for(let i=0;i<d.length;i+=4){ if(d[i+3]>20){ n++; if(d[i]>150&&d[i+2]<90) red++; } } return [n/(d.length/4),red]; });
     ok('heat: the picture has colour on part of the map, not all of it, and red where places are thickest',painted[0]>0.02&&painted[0]<0.8&&painted[1]>0,JSON.stringify(painted));
@@ -324,13 +322,40 @@ const { chromium } = require('playwright');
     ok('heat: a tap where it is hot says about how many places are there, and how to go closer',/\d/.test(ban)&&/places/.test(ban)&&/double/i.test(ban),ban.slice(0,90));
     await p.evaluate(()=>{ document.querySelector('#banner').hidden=true; window.__atlasMap.fire('click',{latlng:L.latLng(30,-45)}); }); await p.waitForTimeout(300);
     ban=await p.evaluate(()=>{ const x=document.querySelector('#banner'); return x&&!x.hidden?x.textContent:''; }); ok('heat: a tap on empty sea says nothing',ban==='',ban.slice(0,60));
-    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],6,{animate:false})); await p.waitForTimeout(700); const b6=await st();
-    ok('heat: it is drawn again for the new view',b6.img===1&&b6.clus===0&&b6.h.cells>0,JSON.stringify({img:b6.img,cells:b6.h&&b6.h.cells}));
-    await p.evaluate(()=>window.__atlasMap.setView([42.65,-73.75],12,{animate:false})); await p.waitForTimeout(900); const b12=await st();
-    ok('heat: zoomed in past the switch the heat is gone and the pins are there',b12.img===0&&b12.pins>20,JSON.stringify({img:b12.img,pins:b12.pins}));
+    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],8,{animate:false})); await p.waitForTimeout(800); const b8=await st();
+    ok('heat: at zoom 8 it is still the heat, drawn again for the new view',b8.img===1&&b8.clus===0&&b8.h.cells>0&&b8.pins<=5,JSON.stringify({img:b8.img,pins:b8.pins,cells:b8.h&&b8.h.cells}));
+    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],9,{animate:false})); await p.waitForTimeout(1800); const b9=await st();
+    ok('heat: at zoom 9 the pins are there and the heat is gone, a step earlier than after the discs',b9.img===0&&b9.clus===0&&b9.pins>40,JSON.stringify({img:b9.img,clus:b9.clus,pins:b9.pins}));
+    // a favourite keeps a pin at every zoom, and with no number to hide it is full size
+    await p.evaluate(()=>{ location.hash='#harmony-mills-cohoes'; }); await p.waitForTimeout(900); await p.evaluate(()=>{ const x=[...document.querySelectorAll('#v-detail button')].find(e=>/favourite/i.test(e.getAttribute('aria-label')||e.title||'')||e.textContent.trim()==='♡'); if(x) x.click(); }); await p.waitForTimeout(300);
+    await p.evaluate(()=>{ const x=[...document.querySelectorAll('#v-detail button')].find(e=>/Back/.test(e.textContent)); if(x) x.click(); }); await p.waitForTimeout(300);
+    await p.evaluate(()=>window.__atlasMap.setView([41,-78],5,{animate:false})); await p.waitForTimeout(900);
+    const fv=await p.evaluate(()=>{ const P=[...document.querySelectorAll('.leaflet-marker-pane .pin')]; return {n:P.length,far:P.filter(x=>x.classList.contains('far')).length,fav:P.filter(x=>x.classList.contains('fav')).length}; });
+    ok('heat: zoomed far out a favourite still has its pin, at full size',fv.fav>=1&&fv.far===0,JSON.stringify(fv));
+    // the discs are the backup
     await p.evaluate(()=>window.__atlasMap.setView([39,-96],4,{animate:false})); await p.waitForTimeout(700);
-    await p.click('#lb-opt'); await p.click('#sheet-set'); await p.waitForTimeout(250); await p.evaluate(()=>document.querySelector('#set-heat').click()); await p.waitForTimeout(400); await p.click('#sheet-x'); await p.waitForTimeout(700);
-    a=await st(); ok('heat switched off again: the discs are back and the picture is gone',a.clus>=8&&a.img===0,JSON.stringify({clus:a.clus,img:a.img}));
+    await p.click('#lb-opt'); await p.click('#sheet-set'); await p.waitForTimeout(250); ok('heat: Settings has the switch, ticked',await p.evaluate(()=>{ const x=document.querySelector('#set-heat'); return !!x&&x.checked; }));
+    await p.evaluate(()=>document.querySelector('#set-heat').click()); await p.waitForTimeout(400); await p.click('#sheet-x'); await p.waitForTimeout(700);
+    a=await st(); ok('heat switched off: the numbered discs are there instead',a.clus>=8&&a.img===0,JSON.stringify({clus:a.clus,img:a.img}));
+    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],9,{animate:false})); await p.waitForTimeout(900); a=await st();
+    ok('and with discs the pins come at zoom 10 as before: zoom 9 still has discs',a.clus>=2,JSON.stringify({clus:a.clus,pins:a.pins}));
     ok('heat: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- the step from heat or discs to pins (the lag the owner felt): a first lot of pins at once, from the middle outwards, then a lot a frame
+  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(1500);
+    await p.evaluate(()=>window.__atlasMap.setView([42.7,-73.8],8,{animate:false})); await p.waitForTimeout(800);
+    const r=await p.evaluate(async()=>{ const m=window.__atlasMap, D=JSON.parse(document.getElementById('d-sites').textContent), S=D.sites||D, n=()=>document.querySelectorAll('.leaflet-marker-pane .pin').length;
+      m.setView([42.7,-73.8],10,{animate:false}); const vb=m.getBounds(), big=vb.pad(1), c=m.getCenter();
+      const inView=S.filter(s=>vb.contains([s.lat,s.lon])).length, inRing=S.filter(s=>big.contains([s.lat,s.lon])).length, at0=n();
+      const first=[]; m.eachLayer(l=>{ if(l.getLatLng&&l._icon&&l._icon.querySelector&&l._icon.querySelector('.pin')) first.push(m.distance(c,l.getLatLng())); });
+      const far=S.filter(s=>big.contains([s.lat,s.lon])).map(s=>m.distance(c,[s.lat,s.lon])).sort((a,b)=>a-b);
+      await new Promise(r=>setTimeout(r,2500)); return {inView:inView,inRing:inRing,at0:at0,later:n(),firstFarthest:Math.round(Math.max.apply(null,first)),ringFarthest:Math.round(far[far.length-1])}; });
+    ok('to pins: straight away a first lot of pins is on the map, not all of them at once',r.at0>=60&&r.at0<=140&&r.at0<r.inRing,JSON.stringify(r));
+    ok('to pins: the first lot is the pins nearest the middle of the view',r.firstFarthest<r.ringFarthest*0.5,r.firstFarthest+' m of '+r.ringFarthest+' m');
+    ok('to pins: a moment later every pin in view and in the ring round it is there, so a drag shows pins',r.later>=r.inRing*0.97,JSON.stringify(r));
+    await p.evaluate(()=>{ const m=window.__atlasMap; m.setView([42.7,-73.8],10,{animate:false}); m.setView([44.5,-70],10,{animate:false}); }); await p.waitForTimeout(2500);
+    const left=await p.evaluate(()=>{ const m=window.__atlasMap, big=m.getBounds().pad(1.05); let out=0; m.eachLayer(l=>{ if(l.getLatLng&&l._icon&&l._icon.classList.contains('pinwrap')===false&&l._icon.querySelector&&l._icon.querySelector('.pin')&&!big.contains(l.getLatLng())) out++; }); return out; });
+    ok('to pins: a move made before the ring was filled leaves no pin behind on ground now far away',left===0,left);
+    ok('to pins: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();
