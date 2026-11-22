@@ -27,7 +27,8 @@ const HERE = { latitude: 42.7742, longitude: -73.7005, accuracy: 10 };
   const view = (page, lat, lon, z) => page.evaluate(([a, b, c]) => window.__atlasMap.setView([a, b], c, { animate: false }), [lat, lon, z]);
   await shot('01-map', '', async p => { await p.waitForTimeout(3000); });
   await shot('02-place', '#kinzua-bridge', async p => { await p.waitForTimeout(4000); });
-  await shot('03-access', '#kinzua-bridge', async p => { await p.evaluate(() => { const h = [...document.querySelectorAll('#v-detail h3, #v-detail dt')].find(x => /Getting there/.test(x.textContent)); h.scrollIntoView(); let e = h.parentElement; while (e && e.scrollHeight <= e.clientHeight + 5) e = e.parentElement; if (e) e.scrollTop -= 14; }); await p.waitForTimeout(1500); });
+  // the same place twice: 02 with the old map laid over it (as a place opens), 03 with it switched off, so the two can be compared (the owner, November 22, 2026)
+  await shot('03-access', '#kinzua-bridge', async p => { await p.evaluate(() => { const c = document.querySelector('#d-hist'); if (c && c.checked) c.click(); }); await p.waitForTimeout(2500); await p.evaluate(() => { const h = [...document.querySelectorAll('#v-detail h3, #v-detail dt')].find(x => /Getting there/.test(x.textContent)); h.scrollIntoView(); let e = h.parentElement; while (e && e.scrollHeight <= e.clientHeight + 5) e = e.parentElement; if (e) e.scrollTop -= 14; }); await p.waitForTimeout(1500); });
   await shot('04-filters', '', async p => { await p.click('#filt-btn'); await p.waitForTimeout(800); });
   await shot('05-compare', '#crown-point-forts', async p => { await p.click('#v-detail button:has-text("Swipe aerial")'); await p.waitForTimeout(10000); });
   await shot('06-lines', '', async p => { await p.click('#lb-big'); await view(p, 42.79, -73.69, 13); for (const b of ['#lb-rails', '#lb-canal', '#lb-leads']) await tap(p, b); await p.waitForTimeout(9000); });

@@ -254,6 +254,8 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 @keyframes starpulse{0%{stroke-width:5;stroke-opacity:.75}100%{stroke-width:17;stroke-opacity:0}}
 .zfar .pin.sq{width:15px;height:15px;margin:3.5px}
 .pin.mine{border-radius:2px;transform:rotate(45deg)}
+.leaflet-marker-pane.pinch-on .pinwrap{display:none}
+canvas.pinstand{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;pointer-events:none}
 /* a favourite: a thick white ring with a dark edge, and a little bigger, so it stands out at any zoom on any map */
 .pin.fav{box-shadow:0 0 0 3px #fff,0 0 0 4.5px rgba(0,0,0,.8),0 2px 5px rgba(0,0,0,.6)}
 .pin.sq.fav{box-shadow:none;transform:scale(1.25);filter:drop-shadow(0 0 1px #000) drop-shadow(0 0 1.5px #000)}
