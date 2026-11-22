@@ -1,0 +1,10 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'bank-of-vernal':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Bank_of_Vernal_Utah.jpeg/960px-Bank_of_Vernal_Utah.jpeg', 900, 675, 'Ntsimp', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Bank_of_Vernal_Utah.jpeg', '2026-11-22', 'pin+name'),
+ 'beaver-county-courthouse-ut':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'dewey-bridge-ut':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9c/2025_view_of_the_remains_of_the_historic_Dewey_Suspension_Bridge%2C_viewing_from_the_south.jpg/960px-2025_view_of_the_remains_of_the_historic_Dewey_Suspension_Bridge%2C_viewing_from_the_south.jpg', 900, 1200, 'DandyJess13', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:2025_view_of_the_remains_of_the_historic_Dewey_Suspension_Bridge,_viewing_from_the_south.jpg', '2026-11-22', 'pin'),
+ 'josie-morris-cabin':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Josie_Morris_Cabin.jpeg/960px-Josie_Morris_Cabin.jpeg', 900, 598, 'Tricia Simpson', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Josie_Morris_Cabin.jpeg', '2026-11-22', 'pin'),
+ 'parowan-old-rock-church':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Parowan_Stake_House.jpg/960px-Parowan_Stake_House.jpg', 900, 556, 'Unknown authorUnknown author', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Parowan_Stake_House.jpg', '2026-11-22', 'name'),
+ 'spring-city-historic-district':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/Spring_City_Utah_LDS_Chapel.jpeg/960px-Spring_City_Utah_LDS_Chapel.jpeg', 900, 675, 'Ntsimp', 'CC0', 'https://commons.wikimedia.org/wiki/File:Spring_City_Utah_LDS_Chapel.jpeg', '2026-11-22', 'pin'),
+}

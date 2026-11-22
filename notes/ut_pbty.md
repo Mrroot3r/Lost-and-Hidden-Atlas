@@ -11,8 +11,6 @@ Eighteen places spread across Utah, which had 17, all round Tintic and the West 
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Spring City historic district | Spring City, UT | Whole-town Register district of stone houses (not read this session) | Sources and a pick of buildings |
-| Corinne | Corinne, UT | Railroad town near Promontory; Methodist church said to survive (memory only) | Any source opened |
 | Mercur | Tooele County, UT (40.32078, -112.21217, vanished-places layer) | Vanished mining town | Whether anything is left and whether it is reachable (mine land) |
 | Intermountain Indian School / Bushnell Hospital | Brigham City, UT (41.49, -112.01, OpenStreetMap ruins) | Mapped as ruins | Current state (demolition reported in the past, not checked) and access |
 | Hole-in-the-Rock crossing | Glen Canyon NRA, UT | Bluff Fort page says the cut is still visible at Lake Powell | NPS page, coordinate, road and boat access |
