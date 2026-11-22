@@ -1,0 +1,9 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'arthurdale-new-deal-homestead':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/19/The_Arthurdale_Inn_in_the_Arthurdale_community_near_Kingwood%2C_West_Virginia_LCCN2015631567.tif/lossy-page1-960px-The_Arthurdale_Inn_in_the_Arthurdale_community_near_Kingwood%2C_West_Virginia_LCCN2015631567.tif.jpg', 900, 601, 'Carol M. Highsmith', 'Public domain', 'https://commons.wikimedia.org/wiki/File:The_Arthurdale_Inn_in_the_Arthurdale_community_near_Kingwood,_West_Virginia_LCCN2015631567.tif', '2026-11-22', 'pin'),
+ 'ashbys-fort-fort-ashby':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Fort_Ashby.jpg/960px-Fort_Ashby.jpg', 900, 600, 'Generic1139', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Fort_Ashby.jpg', '2026-11-22', 'pin'),
+ 'bramwell-historic-district':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Bramwell-Main-Street-wv.jpg/960px-Bramwell-Main-Street-wv.jpg', 900, 614, 'Brian Stansberry', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Bramwell-Main-Street-wv.jpg', '2026-11-22', 'name'),
+ 'grave-creek-mound':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/18/Grave_Creek_Mound%2C_Moundsville%2C_WV_-_53040673464.jpg/960px-Grave_Creek_Mound%2C_Moundsville%2C_WV_-_53040673464.jpg', 900, 675, 'w_lemay', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Grave_Creek_Mound,_Moundsville,_WV_-_53040673464.jpg', '2026-11-22', 'pin+name'),
+ 'jacksons-mill-weston':('', '2026-11-22', 'log cabins, cottages, a chapel and a portrait from the 4-H camp; none shows the mill', 2),
+}
