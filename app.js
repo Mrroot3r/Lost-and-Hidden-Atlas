@@ -2067,9 +2067,9 @@ function pinIcon(s,far,dx,dy){      /* far: a favourite while the numbered discs
 }
 /* Zoomed out to town level or wider, pins that would sit on top of each other are replaced by one numbered disc.
    A cell of the screen with four or more pins becomes a disc; the selected place always keeps its own pin. */
-const CLUSZ=9, HEATZ=8, CLUSPX=58, CLUSMIN=4;
+const CLUSZ=9, HEATZ=9, CLUSPX=58, CLUSMIN=4;      /* HEATZ was 8 for a day (pins from zoom 9): round Albany that put 1,350 pins on the map and a pinch crawled, so the owner had it put back (November 22, 2026) */
 const clusSize=n=>{ const st=n<10?0:n<30?1:n<100?2:n<300?3:4; return [st,[30,36,42,46,52][st]]; };      /* a disc's colour step and width by its count */
-function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>(pref('heat')?HEATZ:CLUSZ)) return null;      /* the heat gives way to pins a zoom step sooner than the discs do (the owner, November 22, 2026) */
+function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>(pref('heat')?HEATZ:CLUSZ)) return null;      /* the heat and the discs give way to pins at the same step, zoom 10 */
   if(pref('heat')) return heatPlan(show);
   const z=map.getZoom(), cells=new Map();
   sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
