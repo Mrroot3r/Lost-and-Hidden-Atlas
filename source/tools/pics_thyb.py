@@ -1,0 +1,20 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'barkhamsted-lighthouse':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'burke-idaho':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Remants-of-the-Hecla_mine-BURKE-CANYON-Idaho-2016.jpg/960px-Remants-of-the-Hecla_mine-BURKE-CANYON-Idaho-2016.jpg', 900, 626, 'Mossbones', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Remants-of-the-Hecla_mine-BURKE-CANYON-Idaho-2016.jpg', '2026-11-22', 'name'),
+ 'cedarvale-cemetery-white-oaks-nm':('', '2026-11-22', 'a cemetery in Bay City, Texas; no picture of White Oaks', 2),
+ 'erie-canal-lock-one-albany':('', '2026-11-22', 'Albany riverfront and steamer views, and HABS photos of Erie Canal Lock 18 in Cohoes, a different lock; none shows Lock One', 2),
+ 'fort-cobun-grand-gulf':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Fort_Cobun_2023.jpg/960px-Fort_Cobun_2023.jpg', 900, 675, 'Hog Farm', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Fort_Cobun_2023.jpg', '2026-11-22', 'loose'),
+ 'glenaladale-house':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Glenaladale_Estate%2C_Prince_Edward_Island_3.jpg/960px-Glenaladale_Estate%2C_Prince_Edward_Island_3.jpg', 900, 675, 'Hayden Soloviev', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Glenaladale_Estate,_Prince_Edward_Island_3.jpg', '2026-11-22', 'far'),
+ 'griffin':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'hotel-balmoral':('', '2026-11-22', 'Balmoral Hotel in Bowmanville and Edinburgh, a railroad switch engine, and a map: none shows the Wilton hotel', 2),
+ 'miller-hall-hartwell-collar-factory-troy':('', '2026-11-22', 'Cornell University agricultural buildings postcard, a different place; no candidate shows the Troy collar factory', 2),
+ 'moffett-mill-lincoln':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/LincolnRI_GreatRoad_MoffettMill.jpg/960px-LincolnRI_GreatRoad_MoffettMill.jpg', 900, 598, 'User:Magicpiano', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:LincolnRI_GreatRoad_MoffettMill.jpg', '2026-11-22', 'name'),
+ 'poestenkill-gorge':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Poesten_Kill_Downstream_Falls.JPG/960px-Poesten_Kill_Downstream_Falls.JPG', 900, 602, 'UpstateNYer', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Poesten_Kill_Downstream_Falls.JPG', '2026-11-22', 'pin+name'),
+ 'prospect-mountain-incline':('', '2026-11-22', 'a lake view from the mountain top; no candidate shows the incline, its bull wheel or cable gear', 2),
+ 'split-rock-park-wpa-garretson':('', '2026-11-22', "Palisades farm and Palisades State Park scenery in the same town, and a railroad bridge at Devil's Gulch; none shows the WPA dam, bathhouse or arch bridge", 2),
+ 'wasioja-seminary-ruins':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Wasioja_Seminary_2021-09-18_-_1.jpg/960px-Wasioja_Seminary_2021-09-18_-_1.jpg', 900, 600, 'August Schwerdfeger', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Wasioja_Seminary_2021-09-18_-_1.jpg', '2026-11-22', 'pin'),
+ 'waterport-bridge-ruins':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Carlton%2C_NY%2C_USA_-_panoramio_%2811%29.jpg/960px-Carlton%2C_NY%2C_USA_-_panoramio_%2811%29.jpg', 900, 600, 'Ron Shawley', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Carlton,_NY,_USA_-_panoramio_(11).jpg', '2026-11-22', 'pin'),
+ 'whitesbog-village':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Whitesbog_Historic_District_%2815%29.JPG/960px-Whitesbog_Historic_District_%2815%29.JPG', 900, 673, 'Apc106', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Whitesbog_Historic_District_(15).JPG', '2026-11-22', 'pin+name'),
+}
