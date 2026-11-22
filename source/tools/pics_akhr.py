@@ -1,0 +1,21 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'boultenhouse-heritage-centre':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'conception-bay-museum-harbour-grace':('', '2026-11-22', 'Sheet shows the Cathedral of the Immaculate Conception in Harbour Grace, a different building from the 1870 customs house', 2),
+ 'day-old-town-hall':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'esperance-old-stone-church':('', '2026-11-22', 'Sheet shows a cheese house with a Welcome to Esperance sign (52 m from the pin) and a creek (250 m); no candidate shows an old stone church', 2),
+ 'gould-memorial-church-roxbury':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Jay_Gould_Memorial_Church_Feb_09.jpg/960px-Jay_Gould_Memorial_Church_Feb_09.jpg', 900, 675, 'Doug Kerr from Upstate New York', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Jay_Gould_Memorial_Church_Feb_09.jpg', '2026-11-22', 'name'),
+ 'harbour-grace-court-house':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Harbour_Grace_Court_House_%28121640250%29.jpg/960px-Harbour_Grace_Court_House_%28121640250%29.jpg', 900, 675, 'Rob Durdle from Moncton, Canada', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Harbour_Grace_Court_House_(121640250).jpg', '2026-11-22', 'name'),
+ 'holland-land-vault-mayville':('', '2026-11-22', 'Sheet shows the Chautauqua County Courthouse 69 m away, a different building; no view of the 1810s vault', 2),
+ 'indian-fields-cemetery':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'jug-end-barn-site':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'little-falls-canal':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Lock_17_Erie_canal.JPG/960px-Lock_17_Erie_canal.JPG', 900, 1106, 'DCwom', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Lock_17_Erie_canal.JPG', '2026-11-22', 'name'),
+ 'madrid-stone-bridge':('', '2026-11-22', 'Candidates are all Madrid, Spain (Spanish bridges, a garden, a stone vase) or a painting; no photograph of the Madrid, New York, bridge', 2),
+ 'moviehouse-millerton':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/The_Moviehouse_movie_theater_%2853528048755%29.jpg/960px-The_Moviehouse_movie_theater_%2853528048755%29.jpg', 900, 1260, 'Chris Rycroft from Madison, Wisconsin, United States', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:The_Moviehouse_movie_theater_(53528048755).jpg', '2026-11-22', 'pin'),
+ 'old-stone-church-north-milton':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Old_Stone_Church%2C_Ballston_Spa.jpg/960px-Old_Stone_Church%2C_Ballston_Spa.jpg', 900, 616, 'Beyond My Ken', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Old_Stone_Church,_Ballston_Spa.jpg', '2026-11-22', 'pin'),
+ 'on-a-slant-village-mandan':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'queens-fort':('', '2026-11-22', "Sheet 1 is a 1865 street scene 15 m from the pin in the Stockade district, not the fort or its site; the rest are other Queen's forts (Rhode Island, India, Scot", 2),
+ 'split-rock-park-wpa-garretson':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Palisades_State_Park%2C_SD_7-13_%2813929343972%29.jpg/960px-Palisades_State_Park%2C_SD_7-13_%2813929343972%29.jpg', 900, 682, 'inkknife_2000 (7.5 million views +)', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Palisades_State_Park,_SD_7-13_(13929343972).jpg', '2026-11-22', 'pin'),
+ 'waterford-side-cut':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/Lock_2_of_the_Erie_Canal_in_Waterford%2C_NY_%2835922296630%29.jpg/960px-Lock_2_of_the_Erie_Canal_in_Waterford%2C_NY_%2835922296630%29.jpg', 900, 1600, 'Henry Bellagnome from Troy, New York, United States', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Lock_2_of_the_Erie_Canal_in_Waterford,_NY_(35922296630).jpg', '2026-11-22', 'pin'),
+}
