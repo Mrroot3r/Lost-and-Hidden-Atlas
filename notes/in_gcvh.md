@@ -11,9 +11,7 @@ Indiana's first real batch: 19 places spread across the state (Indiana had only 
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| New Harmony Harmonist buildings | New Harmony, IN | A New Harmony State Historic Site exists under Indiana State Museum | The right page (the guessed address served another site's page); pick the best single building |
 | Old Treasury Building and Posey House | Corydon, IN | Named in the Corydon Historic District article | Own sources and whether they open |
-| Fort Knox II and Sugarloaf Mound | Vincennes, IN | ISM page: free self-guided outdoor visits Wednesday to Sunday | A description of what is left at Fort Knox II |
 | Wabash and Erie Canal remains | Delphi / Fort Wayne, IN | Wikipedia article on the canal | A particular lock or section with a public way in |
 
 ## Tips
