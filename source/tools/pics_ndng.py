@@ -1,0 +1,27 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'albany-hudson-trolley':('', '2026-11-22', 'Candidates were ordinary Nassau street scenes and a marker in Albany; no picture shows the trolley line or a station', 2),
+ 'cable-building-bay-roberts':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'capitol-theatre-rome':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Capital_Theatre_Marquee.jpg/960px-Capital_Theatre_Marquee.jpg', 900, 1049, 'Mysticrain19', 'CC0', 'https://commons.wikimedia.org/wiki/File:Capital_Theatre_Marquee.jpg', '2026-11-22', 'pin'),
+ 'empire-brickyard':('', '2026-11-22', 'Candidates were a wisteria garden in Kingston NY and an old Russian brickworks; neither is this Stockport yard', 2),
+ 'fallsburg-tunnel-ow':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'farmington-canal-lock-13-hamden':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/HamdenCT_FarmingtonCanalLock13_LockWall.jpg/960px-HamdenCT_FarmingtonCanalLock13_LockWall.jpg', 900, 598, 'Magicpiano', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:HamdenCT_FarmingtonCanalLock13_LockWall.jpg', '2026-11-22', 'pin+name'),
+ 'first-methodist-church-nebraska-city':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/First_United_Methodist_Church_of_Nebraska_City_Original_Wall_1855.jpg/960px-First_United_Methodist_Church_of_Nebraska_City_Original_Wall_1855.jpg', 900, 1160, 'CastIronSeasoner', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:First_United_Methodist_Church_of_Nebraska_City_Original_Wall_1855.jpg', '2026-11-22', 'pin+name'),
+ 'first-presbyterian-anson':('', '2026-11-22', 'Candidates were a Dr Pepper mural and a City Hall wall painting in Anson, Texas; no view of the church', 2),
+ 'frog-alley-ruins-kingston':('', '2026-11-22', 'Candidates were a 145 m Stockade District building with a mural and a portrait of a bank president; neither shows the ruin', 2),
+ 'greenport-antique-carousel':('', '2026-11-22', 'Candidates were harbour, post office and theatre street views and a child with a brass ring (a person); none shows the carousel house in Mitchell Park', 2),
+ 'high-rock-park-spring':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a0/High_Rock_Spring%2C_by_McDonnald_%26_Sterry.jpg/960px-High_Rock_Spring%2C_by_McDonnald_%26_Sterry.jpg', 900, 455, 'McDonnald & Sterry -- Photographer', 'Public domain', 'https://commons.wikimedia.org/wiki/File:High_Rock_Spring,_by_McDonnald_%26_Sterry.jpg', '2026-11-22', 'name'),
+ 'kyburz-flat-mores-station':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/Kyburz_Flat%2C_Sierra_County%2C_California.jpg/960px-Kyburz_Flat%2C_Sierra_County%2C_California.jpg', 900, 600, 'Rifflebox', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Kyburz_Flat,_Sierra_County,_California.jpg', '2026-11-22', 'category'),
+ 'lidar-beaver-dam-road-house-site':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'lidar-gulf-road-house-site':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'onesquethaw-reformed-church':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'packer-farm-barkersville-store':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'pecos-mission-church-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/df/Ruins_of_Pecos_Pueblo_Mission_Church%2C_Pecos_National_Historical_Park_-_panoramio.jpg/960px-Ruins_of_Pecos_Pueblo_Mission_Church%2C_Pecos_National_Historical_Park_-_panoramio.jpg', 900, 602, 'olekinderhook', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Ruins_of_Pecos_Pueblo_Mission_Church,_Pecos_National_Historical_Park_-_panoramio.jpg', '2026-11-22', 'pin+name'),
+ 'potsdam-civic-center-museum':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Potsdam_Civic_Center_02.jpg/960px-Potsdam_Civic_Center_02.jpg', 900, 675, 'Dclemens1971', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Potsdam_Civic_Center_02.jpg', '2026-11-22', 'name'),
+ 'potter-tavern-potter-hill':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+ 'rexford-lock-21':('', '2026-11-22', 'Candidates were a concrete barge at Lock 13, a view of Lock 7 at Niskayuna, stereo cards of Buffalo and Syracuse, and an Ohio canal stump basin; none shows Lock', 2),
+ 'stafford-flint-furnace':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Stafford_Flint_Furnace_%282022%29.jpg/960px-Stafford_Flint_Furnace_%282022%29.jpg', 900, 600, 'engineerchange', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Stafford_Flint_Furnace_(2022).jpg', '2026-11-22', 'category'),
+ 'troy-steel-iron-furnace-site-menands':('', '2026-11-22', 'Candidates were a Menands bridge, a 395 m view of an old King Fuels masonry tower yard (not the furnace), 1870s and 1921 furnace drawings of other works, and fo', 2),
+ 'windswept-carriage-house-black-point':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
+}
