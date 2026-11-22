@@ -11,11 +11,9 @@ Thirteen standing places in Albany County outside the city, a third pass after `
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Knox Dutch barn (Sholtes) | Knox, NY (42.63724, -74.15129), Rock Road at Michienzi Road | HMdb 62841: Dutch barn built about 1800 for Jacob Sholtes | Whether it still stands; which building |
 | Becker Homestead | Selkirk, NY (42.54678, -73.81290), NY 396 at Beckers Corners | HMdb 305289, 1932 state marker | Whether a homestead building survives |
 | Bennett Hill House and Preserve | Feura Bush, NY (42.57089, -73.96047) | HMdb 276308: house built 1821, Bennett sheep and apple farm, boarding house 1890s–1920s; preserve is MHLC land (mohawkhudson.org) | Whether the house is on the preserve or private; any farm traces on the trails |
 | Coeymans Creek gunboat encampment | Selkirk, NY (42.50251, -73.79223), NY 144 | HMdb 308875 (Pomeroy 2025): Continental troops built gunboats nearby 1777–78 | Anything to see; access to the creek mouth |
-| Westerlo Quaker meeting house site and cemetery | Westerlo/Rensselaerville line, NY (42.46426, -74.09884), County Route 402 | HMdb 136064: Quaker church and school erected 1803, cemetery behind | Whether the cemetery can be visited; owner |
 | Five Rivers CCC camp and game farm | Delmar, NY (42.60864, -73.89029) | HMdb 263982: CCC camp S-72 1933–36, Delmar Experimental Game Farm 1933–70; DEC centre, trails sunrise to sunset (dec.ny.gov) | Whether any camp or game-farm building survives |
 
 ## Tips
