@@ -48,8 +48,8 @@ ok('a photograph that names the place comes before a nearer one that does not, a
 r=[c['title'] for c in pf.rank([dict(near,m=90,title='File:B.jpg'),dict(near,m=10,title='File:A.jpg')],nw,'sag harbor')] if hasattr(pf,'rank') else []
 ok('the rest stay nearest first',r==['File:A.jpg','File:B.jpg'],r)
 ag=getattr(pf,'asked_again',lambda v:None)
-ok('a "none" recorded before the search was widened is asked again',ag(('','2026-11-19','nothing on Commons within 150 m'))is True)
-ok('a "none" recorded on the day it was widened or after is not, and a chosen picture never is',ag(('','2026-11-20','only a street sign'))is False and ag(('','2026-11-21','only a street sign'))is False and ag(row)is False)
+ok('a "none" recorded under an earlier, narrower search is asked again',ag(('','2026-11-19','nothing on Commons within 150 m'))is True and ag(('','2026-11-21','only a street sign'))is True and ag(('','2026-11-22','x'*9,1))is True)
+ok('a "none" recorded under the search as it is now is not, and a chosen picture never is',ag(('','2026-11-22','only a street sign',getattr(pf,'SEARCH',0)))is False and ag(row)is False and ag(tuple(row)+('loose',))is False)
 d2=tempfile.mkdtemp(); later=row[:6]+('2026-11-21',)
 pf.write_pick(os.path.join(d2,'pics_zzzz.py'),'place-x',('','2026-11-19','nothing nearby')); pf.write_pick(os.path.join(d2,'pics_aaaa.py'),'place-x',later)
 pf.write_pick(os.path.join(d2,'pics_aaaa.py'),'place-y',row); pf.write_pick(os.path.join(d2,'pics_zzzz.py'),'place-y',('','2026-11-22','the picture was of the house next door'))
@@ -69,7 +69,7 @@ ok('a new place with no Wikipedia article is one to look for a picture for',na({
 ok('one with an article is left to its article',na({'links':[['Wikipedia: Old Mill','https://en.wikipedia.org/wiki/Old_Mill'],['Other','https://example.org']]})is False)
 pn=getattr(pf,'new_places',lambda P,done:None)
 PL=[dict(id='a',st='standing',links=[]),dict(id='b',st='standing',links=[['Wikipedia: B','https://en.wikipedia.org/wiki/B']]),dict(id='c',st='gone',links=[]),dict(id='d',st='ruins',links=[]),dict(id='e',st='standing',links=[])]
-got=pn(PL,{'d':row,'e':('','2026-11-20','only a street sign')})
+got=pn(PL,{'d':row,'e':('','2026-11-22','only a street sign',getattr(pf,'SEARCH',0))})
 ok('of a batch, the places listed are those with no article, still there, and not answered yet',got is not None and [p['id'] for p in got]==['a'],got and [p['id'] for p in got])
 try: got=pn(PL,{},{'b'})
 except TypeError: got=None
@@ -96,4 +96,111 @@ R=tr(T) if tr else None
 ok('a trial answer is one line a note file can carry, and reads back: the last answer for a place wins, "none" is an empty picture',R=={'old-mill':'https://commons.wikimedia.org/wiki/File:Old_mill_2.jpg','depot':''},R)
 io=getattr(pf,'id_ok',lambda i,ids:None)
 ok('a landmark pin (lm-...) may have a picture though it is in no place list; any other unknown id may not',io('lm-thomas-cole-house',{'a'})is True and io('a',{'a'})is True and io('no-such-place',{'a'})is False and io('lm-Bad Id',{'a'})is False)
+# ---- the search was widened again (November 21, 2026): the owner found the finder passing over photographs that are on Commons ----
+G=lambda n,d=None: getattr(pf,n,d)
+ok('a TIFF photograph is offered (the Library of Congress building surveys are TIFF, and Commons serves a JPEG of each)',pf.usable(dict(good,mime='image/tiff'))=='',pf.usable(dict(good,mime='image/tiff')))
+ok('a PDF or an SVG is still not a photograph',pf.usable(dict(good,mime='application/pdf'))!='' and pf.usable(dict(good,mime='image/svg+xml'))!='')
+ok('a survey drawing sheet is not offered',pf.usable(dict(good,mime='image/tiff',title='File:Old Mill, Exampleville, Example County, NY HAER NY,1-EX,1- (sheet 2 of 6).tif'))!='')
+ok('a survey credit reads as a name',pf.credit('<div class="fn value">\nLowe, Jet, creator</div>')=='Jet Lowe' and pf.credit('Historic American Buildings Survey, creator')=='Historic American Buildings Survey',[pf.credit('<div class="fn value">\nLowe, Jet, creator</div>'),pf.credit('Historic American Buildings Survey, creator')])
+va=G('variants',lambda n:[])
+V=va('Adirondac (Tahawus) and McIntyre furnace')
+ok('a long title is also tried by its parts and by the name in brackets',V[:1]==['Adirondac and McIntyre furnace'] and 'McIntyre furnace' in V and 'Adirondac' in V and 'Tahawus' in V,V)
+V=va("Brimmer Farm: George Brimmer's grave (1755)")
+ok('a year in brackets is not a name',"George Brimmer's grave" in V and 'Brimmer Farm' in V and not any('1755' in v for v in V),V)
+po=G('places_of',lambda s:[])
+ok('the hamlet in brackets counts as the town too',po({'name':'Knox District School No. 5','town':"Knox (Thompson's Lake)"})[:2]==['knox','thompson s lake'],po({'name':'Knox District School No. 5','town':"Knox (Thompson's Lake)"}))
+nm=G('named',lambda t,s:None)
+ADK={'id':'adirondac','name':'Adirondac (Tahawus) and McIntyre furnace','town':'Newcomb','lat':44.0872,'lon':-74.0557,'prec':'site'}
+LYN={'id':'lynde','name':'Lynde Point Light','town':'Old Saybrook','lat':41.2700,'lon':-72.3400,'prec':'exact'}
+ok('a survey photograph that names one part of the title and the hamlet names the place',nm('File:Jet Lowe, Photographer, June, 1978. MCINTYRE IRON WORKS. EAST PORTAL FURNACE. - Adirondack Iron and Steel Company, New Furnace, Hudson River, Tahawus, Essex County, NY HAER NY,16-TAHA,1-28.tif',ADK)==2)
+ok('a name one word short, with the town, half names it: offered, marked to look twice',nm('File:Lynde Lighthouse, Old Saybrook, Connecticut.jpg',LYN)==1,nm('File:Lynde Lighthouse, Old Saybrook, Connecticut.jpg',LYN))
+ok('three telling words with no town half name it too',nm('File:Lynde Point Light 2019.jpg',LYN)==1)
+ok('the town alone does not name it, nor does one word of a short name',nm('File:Main Street, Old Saybrook.jpg',LYN)==0 and nm('File:Custom House, Salem.jpg',{'name':'Sag Harbor Custom House','town':'Sag Harbor'})==0)
+ok('the old rule still holds: every telling word and the town',nm('File:Custom House, Sag Harbor, New York.jpg',{'name':'Sag Harbor Custom House','town':'Sag Harbor'})==2)
+qs=G('queries',lambda s:[])(ADK)
+ok('Commons is asked under the whole title with the town, and under each telling part by itself, five questions at most',qs[:1]==['Adirondac and McIntyre furnace Newcomb'] and 'McIntyre furnace' in qs and len(qs)<=5,qs)
+t3=G('thumb330',lambda u:u)
+ok('the sheet asks for a small copy of a TIFF as of a JPEG',t3('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/X.tif/lossy-page1-960px-thumbnail.tif.jpg')=='https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/X.tif/lossy-page1-330px-thumbnail.tif.jpg' and t3('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Old_mill.jpg/900px-Old_mill.jpg')=='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Old_mill.jpg/330px-Old_mill.jpg',t3('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d9/X.tif/lossy-page1-960px-thumbnail.tif.jpg'))
+# gathering, with Commons' answers canned
+def pg(title,dlat=None,mime='image/jpeg',desc='',cats=()):
+    d={'title':title,'imageinfo':[{'mime':mime,'width':3000,'height':2000,'thumburl':'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/x.jpg/900px-x.jpg','thumbwidth':900,'thumbheight':600,'descriptionurl':'https://commons.wikimedia.org/wiki/'+title.replace(' ','_'),
+       'extmetadata':{'LicenseShortName':{'value':'CC BY-SA 4.0'},'Artist':{'value':'Pat Example'},'ImageDescription':{'value':desc}}}],'categories':[{'title':c} for c in cats]}
+    if dlat is not None: d['coordinates']=[{'lat':LYN['lat']+dlat,'lon':LYN['lon']}]
+    return d
+asked=[]
+def canned(params,tries=8):
+    asked.append(params)
+    g=params.get('generator')
+    if g=='geosearch': return {'query':{'pages':[pg('File:Shore road.jpg',0.0009),pg('File:Lynde Point Lighthouse from the water, Old Saybrook.jpg',0.0045),pg('File:Yacht club.jpg',0.0045),pg('File:Keeper at the door.tif',0.0002,mime='image/tiff')]}}
+    if g=='search': return {'query':{'pages':[pg('File:Lynde Point Light, Old Saybrook CT.jpg'),{'title':'Category:Lynde Point Light'},{'title':'Category:Lighthouses in Connecticut'},pg('File:Lynde Point Light replica at a fairground (namesake far away).jpg',0.3)]}}
+    if g=='categorymembers' and params.get('gcmtitle')=='Category:Lynde Point Light': return {'query':{'pages':[pg('File:Inner Light 1905.jpg'),pg('File:Somewhere else entirely.jpg',0.3)]}}
+    return {'query':{'pages':[]}}
+def canned2(params,tries=8):
+    # Commons answers in two parts when there is much to say: the second part carries what the first left out
+    if params.get('generator')!='geosearch': return {'query':{'pages':[]}}
+    if 'clcontinue' in params: return {'query':{'pages':[dict(pg('File:Tower by the river.jpg',0.0003),categories=[{'title':'Category:Lynde Point Light'},{'title':'Category:Old Saybrook, Connecticut'}])]}}
+    return {'continue':{'clcontinue':'x|y','continue':'||'},'query':{'pages':[dict(pg('File:Tower by the river.jpg',0.0003),categories=[])]}}
+if G('gather'):
+    real=pf._get; pf._get=canned2
+    try: C2=pf.gather(LYN)
+    finally: pf._get=real
+    ok('when Commons answers in two parts both are read: a file whose categories come in the second part is known by them',[c.get('how') for c in C2]==['pin+name'],[(c['title'],c.get('how')) for c in C2])
+else: ok('when Commons answers in two parts both are read',False)
+FEN={'id':'fendall','name':'Fendall Hall','town':'Eufaula','lat':41.27,'lon':-72.34,'prec':'exact'}
+def canned3(params,tries=8):
+    g=params.get('generator')
+    if g=='search': return {'query':{'pages':[pg('File:Fendall Hall, Eufaula, Alabama.jpg',0.23),pg('File:Fendall Hall, Eufaula (other side of the world).jpg',9.0),{'title':'Category:Fendall Hall'},{'title':'Category:Halls in Alabama'}]}}
+    if g=='categorymembers' and params.get('gcmtitle')=='Category:Fendall Hall': return {'query':{'pages':[pg('File:Front porch.jpg')]}}
+    return {'query':{'pages':[]}}
+if G('gather'):
+    real=pf._get; pf._get=canned3
+    try: C3=pf.gather(FEN)
+    finally: pf._get=real
+    H3={c['title']:c.get('how') for c in C3}
+else: H3={}
+ok('a file that names the place and its town but carries a position some miles off is kept, to look twice (the Register gives Fendall Hall a point 27 km out of town, and Commons copied it); one a thousand kilometres off is a namesake',H3.get('File:Fendall Hall, Eufaula, Alabama.jpg')=='loose' and not any('other side' in t for t in H3),H3)
+ok('a category that bears exactly the place\'s name is opened though the name has one telling word',H3.get('File:Front porch.jpg')=='category',H3)
+ga=G('gather')
+if ga:
+    real=pf._get; pf._get=canned; slp=pf.time.sleep; pf.time.sleep=lambda x:None
+    try: C=ga(LYN)
+    finally: pf._get=real; pf.time.sleep=slp
+    H={c['title']:c.get('how') for c in C}
+else: C=[]; H={}
+ok('a photograph taken at the pin is offered whatever its name, a TIFF among them',H.get('File:Shore road.jpg')=='pin' and H.get('File:Keeper at the door.tif')=='pin',H)
+ok('one taken further off is offered when it names the place, and not when it does not',H.get('File:Lynde Point Lighthouse from the water, Old Saybrook.jpg')=='far' and 'File:Yacht club.jpg' not in H,H)
+ok('one found by its name is offered',H.get('File:Lynde Point Light, Old Saybrook CT.jpg')=='name',H)
+ok('the photographs in a category named for the place are offered; a category of the whole state is not opened',H.get('File:Inner Light 1905.jpg')=='category' and sum(1 for a in asked if a.get('generator')=='categorymembers')==1,H)
+ok('Commons is asked for pictures, not for the scanned books that hold the same words',all('-filemime:pdf' in a.get('gsrsearch','') for a in asked if a.get('generator')=='search') and any(a.get('generator')=='search' for a in asked))
+ok('every question asks for the position of every file, not of the first ten (Commons gives ten unless asked; the first finder saw at most ten photographs near a pin)',bool(asked) and all(a.get('colimit')=='max' for a in asked if a.get('generator')),[a.get('colimit') for a in asked])
+ok('a photograph whose own position is somewhere else is a namesake, by name or by category',not any('namesake' in t or 'Somewhere else' in t for t in H),H)
+ok('those that name the place come first, the unnamed one at the pin last',[c['title'] for c in C][:1]==['File:Lynde Point Light, Old Saybrook CT.jpg'] and [c['title'] for c in C][-1:]==['File:Shore road.jpg'],[c['title'] for c in C])
+MES={'name':'Mesier Homestead','town':'Wappingers Falls','lat':41.6,'lon':-73.9}
+ok('a file name run together is read as its words',nm('File:MesierHomestead.JPG The house in Wappingers Falls, New York',MES)==2,nm('File:MesierHomestead.JPG The house in Wappingers Falls, New York',MES))
+ok('both words of a two-word name with no town half name it (look twice); one of the two does not',nm('File:Mesier Homestead in winter.jpg',MES)==1 and nm('File:Homestead in winter.jpg',MES)==0)
+qc=G('queries',lambda s:[])({'name':'Coxsackie Light site','town':'Coxsackie'})
+ok('Commons is not asked for the word "site" or "ruins": no photograph is called that',qc and not any(' site' in q for q in qc) and 'Coxsackie Light' in qc,qc)
+pk=G('pick',lambda C:[])
+many=[dict(title='File:P%02d.jpg'%i,how='pin',m=i) for i in range(30)]+[dict(title='File:L%d.jpg'%i,how='loose',m=None) for i in range(6)]+[dict(title='File:N.jpg',how='name',m=None)]
+got=pk(many)
+ok('of many candidates sixteen are shown: those that name the place first, and room is kept for four that half name it',len(got)==16 and got[0]['title']=='File:N.jpg' and sum(1 for c in got if c['how']=='loose')==4,[c['title'] for c in got])
+os_=G('other_state',lambda t,st:None)
+ok('a file that names another state and not this one is marked: the classic namesake',os_('File:Crawfordville Baptist Church, Crawfordville, Florida.jpg','Georgia') is True and os_('File:Crawfordville Baptist Church, Georgia.jpg','Georgia') is False and os_('File:Baptist church.jpg','Georgia') is False)
+ok('"Washington" and "Georgia" in a name are not taken for the states, and a place with no known state is never marked',os_('File:Washington Park lake house, Albany.jpg','New York') is False and os_('File:Old mill, Florida.jpg',None) is False and os_('File:West Virginia Central depot, Virginia.jpg','Virginia') is False)
+if G('gather'):
+    import io,contextlib
+    f3=os.path.join(tempfile.mkdtemp(),'pics_abcd.py'); real=pf._get; pf._get=lambda params,tries=8:{'query':{'pages':[]}}; cwd=os.getcwd(); os.chdir(tempfile.mkdtemp())
+    try:
+        with contextlib.redirect_stdout(io.StringIO()): n0=pf.look(dict(LYN,id='empty-place'),f3); n1=pf.look(dict(LYN,id='just-looking'))
+    finally: pf._get=real; os.chdir(cwd)
+    R3=pf.all_pics(os.path.dirname(f3))
+    ok('a place Commons has nothing for is recorded as none by the tool, under today\'s search, so nobody looks at an empty sheet and it is not asked again',n0==0 and R3.get('empty-place',('x',))[0]=='' and pf.asked_again(R3['empty-place']) is False and pf.row_problem(R3['empty-place'])=='',str(R3)[:160])
+    ok('but only when a file to record in is given: a bare look records nothing',n1==0 and 'just-looking' not in R3)
+else: ok('a place Commons has nothing for is recorded as none by the tool',False)
+rp=G('row_problem',lambda v:'missing')
+ok('a chosen row may say how the picture was found, and a "none" under which search',rp(tuple(row)+('loose',))=='' and rp(tuple(row))=='' and rp(('','2026-11-22','nothing on Commons near the pin',2))=='' and rp(('','2026-11-22','only a street sign'))=='',[rp(tuple(row)+('loose',)),rp(('','2026-11-22','nothing on Commons near the pin',2))])
+ok('a row with a picture from elsewhere, or no credit, is refused',rp(('https://example.org/a.jpg',900,600,'Pat','CC BY 4.0','https://commons.wikimedia.org/wiki/File:A.jpg','2026-11-22'))!='' and rp((row[0],900,600,'','CC BY 4.0',row[5],'2026-11-22'))!='' and rp(tuple(row)+('made up',))!='')
+d2=tempfile.mkdtemp(); f2=os.path.join(d2,'pics_wxyz.py'); pf.write_pick(f2,'a-place',tuple(row)+('far',)); pf.write_pick(f2,'b-place',('','2026-11-22','nothing on Commons near the pin',2))
+A2=pf.all_pics(d2); out2=pf.merge({},A2,{'a-place','b-place'})
+ok('such rows are written, read back and built into the site like the others',A2.get('a-place')==tuple(row)+('far',) and A2.get('b-place')[0]=='' and out2.get('a-place',[None])[:6]==list(row[:6]) and not out2.get('b-place'),str(out2)[:120])
 print(f'{len(fails)} FAILED' if fails else 'photo_find test: all checks passed'); sys.exit(1 if fails else 0)
