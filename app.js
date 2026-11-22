@@ -158,9 +158,19 @@ async function findSpot(q){ q=String(q||'').trim(); if(!q) return {err:'Type a t
   return {lat:la,lon:lo,name:name}; }
 const homeKey=()=>{ const H=homeObj(); return H.lat.toFixed(4)+','+H.lon.toFixed(4); };
 function roughMin(mi){ const road=mi*1.3, mph=road<8?26:road<35?40:50; return {min:Math.max(1,Math.round(road/mph*60)),mi:Math.round(road*10)/10}; }
+/* Routed drive times from a start city come in a file of their own, data/dt/<city>-<stamp>.json, fetched the first time that city
+   is the start place (they were a fifth of the page; tools/make.py). Until it arrives, and when it cannot be had, the time is the
+   straight-line estimate, marked ~. A place that still carries its own table (the single-file copy, or older place data in the
+   Android app) is read as before. */
+const DTT={}, DTW={};
+function dtLoad(h){ const x=(D.dtx||{})[h]; if(!x||DTT[h]||DTW[h]===true||(DTW[h]&&Date.now()-DTW[h]<60000)) return; DTW[h]=true; const p='data/dt/'+h+'-'+x+'.json';
+  (AT?AT.fetch(p):fetch(p+'?v='+x)).then(r=>{ if(!r.ok) throw new Error('http '+r.status); return r.json(); })
+    .then(j=>{ DTT[h]=j; DTW[h]=0; if(U.home.id===h){ refresh(); if(sel&&view==='detail') renderDetail(sel); } })
+    .catch(()=>{ DTW[h]=Date.now(); }); }
+try{ window.__atlasDT=h=>DTT[h]?Object.keys(DTT[h]).length:0; }catch(e){}
 function dt(s){
   const h=U.home.id;
-  if(h!=='custom'&&s.dt&&s.dt[h]&&!U.moved[s.id]) return {min:s.dt[h][0],mi:s.dt[h][1],est:false};
+  if(h!=='custom'&&!U.moved[s.id]){ const T=DTT[h]; if(T&&T[s.id]) return {min:T[s.id][0],mi:T[s.id][1],est:false}; if(s.dt&&s.dt[h]) return {min:s.dt[h][0],mi:s.dt[h][1],est:false}; if(!T&&homePicked()) dtLoad(h); }      /* nobody who has not chosen a start place downloads a table */
   if(U.dtc&&U.dtc.key===homeKey()&&U.dtc.t[s.id]) return {min:U.dtc.t[s.id][0],mi:U.dtc.t[s.id][1],est:false};
   const H=homeObj(),d=dest(s),r=roughMin(hav(H.lat,H.lon,d.lat,d.lon)); return {min:r.min,mi:r.mi,est:true};
 }
