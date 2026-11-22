@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={heat:true,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={heat:true,pinchStand:false,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -681,7 +681,7 @@ function initMap(){
   map.on('moveend',()=>{ if(U.ui.land) drawLand(); if(view==='near'&&NM.org==='map') nmDraw(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
   if(!LD[U.ui.base]) U.ui.base='streets';
   setBase(U.ui.base,true); if(cmp.on){ cmp.lap=0; setCmp(); }      /* a comparison left on is on again, the way it was */
-  map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
+  map.on('zoom',pinchFrame); map.on('zoomanim',pinchAnim); map.on('zoomend moveend',pinchEnd); map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
   map.on('move zoom zoomend moveend resize viewreset',clipCmp);
   map.on('click',onMapClick); drawSpots();
   /* A double tap. Leaflet's own goes in one step, which is slow work with one thumb, most of all with the map full screen:
@@ -849,6 +849,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('cluster','Zoomed out, stand in for the pins','The heat map below, or numbered discs, in place of hundreds of pins. Off: every pin at every zoom, which is slow where places are thick.'),
     tog('heat','Zoomed out, show a heat map','Colour shows where places are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in. Off: numbered discs instead, each standing for the pins under it.'),
+    tog('pinchStand','Trial: smoother pinch','While two fingers are down the pins are shown as one picture that stretches with the map, and they come back when you let go. A trial: say whether pinching feels better with it on.'),
     pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
     tog('nativeLeads','Show Native American sites among the leads','Mounds, pueblos, rock art, heiau and other sites mapped on OpenStreetMap, and old sites on reservation land: turquoise dots when Unchecked leads is on, and rows in the Near tab. Off unless you switch it on here. Many are sacred, protected by law or closed: go only where whoever looks after the place invites visitors.'),
@@ -2141,6 +2142,43 @@ try{ window.__atlasHeat=()=>heatNow&&heatLayer?{cells:heatNow.cells.size,total:h
    is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
    the list, the filters or the chosen place change. */
 const pinPool=new Map(); let clusSig='', pinGen=0; const PINFIRST=80, PINLOT=30;
+/* The pinch trial (a setting, pinchStand, off unless switched on; the owner, November 22, 2026). A one-finger drag slides the
+   whole map as one sheet. A pinch does not: at every frame Leaflet moves each pin on the map separately, and round Albany
+   that is 800 pins, so the map crawls while two fingers are down. The heat map, which is one picture stretched, pinches
+   smoothly on his phone. So for the length of a pinch the pins are hidden and one picture of them, drawn here, is stretched
+   with the map in their place; when the fingers lift it is taken away and the pins, which Leaflet has kept up to date all
+   the while, are shown again. The price is that the pins grow and shrink with the map during the pinch. pinDraw() draws a
+   pin as app.css does (.pin, .zfar .pin, .pin.sq, .hollow, .mine, .fav, .sel); the status rings and the pulse are not drawn. */
+let pinchSt=null, pinStar=null;
+function pinDraw(g,s,x,y,far,ring,accent){
+  const col=(CAT[s.cat]||CAT.landmark)[1], star=s.st==='standing'&&!s.mine, fav=isFav(s.id), my=U.status[s.id], disc=(r,c)=>{ g.beginPath(); g.arc(x,y,r,0,6.2832); g.fillStyle=c; g.fill(); };
+  g.globalAlpha=(my==='filmed'||my==='skip')?0.45:1; let r;
+  if(star){ const k=(far?15:22)/24*(fav?1.25:1); r=12*k; g.save(); g.translate(x-12*k,y-12*k); g.scale(k,k); g.lineJoin='round'; if(!pinStar) pinStar=new Path2D(STARD);
+    g.lineWidth=fav?8:5; g.strokeStyle=fav?'#fff':'rgba(0,0,0,.65)'; g.stroke(pinStar); g.lineWidth=2; g.strokeStyle=ring; g.fillStyle=col; g.fill(pinStar); g.stroke(pinStar); g.restore(); }
+  else if(s.mine){ r=far?5:8; g.save(); g.translate(x,y); g.rotate(0.7854); g.fillStyle='rgba(0,0,0,.6)'; g.fillRect(-r-1,-r-1,2*r+2,2*r+2); g.fillStyle=ring; g.fillRect(-r,-r,2*r,2*r); const b=far?1.5:2; g.fillStyle=col; g.fillRect(-r+b,-r+b,2*(r-b),2*(r-b)); g.restore(); }
+  else { r=far?5:8; const hol=!!HOLLOW[s.st], b=hol?(far?2.5:3.5):(far?1.5:2);
+    if(fav){ disc(r+4.5,'rgba(0,0,0,.8)'); disc(r+3,'#fff'); } else disc(r+1,'rgba(0,0,0,.6)');
+    disc(r,hol?col:ring); disc(r-b,hol?'#fff':col); }
+  if(sel&&sel.id===s.id){ g.beginPath(); g.arc(x,y,r+4.5,0,6.2832); g.lineWidth=3; g.strokeStyle=accent; g.stroke(); }
+  g.globalAlpha=1;
+}
+function pinchBegin(){
+  if(pinchSt||!pref('pinchStand')||!markers.size) return;
+  const css=getComputedStyle(map.getContainer()), ring=(css.getPropertyValue('--pinring')||'#fff').trim()||'#fff', accent=(css.getPropertyValue('--accent')||'#2563eb').trim()||'#2563eb', far=map.getContainer().classList.contains('zfar');
+  const vb=map.getBounds().pad(0.5), nwLL=vb.getNorthWest(), nw=map.latLngToLayerPoint(nwLL), se=map.latLngToLayerPoint(vb.getSouthEast()), w=Math.round(se.x-nw.x), h=Math.round(se.y-nw.y), k=Math.min(2,window.devicePixelRatio||1);
+  const cv=document.createElement('canvas'); cv.className='pinstand leaflet-zoom-animated'; cv.width=Math.round(w*k); cv.height=Math.round(h*k); cv.style.width=w+'px'; cv.style.height=h+'px';
+  const g=cv.getContext('2d'); g.scale(k,k); const list=[];
+  markers.forEach((m,id)=>{ const t=byId(id); if(!t) return; const q=map.latLngToLayerPoint(m.getLatLng()), x=q.x-nw.x, y=q.y-nw.y; if(x<-20||y<-20||x>w+20||y>h+20) return;
+    list.push([(sel&&sel.id===id?2e6:isFav(id)?1e6:t.cat==='landmark'?-1e6:0)+y,t,x,y]); });      /* the order the pins are stacked in: down the screen, favourites and the chosen place on top */
+  list.sort((a,b)=>a[0]-b[0]).forEach(a=>pinDraw(g,a[1],a[2],a[3],far,ring,accent));
+  let pane=map.getPane('pinstand'); if(!pane){ pane=map.createPane('pinstand'); pane.style.zIndex=600; pane.style.pointerEvents='none'; }
+  pane.appendChild(cv); L.DomUtil.setTransform(cv,nw,1); map.getPane('markerPane').classList.add('pinch-on');
+  pinchSt={cv:cv,nwLL:nwLL,z0:map.getZoom(),w:w,h:h};
+}
+function pinchFrame(e){ if(!e||!e.pinch) return; if(!pinchSt) pinchBegin(); if(pinchSt) L.DomUtil.setTransform(pinchSt.cv,map.latLngToLayerPoint(pinchSt.nwLL),map.getZoomScale(map.getZoom(),pinchSt.z0)); }
+function pinchAnim(e){ if(pinchSt) L.DomUtil.setTransform(pinchSt.cv,map._latLngToNewLayerPoint(pinchSt.nwLL,e.zoom,e.center),map.getZoomScale(e.zoom,pinchSt.z0)); }      /* the fingers lift: Leaflet glides to a whole zoom step, and the picture glides with it */
+function pinchEnd(){ if(!pinchSt) return; pinchSt.cv.remove(); pinchSt=null; map.getPane('markerPane').classList.remove('pinch-on'); }
+try{ window.__atlasPinch=()=>pinchSt?{nw:[pinchSt.nwLL.lat,pinchSt.nwLL.lng],z0:pinchSt.z0,w:pinchSt.w,h:pinchSt.h}:null; }catch(e){}
 function syncMarkers(){
   if(!map) return;
   const show=new Set(visible.map(s=>s.id)); if(sel) show.add(sel.id);
