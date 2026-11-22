@@ -14,7 +14,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Columbus Ironworks | Columbus, GA (32.46306, -84.99528) | Built 1853, made cannon, pistols and swords for the Confederacy, now the Columbus Georgia Convention & Trade Center (Wikipedia; pin checked on the aerial, on the building) | Written and pin checked, then taken out: check.py says the pin is in Alabama, because Georgia's outline runs about 1.5 km east of the Chattahoochee here and the border test only measures to outline corners (nearest 3 km away). Needs the tool fix in Tips, then it can go in as written |
-| Chesser Island Homestead | Okefenokee National Wildlife Refuge, near Folkston, GA (30.70667, -82.16222, Wikipedia) | A yellow-pine homestead built 1927 by Tom and Iva Chesser, with smokehouse, syrup shed and corncrib, kept by the refuge (Wikipedia: Chesser Island) | The refuge's own page for hours and the swamp-park entrance fee |
 | Midway Museum key to the church | Midway, GA | The museum opposite gives tours Tuesday to Saturday 10 to 4 | Whether it opens Midway Church to visitors, from its own page or by telephone |
 
 ## Tips
