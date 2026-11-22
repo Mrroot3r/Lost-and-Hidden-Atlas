@@ -12,10 +12,7 @@ Twenty places in inland Columbia County, New York, the first pass there (region 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Jacob Rutsen Van Rensselaer House and Mill Complex | Claverack, NY (42.22111, -73.71083) | Wikipedia (Register summary): 18th-century mill, remains of early waterworks, cooperage or store, brick house by Pierre Pharoux; sold to a developer in the 1960s | Owner and whether the mill can be seen from NY 23; likely private |
-| High Falls and the Agawamuck mill sites | Philmont, NY (High Falls Conservation Area, Columbia Land Conservancy) | Uncovering New York: more than a dozen mills once lined the creek; a dam of the early 19th century is still seen from the overlook; 1.5 miles of trails | The conservancy's own page for hours and parking; any mill remains beyond the dam; Philmont's mill buildings (Summit Knitting Mill) |
-| Van Rensselaer Lower Manor House | Claverack, NY (42.22472, -73.72556) | Wikipedia: two 18th-century houses (one stone) joined into one; one of the earliest in the region; private | Whether anything shows from the road; probably view-only and plain-looking |
 | Mellenville station | Mellenville, Claverack, NY (42.25306, -73.66806) | Wikipedia: Boston and Albany station of about 1900, a Grange hall since the 1930s | Present use and a picture |
-| Hudson city | Hudson, NY | Only Diamond Street and the lighthouse are on the map; the Register list names the Hudson Almshouse, the Dr. Oliver Bronson House (on prison grounds), South Bay Mill, the Railway Steel Spring foundry, Warren Street (Hudson Historic District) | A batch of its own |
 | Burden iron mines | Livingston and Greenport, NY (Mount Tom, about 42.166, -73.829) | The USGS mines layer lists Burden No. 2 and No. 3 carbonate iron mines and Mount Tom | Any source on what is left and who owns it |
 
 ## Tips

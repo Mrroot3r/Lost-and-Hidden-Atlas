@@ -38,7 +38,6 @@ Places someone read about while researching but did not add, with what is missin
 | Farnams lime works | Cheshire, MA | Wikipedia: lime quarries and plant from 1874, US Gypsum 1927 to 1969; village buildings stand | What is left of the kilns and quarries and whether any of it is public |
 | Tifft Nature Preserve | Buffalo, NY | Wikipedia: a coal and iron ore transfer yard by 1900, then a dump, a preserve since 1976 | What industrial remains can be seen on the trails |
 | Lebanon Springs Union Free School | New Lebanon, NY | Wikipedia: 1913 school; the listing includes the remains of a railroad trestle over Wyomanock Creek | Present state of the school and whether the trestle can be reached |
-| High Falls Conservation Area | Philmont, NY | Recalled as a waterfall preserve with mill remains; the land trust's page refused the fetch | A source read in full and a coordinate |
 | Rip Van Winkle House | Palenville, NY | Recalled as a ruin on the old mountain road to the Catskill Mountain House | A source and a coordinate |
 | Staalesen Vanderheyden Preserve | Troy, NY | Recalled as a preserve round an old city reservoir | A source and a coordinate |
 | Willard Asylum for the Chronic Insane | Willard, NY | Wikipedia: state asylum opened 1869; a drug treatment center opened on the campus in 1995; 400 patients' suitcases were found in an attic that year | Who holds the campus now, whether any of it can be seen from a public road, the cemetery |
