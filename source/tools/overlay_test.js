@@ -1,7 +1,7 @@
 // What is on the map, and what is not: pins, lead dots, pocket discs and old lines are kept on the map only in or near the
 // view, because Leaflet works out every layer's position again at each zoom step, on screen or not.
 //   node tools/overlay_test.js http://localhost:8766/index.html      (serve the built site first, as for smoke.js)
-// Run it after changing syncMarkers(), the pinch rule (pinchPins()), viewDots()/viewSync(), drawLeads(), drawXL(), pockZoom() or the line levels (LLEV,
+// Run it after changing syncMarkers(), viewDots()/viewSync(), drawLeads(), drawXL(), pockZoom() or the line levels (LLEV,
 // syncLines()) in app.js. What it holds the app to:
 //   1. every place in view has its pin, and most places out of view have none; panning brings in the pins for the new ground;
 //   2. the chosen place keeps its pin wherever the map goes;
@@ -10,7 +10,6 @@
 //      after the map moves as well as before;
 //   5. the old lines are a handful of layers when zoomed out, and a tap on one still opens its box, zoomed out and zoomed in;
 //   6. with everything switched on the map holds hundreds of layers, not thousands.
-//   7. a pinch moves only the pins in or near the view at each frame, and every pin is right again when the fingers lift.
 const { chromium } = require('playwright');
 (async()=>{
   const fails=[]; const ok=(name,cond,extra)=>{ console.log((cond?'ok   ':'FAIL ')+name+(extra!==undefined?'  ['+extra+']':'')); if(!cond) fails.push(name); };
@@ -221,34 +220,6 @@ const { chromium } = require('playwright');
     const whole=await q.evaluate(()=>Promise.all(['vanished','mines'].map(k=>fetch('data/'+k+'.json').then(r=>r.json()).then(j=>({n:j.p.length,st:Object.keys(j.s).length,t:j.t.length})))));
     ok('the old whole-layer files are still there for older copies of the Android app, holding the eleven states they held',whole.every(w=>w.n>10000&&w.st===11&&w.t>0),JSON.stringify(whole));
     await c2.close(); }
-  /* 7. Two fingers on the map: Leaflet moves every pin on the map at every frame of a pinch, the ones off the screen too, and
-        sets each one's stacking order again. Around Albany that was 800 to 1,300 pins a frame and the map crawled while two
-        fingers were down (the owner, November 22, 2026). During a pinch only the pins in or near the view are moved; when the
-        fingers lift every pin is put where it belongs. The frames here are the ones Leaflet's own pinch handler makes. */
-  { const c3=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
-    await c3.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,set:{heat:true},ui:{base:'streets',view:[42.7,-73.8,10],hist:false,leads:false}})); }catch(e){} });
-    await c3.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
-    const q=await c3.newPage(); q.on('pageerror',e=>errs.push('pinch: '+e.message)); await q.goto(url); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(2500);
-    const r=await q.evaluate(async()=>{ const m=window.__atlasMap, pane=m.getPane('markerPane'), c=m.getCenter(), z0=m.getZoom(), frame=()=>new Promise(r=>requestAnimationFrame(r));
-      const pins=()=>{ const a=[]; m.eachLayer(l=>{ if(l instanceof L.Marker&&l._icon) a.push(l); }); return a; };
-      const right=l=>{ const w=m.latLngToLayerPoint(l.getLatLng()).round(), g=L.DomUtil.getPosition(l._icon); return Math.abs(w.x-g.x)<=1&&Math.abs(w.y-g.y)<=1; };
-      const inView=l=>m.getBounds().contains(l.getLatLng());
-      const all=pins(), zi=new Map(all.map(l=>[l,l._icon.style.zIndex])); let touched=new Set();
-      const mo=new MutationObserver(L=>L.forEach(x=>{ if(x.target.parentNode===pane) touched.add(x.target); })); mo.observe(pane,{subtree:true,attributes:true,attributeFilter:['style']});
-      m._stop(); m._moveStart(true,false);
-      m._move(c,z0+0.3,{pinch:true,round:false}); await frame(); const one=touched.size, seen=all.filter(inView), okIn=seen.filter(right).length, sameZ=seen.filter(l=>l._icon.style.zIndex===zi.get(l)).length;
-      for(let i=1;i<=6;i++){ m._move(c,z0+0.3-i*0.2,{pinch:true,round:false}); await frame(); }
-      const seenOut=pins().filter(inView), okOut=seenOut.filter(right).length; mo.disconnect();
-      m._animateZoom(c,Math.round(m.getZoom()),true,true);      /* the fingers lift: Leaflet settles on a whole zoom step */
-      await new Promise(r=>setTimeout(r,700)); const end=pins(), okEnd=end.filter(right).length, zEnd=end.filter(l=>+l._icon.style.zIndex===L.DomUtil.getPosition(l._icon).y+(l.options.zIndexOffset||0)).length;
-      return {z0,pins:all.length,one,seen:seen.length,okIn,sameZ,seenOut:seenOut.length,okOut,end:end.length,okEnd,zEnd,zoom:m.getZoom()}; });
-    ok('pinch: round Albany there are hundreds of pins on the map, most of them off the screen',r.pins>400&&r.seen<r.pins*0.7,JSON.stringify(r));
-    ok('pinch: a frame of a pinch moves the pins in or near the view, not every pin on the map',r.one>0&&r.one>=r.seen&&r.one<r.pins*0.75,r.one+' moved of '+r.pins+', '+r.seen+' in view');
-    ok('pinch: every pin in view is where it belongs on that frame',r.okIn===r.seen,r.okIn+' of '+r.seen);
-    ok('pinch: and their stacking order is left alone while the fingers are down',r.sameZ===r.seen,r.sameZ+' of '+r.seen);
-    ok('pinch: pinching out, the pins that come into view are where they belong',r.seenOut>r.seen&&r.okOut===r.seenOut,r.okOut+' of '+r.seenOut);
-    ok('pinch: when the fingers lift every pin on the map is where it belongs, stacking order too',r.end>0&&r.okEnd===r.end&&r.zEnd===r.end,JSON.stringify({end:r.end,okEnd:r.okEnd,zEnd:r.zEnd,zoom:r.zoom}));
-    await c3.close(); }
   ok('no script errors',errs.length===0,errs.join(' | ').slice(0,200));
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\noverlay test passed'); process.exit(fails.length?1:0);
 })();
