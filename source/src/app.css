@@ -364,6 +364,7 @@ canvas.pinstand{position:absolute;left:0;top:0;transform-origin:0 0;will-change:
 .fr{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 10px;border-radius:0 6px 6px 0}
 .pin.my-ok{box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 0 4px rgba(26,150,65,.75)}
 .pin.my-asked{box-shadow:0 0 0 1px rgba(0,0,0,.6),0 0 0 4px rgba(224,138,0,.75)}
+.pin.sq.my-ok,.pin.sq.my-asked{box-shadow:none}      /* a star shows its status in its outline (.o, above); the ring for round pins drew a square round a star */
 @media (max-width:820px),(orientation:landscape) and (min-width:560px) and (max-height:540px){
   :root{--barh:54px}
   #map{inset:0 0 var(--barh) 0}
