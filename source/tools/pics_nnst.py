@@ -1,0 +1,14 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'cleveland-roller-mill-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Cassidy_Mill_near_Cleveland%2C_NM.JPG/960px-Cassidy_Mill_near_Cleveland%2C_NM.JPG', 900, 672, 'Cmarrou', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Cassidy_Mill_near_Cleveland,_NM.JPG', '2026-11-22', 'pin'),
+ 'cuervo-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Cuervo%2C_New_Mexico_USA_-_abandoned_town_-_panoramio_%2812%29.jpg/960px-Cuervo%2C_New_Mexico_USA_-_abandoned_town_-_panoramio_%2812%29.jpg', 900, 675, 'MARELBU', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Cuervo,_New_Mexico_USA_-_abandoned_town_-_panoramio_(12).jpg', '2026-11-22', 'pin'),
+ 'elizabethtown-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Elizabethtown%2C_New_Mexico.jpg/960px-Elizabethtown%2C_New_Mexico.jpg', 900, 675, 'AmateurHistory01', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Elizabethtown,_New_Mexico.jpg', '2026-11-22', 'name'),
+ 'glenrio-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Abandoned_motel_in_Glenrio%2C_Texas.jpg/960px-Abandoned_motel_in_Glenrio%2C_Texas.jpg', 900, 573, 'Cullen328', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Abandoned_motel_in_Glenrio,_Texas.jpg', '2026-11-22', 'pin'),
+ 'golden-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/Autumn_Feel_%285349502807%29.jpg/960px-Autumn_Feel_%285349502807%29.jpg', 900, 600, 'Greg Willis from Denver, CO, usa', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Autumn_Feel_(5349502807).jpg', '2026-11-22', 'pin'),
+ 'kelly-nm':('', '2026-11-22', 'a mountain landscape with no building, and ghost towns in Nevada and Montana', 2),
+ 'kingston-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/Percha_Bank%2C_Kingston%2C_NM.jpg/960px-Percha_Bank%2C_Kingston%2C_NM.jpg', 900, 506, 'Pi3.124', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Percha_Bank,_Kingston,_NM.jpg', '2026-11-22', 'name'),
+ 'pioneer-store-chloride-nm':('', '2026-11-22', 'an interior view of tools in a store, and a co-operative store in Rochdale, England', 2),
+ 'shakespeare-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/63/Shakespeare%2C_New_Mexico_from_SE_3.JPG/960px-Shakespeare%2C_New_Mexico_from_SE_3.JPG', 900, 482, 'Ammodramus', 'CC0', 'https://commons.wikimedia.org/wiki/File:Shakespeare,_New_Mexico_from_SE_3.JPG', '2026-11-22', 'pin+name'),
+ 'shuler-theater-raton-nm':('', '2026-11-22', 'a different theatre (El Raton), a street view of Raton, and photographs of an actor', 2),
+}

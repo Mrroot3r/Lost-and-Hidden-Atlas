@@ -12,9 +12,6 @@ Fifteen places scattered across New Mexico, which had 16 places, all but Lake Va
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Castañeda Hotel | Las Vegas, NM | Plaza Hotel history page: Allan Affeldt's team planned its restoration; Wikipedia (Plaza Hotel) calls it the Harvey House rival of the 1890s | A page of its own read, whether it now operates, hours |
-| Kelly ghost town and church | Kelly, south of Magdalena, NM | Wikipedia (Magdalena): the Kelly mine opened in 1883 about 2.5 mi south of Magdalena; the church still stands | Owner, access rules, a source for the ruins |
-| Elizabethtown | Colfax County, NM (Wikipedia 36.61917, -105.28444) | Wikipedia: the only remnant of the old town is the stone wall of a boarding house; a hilltop cemetery | Who owns the wall, a view point |
-| Shakespeare ghost town | Near Lordsburg, NM (Wikipedia 32.32556, -108.73833) | Wikipedia: part of a private ranch, sometimes open to tourists | The ranch's own page and tour days |
 | Fannie Hill mill | Mogollon, NM (Register 33.403056, -108.798889, ref. 87001567) | Register row only | Form not read; is it visible from NM 159 |
 | Hall Hotel and Magdalena depot | Magdalena, NM (34.1168, -107.2416) | Register rows; the depot is the village hall and library, the hotel reopened (Wikipedia, Magdalena) | Articles or forms not read |
 | Pecos River Bridge at Terrero, Variadero Bridge | San Miguel County, NM | Register rows | Not read |
