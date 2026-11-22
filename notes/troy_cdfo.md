@@ -15,9 +15,7 @@ Places you read about and could not finish. One row each; delete the example row
 |---|---|---|---|
 | Firemen's Hall | Lansingburgh, Troy, NY (3 115th Street; geocoder 42.77504, -73.67804) | Central Lansingburgh Register form: 1873 central fire station and village hall, courtroom added 1892, heavily altered into apartments after a fire in the 1950s | Little original left to see by the form's account; a picture |
 | Russell Armington house | Lansingburgh, Troy, NY (1 113th Street) | Central Lansingburgh Register form: shipbuilder's house of about 1795, front altered about 1890, now vinyl-sided | Worth a pin only with more story or a picture |
-| Jacob H. Patten House | Lansingburgh, Troy, NY (254 Fourth Avenue; Wikipedia 42.76222, -73.68222) | Wikipedia, historypointer: 1881-1882 Italianate brick house and carriage house, National Register 2016 | A reason beyond being a listed house |
 | Pittsburgh Building and Walker Laboratory, RPI | Troy, NY (RPI campus) | RPI Institute Archives building histories: 1912 administration building (now the Lally School), 1907 chemical laboratory | Positions and a look at the aerial; left out to keep the batch from being all RPI |
-| Catholic Central High School building | Lansingburgh, Troy, NY (Register 42.7751, -73.6706) | Still as in the troy_odvt row: for sale 2022, National Register 2024 | What it is like and its present use |
 
 ## Tips
 - The RPI Institute Archives building histories (`archives.rpi.edu/institute-history/building-histories/<slug>`, index at `archives.rpi.edu/node/3563`) read in full with `page.py --all` and give year, architect, cost and later use for every campus building; slugs are the building name in lower case with hyphens (`approach`, `87-gymnasium`).

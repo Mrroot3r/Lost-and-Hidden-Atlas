@@ -16,8 +16,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Staalesen Vanderheyden Preserve (update to the LEADS.md row) | Troy, NY (end of Wynantskill Way off Campbell Avenue, South Troy) | Rensselaer Land Trust page (now Hudson Taconic Lands): 24 acres on the Wynants Kill, open dawn to dusk, once part of the Troy Orphan Asylum (Vanderheyden Hall from 1942); no reservoir mentioned | Any remains of the asylum or anything old to see; the page describes only fields, woods and a marsh |
 | Fire Alarm, Telegraph and Police Signaling Building | Troy, NY (67 State Street) | Wikipedia: 1922, National Register 2003, demolished in 2022 | Nothing to see; listed so nobody adds it |
 | Rensselaer County's first courthouse marker | Troy, NY | Folded into `rensselaer-county-courthouse-troy` | Nothing |
-| Catholic Central High School building | Lansingburgh, Troy, NY (Register 42.7751, -73.6706) | Wikipedia (the Latham school's article): school founded 1923, Troy property put up for sale in 2022, National Register 2024 | What the building is like and its present use |
-| Van Zandt, Jacobs and Company Collar and Cuff Factory; Wilbur–Campbell–Stephens factory; Neemes Foundry; Whalen Bottling Plant | Troy, NY (Register list) | Register listings only | A source opened that says what stands and how it looks |
 
 ## Tips
 - `build_sites.py` refuses `was=` when the old `lm-` pin is over 600 m away, and some `lm-` pins are badly placed (the Oakwood one is 1.3 km off), so a research batch cannot replace them without a change to `src/landmarks.json`.
