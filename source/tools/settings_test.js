@@ -5,7 +5,7 @@ const { chromium, devices } = require('playwright');
 (async()=>{
   const fails=[]; const ok=(name,cond,extra)=>{ console.log((cond?'ok   ':'FAIL ')+name+(extra!==undefined?'  ['+extra+']':'')); if(!cond) fails.push(name); };
   const b=await chromium.launch({proxy:{server:process.env.HTTPS_PROXY||'http://x',bypass:'localhost,127.0.0.1'}});
-  const c=await b.newContext(Object.assign({},devices['Pixel 7'])); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+  const c=await b.newContext(Object.assign({},devices['Pixel 7'])); await c.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({set:{heat:false}})); }catch(e){} });      /* these checks are of the numbered discs, the backup since the heat map became what a first visit shows */ const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   // a trip of two places, put in before the page first loads
   await c.addInitScript(()=>{ if(location.protocol!=='about:'&&!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},trip:['joliet-iron-works','lidar-high-knob-walled-yard']})); });
   await p.goto(process.argv[2]||'http://localhost:8766/index.html'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600);
@@ -129,8 +129,8 @@ const { chromium, devices } = require('playwright');
   const mig=await p2.evaluate(()=>getComputedStyle(document.documentElement).getPropertyValue('--trk').trim()); await c2.close();
   ok('a track colour saved as the old pink comes back as the blue default',mig==='#2563eb',mig);
   // ---- a double tap: three steps in on open map (as many as Settings says), street level on a pin, and at least three steps toward a numbered disc
-  { const c4=await b.newContext(Object.assign({},devices['Pixel 7'])); const p4=await c4.newPage(); p4.on('pageerror',e=>errs.push(e.message));
-    await p4.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1}})); });
+  { const c4=await b.newContext(Object.assign({},devices['Pixel 7'])); await c4.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({set:{heat:false}})); }catch(e){} });      /* these checks are of the numbered discs, the backup since the heat map became what a first visit shows */ const p4=await c4.newPage(); p4.on('pageerror',e=>errs.push(e.message));
+    await p4.addInitScript(()=>{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({home:{id:'alb',by:1},set:{heat:false}})); });
     await p4.goto(process.argv[2]||'http://localhost:8766/index.html'); await p4.waitForFunction(()=>window.__atlasNM); await p4.waitForTimeout(300);
     const dbl=(opt)=>p4.evaluate(async opt=>{ const m=window.__atlasMap; m.setView([42.9,-75.2],opt.z,{animate:false}); await new Promise(r=>setTimeout(r,150));
       const pt=m.latLngToContainerPoint(m.getCenter()); m.fire('dblclick',{latlng:m.getCenter(),containerPoint:pt,layerPoint:m.containerPointToLayerPoint(pt),originalEvent:{shiftKey:!!opt.shift}}); await new Promise(r=>setTimeout(r,900)); return m.getZoom(); },opt);

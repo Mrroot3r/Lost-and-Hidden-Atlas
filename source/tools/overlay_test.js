@@ -14,9 +14,9 @@ const { chromium } = require('playwright');
 (async()=>{
   const fails=[]; const ok=(name,cond,extra)=>{ console.log((cond?'ok   ':'FAIL ')+name+(extra!==undefined?'  ['+extra+']':'')); if(!cond) fails.push(name); };
   const b=await chromium.launch(); const url=process.argv[2]||'http://localhost:8766/index.html';
-  const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+  const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); await c.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({set:{heat:false}})); }catch(e){} });      /* these checks are of the numbered discs, the backup since the heat map became what a first visit shows */ const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
-  await p.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,ui:{base:'streets',view:[42.6526,-73.7562,13],hist:false,lines:{oldrail:true,canal:true,rail:true},leads:true,xl:{vanished:true,mines:true},pockets:true}})); }catch(e){} });
+  await p.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,set:{heat:false},ui:{base:'streets',view:[42.6526,-73.7562,13],hist:false,lines:{oldrail:true,canal:true,rail:true},leads:true,xl:{vanished:true,mines:true},pockets:true}})); }catch(e){} });
   await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(2500);
   const snap=()=>p.evaluate(async()=>{ const m=window.__atlasMap, b=m.getBounds(), D=JSON.parse(document.getElementById('d-sites').textContent), S=D.sites||D;
     const LD=window.__ld||(window.__ld=await fetch('data/leads.json').then(r=>r.json()).catch(()=>({p:[]})));

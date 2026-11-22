@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={heat:false,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={heat:true,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -837,8 +837,8 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     el('div',{class:'field setrow'},el('span',{text:'Track colour'}),sw),
     H('Map'),
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
-    tog('cluster','Group pins that crowd together when zoomed out','A numbered disc stands for the pins under it. Tap it to zoom in to them.'),
-    tog('heat','Zoomed out, show a heat map instead of numbered discs (a trial)','Colour shows where places are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in.'),
+    tog('cluster','Zoomed out, stand in for the pins','The heat map below, or numbered discs, in place of hundreds of pins. Off: every pin at every zoom, which is slow where places are thick.'),
+    tog('heat','Zoomed out, show a heat map','Colour shows where places are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in. Off: numbered discs instead, each standing for the pins under it.'),
     pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
     tog('nativeLeads','Show Native American sites among the leads','Mounds, pueblos, rock art, heiau and other sites mapped on OpenStreetMap, and old sites on reservation land: turquoise dots when Unchecked leads is on, and rows in the Near tab. Off unless you switch it on here. Many are sacred, protected by law or closed: go only where whoever looks after the place invites visitors.'),
@@ -2057,9 +2057,9 @@ function pinIcon(s,far,dx,dy){      /* far: a favourite while the numbered discs
 }
 /* Zoomed out to town level or wider, pins that would sit on top of each other are replaced by one numbered disc.
    A cell of the screen with four or more pins becomes a disc; the selected place always keeps its own pin. */
-const CLUSZ=9, CLUSPX=58, CLUSMIN=4;
+const CLUSZ=9, HEATZ=8, CLUSPX=58, CLUSMIN=4;
 const clusSize=n=>{ const st=n<10?0:n<30?1:n<100?2:n<300?3:4; return [st,[30,36,42,46,52][st]]; };      /* a disc's colour step and width by its count */
-function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>CLUSZ) return null;
+function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>(pref('heat')?HEATZ:CLUSZ)) return null;      /* the heat gives way to pins a zoom step sooner than the discs do (the owner, November 22, 2026) */
   if(pref('heat')) return heatPlan(show);
   const z=map.getZoom(), cells=new Map();
   sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
@@ -2130,7 +2130,7 @@ try{ window.__atlasHeat=()=>heatNow&&heatLayer?{cells:heatNow.cells.size,total:h
    each zoom step moved 800 pins and took a mid-range phone about 80 ms; it took 16 ms with none. A pin that has been made
    is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
    the list, the filters or the chosen place change. */
-const pinPool=new Map(); let clusSig='';
+const pinPool=new Map(); let clusSig='', pinGen=0; const PINFIRST=80, PINLOT=30;
 function syncMarkers(){
   if(!map) return;
   const show=new Set(visible.map(s=>s.id)); if(sel) show.add(sel.id);
@@ -2138,14 +2138,17 @@ function syncMarkers(){
   const all=sites(), want=new Map();
   all.forEach(s=>{ if(!show.has(s.id)||(plan&&!plan.single.has(s.id))) return; const p=pos(s);
     if((sel&&sel.id===s.id)||(p.lat>=S&&p.lat<=N&&p.lon>=W&&p.lon<=E)) want.set(s.id,s); });
-  markers.forEach((m,id)=>{ if(!want.has(id)){ map.removeLayer(m); markers.delete(id); } });
+  /* a pin no longer wanted comes off now if it is in or near the view (a filter, a place folded into a disc), and a lot a frame if it is
+     off beyond the edges, where nobody sees it go: a zoom step in left some 500 of them to take off at once */
+  const vnow=map.getBounds().pad(0.3), going=[];
+  markers.forEach((m,id)=>{ if(want.has(id)) return; if(vnow.contains(m.getLatLng())){ map.removeLayer(m); markers.delete(id); } else going.push(id); });
   if(pinPool.size>all.length){ const ids=new Set(all.map(s=>s.id)); pinPool.forEach((m,id)=>{ if(!ids.has(id)) pinPool.delete(id); }); }      /* a place of your own that was deleted */
   /* While the numbered discs are showing, a favourite still has its own pin, but smaller, and a pin that would sit on a disc is
      drawn on its rim, over it: in the middle it hid the number, and pushed clear of the disc it was not plain where the place
      was (the owner, November 21, 2026). The discs on the screen: */
   const discs=plan&&plan.groups.length?plan.groups.map(c=>{ const n=c.ids.length, q=map.latLngToLayerPoint([c.la/n,c.lo/n]); return {x:q.x,y:q.y,r:clusSize(n)[1]/2}; }):null;
-  want.forEach(s=>{
-    const p=pos(s), far=!!plan&&isFav(s.id)&&!(sel&&sel.id===s.id); let dx=0, dy=0;
+  const put=s=>{
+    const p=pos(s), far=!!plan&&!plan.heat&&isFav(s.id)&&!(sel&&sel.id===s.id); let dx=0, dy=0;      /* smaller beside the discs' numbers; over the heat there is no number to hide, so full size */
     if(discs&&!(sel&&sel.id===s.id)){ const q=map.latLngToLayerPoint([p.lat,p.lon]); for(const g of discs){ const ex=q.x+dx-g.x, ey=q.y+dy-g.y, d=Math.hypot(ex,ey), need=g.r+(far?2:4);      /* its middle goes just outside the rim, so it sits on the disc's edge like a badge, on the side its place is on, clear of the number. Any pin that stands alone, favourite or not */
         if(d<need){ const ux=d<1?0.7071:ex/d, uy=d<1?-0.7071:ey/d; dx+=Math.round(ux*(need-d)); dy+=Math.round(uy*(need-d)); } } }
     const ic=pinIcon(s,far,dx,dy), sig=ic.options.html+(dx||dy?'|'+dx+','+dy:''); let m=pinPool.get(s.id);
@@ -2158,7 +2161,19 @@ function syncMarkers(){
     else { const q=m.getLatLng(); if(q.lat!==p.lat||q.lng!==p.lon) m.setLatLng([p.lat,p.lon]); if(m._sig!==sig){ m.setIcon(ic); m._sig=sig; } }      /* an icon is rebuilt only when it would look different */
     if(!markers.has(s.id)){ m.addTo(map); markers.set(s.id,m); }
     const zo=sel&&sel.id===s.id?1000:isFav(s.id)?600:(dx||dy)?300:(s.cat==='landmark'?-200:0);      /* a pin moved to a disc's rim is drawn over the disc */ if(m._zo!==zo){ m._zo=zo; m.setZIndexOffset(zo); }
-  });
+  };
+  /* New pins go on from the middle of the view outwards, a first lot now and the rest a lot a frame, so the page is never held while
+     hundreds are made. All at once, the step from heat or discs to pins put some 800 pins on the map in one go round Albany
+     (every place within a screen of the view, there so that a drag shows pins) and held a mid-range phone for about a second:
+     the lag the owner felt. A pin already on the map is only brought up to date, which is cheap, so that is done now. A later
+     call drops whatever is still waiting. */
+  const gen=++pinGen, mid=map.getCenter(), kx=Math.cos(mid.lat*Math.PI/180), later=[];
+  want.forEach(s=>{ if((sel&&sel.id===s.id)||markers.has(s.id)) put(s); else { const p=pos(s); later.push([Math.abs(p.lat-mid.lat)+Math.abs(p.lon-mid.lng)*kx,s]); } });
+  if(later.length){ later.sort((a,b)=>a[0]-b[0]); let i=0;
+    const lot=n=>{ const end=Math.min(later.length,i+n); for(;i<end;i++) put(later[i][1]); };
+    const more=()=>{ if(gen!==pinGen) return; lot(PINLOT); if(i<later.length) requestAnimationFrame(more); };
+    lot(PINFIRST); if(i<later.length) requestAnimationFrame(more); }
+  if(going.length){ let j=0; const off=()=>{ if(gen!==pinGen) return; const end=Math.min(going.length,j+PINLOT*2); for(;j<end;j++){ const m=markers.get(going[j]); if(m){ map.removeLayer(m); markers.delete(going[j]); } } if(j<going.length) requestAnimationFrame(off); }; requestAnimationFrame(off); }
   drawHeat(plan&&plan.heat||null);
   /* the grouped pins are made again only when the groups change, not each time the map is nudged */
   const sig=plan?map.getZoom()+'|'+plan.groups.map(c=>c.ids.length+':'+c.la.toFixed(3)+':'+c.lo.toFixed(3)).join():'';
@@ -2198,7 +2213,7 @@ function onMapClick(e){
   if(asking){ setAsking(false); whoPopup({lat:e.latlng.lat,lon:e.latlng.lng}); return; }
   if(pickingHome){ pickingHome=false; stage.classList.remove('adding'); $('#addbar').hidden=true; setSpot(e.latlng.lat,e.latlng.lng); return; }
   if(adding){ placeAt(e.latlng.lat,e.latlng.lng); return; }
-  if(pref('heat')&&pref('cluster')&&map.getZoom()<=CLUSZ) heatTap(e.latlng);
+  if(pref('heat')&&pref('cluster')&&map.getZoom()<=HEATZ) heatTap(e.latlng);
 }
 function scoutLinks(p,town){
   const c=p.lat.toFixed(5)+','+p.lon.toFixed(5);

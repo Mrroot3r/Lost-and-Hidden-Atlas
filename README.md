@@ -1,6 +1,6 @@
 # Lost & Hidden Atlas
 
-A map for finding old buildings, ruins and what is left of them, made for a phone in the field. More than 4,500 places across the United States and Canada, each with what is there now, whose land it is and how to reach it legally.
+A map for finding old buildings, ruins and what is left of them, made for a phone in the field. More than 5,000 places across the United States and Canada, each with what is there now, whose land it is and how to reach it legally.
 
 **Open it:** https://mrroot3r.github.io/Lost-and-Hidden-Atlas/
 
@@ -12,7 +12,7 @@ It is free and there is no account. Notes, favourites, trips and field logs stay
 
 <table>
 <tr>
-<td width="33%" valign="top"><a href="docs/features/01-map.jpg"><img src="docs/features/01-map.jpg" width="250" alt="The whole map"></a><br><b>The whole map</b><br>More than 4,500 old places across the United States and Canada. A numbered disc stands for the pins under it: tap it to zoom in.</td>
+<td width="33%" valign="top"><a href="docs/features/01-map.jpg"><img src="docs/features/01-map.jpg" width="250" alt="The whole map"></a><br><b>The whole map</b><br>More than 5,000 old places across the United States and Canada. Zoomed out, colour shows where they are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in to the pins.</td>
 <td width="33%" valign="top"><a href="docs/features/02-place.jpg"><img src="docs/features/02-place.jpg" width="250" alt="A page for every place"></a><br><b>A page for every place</b><br>What was there, what is left to see, a photo, and the old survey map laid over the spot.</td>
 <td width="33%" valign="top"><a href="docs/features/03-access.jpg"><img src="docs/features/03-access.jpg" width="250" alt="How to get there, legally"></a><br><b>How to get there, legally</b><br>Whose land it is, how far the walk is, directions, and a way to look up the owner. Nothing about getting past a fence.</td>
 </tr>
@@ -37,7 +37,7 @@ Tap a picture to see it full size. Photographs shown in the screenshots: Kinzua 
 
 ## How to use it
 
-1. **Open the link** above, on a phone or a computer. Tap a numbered disc to zoom in and a pin to open its page.
+1. **Open the link** above, on a phone or a computer. Zoomed out, colour shows where the places are thick; double-tap or pinch to zoom in, and tap a pin to open its page.
 2. **Say where you start** ("Use my location" or "Choose a place"). Drive times and "nearest first" count from there.
 3. **Narrow it down** with the search box and Filters on the Places tab.
 4. **Change the map** with the bar under it: streets, bare-tree aerial, LiDAR, satellite, old topo maps. "More" holds the rest.
