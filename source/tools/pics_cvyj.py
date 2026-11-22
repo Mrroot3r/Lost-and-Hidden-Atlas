@@ -1,0 +1,7 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'atlanta-biltmore-hotel':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f2/View_of_the_Biltmore_from_the_Palomar%2C_Midtown_Atlanta_GA.jpg/960px-View_of_the_Biltmore_from_the_Palomar%2C_Midtown_Atlanta_GA.jpg', 900, 675, 'John Phelan', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:View_of_the_Biltmore_from_the_Palomar,_Midtown_Atlanta_GA.jpg', '2026-11-22', 'pin+name'),
+ 'atlanta-federal-penitentiary':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Entrance_to_the_federal_penitentiary%2C_Atlanta_LCCN2002698072.jpg/960px-Entrance_to_the_federal_penitentiary%2C_Atlanta_LCCN2002698072.jpg', 900, 611, 'George Grantham Bain Collection', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Entrance_to_the_federal_penitentiary,_Atlanta_LCCN2002698072.jpg', '2026-11-22', 'name'),
+ 'oglethorpe-university-historic-district':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Lupton_Hall_at_Oglethorpe_University%2C_September_2015.jpg/960px-Lupton_Hall_at_Oglethorpe_University%2C_September_2015.jpg', 900, 600, 'Marc Merlin', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Lupton_Hall_at_Oglethorpe_University,_September_2015.jpg', '2026-11-22', 'pin'),
+}
