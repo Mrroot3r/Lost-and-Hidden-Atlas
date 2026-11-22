@@ -672,7 +672,7 @@ function initMap(){
   setTimeout(tcScan,4000);
   window.addEventListener('offline',()=>banner('No signal. Leaf-off, LiDAR and Topo still show for areas you saved or looked at recently.',true,9000));
   window.addEventListener('online',()=>{ banner('Back online.',false,2500); linesRetry(); drawLines(); });
-  pinchPins(); map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:3,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); if(sv.b) map.fitBounds(sv.b,{animate:false}); else map.setView(sv.c,sv.z); }
+  map=L.map('map',{zoomControl:false,maxZoom:20,minZoom:3,zoomSnap:1,worldCopyJump:false,maxBounds:MAXB,maxBoundsViscosity:0.6}); if(U.last&&U.last.ll) nearHome(U.last.ll,false); { const sv=startView(); if(sv.b) map.fitBounds(sv.b,{animate:false}); else map.setView(sv.c,sv.z); }
   L.control.zoom({position:'bottomright'}).addTo(map);
   drawScale();
   map.attributionControl.setPrefix(false);
@@ -681,7 +681,7 @@ function initMap(){
   map.on('moveend',()=>{ if(U.ui.land) drawLand(); if(view==='near'&&NM.org==='map') nmDraw(); const c=map.getCenter(); U.ui.view=[+c.lat.toFixed(5),+c.lng.toFixed(5),map.getZoom()]; save(); });
   if(!LD[U.ui.base]) U.ui.base='streets';
   setBase(U.ui.base,true); if(cmp.on){ cmp.lap=0; setCmp(); }      /* a comparison left on is on again, the way it was */
-  map.on('moveend',()=>pinchSettle()); map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
+  map.on('zoomend',onZoom); onZoom(); map.on('moveend',syncMarkers);        /* a zoom ends with a moveend too */
   map.on('move zoom zoomend moveend resize viewreset',clipCmp);
   map.on('click',onMapClick); drawSpots();
   /* A double tap. Leaflet's own goes in one step, which is slow work with one thumb, most of all with the map full screen:
@@ -2141,28 +2141,6 @@ try{ window.__atlasHeat=()=>heatNow&&heatLayer?{cells:heatNow.cells.size,total:h
    is kept (pinPool) and put back when its ground comes into view again. Called when the map stops moving, and whenever
    the list, the filters or the chosen place change. */
 const pinPool=new Map(); let clusSig='', pinGen=0; const PINFIRST=80, PINLOT=30;
-/* Two fingers on the map. A one-finger drag slides the whole map as one sheet, which costs nothing. A pinch does not: at every
-   frame Leaflet works out where each pin on the map goes and writes its place and its stacking order again, the pins off the
-   screen included, and the browser then redraws with every one of them changed. Round Albany that is 800 pins at zoom 10 and
-   1,300 at zoom 9, of which under half are in view, and a pinch frame took 85 and 160 ms on a mid-range phone against 17 ms
-   with no pins: the crawl the owner felt only while two fingers were down (November 22, 2026). So during a pinch a pin in or
-   near the view is moved and nothing else about it is touched, and a pin beyond that is left where it was, off the screen.
-   Leaflet puts every pin right when the fingers lift (its closing step moves them all), and pinchSettle() does the same for
-   whatever was passed over, in case that step did not run. That halves the time (45 and 90 ms); what is left is the browser's
-   own bookkeeping for each pin in view, each being its own piece of the page. */
-const pinchLate=new Set();
-function pinchPins(){
-  const P=L.Marker.prototype, whole=P.update; if(P._atlasPinch) return; P._atlasPinch=true;
-  P.update=function(e){
-    if(!(e&&e.pinch&&this._map&&this._icon)) return whole.call(this);
-    const m=this._map, o=m._getMapPanePos(), z=m.getSize(), q=m.latLngToLayerPoint(this._latlng), x=q.x+o.x, y=q.y+o.y, mx=Math.max(60,z.x*0.15), my=Math.max(60,z.y*0.15);
-    pinchLate.add(this);
-    if(x<-mx||x>z.x+mx||y<-my||y>z.y+my) return this;
-    q._round(); L.DomUtil.setPosition(this._icon,q); if(this._shadow) L.DomUtil.setPosition(this._shadow,q);
-    return this; };
-  pinchSettle=()=>{ if(!pinchLate.size) return; pinchLate.forEach(k=>{ if(k._map) whole.call(k); }); pinchLate.clear(); };
-}
-let pinchSettle=()=>{};
 function syncMarkers(){
   if(!map) return;
   const show=new Set(visible.map(s=>s.id)); if(sel) show.add(sel.id);
