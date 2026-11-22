@@ -96,7 +96,21 @@ applyTheme();
 if(DARKQ&&DARKQ.addEventListener) DARKQ.addEventListener('change',applyTheme);      /* the phone went to night mode, or back */
 const save=debounce(()=>{ try{ localStorage.setItem(LS,JSON.stringify(U)); }catch(e){ storeOK=false; } },250);
 
-const sites=()=>BASE.concat(U.custom);
+/* No two pins for one place (the owner, November 21, 2026). A reader adds a place of their own, sends it in, and in time the
+   public Atlas has it: their own copy would then sit on top of the public pin. So a place of the reader's own steps aside,
+   kept but not shown, when a public place stands on the same spot: within 80 m of one marked "sent in by a reader", or within
+   40 m of any public place once the reader has pressed Send for it (U.sent). "Show my copy" on the public place's page
+   (U.keep) brings it back. The answer is worked out once and kept until the reader's places change. */
+let twinKey=null, twinMap=new Map();
+function twins(){ const C=U.custom||[], key=C.map(x=>x.id+':'+x.lat+','+x.lon).join('|')+'#'+Object.keys(U.sent||{}).join()+'#'+Object.keys(U.keep||{}).join();
+  if(key===twinKey) return twinMap; twinKey=key; twinMap=new Map();
+  C.forEach(m=>{ if((U.keep||{})[m.id]) return; const sent=!!(U.sent||{})[m.id], k=Math.cos(m.lat*Math.PI/180); let best=null, bd=1e9;
+    for(const b of BASE){ const dy=(b.lat-m.lat)*111320; if(dy>80||dy<-80) continue; const dx=(b.lon-m.lon)*111320*k; if(dx>80||dx<-80) continue; const d=Math.hypot(dx,dy);
+      if(d<bd&&((b.tip&&d<=80)||(sent&&d<=40))){ bd=d; best=b; } }
+    if(best) twinMap.set(m.id,best.id); });
+  return twinMap; }
+const twinsOf=id=>{ const out=[]; twins().forEach((b,m)=>{ if(b===id) out.push(m); }); return out.map(m=>(U.custom||[]).find(x=>x.id===m)).filter(Boolean); };
+const sites=()=>{ const T=twins(); return T.size?BASE.concat(U.custom.filter(x=>!T.has(x.id))):BASE.concat(U.custom); };
 /* Ids that gave way to a fuller entry for the same place: {old id: new id} (was= in a place list). What a reader had saved
    against the old id (status, notes, a moved pin, visit reports, a trip stop, a field-log note's place) moves to the new one. */
 const ALIAS=D.alias||{};
@@ -668,7 +682,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,nmGoal:nmGoal,setPref:setPref,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,xlNeed:xlNeed,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
+  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,custom:()=>U.custom,addMine:o=>{ U.custom.push(o); save(); refresh(); },nmGoal:nmGoal,setPref:setPref,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,xlNeed:xlNeed,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -2135,12 +2149,17 @@ function scoutLinks(p,town){
 function onContext(e){
   const p={lat:e.latlng.lat,lon:e.latlng.lng}; const box=el('div',{class:'ctx'});
   const cb=el('button',{class:'btn sm',type:'button'},ll(p)); cb.addEventListener('click',()=>copy(ll(p),cb)); box.append(cb);
-  scoutLinks(p).slice(0,5).forEach(l=>box.append(ext(l[1],l[0],'btn sm')));
-  if(!schematic) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(p)},'Whose land is it?'));
+  /* Short enough to fit the map on a phone: adding and sending first, the links to other maps folded away. With all of them
+     in a column the box was taller than the map and its lower half could not be reached (the owner, November 21, 2026). */
   box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); quickAdd({lat:+p.lat.toFixed(6),lon:+p.lon.toFixed(6)}); }},'+ Add to my places'));
   box.append(spotLink('',p.lat,p.lon,'')); box.lastChild.title='Opens a short form with these coordinates filled in. You say what is there; it is researched later.'; box.append(WHICH());
-  box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); pickingHome=true; onMapClick(e); }},'Measure drive times from here'));
-  L.popup({maxWidth:260}).setLatLng(e.latlng).setContent(box).openOn(map);
+  if(!schematic) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(p)},'Whose land is it?'));
+  const more=el('details',{class:'ctxmore'},el('summary',{text:'See this spot in other maps'}));
+  scoutLinks(p).slice(0,5).forEach(l=>more.append(ext(l[1],l[0],'btn sm')));
+  more.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); pickingHome=true; onMapClick(e); }},'Measure drive times from here'));
+  box.append(more);
+  const pop=L.popup({maxWidth:260,maxHeight:Math.max(150,map.getSize().y-70)}).setLatLng(e.latlng).setContent(box).openOn(map);
+  more.addEventListener('toggle',()=>pop.update());
 }
 
 /* ---------- views ---------- */
@@ -2256,6 +2275,22 @@ function hoursDd(s){ if(!s.hrs&&!takesVisitors(s)) return null;
   dd.append(el('div',null,when?el('small',{text:'As read '+when+(s.hru?', ':'.')}):null,when&&s.hru?ext(s.hru,'on this page','hsrc'):null,when?' ':'',ext('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([s.name,s.town,STATE[REG_STATE[s.reg]]].filter(Boolean).join(', ')),'Today\u2019s hours in Google Maps')));
   return dd; }
 const tipDay=s=>{ const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(s.tip||''); return m?' on '+new Date(+m[1],+m[2]-1,+m[3]).toLocaleDateString(undefined,{month:'long',day:'numeric',year:'numeric'}):''; };
+/* A place of the reader's own: the button that sends it to the public Atlas is at the top of its page, not far down under
+   My notes (the owner, November 21, 2026). Pressing a Send link is remembered (U.sent), so the page can say so and so that
+   the copy steps aside once the public Atlas has the place (twins()). */
+function sendRow(s){ const day=(U.sent||{})[s.id], wrap=el('div',{class:'sendrow'});
+  const b=el('button',{class:'btn sm'+(day?'':' pri'),type:'button',id:'lead-send','aria-expanded':'false'},day?'Send to the public Atlas again':'Send to the public Atlas');
+  b.addEventListener('click',()=>{ const old=wrap.querySelector('.sharebox'); if(old){ old.remove(); b.setAttribute('aria-expanded','false'); return; }
+    const box=shareBox('lead',{place:s.name,where:[s.town,s.lat.toFixed(5)+', '+s.lon.toFixed(5)].filter(Boolean).join(' \u00b7 '),text:[s.story,s.years?'Years: '+s.years:'',(STS[s.st]||'')+', '+((CAT[s.cat]||[''])[0])].filter(Boolean).join('. '),source:(s.links&&s.links[0]&&s.links[0][1])||'',access:(ACC[s.acc]||'')});
+    box.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ if(!U.sent) U.sent={}; U.sent[s.id]=new Date().toISOString().slice(0,10); save(); }));
+    wrap.append(box); b.setAttribute('aria-expanded','true'); });
+  wrap.append(b); if(day) wrap.append(el('small',{class:'snote',style:'display:block;margin-top:4px',text:'Sent on '+day+'. It shows on the public Atlas once it has been researched; this copy then steps aside.'}));
+  return wrap; }
+function twinNote(s){ if(s.mine) return null; const T=twinsOf(s.id); if(!T.length) return null; const m=T[0];
+  return el('div',{id:'twin-note',class:'sendrow'},el('small',{class:'snote',style:'display:block',text:'Your own place "'+m.name+'" is on this spot, so its pin is hidden: this is the public Atlas\u2019s entry for it.'}),
+    el('div',{class:'row',style:'margin-top:6px'},
+      el('button',{class:'btn sm',type:'button',id:'twin-show',onclick:()=>{ if(!U.keep) U.keep={}; U.keep[m.id]=1; save(); refresh(); renderDetail(s); }},'Show my copy'),
+      el('button',{class:'btn sm',type:'button',id:'twin-del',onclick:()=>{ U.custom=U.custom.filter(x=>x.id!==m.id); if(Array.isArray(U.fav)) U.fav=U.fav.filter(i=>i!==m.id); U.trip=U.trip.filter(i=>i!==m.id); save(); refresh(); renderDetail(s); }},'Delete my copy'))); }
 function renderDetail(s){
   const v=$('#v-detail'); v.textContent=''; v.scrollTop=0;
   const p=pos(s), d=dt(s), H=homeObj(), dst=dest(s), cat=CAT[s.cat]||CAT.landmark, pr=PREC[s.prec]||PREC.site;
@@ -2282,6 +2317,7 @@ function renderDetail(s){
     el('div',{class:'dintro pad'},
     el('p',{class:'sub2',text:[s.name2,s.town,s.years,s.bk==='y'?'Red brick':s.bk==='s'?'Some red brick':''].filter(Boolean).join(' · ')}),
     tags,
+    s.mine?sendRow(s):null, twinNote(s),
     photoBox(s),
     s.mine?null:(()=>{ const a=morePhotos(s); a.id='d-morephotos'; a.title='Search the web for pictures of this place by its name. Opens outside the Atlas.'; return el('p',{class:'dmore'},a); })()));
   nameFit();
@@ -2358,8 +2394,7 @@ function renderDetail(s){
       U.moved[s.id]?el('button',{class:'btn sm',type:'button',onclick:()=>{ delete U.moved[s.id]; save(); refresh(); select(s,true); }},'Put pin back'):null,
       s.mine?el('button',{class:'btn sm',type:'button',onclick:()=>openForm(s)},'Edit'):null,
       s.mine?delBtn(s):null,
-      s.mine?el('button',{class:'btn sm',type:'button',id:'lead-send','aria-expanded':'false',onclick:e=>{ const row=e.target.closest('.row'), old=row.parentNode.querySelector('.sharebox'); if(old){ old.remove(); e.target.setAttribute('aria-expanded','false'); return; }
-        row.after(shareBox('lead',{place:s.name,where:[s.town,s.lat.toFixed(5)+', '+s.lon.toFixed(5)].filter(Boolean).join(' · '),text:[s.story,s.years?'Years: '+s.years:'',(STS[s.st]||'')+', '+((CAT[s.cat]||[''])[0])].filter(Boolean).join('. '),source:(s.links&&s.links[0]&&s.links[0][1])||'',access:(ACC[s.acc]||'')})); e.target.setAttribute('aria-expanded','true'); }},'Suggest it for the public Atlas'):null,sv),
+      sv),
     (()=>{ const fl=s.from&&logById(s.from.log), fn=fl&&fl.notes.find(x=>x.t===s.from.t); if(!fn) return null; const ph=photosOf(fl,fn);   /* a place made from a field-log note keeps its photos and its walk */
       return el('div',{style:'margin-top:10px'},el('p',{class:'snote',text:'From your field log "'+fl.name+'", note "'+fn.x+'".'}),ph.length?mediaStrip(fl,ph):null,
         el('div',{class:'row',style:'margin-top:6px'},el('button',{class:'btn sm',type:'button',onclick:()=>{ showLog(fl,true); banner('Showing the walk that found it.',false,4000); }},'Show the walk on the map'))); })(),
@@ -2730,7 +2765,7 @@ function renderGuide(){
       el('li',{text:'On site, open the Log tab and start a field log. It draws where you walk and lets you drop timed notes, then exports the track (GPX) and a note list with times to match against your footage.'}),
       el('li',{text:'Found the real spot? Open My notes, choose "Move the pin," and drag it. Right-click (or long-press) anywhere on the map for coordinates and links.'}),
       el('li',{text:'Been to a place? Open it and tap "I was here": say what you found, how you got in, and mark the true spot from where you stand. Then tap "Send to the public Atlas" on the report and the map gets corrected for everyone.'}),
-      el('li',{text:'Know a place that is not on the map? Tap "+ Add", drop a pin, write a line about it, then tap "Suggest it for the public Atlas" on its page. You do not need to research it: a name and a spot are enough, and it is looked into later. A place that began this way carries the badge "Sent in by a reader", and Filters can show only those. No name is ever shown.'})),
+      el('li',{text:'Know a place that is not on the map? Tap "+ Add", put the cross on it, tap what it is, then open its pin and tap "Send to the public Atlas". You do not need to research it: the spot is enough, and it is looked into later. A place that began this way carries the badge "Sent in by a reader", and Filters can show only those. No name is ever shown.'})),
     el('div',{id:'share-blank'},el('p',{class:'snote',style:'display:block;margin-top:8px',text:'Or send a place without a pin:'}),shareBox('lead',{place:'',where:'',text:'',source:'',access:''})),
     cats,shapes,el('div',{class:'legend',style:'margin-top:8px'},Object.keys(LK).map(k=>el('span',null,el('span',{class:'sw'+(LK[k][2]?' dash':''),style:'--c:'+LK[k][1]}),LK[k][0])))]));
   v.append(sec('Near me: what is close, and a buzz when you pass it',false,[
@@ -2795,7 +2830,7 @@ function renderGuide(){
     P('Every New York city, town and village must appoint a historian. They know where the ruins are and usually who owns them, so ask "what was here?" rather than "how do I get in?"'),
     fo,
     el('p',null,el('b',{text:'Sharing locations: '}),'name public-land sites openly, since that sends viewers somewhere legal. For fragile private sites, name the region and not the route, or hold the video until the owner is on side.')]));
-  v.append(sec('Add places with your own Claude',false,[P('The Atlas grows by research sessions: a Claude session reads the sources, looks at every pin on the aerial and sends its places in. If you have Claude with Claude Code, yours can do the same for any town or county you choose, on your own account. Nothing of it reaches the map until the owner of the Atlas has looked at it. To tell us about a single place, "+ Add" and then "Suggest it for the public Atlas" is quicker.'),
+  v.append(sec('Add places with your own Claude',false,[P('The Atlas grows by research sessions: a Claude session reads the sources, looks at every pin on the aerial and sends its places in. If you have Claude with Claude Code, yours can do the same for any town or county you choose, on your own account. Nothing of it reaches the map until the owner of the Atlas has looked at it. To tell us about a single place, "+ Add" and then "Send to the public Atlas" on its page is quicker.'),
     el('div',{class:'row'},ext('https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/blob/main/CONTRIBUTING.md','How to add places with your own Claude','btn sm'))]));
   v.append(sec('Settings, backups and storage',false,[P('Backups, restoring, offline map storage and the app\'s own settings are under the gear: tap More under the map, then the gear next to Done.'),
     el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>openSettings()},'Open Settings')),P('Settings holds: colours, units and clock; how the map opens and your start place; Near me (how far to list, when to buzz); the field log; the episode kit; trimming a shared walk; backups; where the app gets its places; offline storage.'),
