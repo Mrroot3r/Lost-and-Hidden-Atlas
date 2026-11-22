@@ -14,7 +14,6 @@ Second pass over Delaware, taken with `choose.py --thinnest` (16 places, all in 
 | Fort Saulsbury batteries and the Big Stone Beach fire-control tower | Near Slaughter Beach, DE (Wikipedia 38.93417, -75.33056) | Wikipedia: 1917–1924 batteries of two 12-inch guns each, sold in 1948, privately owned with no public access; the batteries are well preserved; the Big Stone Beach tower remains | Whether anything can be seen from a public road |
 | Fourteen Foot Bank Light | Delaware Bay off Bowers Beach, DE (39.0482, -75.1836) | Wikipedia: 1885–86, the first lighthouse built on a pneumatic caisson; 11 miles out, not visible from land | A boat tour that passes it; an entry would be acc='boat' |
 | Chipman's Mill site | Laurel, DE (38.56167, -75.54) | Wikipedia: grist mill of 1884 burned by arson in 1986; the millrace survives; the pond is fished from a boat ramp | Who owns the race and whether it can be seen; could join the Old Christ Church entry |
-| Belmont Hall | Smyrna, DE (39.294501, -75.595902) | State list of historic sites: Georgian house of 1773, owned by the state, open for tours by appointment and events | A source for the house's history and what survives inside |
 | Mispillion Lighthouse (rebuilt) | Shipcarpenter Square, Lewes, DE | Wikipedia: the 1873 lighthouse burned and was rebuilt in Lewes in 2004 as part of a private house; the skeleton tower at the river was demolished in 2008 | Whether it can be seen from a public street; private house |
 
 ## Tips
