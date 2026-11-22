@@ -322,10 +322,10 @@ const { chromium } = require('playwright');
     ok('heat: a tap where it is hot says about how many places are there, and how to go closer',/\d/.test(ban)&&/places/.test(ban)&&/double/i.test(ban),ban.slice(0,90));
     await p.evaluate(()=>{ document.querySelector('#banner').hidden=true; window.__atlasMap.fire('click',{latlng:L.latLng(30,-45)}); }); await p.waitForTimeout(300);
     ban=await p.evaluate(()=>{ const x=document.querySelector('#banner'); return x&&!x.hidden?x.textContent:''; }); ok('heat: a tap on empty sea says nothing',ban==='',ban.slice(0,60));
-    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],8,{animate:false})); await p.waitForTimeout(800); const b8=await st();
-    ok('heat: at zoom 8 it is still the heat, drawn again for the new view',b8.img===1&&b8.clus===0&&b8.h.cells>0&&b8.pins<=5,JSON.stringify({img:b8.img,pins:b8.pins,cells:b8.h&&b8.h.cells}));
-    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],9,{animate:false})); await p.waitForTimeout(1800); const b9=await st();
-    ok('heat: at zoom 9 the pins are there and the heat is gone, a step earlier than after the discs',b9.img===0&&b9.clus===0&&b9.pins>40,JSON.stringify({img:b9.img,clus:b9.clus,pins:b9.pins}));
+    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],9,{animate:false})); await p.waitForTimeout(800); const b8=await st();
+    ok('heat: at zoom 9 it is still the heat, drawn again for the new view',b8.img===1&&b8.clus===0&&b8.h.cells>0&&b8.pins<=5,JSON.stringify({img:b8.img,pins:b8.pins,cells:b8.h&&b8.h.cells}));
+    await p.evaluate(()=>window.__atlasMap.setView([42.5,-74.5],10,{animate:false})); await p.waitForTimeout(1800); const b9=await st();
+    ok('heat: at zoom 10 the pins are there and the heat is gone, the same step as after the discs',b9.img===0&&b9.clus===0&&b9.pins>20,JSON.stringify({img:b9.img,clus:b9.clus,pins:b9.pins}));
     // a favourite keeps a pin at every zoom, and with no number to hide it is full size
     await p.evaluate(()=>{ location.hash='#harmony-mills-cohoes'; }); await p.waitForTimeout(900); await p.evaluate(()=>{ const x=[...document.querySelectorAll('#v-detail button')].find(e=>/favourite/i.test(e.getAttribute('aria-label')||e.title||'')||e.textContent.trim()==='♡'); if(x) x.click(); }); await p.waitForTimeout(300);
     await p.evaluate(()=>{ const x=[...document.querySelectorAll('#v-detail button')].find(e=>/Back/.test(e.textContent)); if(x) x.click(); }); await p.waitForTimeout(300);
