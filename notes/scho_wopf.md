@@ -18,8 +18,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Chenango Canal stone arch near Greene | Route 12 east of Williams Road, Greene, NY (marker 42.37722, -75.65422) | HMdb 94138: original stone arch carrying the canal over a creek about 150 yards east of the marker | Whether it can be seen from the road; owner |
 | Chenango Canal lock and feeder pond south of Norwich | Route 12, Norwich (town), NY (marker 42.46156, -75.56537) | HMdb 92595: remains of a lock and feeder pond east of the road | The lock on the aerial or LiDAR; owner |
 | N.Y.O.&W. depot, New Berlin (1869) | Genesee Street (Route 80), New Berlin, NY (marker 42.62467, -75.32857) | HMdb 230546: board-and-batten depot, the largest the Oswego Midland built | A source that it still stands, and its use |
-| One-room schoolhouse, Sherburne | School Street, Sherburne, NY (marker 42.68889, -75.50041) | HMdb 93162: District 12 and 14 school, 1890–1947, given in memory of the Kehoes in 1991 | Owner and whether it can be visited |
-| Columbus Community Church (1844) and Smithville Valley Grange (1842) | Columbus (42.68361, -75.37333) and Smithville Flats (42.39917, -75.80917), NY | Wikipedia articles read | Pin check, access; left out for time |
 
 ## Tips
 - chenangohistorical.org (the county historical society, including every `/town/<name>/` page) answers HTTP 403 to `page.py`; chenangocounty.org/historic-museums.php has the museum hours for the whole county in plain text.
