@@ -197,6 +197,17 @@ if G('gather'):
     ok('a place Commons has nothing for is recorded as none by the tool, under today\'s search, so nobody looks at an empty sheet and it is not asked again',n0==0 and R3.get('empty-place',('x',))[0]=='' and pf.asked_again(R3['empty-place']) is False and pf.row_problem(R3['empty-place'])=='',str(R3)[:160])
     ok('but only when a file to record in is given: a bare look records nothing',n1==0 and 'just-looking' not in R3)
 else: ok('a place Commons has nothing for is recorded as none by the tool',False)
+if G('gather'):
+    asked4=[]
+    def canned4(params,tries=8):
+        asked4.append(params)
+        if params.get('generator')=='search': return {'query':{'pages':[pg('File:Lynde Point Light, Old Saybrook %d.jpg'%i) for i in range(3)]}}
+        return {'query':{'pages':[]}}
+    real=pf._get; pf._get=canned4
+    try: C4=pf.gather(LYN)
+    finally: pf._get=real
+    ok('Commons allows about ten questions a minute, so none is wasted: once three photographs name the place no further name question is asked and no category opened',len(C4)==3 and sum(1 for a in asked4 if a.get('generator')=='search')==1 and not any(a.get('generator')=='categorymembers' for a in asked4),[a.get('generator') for a in asked4])
+    ok('and the questions are spaced to stay under that allowance',6<=getattr(pf,'PACE',0)<=8,getattr(pf,'PACE',None))
 rp=G('row_problem',lambda v:'missing')
 ok('a chosen row may say how the picture was found, and a "none" under which search',rp(tuple(row)+('loose',))=='' and rp(tuple(row))=='' and rp(('','2026-11-22','nothing on Commons near the pin',2))=='' and rp(('','2026-11-22','only a street sign'))=='',[rp(tuple(row)+('loose',)),rp(('','2026-11-22','nothing on Commons near the pin',2))])
 ok('a row with a picture from elsewhere, or no credit, is refused',rp(('https://example.org/a.jpg',900,600,'Pat','CC BY 4.0','https://commons.wikimedia.org/wiki/File:A.jpg','2026-11-22'))!='' and rp((row[0],900,600,'','CC BY 4.0',row[5],'2026-11-22'))!='' and rp(tuple(row)+('made up',))!='')

@@ -268,8 +268,11 @@ def _waiting(S):
 def refused(j):
     """Commons answered, but with an error in place of results. That is not the same as finding nothing"""
     return isinstance(j,dict) and 'error' in j
-PACE=2.5; _last=[0.0]      # seconds between questions to Commons. It allows a client a few dozen a minute, and every Atlas session
-                           # asking at the same hour shares that allowance: 18 questions in a row got 8 answers (November 21, 2026)
+PACE=6.5; _last=[0.0]      # seconds between questions to Commons. Its allowance for a tool like this one is about ten questions a minute
+                           # after a first burst (its own page says 10 for a client known only by its address), and every Atlas session
+                           # asking in the same hour shares it. At 2.5 s every fourth question was refused with a 45-second wait, which made
+                           # a place cost half a minute or more and the first unattended batch reach 20 places in 40 minutes; spaced
+                           # under the allowance, nothing is refused and a place costs about 20 seconds (November 22, 2026)
 def _get(params,tries=8):
     import requests
     for k in range(tries):
@@ -348,7 +351,7 @@ def gather(s):
         elif c['n'] or words_only(c['title']+' '+c['desc']+' '+c['cats'],s,1): add(c,'far')
     cats=[]
     for q in queries(s):
-        if sum(1 for c in C.values() if c['how'] in('pin+name','name'))>=8: break          # plenty that name it already: ask Commons no more
+        if sum(1 for c in C.values() if c['how'] in('pin+name','name'))>=3: break          # three that name it already: ask Commons no more
         for pg in _pages(dict(PROPS,action='query',generator='search',gsrnamespace='6|14',gsrlimit='30',gsrsearch=q+NOBOOKS)):
             if str(pg.get('title') or '').startswith('Category:'):
                 t=pg['title'][9:]
@@ -363,7 +366,7 @@ def gather(s):
                 c['off']=True; add(c,'loose'); continue
             add(c,('pin+name' if c['n']==2 else 'pin') if c['m'] is not None and c['m']<=reach else 'name' if c['n']==2 else 'loose')
     for t in cats[:2]:
-        if len(C)>=16: break
+        if len(C)>=16 or sum(1 for c in C.values() if c['how'] in('pin+name','name','category'))>=3: break
         for pg in _pages(dict(PROPS,action='query',generator='categorymembers',gcmtitle=t,gcmtype='file',gcmlimit='30')):
             c=_cand(pg,s)
             if not c or (c['m'] is not None and c['m']>1500): continue
