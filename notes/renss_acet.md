@@ -14,7 +14,6 @@ Places you read about and could not finish. One row each.
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Sampson Station, Grafton Lakes State Park | Grafton, NY (OpenStreetMap ruin lead 42.79453, -73.44664) | Only the OpenStreetMap name; the park's master-plan PDFs on parks.ny.gov answer 404 | What it was and what is left |
-| Arlington Hotel (Elkhorn) | West Sand Lake, NY (3532 NY 43, 42.64573, -73.59460) | Pomeroy marker 2024 (HMdb 284354): stop 22 on the Troy & New England trolley | Whether the building stands; the marker is in the past tense |
 | Craver Farmstead | Craver Road, East Greenbush, NY (Wikipedia 42.62306, -73.64361) | Wikipedia: Federal farmhouse of before 1790 and barn, NRHP 1996; the article reads like a family history | An independent source and whether the house shows from the road |
 
 ## Tips

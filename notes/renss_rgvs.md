@@ -19,8 +19,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Ball Seminary | Classic Street, Hoosick Falls, NY (HMdb 124805) | State marker: built 1842, given to the town in 1863 for a free union school | Whether the building stands |
 | Gilead Lutheran Church | Center Brunswick, NY (marker HMdb 97561 on NY 7 at Mickelhill Road) | State marker: congregation organized about 1746, moved 2.5 miles south to its present site in 1817 | The present church's position, date and page |
 | Hoag's Tavern | Hoags Corners, Nassau, NY (42.5564, -73.5112) | Marker seen in a 2010 Commons photo: built about 1820, meeting place of the Anti-Rent War | Which building, whether it stands |
-| Smith Boughton (Big Thunder) house | 2093 NY 43, Averill Park, NY (42.59562, -73.50950) | HMdb 315226: Boughton lived here 1838–1888 | Whether his house is the one standing |
-| Van Alen Home | 1745 Washington Avenue, Defreestville, NY (HMdb 145274) | 1932 state marker: 400-acre tract bought 1778 by Congressman John Evert Van Alen | Whether the house stands |
 | Hoosick Falls Louis Miller Museum hours | 166 Main Street | The society's site gives no hours; a 2014 town item on second-Saturday openings (townofhoosick.org/news2014/013.php) was not read | Current hours |
 
 ## Tips
