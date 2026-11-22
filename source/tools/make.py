@@ -83,6 +83,18 @@ WEB=R+'dist/web/'
 for d in ('data','topo'):
     shutil.rmtree(WEB+d,ignore_errors=True); os.makedirs(WEB+d)
 for i in topo: shutil.copyfile(R+f'build/topo/{i}.webp',WEB+f'topo/{i}.webp')
+# Drive times leave the hosted page (November 22, 2026). Each place carried its routed time and distance from every start city in
+# reach, about 29 of them: a fifth of the page, 0.64 MB of the 3.3 MB a first visit downloads, and wanted only once a reader has
+# chosen a start city. They go out as one file per start city, data/dt/<city>-<stamp>.json = {place id: [minutes, miles]}, and the
+# page lists the stamps (dtx). app.js fetches the chosen city's file (dtLoad) and shows estimates until it has it. The single-file
+# copies written above keep the times inside: they cannot fetch.
+os.makedirs(WEB+'data/dt'); _dth={}
+for s in S:
+    for h,v in (s.pop('dt',None) or {}).items(): _dth.setdefault(h,{})[s['id']]=v
+data['dtx']={}
+for h,t in sorted(_dth.items()):
+    txt=json.dumps(t,separators=(',',':'),sort_keys=True); x=hashlib.md5(txt.encode()).hexdigest()[:8]
+    open(WEB+f'data/dt/{h}-{x}.json','w',encoding='utf-8').write(txt); data['dtx'][h]=x
 open(WEB+'data/lines.json','w').write(open(R+'build/lines.json').read())      # every line in one file: what the Android app reads, and what the next build starts from
 os.makedirs(WEB+'data/lines')
 for k,txt in LSTATE.items(): open(WEB+f'data/lines/{k}.json','w',encoding='utf-8').write(txt)

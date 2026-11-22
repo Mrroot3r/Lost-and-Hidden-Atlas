@@ -26,7 +26,7 @@ A.call=function(method,options){ return native?cap.nativePromise('FieldLog',meth
    state, each named with a stamp of its content), that are in neither place are fetched from the Atlas address and kept.
    So is the leads' second file (data/leads/native-<stamp>.json), which the page asks for only when a reader switches it on.
    The stone-walls layer (data/walls.json and data/walls/<cell>.json) is always asked for at the Atlas address first. */
-A.fetch=function(path){ var p=path.split('?')[0], pock=/^data\/(pock|vanished|mines|leads)\//.test(p), walls=/^data\/walls/.test(p);
+A.fetch=function(path){ var p=path.split('?')[0], pock=/^data\/(pock|vanished|mines|leads|dt)\//.test(p), walls=/^data\/walls/.test(p);
   function local(){ return fetch(p).then(function(r){ if(pock&&!r.ok) throw new Error('not built in'); return r; }); }
   function kept(){ return store(DATA).then(function(c){ return c.match(p); }).then(function(r){ if(!r) throw new Error('not kept'); return r; }); }
   function remote(){ return get(A.base+p).then(function(r){ return store(DATA).then(function(c){ return c.put(p,r.clone()); }).then(function(){ return r; },function(){ return r; }); }); }

@@ -357,5 +357,19 @@ const { chromium } = require('playwright');
     const left=await p.evaluate(()=>{ const m=window.__atlasMap, big=m.getBounds().pad(1.05); let out=0; m.eachLayer(l=>{ if(l.getLatLng&&l._icon&&l._icon.classList.contains('pinwrap')===false&&l._icon.querySelector&&l._icon.querySelector('.pin')&&!big.contains(l.getLatLng())) out++; }); return out; });
     ok('to pins: a move made before the ring was filled leaves no pin behind on ground now far away',left===0,left);
     ok('to pins: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- drive times travel apart from the page (November 22, 2026): they were a fifth of the first download, and are wanted only once a start place is chosen
+  { const seen=[]; const mk=async seed=>{ const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); p.on('request',r=>{ const m=/\/data\/dt\/([a-z0-9]+)-[0-9a-f]{8}\.json/.exec(r.url()); if(m) seen.push(m[1]); });
+      if(seed) await p.addInitScript(x=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify(x)); }catch(e){} },seed); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+      await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(1800); return {c:c,p:p,errs:errs}; };
+    let x=await mk(null);
+    const pg=await x.p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), S=D.sites||D; return {withDt:S.filter(s=>s.dt).length,hubs:Object.keys(D.dtx||{}).length,bytes:document.getElementById('d-sites').textContent.length}; });
+    ok('drive times: no place in the page carries its table, and the page lists a file for each start city',pg.withDt===0&&pg.hubs>=60,JSON.stringify(pg));
+    ok('drive times: a visitor with no start place downloads none of them',seen.length===0,seen.join());
+    await x.c.close(); seen.length=0;
+    x=await mk({v:1,home:{id:'bost',by:1}}); await x.p.waitForTimeout(800);
+    const row=await x.p.evaluate(()=>{ const li=document.querySelector('#v-list li'); const m=li&&li.querySelector('.mins'); return {mins:m?m.textContent:'',n:window.__atlasDT?window.__atlasDT('bost'):-1}; });
+    ok('drive times: with Boston chosen, Boston\'s file is fetched and no other',seen.join()==='bost',seen.join());
+    ok('drive times: and the list then shows a routed time, not an estimate marked ~',row.n>50&&/\d/.test(row.mins)&&!/~/.test(row.mins),JSON.stringify(row));
+    ok('drive times: no script errors',x.errs.length===0,x.errs.join(' | ').slice(0,200)); await x.c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();
