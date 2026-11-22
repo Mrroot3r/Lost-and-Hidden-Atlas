@@ -116,6 +116,8 @@ json.dump(ALIAS,open('build/alias.json','w'),indent=0,sort_keys=True)
 ids=[s['id'] for s in sites]
 dup=sorted({i for i in ids if ids.count(i)>1})
 if dup: raise SystemExit('Duplicate place ids: '+', '.join(dup)+'. Ids are shared across every state, so add a town or state suffix to the NEW one (queens-fort-exeter). Never rename an id that is already published.')
+import plainwords      # workshop talk out of what a reader sees ("in this session", a tool's name in a pin note): wording only
+sites=[plainwords.site(x) for x in sites]
 json.dump(sites,open('build/sites.json','w'),indent=1,ensure_ascii=False)
 from collections import Counter
 print(len(sites),Counter(s['cat'] for s in sites),Counter(s['st'] for s in sites),Counter(s['prec'] for s in sites),Counter(s['reg'] for s in sites))

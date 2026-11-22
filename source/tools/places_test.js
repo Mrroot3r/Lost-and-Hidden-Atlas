@@ -282,5 +282,30 @@ const { chromium } = require('playwright');
     await p.click('#lb-loc'); await p.waitForTimeout(500); await p.click('#tab-list'); await p.waitForTimeout(300);
     t=await top(); ok('location switched off again: back to the start place',t.label==='Nearest to Boston'&&!/Buffalo/.test(t.town),t.label+' | '+t.town);
     ok('location: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- the numbered bubbles do not sit on top of one another (the opening view is the first thing on camera: the owner's reveal, November 2026)
+  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(2500);
+    const over=()=>p.evaluate(()=>{ const D=[...document.querySelectorAll('.clus')].map(n=>{ const r=n.getBoundingClientRect(); return {x:r.left+r.width/2,y:r.top+r.height/2,r:r.width/2,n:+n.textContent}; }); const bad=[];
+      for(let i=0;i<D.length;i++) for(let j=i+1;j<D.length;j++){ const d=Math.hypot(D[i].x-D[j].x,D[i].y-D[j].y); if(d<(D[i].r+D[j].r)*0.8) bad.push(D[i].n+'/'+D[j].n+' '+Math.round(d)+'px'); }
+      return {n:D.length,sum:D.reduce((a,x)=>a+x.n,0),bad:bad}; });
+    const total=async()=>p.evaluate(()=>{ let n=0; document.querySelectorAll('.clus').forEach(x=>n+=+x.textContent); return n+document.querySelectorAll('.leaflet-marker-pane .pin').length; });
+    let o=await over(); ok('opening view: there are bubbles, and no two overlap by more than a sliver',o.n>=8&&o.bad.length===0,o.n+' bubbles; overlapping: '+o.bad.join(', '));
+    for(const [la,lo,z] of [[42.7,-73.8,6],[41.5,-72.5,7],[40.7,-74.0,8],[44,-71.5,5]]){
+      await p.evaluate(a=>window.__atlasMap.setView([a[0],a[1]],a[2],{animate:false}),[la,lo,z]); await p.waitForTimeout(700); o=await over();
+      ok('zoom '+z+' near '+la+','+lo+': no two bubbles overlap by more than a sliver',o.n>=2&&o.bad.length===0,o.n+' bubbles; overlapping: '+o.bad.join(', ')); }
+    await p.evaluate(()=>window.__atlasMap.setView([39,-96],3,{animate:false})); await p.waitForTimeout(700); o=await over();
+    const all=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent); return (D.sites||D).length; });
+    ok('joining bubbles loses no place: with the whole map in view the numbers and the lone pins add up to every place',Math.abs((await total())-all)<=2,(await total())+' of '+all);
+    for(const z of [4,6]){ await p.evaluate(z=>window.__atlasMap.setView([42.5,-74.5],z,{animate:false}),z); await p.waitForTimeout(700);
+      await p.evaluate(()=>{ [...document.querySelectorAll('.leaflet-marker-pane .clus')].sort((a,b)=>(+b.textContent)-(+a.textContent))[0].click(); }); await p.waitForTimeout(900);
+      const z1=await p.evaluate(()=>window.__atlasMap.getZoom()); ok('a tap on the biggest bubble at zoom '+z+' goes closer, though it took in its neighbours',z1>z,z+' -> '+z1); }
+    ok('bubbles: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
+  // ---- "Within 30 min" with no start place: there is nothing to count from, so it says so instead of switching on and changing nothing
+  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(1500);
+    await p.click('#filt-btn'); await p.waitForTimeout(300); await p.click('#presets button:has-text("Within 30 min")'); await p.waitForTimeout(500);
+    const st=await p.evaluate(()=>({ban:(document.querySelector('#banner')||{}).hidden===false?document.querySelector('#banner').textContent:'', btn:document.querySelector('#filt-btn').textContent.trim()}));
+    ok('no start place: "Within 30 min" asks for one and switches no filter on',/where you start/i.test(st.ban)&&!/\d/.test(st.btn),st.btn+' | '+st.ban.slice(0,60));
+    ok('30 minutes: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();

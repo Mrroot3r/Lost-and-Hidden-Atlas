@@ -35,7 +35,10 @@ const HERE = { latitude: 42.7742, longitude: -73.7005, accuracy: 10 };
   await shot('08-near', '', async p => { await p.click('#tab-near'); await p.click('#v-near button:has-text("Find me")'); await p.waitForTimeout(7000); });
   await shot('09-trip', '', async p => {
     for (const id of ['harmony-mills-cohoes', 'lock-23', 'burden-iron-works-office-troy']) { await p.goto(U + '#' + id); await p.waitForTimeout(2500); await p.click('#v-detail button:has-text("Add to trip")'); await p.waitForTimeout(400); }
-    await p.click('#tab-trip'); await p.waitForTimeout(800); await p.click('#v-trip button:has-text("Use my location")'); await p.waitForTimeout(5000); });
+    await p.click('#tab-trip'); await p.waitForTimeout(800);
+    // the trip starts from where you are by itself (November 21, 2026: the "Use my location" button went). Leave at half past nine, so the
+    // arrival times in the picture are a day out, not whatever hour the picture happened to be taken at
+    await p.evaluate(() => { const t = document.querySelector('#trip-t0'); if (t) { t.value = '09:30'; t.dispatchEvent(new Event('change', { bubbles: true })); } }); await p.waitForTimeout(4000); });
   await shot('10-log', '', async p => { await view(p, HERE.latitude, HERE.longitude, 16); await p.click('#tab-log'); await p.click('#v-log button:has-text("Start a field log")'); await p.waitForTimeout(6000); });
   await shot('11-options', '', async p => { await p.click('#lb-opt'); await p.waitForTimeout(900); });
   await shot('12-dark', '#harmony-mills-cohoes', async p => {

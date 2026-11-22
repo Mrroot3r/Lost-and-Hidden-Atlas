@@ -80,7 +80,7 @@ N('vale-cemetery-schenectady','Vale Cemetery','Schenectady','sch','burial','stan
   '',
   'Owned by the nonprofit Vale Cemetery Association; the entrance is at 907 State Street. Its contact page says the gates are open every day from dawn to dusk and the office from 10 a.m. to 4 p.m. on weekdays. The association runs public tours (dates not checked). No lot is mapped inside; park on the cemetery roads only where it is allowed, or on nearby streets.',
   [W('Vale Cemetery and Vale Park'),L('Vale Cemetery: a brief history','https://valecemetery.org/history'),L('Vale Cemetery: contact and hours','https://valecemetery.org/contact')],
-  th=[42.80612,-73.93253],thn='State Street entrance (907 State Street)',brick='?',hours='Gates every day, dawn to dusk; office weekdays 10 a.m. to 4 p.m.'),
+  th=[42.80612,-73.93253],thn='State Street entrance (907 State Street)',brick='?',hours='Gates every day, dawn to dusk; office weekdays 10 a.m. to 4 p.m.',was='lm-vale-cemetery'),
 ]
 PIN_NOTES={
  'esperance-historical-museum':'ArcGIS PointAddress for 123 Church Street, Esperance.',
