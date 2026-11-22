@@ -120,12 +120,6 @@ N('bannack','Bannack','Dillon','mt','town','standing',45.16111,-112.99556,'site'
   [W('Bannack, Montana'),['Montana FWP: Bannack State Park','https://fwp.mt.gov/stateparks/bannack-state-park']]),
 ]
 R+=[
-N('quindaro-townsite','Quindaro townsite','Kansas City','ks','town','ruins',39.15139,-94.65911,'site','view','walk','','1857–1860s',
-  'Quindaro was bought from Wyandot owners in 1856 and built from 1857 as a Missouri River port for Free State settlers heading into Kansas Territory, with backing from the New England Emigrant Aid Company. It peaked at about 600 people and was a station on the Underground Railroad for people escaping slavery in Missouri. Once Kansas was safely a free state the port lost its purpose, and the town was abandoned and grew over. A school for the children of freed people, begun in 1862, grew into Western University. Archaeologists working in 1987–88 found the foundations of 20 main buildings, three wells and a cistern.',
-  'From the overlook in the upper townsite you look down on the wooded lower town by the river, where the foundations lie. A full-size statue of John Brown, in a memorial plaza dedicated in 1978, is the only structure left from Western University.',
-  'An abolitionist river port, lost in the woods for a century.',
-  'See it from the Quindaro Ruins Overlook on North 27th Street. The lower townsite is a listed archaeological site beside working railroad tracks, and who owns each part of it was not confirmed, so keep to the overlook. Congress named it a National Commemorative Site in 2019.',
-  [W('Quindaro Townsite')]),
 N('fort-pike','Fort Pike','New Orleans','la','fort','standing',30.16611,-89.73694,'exact','view','drive','forts','1819–1890',
   'A brick fort begun in 1819, after the War of 1812, to guard the Rigolets, the strait that leads from the Gulf to Lake Pontchartrain and the back door of New Orleans. It was named for General Zebulon Pike. Seminole prisoners were held here on their way to Indian Territory, and Louisiana troops seized it in 1861. The Army left it in the care of a single sergeant from 1871 and gave it up in 1890. Hurricane Katrina\'s surge damaged it in 2005; it reopened in 2008, was shut again by hurricanes Gustav and Isaac, and closed in February 2015 for lack of state money.',
   'The brick fort and its citadel on the water\'s edge. It was listed on the National Register in 1972.',
@@ -326,7 +320,6 @@ PIN_NOTES={
  'fitchburg-furnace':MOVED+' It now sits on the long stone structure beside the parking loop, about 60 m northwest of the Wikipedia point.',
  'windsor-ruins':WK+SAT+'the ring of columns is plain to see at the pin.',
  'bannack':WK+SAT+'it falls on the main street among the buildings.',
- 'quindaro-townsite':OSM+' It is the overlook structure, not the foundations, which lie in the woods below.'+SAT+'the overlook shows at the pin.',
  'fort-pike':WK+SAT+'it falls inside the fort.',
  'daniels-md':WK+SAT+'it falls on the river beside a bridge; the old mill complex is in the bend to the east and the dam to the southeast. The church ruins were not located.',
  'fayette-mi':WK+SAT+'park road and buildings within about 120 m; the furnace complex was not picked out.',

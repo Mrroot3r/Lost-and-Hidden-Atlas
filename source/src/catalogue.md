@@ -13,7 +13,7 @@ This is a field catalogue of places from before the 1850s to the early 1940s, we
 
 **Access and legal notes**
 
-- Most empty lots are private or active industrial land. Film from the public way unless you have permission.
+- Most empty lots are private or active industrial land. Look from the public way unless you have permission.
 - Don't dig or remove artifacts on state land (Forest Preserve, state parks, historic sites); metal detecting there needs a permit.
 - NYC DEP watershed lands (Ashokan, Schoharie/Gilboa) have their own access rules; many areas need a free DEP Access Permit.
 - Active rail lines (CSX, CPKC, Amtrak) are trespassing, including bridges and tunnels. Abandoned grades vary by owner.
@@ -27,7 +27,7 @@ Downtown Albany has lost more than it kept: a 98.5-acre neighborhood under the E
 
   The 11-story refrigerated warehouse was built by the New York Central in 1927. Final demolition began September 21–22, 2026, starting with its rail bridge, and is expected to run through the winter. It will leave a cleared 1.1-acre lot beside I-787.
 
-  *Look for:* the teardown itself; film from public streets, since Amtrak tracks run alongside. *Hook:* the last days of Albany's biggest eyesore, on its 99th birthday. [Governor's release](https://governor.ny.gov/news/governor-hochul-and-county-executive-mccoy-announce-final-demolition-phases-begin-albanys) · [WAMC](https://www.wamc.org/news/2026-09-21/central-warehouse-albany-demolition-beginning)
+  *Look for:* the teardown itself; watch from public streets, since Amtrak tracks run alongside. *Hook:* the last days of Albany's biggest eyesore, on its 99th birthday. [Governor's release](https://governor.ny.gov/news/governor-hochul-and-county-executive-mccoy-announce-final-demolition-phases-begin-albanys) · [WAMC](https://www.wamc.org/news/2026-09-21/central-warehouse-albany-demolition-beginning)
 - [ ] **Empire State Plaza footprint: the lost South End blocks** — Verified
 
   In 1962 the state took 98.5 acres by eminent domain and razed roughly 40 blocks, displacing thousands of residents. Hudson Avenue lost its blocks between South Swan and Eagle; Cathedral Academy and a former executive mansion at Hawk and Lancaster went too.
@@ -75,7 +75,7 @@ Downtown Albany has lost more than it kept: a 98.5-acre neighborhood under the E
   [Wellington Row](https://en.wikipedia.org/wiki/Wellington_Row)
 - [ ] **Delavan House hotel site, Broadway at Steuben** — Lead
 
-  A big railroad-era hotel that burned in 1894. Union Station rose on the site around 1900; the station closed in 1968 and is now Kiernan Plaza. Confirm dates in Albany Institute photo files before filming.
+  A big railroad-era hotel that burned in 1894. Union Station rose on the site around 1900; the station closed in 1968 and is now Kiernan Plaza. Dates not confirmed against the Albany Institute photo files.
 
 ## Albany: neighborhoods, buried creeks, cemeteries, water works and the city edge
 
@@ -266,7 +266,7 @@ Outside the city line the best finds are a drowned hamlet, a dead show cave, a 1
   *Look for:* brickyard worker housing and bottle dumps. [Spotlight News](https://spotlightnews.com/towns/bethlehem/2019/06/19/discover-coeymans-selkirk-feura-bush-coeymans-has-a-long-history-of-brickmaking/) · [Hudson River Explorer](https://hudsonriverexplorer.blogspot.com/2011/07/knickerbocker-ice-company-ruins-north.html) · [Town of Coeymans](https://coeymans.gov/community/history/)
 - [ ] **Van Wies Point, Glenmont** — Verified (keeper, dock); Lead (light's fate)
 
-  William Welch kept the Van Wie's Point light from about 1858 until he died in 1910 at 93, the longest-serving keeper on the Hudson. A state marker notes the Van Wie dock, leased in 1835 to the Hudson River Steamboat Co. as an Albany terminal. Confirm what survives of the light station before filming.
+  William Welch kept the Van Wie's Point light from about 1858 until he died in 1910 at 93, the longest-serving keeper on the Hudson. A state marker notes the Van Wie dock, leased in 1835 to the Hudson River Steamboat Co. as an Albany terminal. What survives of the light station is not confirmed.
 
   [Hudson River Maritime Museum](https://www.hrmm.org/history-blog/featured-artifact-lighthouse-keepers-manual-van-wies-point) · [Van Wie's Dock marker](https://www.stoppingpoints.com/ny/Albany/Van+Wie%27s+Dock.html)
 
@@ -313,7 +313,7 @@ Troy has lost two city halls (one built on a cemetery), its grand station, the w
 
   Winslow, Griswold & Holley started an experimental Bessemer plant in Troy on February 16, 1865, the first in the U.S. Troy's Rensselaer and Albany iron works had already rolled the USS Monitor's armor plates and rivets. The riverfront became Troy Steel & Iron, then a 1924 coke plant, and is now a state remediation site off Water Street.
 
-  *Access:* fenced brownfield; film from Burden Ave and the river trail. [Britannica: Holley](https://www.britannica.com/biography/Alexander-Lyman-Holley) · [NYS Library: Griswold papers](https://nysl.nysed.gov/node/2513) · [HMDB South Troy marker](https://www.hmdb.org/m.asp?m=315258) · [DEC site history](https://extapps.dec.ny.gov/data/DecDocs/442029/Report.HW.442029.2019-01-08.Remedial%20Investigation%20Area%203%20Appendix%20A%20part2%20of3.pdf)
+  *Access:* fenced brownfield; view from Burden Ave and the river trail. [Britannica: Holley](https://www.britannica.com/biography/Alexander-Lyman-Holley) · [NYS Library: Griswold papers](https://nysl.nysed.gov/node/2513) · [HMDB South Troy marker](https://www.hmdb.org/m.asp?m=315258) · [DEC site history](https://extapps.dec.ny.gov/data/DecDocs/442029/Report.HW.442029.2019-01-08.Remedial%20Investigation%20Area%203%20Appendix%20A%20part2%20of3.pdf)
 - [ ] **The stove works: Fuller & Warren's Clinton Foundry** — Verified
 
   Albany and Troy were America's stove capitals, with 349 recorded makers over 130 years. Fuller & Warren's big riverfront works stood between Madison and Monroe streets just below the Poestenkill and is gone. By contrast, the 1846 Empire Stove Works at Second and Ida streets survives as a restaurant.
@@ -607,7 +607,7 @@ The river between Albany and Kingston once ran on ice, brick and steamboats. The
   *Source material:* Gene Dauner's slides, used in the film "Lost Rondout." [Cooper Union screening notes](https://cooper.edu/events-and-exhibitions/events/lost-rondout-story-urban-removal) · [Friends of Historic Kingston tour](https://www.fohk.org/wp-content/uploads/2016/07/RondoutWT2016wMAP.pdf)
 - [ ] **Catskill village: the Prospect Park Hotel** — Lead
 
-  A large hotel overlooked the Hudson at Catskill Point; a 1915 county history says it burned in 1914, and an 1851 fire had already taken the Irving House and two churches downtown. Confirm the site and dates with the Greene County Historical Society before filming.
+  A large hotel overlooked the Hudson at Catskill Point; a 1915 county history says it burned in 1914, and an 1851 fire had already taken the Irving House and two churches downtown. The site and dates are not confirmed with the Greene County Historical Society.
 
   [Dear Old Greene County (1915)](https://ldsgenealogy.com/NY/books/Dear-old-Greene-County-embracing-facts-and-figures-Portraits-and-sketches-of-leading-men-part-11.htm)
 
@@ -657,7 +657,7 @@ The great Catskill hotels are almost all gone, three of them burned on purpose b
   [Hudson Valley Ruins](https://hudsonvalleyruins.org/rob/?p=2019) · [Atlas Obscura](https://www.atlasobscura.com/articles/2645)
 - [ ] **Grossinger's, Liberty (southern Catskills)** — Verified
 
-  The Borscht Belt's best-known resort ran from the 1910s to 1986. Its last building came down on October 19, 2018, and a remaining structure burned in 2022. Out on the southern edge of your range, but a true empty-lot story.
+  The Borscht Belt's best-known resort ran from the 1910s to 1986. Its last building came down on October 19, 2018, and a remaining structure burned in 2022. A true empty-lot story.
 
   [Wikipedia](https://en.wikipedia.org/wiki/Grossinger%27s_Resort)
 
@@ -676,7 +676,7 @@ The great Catskill hotels are almost all gone, three of them burned on purpose b
 
 ## Drowned towns and reservoir ghosts
 
-Between 1907 and 1932 five reservoirs in your range erased more than twenty hamlets and moved well over 6,000 graves. In low water, Gilboa's foundations and roads still surface.
+Between 1907 and 1932 five reservoirs erased more than twenty hamlets and moved well over 6,000 graves. In low water, Gilboa's foundations and roads still surface.
 
 **Access first:** NYC DEP lands posted "Entry by Permit," and City land right beside its reservoirs, need a free DEP Access Permit (age 16 and up, good for five years, available online). Over 74,000 acres of DEP land are open without one. [DEP permit FAQ](https://www.nyc.gov/site/dep/recreation/general-permit-frequently-asked-questions.page) · [2019 rule update](https://www.citylandnyc.org/dep-announces-updated-rules-for-watershed-recreation-use/)
 
@@ -705,7 +705,7 @@ Between 1907 and 1932 five reservoirs in your range erased more than twenty haml
   See the Albany County section: Albany's water supply drowned this Coeymans hamlet and its 14 burying grounds.
 - [ ] **Beyond your range: the 1950s Delaware reservoirs** — Lead
 
-  Later NYC reservoirs drowned villages that were thriving in your era: Pepacton (Arena, Pepacton, Shavertown, Union Grove), Cannonsville (Cannonsville, Rock Rift, Beerston) and Neversink. Save for a future expansion west.
+  Later NYC reservoirs drowned more villages: Pepacton (Arena, Pepacton, Shavertown, Union Grove), Cannonsville (Cannonsville, Rock Rift, Beerston) and Neversink.
 
 ## Saratoga Springs, Ballston Spa and Mount McGregor
 
@@ -715,7 +715,7 @@ Every one of Saratoga's great 19th-century hotels is gone, and Ballston Spa lost
 
   It began as Gideon Putnam's 1802 boarding house and grew into the world's largest hotel, with a dining hall over 200 feet long. It was demolished in 1952–53 and replaced by a Woolworth's plaza. Its giant Adolphe Yvon mural, "The Genius of America," survived and hangs in Chancellor's Hall in the State Education Building in Albany.
 
-  *Hook:* film the plaza, then the mural an hour south. [Wikipedia](<https://en.wikipedia.org/wiki/Grand_Union_Hotel_(Saratoga_Springs,_New_York)>) · [Shorpy (mural note)](https://mail.shorpy.com/node/18817) · [Saratoga.com](https://saratoga.com/waynesword2/2012/10/saratogas-changes-the-adelphi-hotel)
+  *Hook:* see the plaza, then the mural an hour south. [Wikipedia](<https://en.wikipedia.org/wiki/Grand_Union_Hotel_(Saratoga_Springs,_New_York)>) · [Shorpy (mural note)](https://mail.shorpy.com/node/18817) · [Saratoga.com](https://saratoga.com/waynesword2/2012/10/saratogas-changes-the-adelphi-hotel)
 - [ ] **United States Hotel site, Broadway at Division Street** — Verified
 
   The first United States Hotel opened in 1824 and burned in 1865; its grander replacement was finished in 1874. Demolition ran from May 1945 to March 1946, and the corner sat nearly empty for years with a small concrete-block bar. Today shops, including one at 385 Broadway, stand on the footprint.
@@ -788,13 +788,13 @@ The southern Adirondacks hide whole ghost towns: a graphite boomtown, a tannery 
   *Access:* mine shafts and private land; start at the Penfield Homestead Museum in Ironville and Monitor Bay Park's furnace site. [Lakes to Locks: Hammondville](https://passageport.org/journey/the-story-of-iron-in-crown-point-moriah/7-driving-to-hammondville/) · [Vizettes](https://vizettes.com/kt/rr/cpicrr/index.htm) · [UConn dissertation](https://digitalcommons.lib.uconn.edu/dissertations/AAI3476610)
 - [ ] **Adirondac (Tahawus) and the McIntyre furnace** — Verified (outline)
 
-  The best-known ghost town in the state, built around an iron mine and reachable from a trailhead lot. Included for completeness; you have likely filmed it.
+  The best-known ghost town in the state, built around an iron mine and reachable from a trailhead lot.
 
   [Odd Things I've Seen](https://www.oddthingsiveseen.com/2012/09/the-new-york-grimpendium-tahawus-ghost.html)
 
 ## Standing landmarks quick list
 
-These are the well-documented survivors, listed so the catalogue is complete; you have likely filmed many of them. Dates are standard references, not re-checked for this doc.
+These are the well-documented survivors. Dates are standard references and were not re-checked.
 
 **Before you drive:** each Map link opens the place in Google Maps, where the listing shows today's hours, recent photos and Street View. It's late fall, and many house museums and state historic sites cut back to winter or by-appointment schedules, so call anything marked "check season" or "call ahead" before the trip.
 
@@ -804,7 +804,7 @@ These are the well-documented survivors, listed so the catalogue is complete; yo
 | Albany City Hall (H.H. Richardson) | [Map](https://www.google.com/maps/search/?api=1&query=Albany+City+Hall%2C+24+Eagle+St%2C+Albany%2C+NY) | Albany | 1880–1883 | Public building | Replaced Hooker's 1832 hall after the 1880 fire |
 | Old Albany Academy (Philip Hooker) | [Map](https://www.google.com/maps/search/?api=1&query=Old+Albany+Academy%2C+Academy+Park%2C+Albany%2C+NY) | Albany | 1815–1817 | Offices; exterior | One of only two surviving Hooker buildings |
 | First Church in Albany (Hooker) | [Map](https://www.google.com/maps/search/?api=1&query=First+Church+in+Albany%2C+North+Pearl+St%2C+Albany%2C+NY) | Albany | 1798 | Active church; exterior | The other Hooker survivor |
-| Schuyler Mansion | [Map](https://www.google.com/maps/search/?api=1&query=Schuyler+Mansion+State+Historic+Site%2C+Albany%2C+NY) | Albany | 1761–1765 | State historic site; check season | Pair with Schuyler Flatts burials |
+| Schuyler Mansion | [Map](https://www.google.com/maps/search/?api=1&query=Schuyler+Mansion+State+Historic+Site%2C+Albany%2C+NY) | Albany | 1761–1765 | State historic site; check season | Linked with the Schuyler Flatts burials |
 | Cherry Hill | [Map](https://www.google.com/maps/search/?api=1&query=Historic+Cherry+Hill%2C+Albany%2C+NY) | Albany | 1787 | House museum; check hours | South End estate survivor near Mount Hope |
 | Ten Broeck Mansion | [Map](https://www.google.com/maps/search/?api=1&query=Ten+Broeck+Mansion%2C+Albany%2C+NY) | Albany | 1797–1798 | House museum; check hours | Lumber-baron Arbor Hill above the Lumber District |
 | Kiernan Plaza (Union Station) | [Map](https://www.google.com/maps/search/?api=1&query=Kiernan+Plaza%2C+Albany%2C+NY) | Albany | 1900 | Office building; exterior | The station Albany saved, unlike Troy and Schenectady |

@@ -179,7 +179,7 @@ details.filters[open]>summary::after{content:"\2212"}
 .dtop{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
 .dtop .btn{white-space:nowrap}
 .dtop-r{display:flex;gap:6px;margin-left:auto}
-.dmeta{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.dmeta{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px}      /* centred: a tag beside the taller kind chip was stretched to its height, its words left at the top */
 .sec{padding-block:12px;border-bottom:1px solid var(--line)}
 .sec h3{font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
 .sec p{margin:0 0 8px;max-width:65ch} .sec p:last-child{margin-bottom:0}

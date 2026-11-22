@@ -1,7 +1,7 @@
 # Overlay for catalogue entries: (entry index, id, name, town, region, category, status, lat, lon, precision, access, effort, tags, extras)
 # precision: exact = on the structure or marker (within ~30 m); site = inside the documented footprint (~150 m); area = right vicinity, spot not established
 A=[
-(0,'central-warehouse','Central Warehouse','Albany','alb','industry','ruins',42.65656,-73.74527,'exact','view','drive','now',{'years':'1927–2026/27','accn':'Active demolition site beside Amtrak tracks. Film from Montgomery, Colonie and Centre streets or the Livingston Ave side.'}),
+(0,'central-warehouse','Central Warehouse','Albany','alb','industry','ruins',42.65656,-73.74527,'exact','view','drive','now',{'years':'1927–2026/27','accn':'Active demolition site beside Amtrak tracks. Watch from Montgomery, Colonie and Centre streets or the Livingston Ave side.'}),
 (1,'esp-footprint','Empire State Plaza footprint','Albany','alb','civic','gone',42.6506,-73.7598,'area','public','walk','renewal',{'years':'razed 1962–65','name2':'The lost South End blocks'}),
 (2,'old-capitol','Old State Capitol site','Albany','alb','civic','marker',42.65235,-73.75600,'site','public','walk','',{'years':'1809–1883'}),
 (3,'fort-frederick','Fort Frederick site','Albany','alb','fort','marker',42.651428,-73.755512,'exact','public','drive','forts',{'years':'1676–1789'}),

@@ -25,7 +25,7 @@ const { chromium, devices } = require('playwright');
   const far=r.map(x=>{ const m=/^([\d.,]+) (ft|mi)/.exec(x[1]); return m?(+m[1].replace(',',''))*(m[2]==='mi'?5280:1):-1; });
   ok('the list fills in, nearest first',r.length>3&&far.every((v,i)=>v>0&&(!i||v>=far[i-1])),r.slice(0,4).map(x=>x[0]+' '+x[1]).join(' | '));
   ok('the place 400 m to the north reads 0.25 mi N, arrow straight up',/^0\.25 miN$/.test(mine()[1])&&mine()[3]==='rotate(0deg)',mine()[1]+' '+mine()[3]);
-  ok('status says where it measures from',/From where you are, good to 6 m/.test(await p.innerText('#near-st')),(await p.innerText('#near-st')).replace(/\s+/g,' ').slice(0,90));
+  ok('status says where it measures from',/From where you are, good to 20 ft/.test(await p.innerText('#near-st')),(await p.innerText('#near-st')).replace(/\s+/g,' ').slice(0,90));
   const chips=await p.evaluate(()=>[...document.querySelectorAll('#near-k .chip')].map(n=>n.textContent.trim()+':'+n.getAttribute('aria-pressed')));
   ok('five kinds, all on, with counts',chips.length===5&&chips.every(x=>/ \d+:true$/.test(x)),chips.join(' '));
   ok('no stray text in the status row',!/null|undefined/.test(await p.innerText('#v-near')));
