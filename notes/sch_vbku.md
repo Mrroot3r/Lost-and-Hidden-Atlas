@@ -15,7 +15,6 @@ Places you read about and could not finish. One row each; delete the example row
 |---|---|---|---|
 | Vedder Tavern | Glenville, NY, NY 5 a mile from Route 103 (HMdb 130349: 42.88762, -74.05381) | HMdb: built by the Schermerhorn family in 1676 and 1769, long kept as a tavern by Albert Vedder | Whether it still stands, and which building |
 | Stevens House | Alplaus, Glenville, NY, Ronald Reagan Way by NY 24 (HMdb 135688: 42.85045, -73.91700) | HMdb: built 1693 by Jonathan Stevens, Indian interpreter at Ael Plaets | Whether a house stands there; a second source |
-| St. Mary's Roman Catholic Church Complex | Schenectady, NY, 820–828 Eastern Avenue and 104 Irving Street | National Register form 100001071 (2017) reads as text: stone church and buildings of the early 1900s for the Polish parish | The form was not read past its first page; whether the church still holds services, and its page |
 | Robert Sanders House | Schenectady, NY, 43 Washington Avenue (HMdb 77588) | 1932 marker: 1750, Washington visited 1775, later the Schenectady Female Academy; the marker was missing in April 2026 | A source on the house as it stands |
 | Schenectady Public Market and Scale House | Schenectady, NY | On the National Register (100007377) | NPGallery returns a picture, not the form; any source |
 
