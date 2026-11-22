@@ -1,7 +1,7 @@
 // What is on the map, and what is not: pins, lead dots, pocket discs and old lines are kept on the map only in or near the
 // view, because Leaflet works out every layer's position again at each zoom step, on screen or not.
 //   node tools/overlay_test.js http://localhost:8766/index.html      (serve the built site first, as for smoke.js)
-// Run it after changing syncMarkers(), the pinch trial (pinchBegin(), pinDraw()), viewDots()/viewSync(), drawLeads(), drawXL(), pockZoom() or the line levels (LLEV,
+// Run it after changing syncMarkers(), the pinch picture (pinchBegin(), pinDraw()), pockLabels(), viewDots()/viewSync(), drawLeads(), drawXL(), pockZoom() or the line levels (LLEV,
 // syncLines()) in app.js. What it holds the app to:
 //   1. every place in view has its pin, and most places out of view have none; panning brings in the pins for the new ground;
 //   2. the chosen place keeps its pin wherever the map goes;
@@ -10,7 +10,8 @@
 //      after the map moves as well as before;
 //   5. the old lines are a handful of layers when zoomed out, and a tap on one still opens its box, zoomed out and zoomed in;
 //   6. with everything switched on the map holds hundreds of layers, not thousands.
-//   7. the pinch trial (a setting): for the length of a pinch one picture stands in for the pins, and they are back after it.
+//   7. for the length of a pinch one picture stands in for the pins, drawn again when it has stretched far, and they are back after it;
+//   8. the old town centres are drawn over the heat map, with their names from zoom 8.
 const { chromium } = require('playwright');
 (async()=>{
   const fails=[]; const ok=(name,cond,extra)=>{ console.log((cond?'ok   ':'FAIL ')+name+(extra!==undefined?'  ['+extra+']':'')); if(!cond) fails.push(name); };
@@ -123,6 +124,13 @@ const { chromium } = require('playwright');
     ok('at the 50-mile scale (zoom 7) no pocket disc is drawn',k.discs===0,JSON.stringify(k));
     await q.evaluate(()=>{ window.__atlasMap.setZoom(8,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
     ok('at the 20-mile scale (zoom 8) the best town centres show',k.discs>0&&k.discs<200,JSON.stringify(k));
+    // over the heat map, with their names (the owner, November 22, 2026): under it the discs were tinted and looked odd, and a town's name is what finds the right town when the street map's own names are too small to read
+    const ov=await q.evaluate(()=>{ const m=window.__atlasMap, zi=n=>{ const e=m.getPane(n); return e?+getComputedStyle(e).zIndex:null; }, lab=[...document.querySelectorAll('.leaflet-marker-pane .pocklab span')].map(e=>e.textContent);
+      return {heat:document.querySelectorAll('.leaflet-pane img.heatimg').length,zHeat:zi('heat'),zLines:zi('lines'),names:lab.length,blank:lab.filter(t=>!t.trim()).length,first:lab.slice(0,3)}; });
+    ok('at zoom 8 the heat map is showing, and the town centres are drawn over it, not under',ov.heat===1&&ov.zHeat!==null&&ov.zLines!==null&&ov.zHeat<ov.zLines,JSON.stringify(ov));
+    ok('at zoom 8 the best town centres in view have their names written by them',ov.names>=5&&ov.names<=20&&ov.blank===0,JSON.stringify(ov));
+    await q.evaluate(()=>{ window.__atlasMap.setZoom(7,{animate:false}); }); await q.waitForTimeout(700);
+    ok('at zoom 7, where no disc is drawn, no name is either',(await q.evaluate(()=>document.querySelectorAll('.leaflet-marker-pane .pocklab').length))===0);
     await c4.close(); }
   // ---- the old town centres travel one state at a time: an index, then a state's discs when the map looks at it or
   //      the reader stands in it. Nobody looking at Albany downloads Ohio.
@@ -221,39 +229,47 @@ const { chromium } = require('playwright');
     const whole=await q.evaluate(()=>Promise.all(['vanished','mines'].map(k=>fetch('data/'+k+'.json').then(r=>r.json()).then(j=>({n:j.p.length,st:Object.keys(j.s).length,t:j.t.length})))));
     ok('the old whole-layer files are still there for older copies of the Android app, holding the eleven states they held',whole.every(w=>w.n>10000&&w.st===11&&w.t>0),JSON.stringify(whole));
     await c2.close(); }
-  /* 7. Two fingers on the map, a trial (the owner, November 22, 2026). Leaflet moves every pin separately at every frame of a
-        pinch, and round Albany that is hundreds of pins: the map crawls while two fingers are down. With the trial switched on
-        under the gear, the pins are swapped for one picture of themselves for the length of the pinch, stretched with the map
-        like the heat map (which pinches smoothly on his phone), and swapped back when the fingers lift. The frames here are the
+  /* 7. Two fingers on the map (the owner, November 22, 2026). Leaflet moves every pin separately at every frame of a pinch,
+        and round Albany that is hundreds of pins: the map crawled while two fingers were down. So for the length of a pinch
+        the pins are swapped for one picture of themselves, stretched with the map like the heat map, and swapped back when
+        the fingers lift: tried on his phone as a trial and kept ("completely fixed how it feels"). It is on unless switched
+        off under the gear. The picture is drawn again whenever it has been stretched or shrunk a good deal, at the size the
+        pins have then, so a long pinch stays sharp and a pinch far out still has pins to its edges. The frames here are the
         ones Leaflet's own pinch handler makes. This checks that the swap is right, not that it is fast: the test browser's
         frame times did not predict a phone (GUIDE.md section 9, "Pinch lag"). */
-  { const run=async on=>{ const c3=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
-      await c3.addInitScript(on=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,set:on?{pinchStand:true}:{},ui:{base:'streets',view:[42.7,-73.8,10],hist:false,leads:false}})); }catch(e){} },on);
+  { const run=async set=>{ const c3=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true});
+      await c3.addInitScript(set=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,set:set,ui:{base:'streets',view:[42.7,-73.8,10],hist:false,leads:false}})); }catch(e){} },set);
       await c3.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
       const q=await c3.newPage(); q.on('pageerror',e=>errs.push('pinch: '+e.message)); await q.goto(url); await q.waitForFunction(()=>window.__atlasMap); await q.waitForTimeout(2500);
       const r=await q.evaluate(async()=>{ const m=window.__atlasMap, box=m.getContainer().getBoundingClientRect(), c=m.getCenter(), z0=m.getZoom(), frame=()=>new Promise(r=>requestAnimationFrame(r));
         const pins=()=>[...document.querySelectorAll('.leaflet-marker-pane .pinwrap')], shown=()=>pins().filter(e=>getComputedStyle(e).display!=='none').length, cvs=()=>[...m.getContainer().querySelectorAll('canvas.pinstand')];
         const fits=()=>{ const st=window.__atlasPinch&&window.__atlasPinch(), cv=cvs()[0]; if(!st||!cv) return null; const r=cv.getBoundingClientRect(), w=m.latLngToContainerPoint(st.nw), k=m.getZoomScale(m.getZoom(),st.z0);
-          return {dx:Math.round(Math.abs(r.left-box.left-w.x)*10)/10,dy:Math.round(Math.abs(r.top-box.top-w.y)*10)/10,dw:Math.round(Math.abs(r.width-st.w*k)*10)/10}; };
-        const inked=()=>{ const st=window.__atlasPinch(), cv=cvs()[0], g=cv.getContext('2d'), k=cv.width/st.w, o=m.latLngToContainerPoint(st.nw); let n=0, hit=0; m.eachLayer(l=>{ if(!(l instanceof L.Marker)||!l._icon||!l._icon.classList.contains('pinwrap')||!m.getBounds().contains(l.getLatLng())) return; n++; const q=m.latLngToContainerPoint(l.getLatLng()); if(g.getImageData(Math.round((q.x-o.x)*k),Math.round((q.y-o.y)*k),1,1).data[3]>200) hit++; }); return {n,hit}; };
+          return {dx:Math.round(Math.abs(r.left-box.left-w.x)*10)/10,dy:Math.round(Math.abs(r.top-box.top-w.y)*10)/10,dw:Math.round(Math.abs(r.width-st.w*k)*10)/10,stretch:Math.round(k*100)/100,mag:Math.round((st.mag||1)*100)/100,
+            covers:r.left<=box.left+1&&r.top<=box.top+1&&r.right>=box.right-1&&r.bottom>=box.bottom-1}; };
+        const inked=()=>{ const st=window.__atlasPinch(), cv=cvs()[0], g=cv.getContext('2d'), k=cv.width/st.w, o=m.latLngToContainerPoint(st.nw), s=m.getZoomScale(m.getZoom(),st.z0); let n=0, hit=0; m.eachLayer(l=>{ if(!(l instanceof L.Marker)||!l._icon||!l._icon.classList.contains('pinwrap')||!m.getBounds().contains(l.getLatLng())) return; n++; const q=m.latLngToContainerPoint(l.getLatLng()); if(g.getImageData(Math.round((q.x-o.x)/s*k),Math.round((q.y-o.y)/s*k),1,1).data[3]>200) hit++; }); return {n,hit}; };
         const before={pins:pins().length,shown:shown(),cv:cvs().length};
         m._stop(); m._moveStart(true,false); m._move(c,z0+0.02,{pinch:true,round:false}); await frame();
         const one={shown:shown(),cv:cvs().length,fit:fits(),ink:cvs().length?inked():null};
-        m._move(c,z0+0.6,{pinch:true,round:false}); await frame(); const inn={shown:shown(),cv:cvs().length,fit:fits()};
-        m._move(L.latLng(c.lat+0.02,c.lng-0.03),z0-0.4,{pinch:true,round:false}); await frame(); const out={shown:shown(),cv:cvs().length,fit:fits()};
+        m._move(c,z0+0.3,{pinch:true,round:false}); await frame(); const inn={shown:shown(),cv:cvs().length,fit:fits()};
+        for(const d of [0.6,0.9,1.2,1.5]){ m._move(c,z0+d,{pinch:true,round:false}); await frame(); } const deep={cv:cvs().length,fit:fits(),ink:cvs().length?inked():null};
+        for(const d of [1.0,0.5,0,-0.5,-1.0,-1.4]){ m._move(L.latLng(c.lat+0.02,c.lng-0.03),z0+d,{pinch:true,round:false}); await frame(); } const out={shown:shown(),cv:cvs().length,fit:fits(),ink:cvs().length?inked():null};
+        m._move(c,z0+0.2,{pinch:true,round:false}); await frame();      /* back to the pins' zoom before the fingers lift: let go at zoom 9 and the heat map takes over */
         m._animateZoom(c,Math.round(m.getZoom()),true,true); await new Promise(r=>setTimeout(r,700));
         let right=0, tot=0; m.eachLayer(l=>{ if(l instanceof L.Marker&&l._icon&&l._icon.classList.contains('pinwrap')){ tot++; const w=m.latLngToLayerPoint(l.getLatLng()).round(), g=L.DomUtil.getPosition(l._icon); if(Math.abs(w.x-g.x)<=1&&Math.abs(w.y-g.y)<=1) right++; } });
-        return {before,one,inn,out,end:{shown:shown(),pins:pins().length,cv:cvs().length,right,tot,st:window.__atlasPinch?window.__atlasPinch():'none'}}; });
-      await q.click('#lb-opt'); await q.click('#sheet-set'); await q.waitForTimeout(250); r.sw=await q.evaluate(()=>{ const x=document.querySelector('#set-pinchStand'); return x?x.checked:null; });
+        return {before,one,inn,deep,out,end:{shown:shown(),pins:pins().length,cv:cvs().length,right,tot,st:window.__atlasPinch?window.__atlasPinch():'none'}}; });
+      await q.click('#lb-opt'); await q.click('#sheet-set'); await q.waitForTimeout(250); r.sw=await q.evaluate(()=>{ const x=document.querySelector('#set-pinchStand'); return x?{on:x.checked,label:x.closest('label').textContent}:null; });
       await c3.close(); return r; };
-    const off=await run(false), on=await run(true), near=f=>!!f&&f.dx<=1.5&&f.dy<=1.5&&f.dw<=1.5;
-    ok('pinch trial: Settings has the switch, off until it is asked for',off.sw===false&&on.sw===true,JSON.stringify([off.sw,on.sw]));
-    ok('pinch trial off: a pinch leaves every pin on the page and puts no picture there',off.before.shown>400&&off.one.shown===off.before.shown&&off.one.cv===0&&off.out.cv===0,JSON.stringify([off.before,off.one]));
-    ok('pinch trial on: before the pinch the pins are on the page and there is no picture',on.before.shown>400&&on.before.cv===0,JSON.stringify(on.before));
-    ok('pinch trial on: at the first frame the pins are hidden and one picture stands in for them',on.one.shown===0&&on.one.cv===1,JSON.stringify(on.one));
-    ok('pinch trial on: the picture has a pin drawn where each pin in view was',!!on.one.ink&&on.one.ink.n>100&&on.one.ink.hit>=on.one.ink.n*0.98,JSON.stringify(on.one.ink));
-    ok('pinch trial on: the picture sits where the map is, at the first frame, pinched in, and pinched out and aside',near(on.one.fit)&&near(on.inn.fit)&&near(on.out.fit)&&on.inn.cv===1&&on.out.cv===1&&on.out.shown===0,JSON.stringify([on.one.fit,on.inn.fit,on.out.fit]));
-    ok('pinch trial on: when the fingers lift the picture is gone and every pin is back, where it belongs',on.end.cv===0&&on.end.shown===on.end.pins&&on.end.pins>400&&on.end.right===on.end.tot&&on.end.st===null,JSON.stringify(on.end)); }
+    const off=await run({pinchStand:false}), on=await run({}), near=f=>!!f&&f.dx<=1.5&&f.dy<=1.5&&f.dw<=1.5;
+    ok('pinch: Settings has the switch, on unless it is switched off, and it is no longer called a trial',!!on.sw&&on.sw.on===true&&!!off.sw&&off.sw.on===false&&!/trial/i.test(on.sw.label),JSON.stringify([on.sw,off.sw&&off.sw.on]).slice(0,200));
+    ok('pinch switched off: a pinch leaves every pin on the page and puts no picture there',off.before.shown>400&&off.one.shown===off.before.shown&&off.one.cv===0&&off.out.cv===0,JSON.stringify([off.before,off.one]));
+    ok('pinch: before it the pins are on the page and there is no picture',on.before.shown>400&&on.before.cv===0,JSON.stringify(on.before));
+    ok('pinch: at the first frame the pins are hidden and one picture stands in for them',on.one.shown===0&&on.one.cv===1,JSON.stringify(on.one));
+    ok('pinch: the picture has a pin drawn where each pin in view was',!!on.one.ink&&on.one.ink.n>100&&on.one.ink.hit>=on.one.ink.n*0.98,JSON.stringify(on.one.ink));
+    ok('pinch: the picture sits where the map is, at the first frame and pinched in a little',near(on.one.fit)&&near(on.inn.fit)&&on.inn.cv===1,JSON.stringify([on.one.fit,on.inn.fit]));
+    ok('pinch: pinched in a long way, the picture has been drawn again, sharp: it is stretched little, and its pins are drawn as large as they had grown',on.deep.cv===1&&near(on.deep.fit)&&on.deep.fit.stretch<=1.45&&on.deep.fit.mag>1.5&&on.deep.fit.stretch*on.deep.fit.mag>2.6&&on.deep.fit.stretch*on.deep.fit.mag<3,JSON.stringify(on.deep.fit));
+    ok('pinch: and there is still a pin drawn where each pin in view is',!!on.deep.ink&&on.deep.ink.n>20&&on.deep.ink.hit>=on.deep.ink.n*0.98,JSON.stringify(on.deep.ink));
+    ok('pinch: pinched out a long way and aside, the picture still covers the whole map, with a pin drawn for each pin in view',on.out.cv===1&&on.out.shown===0&&near(on.out.fit)&&on.out.fit.covers===true&&!!on.out.ink&&on.out.ink.hit>=on.out.ink.n*0.9,JSON.stringify([on.out.fit,on.out.ink]));
+    ok('pinch: when the fingers lift the picture is gone and every pin is back, where it belongs',on.end.cv===0&&on.end.shown===on.end.pins&&on.end.pins>400&&on.end.right===on.end.tot&&on.end.st===null,JSON.stringify(on.end)); }
   ok('no script errors',errs.length===0,errs.join(' | ').slice(0,200));
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\noverlay test passed'); process.exit(fails.length?1:0);
 })();
