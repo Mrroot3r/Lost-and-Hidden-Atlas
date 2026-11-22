@@ -127,9 +127,7 @@ if not SRC_ONLY:
     if not mm: err.append('index.html has no d-sites block')
     else:
         D=json.loads(mm.group(1).replace('<\\/','</')); built={s['id'] for s in D['sites']}
-        miss=sorted(set(ids)-built-set(WAS)); extra=sorted(i for i in built-set(ids) if not i.startswith('lm-'))
-        # a place another entry replaces (was=) is rightly absent from the built site, whether it was a landmark pin or, like
-        # Quindaro's first entry, a place in a list
+        miss=sorted(set(ids)-built); extra=sorted(i for i in built-set(ids) if not i.startswith('lm-'))
         if miss: err.append('in the place lists but not in the built site (rebuild needed): '+', '.join(miss[:12]))
         if extra: err.append('in the built site but not in the place lists: '+', '.join(extra[:12]))
         for s in D['sites']:
@@ -248,12 +246,13 @@ _used={_wid(t) for t in warn if _soft(t) and _wid(t) in _OK}
 _n0=len(warn); warn=[t for t in warn if not(_soft(t) and _wid(t) in _OK)]
 if _n0-len(warn): print(f'{_n0-len(warn)} more warnings already looked at and accepted (source/tools/checked_ok.json), not repeated here.')
 for _i in sorted(set(_OK)-_used): print(f'note: checked_ok.json lists {_i}, which raises no such warning now: take it out when you next edit the file.')
+# (this ran after the errors were printed until November 22, 2026: the count rose by one and no line said why)
+for _o,_w in WAS.items():      # an entry may replace a landmark pin (lm-...) or an id that is gone from every list; never a full entry that is still in one
+    if _o in ids: err.append(f"{_w}: was='{_o}', but that place is still in {ids[_o]}. was= is for a landmark pin (lm-...) or an entry that has been taken out")
 for w in warn: print('warning:',w)
 for e in err: print('ERROR:',e)
 if stamps:
     stamps.sort(); print(f'newest batch: {stamps[-1][1]} ({stamps[-1][0]} UTC). A new batch must be the newest, or the app will not mark its places as new.')
-for _o,_w in WAS.items():      # an entry may replace a landmark pin (lm-...) or an id that is gone from every list; never a full entry that is still in one
-    if _o in ids: err.append(f"{_w}: was='{_o}', but that place is still in {ids[_o]}. was= is for a landmark pin (lm-...) or an entry that has been taken out")
 print(f'{len(ids)} place ids, {len(keys)} batches, {len(warn)} warnings, {len(err)} errors'+(' (sources only: the built site was not checked)' if SRC_ONLY else ''))
 print('(The built site shows about 39 more places than this count: the Albany and Troy landmark pins, ids starting lm-, are made by build_sites.py from the landmark list and are not in a place list. That is expected.)')
 sys.exit(1 if err else 0)
