@@ -208,6 +208,44 @@ if G('gather'):
     finally: pf._get=real
     ok('Commons allows about ten questions a minute, so none is wasted: once three photographs name the place no further name question is asked and no category opened',len(C4)==3 and sum(1 for a in asked4 if a.get('generator')=='search')==1 and not any(a.get('generator')=='categorymembers' for a in asked4),[a.get('generator') for a in asked4])
     ok('and the questions are spaced to stay under that allowance',6<=getattr(pf,'PACE',0)<=8,getattr(pf,'PACE',None))
+# ---- logging in to Commons (November 22, 2026): a logged-in tool is allowed several thousand questions an hour where one known only
+#      by its address gets a few hundred. The login is a bot password that lives outside the repository, in two environment
+#      variables; without them the tool works as before.
+import io,contextlib
+class FakeResp:
+    def __init__(s,j,code=200): s._j=j; s.status_code=code; s.headers={}
+    def json(s): return s._j
+    def raise_for_status(s): pass
+class FakeSess:
+    def __init__(s,result='Success'): s.calls=[]; s.result=result; s.headers={}
+    def get(s,url,params=None,**k): s.calls.append(('get',dict(params or {}))); return FakeResp({'query':{'tokens':{'logintoken':'tok+\\'}}} if (params or {}).get('meta')=='tokens' else {'query':{'pages':[]}})
+    def post(s,url,data=None,**k): s.calls.append(('post',dict(data or {}))); return FakeResp({'login':{'result':s.result,'reason':'nope'}})
+lg=getattr(pf,'login',None); ok('the tool has a way to log in to Commons',callable(lg) and hasattr(pf,'new_session') and hasattr(pf,'pace'))
+if callable(lg) and hasattr(pf,'new_session'):
+    SECRET='s3cret-bot-pass-do-not-print'; fs=FakeSess(); buf=io.StringIO()
+    with contextlib.redirect_stdout(buf), contextlib.redirect_stderr(buf): got=lg(fs,'Someone@atlas-pictures',SECRET)
+    posts=[c[1] for c in fs.calls if c[0]=='post']
+    ok('login: asks Commons for a login token, then sends the name, the password and the token in the body of a POST',got is True and fs.calls[0][0]=='get' and fs.calls[0][1].get('type')=='login' and len(posts)==1 and posts[0].get('lgname')=='Someone@atlas-pictures' and posts[0].get('lgpassword')==SECRET and posts[0].get('lgtoken')=='tok+\\' and posts[0].get('action')=='login',str([(c[0],sorted(c[1])) for c in fs.calls]))
+    ok('login: the password is never in the address of a request',not any(SECRET in json.dumps(c[1]) for c in fs.calls if c[0]=='get'))
+    fs2=FakeSess('Failed'); buf2=io.StringIO()
+    with contextlib.redirect_stdout(buf2), contextlib.redirect_stderr(buf2): got2=lg(fs2,'Someone@atlas-pictures',SECRET)
+    ok('login: a refused login says so and is not treated as logged in',got2 is False and 'not' in buf2.getvalue().lower(),buf2.getvalue()[:100])
+    ok('login: nothing printed holds the password or the account name',SECRET not in buf.getvalue()+buf2.getvalue() and 'Someone' not in buf.getvalue()+buf2.getvalue(),(buf.getvalue()+buf2.getvalue())[:120])
+    # the whole path: with the two variables set the first question logs in, later ones say "I am logged in" and are spaced closer; without them nothing changes
+    real_new=pf.new_session; slp=pf.time.sleep; waits=[]; pf.time.sleep=lambda x:waits.append(x); env=dict(os.environ)
+    try:
+        for k in ('ATLAS_COMMONS_USER','ATLAS_COMMONS_PASS'): os.environ.pop(k,None)
+        a=FakeSess(); pf.new_session=lambda:a; pf._S.clear(); pf._last[0]=0.0; pf._get({'action':'query','list':'search'}); pf._get({'action':'query','list':'search'})
+        ok('with no login set: no login is tried, no question claims to be logged in, and the questions keep their old spacing',not any(c[0]=='post' for c in a.calls) and not any('assert' in c[1] for c in a.calls) and pf.pace()==pf.PACE and any(w>5 for w in waits),str(waits)[:80])
+        os.environ['ATLAS_COMMONS_USER']='Someone@atlas-pictures'; os.environ['ATLAS_COMMONS_PASS']=SECRET; waits.clear()
+        b=FakeSess(); pf.new_session=lambda:b; pf._S.clear(); pf._last[0]=0.0; pf._get({'action':'query','list':'search'}); pf._get({'action':'query','list':'search'})
+        qs=[c[1] for c in b.calls if c[0]=='get' and c[1].get('meta')!='tokens']
+        ok('with a login set: the tool logs in once, before its first question, and every question then says it is logged in',sum(1 for c in b.calls if c[0]=='post')==1 and len(qs)==2 and all(q.get('assert')=='user' for q in qs) and b.calls[0][1].get('meta')=='tokens',str([(c[0],c[1].get('assert'),c[1].get('meta')) for c in b.calls]))
+        ok('logged in, the questions are spaced closer, but not closer than Commons allows a logged-in tool',1.5<=pf.pace()<=3 and pf.pace()<pf.PACE and not any(w>5 for w in waits),'%s %s'%(pf.pace(),str(waits)[:60]))
+        c=FakeSess('Failed'); pf.new_session=lambda:c; pf._S.clear(); pf._last[0]=0.0
+        with contextlib.redirect_stdout(io.StringIO()): pf._get({'action':'query','list':'search'})
+        ok('a login that is refused: the tool carries on without it, at the old spacing',pf.pace()==pf.PACE and not any('assert' in x[1] for x in c.calls))
+    finally: pf.new_session=real_new; pf.time.sleep=slp; os.environ.clear(); os.environ.update(env); pf._S.clear()
 rp=G('row_problem',lambda v:'missing')
 ok('a chosen row may say how the picture was found, and a "none" under which search',rp(tuple(row)+('loose',))=='' and rp(tuple(row))=='' and rp(('','2026-11-22','nothing on Commons near the pin',2))=='' and rp(('','2026-11-22','only a street sign'))=='',[rp(tuple(row)+('loose',)),rp(('','2026-11-22','nothing on Commons near the pin',2))])
 ok('a row with a picture from elsewhere, or no credit, is refused',rp(('https://example.org/a.jpg',900,600,'Pat','CC BY 4.0','https://commons.wikimedia.org/wiki/File:A.jpg','2026-11-22'))!='' and rp((row[0],900,600,'','CC BY 4.0',row[5],'2026-11-22'))!='' and rp(tuple(row)+('made up',))!='')
