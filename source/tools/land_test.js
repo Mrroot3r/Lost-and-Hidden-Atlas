@@ -16,6 +16,13 @@ const { chromium } = require('playwright');
   // ---- upright: as it was
   let side=await R('#side'), stage=await R('#stage');
   ok('upright: the map is above the menu',stage.b<=side.t+1&&stage.w>380,[stage.b,side.t].join(' '));
+  // The compare divider pushed to the right edge: its right-hand label used to stick out past the screen, which made the page itself
+  // wider than the phone. In the Android app the whole page could then be dragged about by the layer bar, with blank beside and below it.
+  await p.evaluate(()=>{ document.getElementById('lb-cmp').click(); }); await p.waitForTimeout(500);
+  { const g=await p.$('#swipe .grip'), r=await g.boundingBox(); await p.mouse.move(r.x+18,r.y+18); await p.mouse.down(); await p.mouse.move(388,r.y+18,{steps:5}); await p.mouse.up(); await p.waitForTimeout(300); }
+  const wide=await p.evaluate(()=>{ window.scrollTo(200,200); const s=document.scrollingElement; return {w:s.scrollWidth,h:s.scrollHeight,iw:innerWidth,ih:innerHeight,x:scrollX,y:scrollY,grip:document.querySelector('#swipe .grip').getBoundingClientRect().left}; });
+  ok('upright, compare divider at the right edge: the page is still exactly the size of the screen and cannot be scrolled',wide.grip>300&&wide.iw===390&&wide.ih===844&&wide.w<=390&&wide.h<=844&&wide.x===0&&wide.y===0,JSON.stringify(wide));
+  await p.evaluate(()=>{ window.scrollTo(0,0); document.getElementById('lb-cmp').click(); }); await p.waitForTimeout(300);
   // ---- turned on its side, at the two sizes phones come in (under and over the old 820-point switch)
   for(const [W,H,name] of [[780,360,'narrow phone'],[915,412,'wide phone']]){
     await p.setViewportSize({width:W,height:H}); await p.waitForTimeout(500);

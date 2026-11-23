@@ -66,6 +66,10 @@
   --shadow:0 1px 2px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.10); color-scheme:light }
 
 html,body{height:100%}
+/* The page is one screen and never scrolls as a whole: the lists and sheets scroll inside it. Anything that sticks out past an edge
+   (the compare divider's label did, pushed to the right) is cut off there. Left visible it made the page wider than the phone,
+   and in the Android app the whole page could be dragged about by the layer bar, with blank beside and below it. */
+@media screen{ html,body{overflow:hidden} #stage{overflow:hidden} }
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--ff);-webkit-text-size-adjust:100%}
 *{box-sizing:border-box}
 button,input,select,textarea{font:inherit;color:inherit}
