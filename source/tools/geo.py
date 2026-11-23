@@ -36,7 +36,8 @@ if __name__=='__main__':
             try: res[k]=arc(q)
             except Exception as e: res[k]=['ERR',str(e)]
             print(k,'|',q,'->',res[k]); time.sleep(0.15)
-        json.dump(res,open(a[1],'w'),indent=0); sys.exit(0)
+        if len(a)>1: json.dump(res,open(a[1],'w'),indent=0)          # without a second argument the answers are only printed (it used to crash here)
+        sys.exit(0)
     for q in a:
         b=box(q)
         try: r=arc(q,b,3)

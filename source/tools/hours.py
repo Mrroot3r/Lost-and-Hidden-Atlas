@@ -40,7 +40,7 @@ def tried():
 SHUT=re.compile(r'derelict|vacant|closed\b(?! (?:mon|tue|wed|thu|fri|sat|sun|for the season|in winter|on))|not open|no longer (?:a church|used)|private (?:home|house|residence)|now (?:a|an) (?:house|home|residence|apartment)|apartments|deconsecrated',re.I)
 def wants(s):      # a church that is plainly shut or turned into a house is not asked
     return s['st']=='standing' and not s.get('mine') and (s['acc']=='open' or (s['cat']=='worship' and s['acc'] in('view','public') and not SHUT.search(s.get('accn') or '')))
-def waiting(): T=tried(); return [s for s in S if wants(s) and not s.get('hrs') and s['id'] not in T]
+def waiting(): T=tried(); return [s for s in S if wants(s) and not s.get('hrs') and s['id'] not in T and not s['id'].startswith('lm-')]      # a thin landmark pin has no place list of its own to take hours: check.py refuses one in an hours file
 a=[x for x in sys.argv[1:] if x!='--fresh']
 if not a:
     by={}; T=tried()
@@ -89,7 +89,7 @@ if a[0]=='set':
     if i not in BY: sys.exit('No such place id: '+i)
     if not h or len(h)>180: sys.exit('The hours are one row: 1 to 180 characters (this is %d). Put the rest in a note for the next session.'%len(h))
     if not re.match(r'https?://[^\s<>"]+$',u): sys.exit('Give the address of the page the hours were read on (http:// or https://).')
-    if h!='?' and not re.search(r'\d|noon|appointment|services?|closed|no regular',h,re.I): sys.exit('That does not read as days and times. Use "?" if the page gives none.')
+    if h!='?' and not re.search(r'\d|noon|appointment|services?|closed|no regular|daily|every day|weekends?|sunrise|sunset|dawn|dusk|daylight|year.round|summer|winter|spring|autumn|fall|season|(mon|tues|wednes|thurs|fri|satur|sun)day',h,re.I): sys.exit('That does not read as days and times. Use "?" if the page gives none.')
     f=myfile(); cur={}
     if os.path.exists(f): cur=dict(importlib.import_module(os.path.basename(f)[:-3]).HOURS)
     cur[i]=(h,datetime.date.today().isoformat(),u,True) if op else (h,datetime.date.today().isoformat(),u)

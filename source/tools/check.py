@@ -103,6 +103,10 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if not(BOUNDS[0]<=p['lat']<=BOUNDS[2] and BOUNDS[1]<=p['lon']<=BOUNDS[3]): err.append(f"{w}: pin {p['lat']},{p['lon']} is outside the map bounds; widen maxBounds in app.js if this is a new area")
         sts=states_at(p['lat'],p['lon']); stt=sts[0] if sts else None; want=REG_STATE.get(p['reg'])
         if want and want not in sts and near_state(p['lat'],p['lon'],want): warn.append(f"{w}: the pin is just outside {want}'s outline, which is coarse along borders; fine if the pin is on the {want} side on the aerial")
+        # a pin in no state's outline at all is at sea by the outlines' reckoning: an island or a shore they leave out (the Dry Tortugas, Ship
+        # Island, Dauphin Island and Mobile Point all stopped a session). If its own state's outline is within 150 km it is taken for that
+        # state's island or shore and only warned about; a pin inside ANOTHER state's outline is still an error.
+        elif want and not sts and near_state(p['lat'],p['lon'],want,150000): warn.append(f"{w}: the pin is outside every state's outline, as an island or a stretch of coast can be (the outlines are coarse); fine if it is on {want}'s shore or one of its islands on the aerial")
         elif p['reg'] in REG_STATE and want not in sts: err.append(f"{w}: the pin is in {stt or 'no listed state'} but region '{p['reg']}' belongs to {REG_STATE[p['reg']]}; check the coordinate and the region")
         if p.get('th') and not(isinstance(p['th'],(list,tuple)) and len(p['th'])==2): err.append(f'{w}: th must be [lat, lon]')
         if not p['story'].strip(): err.append(f'{w}: empty story')

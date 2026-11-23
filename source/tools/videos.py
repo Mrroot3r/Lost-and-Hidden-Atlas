@@ -80,10 +80,10 @@ def problems(md,ids):
     for c in R:
         o=c[4].lower()
         if not c[0]: out.append('a row has no name'); continue
-        k=next((x for x in OUTCOMES if o==x or o.startswith(x+' ')),None)
+        k=next((x for x in OUTCOMES if o==x or (o.startswith(x) and o[len(x)] in ' :,;(.')),None)          # a remark may follow: "gone: razed 1942"
         if not k: out.append('"%s": the outcome must begin with one of: %s'%(c[0],', '.join(OUTCOMES))); continue
         if k in ('added','on the atlas'):
-            pid=c[4][len(k):].strip()
+            pid=(c[4][len(k):].strip(' :').split() or [''])[0].strip('`.,;')          # the id is the first word; a remark after it is not part of it
             if not pid: out.append('"%s": say which place: %s <place id>'%(c[0],k))
             elif pid not in ids: out.append('"%s": no such place id on the Atlas: %s'%(c[0],pid))
     return out
