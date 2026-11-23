@@ -1,0 +1,7 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'cabildo-new-orleans':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/French_Quarter_Fest_Parade_2026_-_Jackson_Square.jpg/960px-French_Quarter_Fest_Parade_2026_-_Jackson_Square.jpg', 900, 506, 'https://linktr.ee/carnaval.com', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:French_Quarter_Fest_Parade_2026_-_Jackson_Square.jpg', '2026-11-23', 'pin'),
+ 'confederate-memorial-hall-new-orleans':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Confederate_Memorial_Hall_New_Orleans_LA_north_view.jpg/960px-Confederate_Memorial_Hall_New_Orleans_LA_north_view.jpg', 900, 675, 'NastyCanasta', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Confederate_Memorial_Hall_New_Orleans_LA_north_view.jpg', '2026-11-23', 'pin+name'),
+ 'old-ursuline-convent-new-orleans':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Ursuline_Convent%2C_New_Orleans_French_Quarter%2C_April_2023.jpg/960px-Ursuline_Convent%2C_New_Orleans_French_Quarter%2C_April_2023.jpg', 900, 1195, 'edenpictures', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Ursuline_Convent,_New_Orleans_French_Quarter,_April_2023.jpg', '2026-11-23', 'pin+name'),
+}
