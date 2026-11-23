@@ -1,0 +1,10 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'central-high-school-okc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Old_Central_High_School%2C_Robinson_Avenue_and_NW_8th_Street%2C_Oklahoma_City%2C_OK.jpg/960px-Old_Central_High_School%2C_Robinson_Avenue_and_NW_8th_Street%2C_Oklahoma_City%2C_OK.jpg', 900, 675, 'Warren LeMay', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Old_Central_High_School,_Robinson_Avenue_and_NW_8th_Street,_Oklahoma_City,_OK.jpg', '2026-11-23', 'pin+name'),
+ 'oklahoma-city-municipal-building':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Oklahoma_City_May_2016_33_%28Municipal_Building%29.jpg/960px-Oklahoma_City_May_2016_33_%28Municipal_Building%29.jpg', 900, 600, 'Michael Barera', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Oklahoma_City_May_2016_33_(Municipal_Building).jpg', '2026-11-23', 'pin+name'),
+ 'oklahoma-city-university-campus-district':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Oklahoma_City_University_-_Administration_Building.jpg/960px-Oklahoma_City_University_-_Administration_Building.jpg', 900, 675, 'Matthew Rutledge (rutlo)', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Oklahoma_City_University_-_Administration_Building.jpg', '2026-11-23', 'name'),
+ 'oklahoma-governors-mansion':('', '2026-11-23', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'post-office-courthouse-federal-building-okc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/OK-OKC-USPO-courthouse-southwest.JPG/960px-OK-OKC-USPO-courthouse-southwest.JPG', 900, 540, 'Joel Bradshaw', 'CC0', 'https://commons.wikimedia.org/wiki/File:OK-OKC-USPO-courthouse-southwest.JPG', '2026-11-23', 'pin+name'),
+ 'taft-junior-high-school-okc':('', '2026-11-23', 'candidates were other Taft schools in California, Washington and Illinois', 3),
+}
