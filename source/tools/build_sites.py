@@ -110,7 +110,8 @@ if ALIAS:
     for o,n in ALIAS.items():
         if o in by:
             a,c=by[o],by[n]; m=math.hypot((a['lat']-c['lat'])*111000,(a['lon']-c['lon'])*111000*math.cos(math.radians(a['lat'])))
-            if m>600: raise SystemExit(f"{n} says it replaces '{o}', but that pin is {int(m)} m away: was= is for the same place only")
+            # it was 600 m; some thin landmark pins sit over a kilometre from the place they name (Oakwood Cemetery's), and a full entry could not replace them
+            if m>1500: raise SystemExit(f"{n} says it replaces '{o}', but that pin is {int(m)} m away: was= is for the same place only")
     sites=[s for s in sites if s['id'] not in ALIAS]
 json.dump(ALIAS,open('build/alias.json','w'),indent=0,sort_keys=True)
 ids=[s['id'] for s in sites]

@@ -13,7 +13,7 @@ import sys,json,io,math,os,requests
 from PIL import Image,ImageDraw
 S={s['id']:s for s in json.load(open('build/sites.json'))}
 a=sys.argv[1:]
-LIDAR='--lidar' in a; a=[x for x in a if x!='--lidar']
+LIDAR='--lidar' in a; a=[x for x in a if x not in('--lidar','--ids')]          # ids are bare arguments; --ids is accepted because sessions type it
 if a[:1]==['--batch']: ids=[i for i,s in S.items() if s.get('new')==a[1]]; tag=a[1]
 else: ids=a; tag='picked'
 if not ids: sys.exit('no places matched')
