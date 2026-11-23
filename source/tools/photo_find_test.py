@@ -258,6 +258,19 @@ if callable(lg) and hasattr(pf,'new_session'):
         if hasattr(pf,'_T'): pf._T.update(dict(q=12,qs=30.0,qw=22.0,p=40,ps=310.0,pw=240.0,pr=5))
         ok('the tool also ends by saying where its time went: how many questions and how long, how many preview pictures and how long, and how many were refused','12 questions' in tn() and '40 preview pictures' in tn() and '5 refused' in tn() and '310' in tn(),tn()[:160])
     finally: pf.new_session=real_new; pf.time.sleep=slp; os.environ.clear(); os.environ.update(env); pf._S.clear()
+# ---- a second look (November 23, 2026). Until then a candidate whose address was the file itself came out as a grey box on the sheet,
+#      so some places were given "none" by a session that never saw the one picture that fitted. Those are offered once more, and
+#      only those: a "none" given after a look, under the search before this one, at a place that has such a candidate.
+aa=G('asked_again',lambda v:None); sw=getattr(pf,'seen_whole',None); N=getattr(pf,'NOTHING','')
+ok('the search has a new number, so that a none recorded from now on is not asked again',getattr(pf,'SEARCH',0)==3)
+ok('offered again: a none given after a look under the search before this one, and any none from before the searches were numbered',aa(('','2026-11-22','only a street sign',2)) is True and aa(('','2026-11-20','only a street sign')) is True and aa(('','2026-11-21','x',1)) is True)
+ok('not offered again: a none from now on, a place Commons had nothing for, and a place that has its picture',aa(('','2026-11-23','only a street sign',3)) is False and aa(('','2026-11-22',N,2)) is False and aa(tuple(row)) is False,[aa(('','2026-11-22',N,2))])
+thumb=dict(src='https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/A.jpg/900px-A.jpg'); whole=dict(src='https://upload.wikimedia.org/wikipedia/commons/a/ab/Small.jpg?utm=x')
+ok('the tool can tell whether a place\'s candidates were all shown at the earlier look',callable(sw))
+if callable(sw):
+    ok('every candidate was a small copy then, so the session saw them all: the none stands and nobody looks again',sw(('','2026-11-22','only a street sign',2),[thumb,thumb]) is True)
+    ok('one candidate\'s address is the file itself, which was a grey box then: the place gets its second look',sw(('','2026-11-22','only a street sign',2),[thumb,whole]) is False)
+    ok('a place never looked at, or a none from before the searches were numbered, is simply shown',sw(None,[thumb]) is False and sw(('','2026-11-20','x'),[thumb]) is False and sw(tuple(row),[thumb]) is False)
 rp=G('row_problem',lambda v:'missing')
 ok('a chosen row may say how the picture was found, and a "none" under which search',rp(tuple(row)+('loose',))=='' and rp(tuple(row))=='' and rp(('','2026-11-22','nothing on Commons near the pin',2))=='' and rp(('','2026-11-22','only a street sign'))=='',[rp(tuple(row)+('loose',)),rp(('','2026-11-22','nothing on Commons near the pin',2))])
 ok('a row with a picture from elsewhere, or no credit, is refused',rp(('https://example.org/a.jpg',900,600,'Pat','CC BY 4.0','https://commons.wikimedia.org/wiki/File:A.jpg','2026-11-22'))!='' and rp((row[0],900,600,'','CC BY 4.0',row[5],'2026-11-22'))!='' and rp(tuple(row)+('made up',))!='')

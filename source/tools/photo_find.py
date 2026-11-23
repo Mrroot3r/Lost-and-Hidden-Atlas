@@ -50,7 +50,9 @@ UA={'User-Agent':'lost-hidden-atlas-photos/1.0 (https://github.com/Mrroot3r/Lost
 API='https://commons.wikimedia.org/w/api.php'
 FREE=re.compile(r'^(CC BY(-SA)?( \d(\.\d)?)?( [a-z]{2,3})?|CC0( 1\.0)?|Public domain|PD[- ].*|No restrictions)$',re.I)
 NOTPHOTO=re.compile(r'\b(map|maps|plan|plans|diagram|logo|seal|coat of arms|flag|locator|location|survey|chart|drawing|drawings|sketch|blueprint|elevation|postmark|signature|sanborn|topo|usgs|aerial|sheet \d+ of \d+)\b',re.I)
-SEARCH=2                  # which search a "none" was recorded under. 1 (or no number): before November 22, 2026, when the finder refused TIFF files,
+SEARCH=3                  # which search a "none" was recorded under. 1 (or no number): before November 22, 2026, when the finder refused TIFF files,
+                          # 3: since November 23, 2026, when every preview became a small copy. Before, a candidate whose address was the file
+                          # itself came out as a grey box, and a session could say none without having seen the picture that fitted
                           # asked Commons only under a place's whole title and its town, opened no category and looked no further than the pin's reach.
 UNSURE=('loose','far')    # how a chosen picture was found, when that is worth a second look: its name only partly matched, or it was taken further off
 HOW=('pin','pin+name','name','category')+UNSURE
@@ -226,8 +228,14 @@ def all_pics(folder=None):
                 if o is None or _day(v)>_day(o) or (_day(v)==_day(o) and (v[0] or not o[0])): P[k]=tuple(v)
     return P
 def asked_again(v):
-    """a "none" recorded under a narrower search than today's (SEARCH) is offered once more: the wider search may now have a picture for it"""
-    return bool(v) and not v[0] and (len(v)<4 or v[3]<SEARCH)
+    """a "none" is offered once more when it was recorded before the searches were numbered or under the first (a wider search may now have
+    a picture for it), or was given after a look under the second, when one candidate may have been a grey box. A place Commons had
+    nothing for under the second search is not: nothing about that has changed"""
+    return bool(v) and not v[0] and (len(v)<4 or v[3]<2 or (v[3]<SEARCH and v[2]!=NOTHING))
+def seen_whole(prior,C):
+    """True when a place was given "none" after a look under the second search and every candidate now found is a small copy, so that
+    look saw all of them: the none stands and nobody looks again. A candidate whose address is the file itself was a grey box then"""
+    return bool(prior) and not prior[0] and len(prior)>3 and prior[3]==2 and prior[2]!=NOTHING and all('/thumb/' in str(c.get('src') or '').split('?')[0] for c in C)
 def rank(C,nw,town):
     """candidates in the order shown: those whose own name and description name the place first (taken at the pin before those with no
     position), then the rest, nearest first"""
@@ -445,6 +453,11 @@ def look(s,record=None):
         if record: write_pick(record,s['id'],('',datetime.date.today().isoformat(),NOTHING,SEARCH)); print('   Nothing on Commons: no free photograph near the pin, none under its names, no category of its own. Recorded as none by the tool; nothing for you to do.')
         else: print('   Nothing on Commons: no free photograph near the pin, none under its names, no category of its own.')
         return 0
+    if record:
+        prior=all_pics().get(s['id'])
+        if seen_whole(prior,C):
+            write_pick(record,s['id'],('',prior[1],prior[2],SEARCH)); print('   Looked at before, and every candidate was on the sheet then: the earlier none stands. Recorded by the tool; nothing for you to do.')
+            return 0
     tiles=[]
     for n,c in enumerate(C,1):
         im=None; _t0=time.time(); _T['p']+=1
@@ -518,7 +531,7 @@ def main(a):
             if look(s,_myfile()): got.append(s['id'])
             else: empty+=1
             if len(got)>=n: break
-        print('\n%d place(s) to look at: %s. %d had nothing on Commons and were recorded as none by the tool. %d still wait.'%(len(got),' '.join(got) or 'none',empty,len(Wt)-len(got)-empty))
+        print('\n%d place(s) to look at: %s. %d had nothing on Commons, or nothing that an earlier look had not seen, and were recorded as none by the tool. %d still wait.'%(len(got),' '.join(got) or 'none',empty,len(Wt)-len(got)-empty))
         if got: print('For each: LOOK at its sheet, then  set <id> <n>  or  set <id> none "<what they showed>" . Then run  next  again.')
         return
     if a[0]=='set':
