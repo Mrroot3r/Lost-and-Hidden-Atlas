@@ -86,12 +86,17 @@ git -C "$REPO" rev-parse HEAD > "$W/.setup_commit" 2>/dev/null || true    # publ
 # what this machine can and cannot do
 MISS=""
 PKG() { case $1 in PIL) echo Pillow;; *) echo $1;; esac; }
+# Each module is tried the way the tools use it, and installed for the python3 that will run them. A bare "import PIL" passes
+# on a machine whose system copy of Pillow is broken (the pin check then dies on "cannot import name '_imaging'"), and plain
+# "pip" may belong to another Python than "python3" does: both cost sessions an hour in November 2026 (their notes say so).
+TRY() { case $1 in PIL) python3 -c "from PIL import Image, ImageDraw; Image.new('RGB',(2,2)).resize((1,1))" 2>/dev/null;; *) python3 -c "import $1" 2>/dev/null;; esac; }
 for m in requests PIL rasterio shapely numpy scipy pypdf; do
-  python3 -c "import $m" 2>/dev/null && continue
-  echo "installing the Python module $m ..."; pip install -q --break-system-packages "$(PKG $m)" >/dev/null 2>&1 || pip install -q "$(PKG $m)" >/dev/null 2>&1 || true
-  python3 -c "import $m" 2>/dev/null || MISS="$MISS $m"
+  TRY $m && continue
+  echo "installing the Python module $m ..."; EXTRA=""; [ "$m" = PIL ] && EXTRA="--ignore-installed"
+  python3 -m pip install -q --break-system-packages $EXTRA "$(PKG $m)" >/dev/null 2>&1 || python3 -m pip install -q $EXTRA "$(PKG $m)" >/dev/null 2>&1 || pip install -q --break-system-packages "$(PKG $m)" >/dev/null 2>&1 || true
+  TRY $m || MISS="$MISS $m"
 done
-[ -n "$MISS" ] && echo "MISSING Python modules:$MISS  (requests: everything; PIL + rasterio: old-map crops and pin checks; shapely: rebuilding lines). Install: pip install --break-system-packages requests Pillow rasterio shapely"
+[ -n "$MISS" ] && echo "MISSING Python modules:$MISS  (requests: everything; PIL + rasterio: old-map crops and pin checks; shapely: rebuilding lines). Install: python3 -m pip install --break-system-packages --ignore-installed requests Pillow rasterio shapely"
 node -e "require('playwright')" 2>/dev/null || echo "MISSING Playwright for Node: the smoke test cannot run. Install: npm i playwright && npx playwright install chromium"
 (cd "$W" && python3 tools/build_sites.py >/dev/null 2>&1) || true         # the place list, so nearby.py and start.py work at once
 echo "Workspace ready at $W. Build with: ATLAS=$W bash $W/tools/all.sh"
