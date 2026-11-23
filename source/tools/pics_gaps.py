@@ -1,0 +1,8 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'atlantic-city-mercantile-wy':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/General_view_of_front_facade_from_southeast_-_Mercantile_Bar%2C_Atlantic_City%2C_Fremont_County%2C_WY_HABS_WYO%2C7-ATCI%2C4-1.tif/lossy-page1-960px-General_view_of_front_facade_from_southeast_-_Mercantile_Bar%2C_Atlantic_City%2C_Fremont_County%2C_WY_HABS_WYO%2C7-ATCI%2C4-1.tif.jpg', 900, 652, 'Jack Boucher', 'Public domain', 'https://commons.wikimedia.org/wiki/File:General_view_of_front_facade_from_southeast_-_Mercantile_Bar,_Atlantic_City,_Fremont_County,_WY_HABS_WYO,7-ATCI,4-1.tif', '2026-11-23', 'name'),
+ 'historic-governors-mansion-cheyenne':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/29/Wyoming_Governor%27s_Mansion_-_panoramio.jpg/960px-Wyoming_Governor%27s_Mansion_-_panoramio.jpg', 900, 611, 'Jim Bowen', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Wyoming_Governor%27s_Mansion_-_panoramio.jpg', '2026-11-23', 'pin'),
+ 'independence-rock-wy':('', '2026-11-23', 'only roadside signs at the rest area, 300 m away', 3),
+ 'mountain-view-hotel-centennial':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Mountain_View_Hotel.JPG/960px-Mountain_View_Hotel.JPG', 900, 437, 'Jeffrey Beall', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Mountain_View_Hotel.JPG', '2026-11-23', 'pin+name'),
+}
