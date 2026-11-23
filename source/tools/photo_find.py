@@ -273,16 +273,45 @@ PACE=6.5; _last=[0.0]      # seconds between questions to Commons. Its allowance
                            # asking in the same hour shares it. At 2.5 s every fourth question was refused with a 45-second wait, which made
                            # a place cost half a minute or more and the first unattended batch reach 20 places in 40 minutes; spaced
                            # under the allowance, nothing is refused and a place costs about 20 seconds (November 22, 2026)
-def _get(params,tries=8):
+# Logged in, Commons allows a tool several thousand questions an hour where one known only by its address gets a few hundred
+# (its rate-limit page, 2026). The login is a bot password with basic rights only, made by the owner at Special:BotPasswords; it
+# is kept outside the repository, in two environment variables of the cloud environment the pictures job runs in, and is never
+# printed, logged or written to a file. Without the variables, or if the login is refused, the tool works as it did before.
+PACE_IN=2.0; _S={}          # 1,800 questions an hour when logged in: well under "several thousand", and a refusal is still obeyed
+def new_session():
     import requests
+    x=requests.Session(); x.headers.update(UA); return x
+def login(sess,user,pw):
+    """True when Commons accepts the bot password. Says nothing that holds the name or the password."""
+    try:
+        t=sess.get(API,params=dict(action='query',meta='tokens',type='login',format='json',formatversion='2'),timeout=60).json()['query']['tokens']['logintoken']
+        j=sess.post(API,data=dict(action='login',lgname=user,lgpassword=pw,lgtoken=t,format='json',formatversion='2'),timeout=60).json()
+        if (j.get('login') or {}).get('result')=='Success': return True
+        print('Commons did not accept the login (%s); carrying on without it, at the slower pace.'%str((j.get('login') or {}).get('result') or 'no answer')[:30])
+    except Exception as e:
+        print('Commons could not be logged in to (%s); carrying on without it, at the slower pace.'%type(e).__name__)
+    return False
+def _sess():
+    if 's' not in _S:
+        _S['s']=new_session(); u=os.environ.get('ATLAS_COMMONS_USER','').strip(); pw=os.environ.get('ATLAS_COMMONS_PASS','').strip()
+        _S['in']=bool(u and pw) and login(_S['s'],u,pw)
+        if _S['in']: print('Logged in to Commons: questions go faster.')
+    return _S['s']
+def pace(): return PACE_IN if _S.get('in') else PACE
+def _get(params,tries=8):
+    sess=_sess()
     for k in range(tries):
-        w=PACE-(time.time()-_last[0])
+        w=pace()-(time.time()-_last[0])
         if w>0: time.sleep(w)
         _last[0]=time.time()
-        r=requests.get(API,params=dict(params,format='json',formatversion='2'),headers=UA,timeout=60)
+        q=dict(params,format='json',formatversion='2')
+        if _S.get('in'): q['assert']='user'          # if the login has lapsed Commons says so, where it would otherwise answer at the anonymous allowance without a word
+        r=sess.get(API,params=q,headers=UA,timeout=60)
         if r.status_code==429 or r.status_code>=500: time.sleep(min(90,int(r.headers.get('Retry-After') or 0) or 8*(k+1))); continue
         r.raise_for_status(); j=r.json()
         if refused(j):
+            if _S.get('in') and isinstance(j['error'],dict) and j['error'].get('code')=='assertuserfailed':          # logged out part-way: log in again once, or go on without
+                u=os.environ.get('ATLAS_COMMONS_USER','').strip(); pw=os.environ.get('ATLAS_COMMONS_PASS','').strip(); _S['in']=(not _S.get('again')) and login(sess,u,pw); _S['again']=True; continue
             if k>=3: raise SystemExit('Wikimedia Commons answered with an error: %s. Nothing was recorded; run the same command again later.'%str(j['error'].get('code') if isinstance(j['error'],dict) else j['error'])[:80])
             time.sleep(8*(k+1)); continue        # an error inside a 200 reply (too busy, too many requests): never read it as "nothing here"
         return j
