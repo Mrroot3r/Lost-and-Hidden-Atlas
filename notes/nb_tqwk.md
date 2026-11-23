@@ -11,8 +11,6 @@ Nineteen places spread across New Brunswick, the province's first real batch (Fo
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Partridge Island Quarantine Station | Saint John harbour, NB | National Historic Site (Register 12721) and light tower (13264) | Whether the public may go on the island now; a source for what stands |
-| Fort Howe | Saint John, NB (45.2765, -66.0728 from the Register list) | National Historic Site (Register 13001) | What is on the ground and access |
 | Fort Nashwaak (Naxoat) site | Fredericton, NB (45.9618, -66.6254) | National Historic Site (Register 13272) | Anything to see above ground |
 | Swallowtail Lighthouse | Grand Manan, NB | Lightkeeper's house on the Register (16105) | Register statement not read; access |
 | MacDonald Farm Provincial Historic Site | Bartibog, Miramichi, NB (47.0971, -65.3555) | Register idp 6244 | Statement and opening not read |
