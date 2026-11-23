@@ -4,7 +4,7 @@ This file is everything a model needs to find cellar holes and farm sites that n
 
 **What you are doing.** New York State bought thousands of worn-out hill farms and let them go back to woods. The houses are gone but the cellars are still holes in the ground, and the state's LiDAR ground model shows them through the trees. The tools scan a unit of public land for cellar-sized pits, keep the pits that lie beside a building drawn on a USGS map from about 1900, and show them to you. **You look at the pictures and decide.** A few in every hundred become a place on the map, marked as an unverified lead for the owner to walk to.
 
-**One command does everything:** `python3 tools/lidar.py`. It keeps a ledger of every unit swept and every candidate with its verdict, in the repository, so each session starts where the last one stopped. It covers New York and Massachusetts; the section "Massachusetts" below says what is different there.
+**One command does everything:** `python3 tools/lidar.py`. It keeps a ledger of every unit swept and every candidate with its verdict, in the repository, so each session starts where the last one stopped. It covers New York, Massachusetts, Missouri and Kansas; the sections "Massachusetts" and "Missouri and Kansas" below say what is different there.
 
 ## Rules that do not bend
 
@@ -58,7 +58,7 @@ python3 tools/lidar.py sweep "Burnt-Rossman Hills State Forest"
 - **Poor ground:** city and town parks (their own earthworks), anything under 300 acres, flat valley floors, and the high Adirondacks, where the ground model is coarse and only 5 of the first 94 held up.
 - Leave alone names that belong to many places at once ("Memorial Park", "Conservation Area", "New York State Lands", "Unknown Park", "Erie Canal"). `sweep` refuses a name whose pieces lie more than 90 km apart.
 - Sweep only units whose access column says OA or RA.
-- `find` and `near` list units in New York and Massachusetts alike; `find "name" --state ma` searches one state. `sweep` works out which state a unit is in and says so. A unit in any other state is refused.
+- `find` and `near` list units in New York, Massachusetts, Missouri and Kansas alike; `find "name" --state ma` (or `ny`, `mo`, `ks`) searches one state. `sweep` works out which state a unit is in and says so. A unit in any other state is refused.
 
 ### Sweeping on the owner's own computer
 
@@ -232,11 +232,26 @@ The method is the same. What differs:
 - **Sources:** add the managing body's own page for the forest to the batch's source list (the first batch, `tools/data_lidar_1116_kdmsf.py`, shows how) and take hours, parking and rules from it. Massachusetts DCR's rules say to stay on designated trails and roads: say how far off the road each pit is.
 - **What the first four units gave (November 2026):** Kenneth Dubuque Memorial State Forest, Hawley: 131 map buildings, 26 pits beside one, 4 published, all in or near the abandoned village of South Hawley, which DCR itself lists; 33 km of stone wall. Catamount State Forest, Colrain: 24 map buildings, 3 pits, none published (one "maybe"). Monroe State Forest: 57 map buildings, 10 pits, given a first verdict from the contact sheet (six "maybe" waiting for full sheets); 20 km of wall. Savoy Mountain State Forest: 161 map buildings, 47 pits, **none looked at yet**; 48 km of wall. The western edge of the Dubuque forest lies on the Greylock sheet and was read from its 1886 printing before the rule above existed; it was not read again.
 
+## Missouri and Kansas
+
+Set up on November 23, 2026 for the country round Kansas City, at the owner's request. The method is the same. What differs:
+
+- **Old maps: up to 1936, and no later.** This country's first surveys are 1:125,000 sheets of the 1890s, too coarse to show a house. The first detailed sheets came between 1910 and 1936, at 1:62,500 (Smithville 1914, Leavenworth 1910, Dearborn 1927), 1:48,000 (Kearney 1936) or 1:24,000 (Blue Springs 1933, Lees Summit 1934). The sweep reads the oldest of those for each spot. The owner's rule: a sheet up to 1936 is old enough; a 1950s sheet is not, because a building on it need not be old. So ground whose first detailed sheet is later than 1936 (Clinton Lake's is 1955, Hillsdale Lake's 1957) gives "0 buildings on the old sheets": that is the rule working, not a fault, and nothing is to be done about it. The comparison sheets still show a later map in their fourth panel where one exists; use it to say how long a building stood, never to accept a candidate the old sheet does not show.
+- **How the detailed sheets are read.** A 1:48,000 or 1:24,000 sheet draws roads heavier for the size of a building, and read like a New York sheet the 1936 Kearney sheet gave mostly road junctions, railway ticks and lettering. So on those scales a building must be a solid, nearly square mark with paper round it (`tools/lidar_oldmap.py`). Looked at mark by mark: on Kearney 1936, 23 marks in a 4 km square, nearly all true, with a numeral, a letter and two railway ticks among them; on Blue Springs 1933, 14 marks, every one a true building, with about one true building in three missed (those hard against a lane or a label). Expect a letter or a numeral now and then: on the sheet, look for the black square before believing the pit.
+- **Ground model:** the USGS 3DEP service, 1 m, checked on both sides of the state line.
+- **Aerial:** Kansas has its own 2024 leaf-off flight. Missouri has none wired in, so the sheets show a satellite picture that may have leaves on: "nothing standing" cannot be read off it under trees, so say so.
+- **Ownership:** neither state publishes a tax-parcel file for the whole state. Missouri publishes the parcels the state itself owns: a pit on one comes back `STATE LAND` and may be published plainly (Platte Falls, Weston Bend and Watkins Mill do). Anywhere else, and everywhere in Kansas, `check` says there is no parcel record and the federal public-land record decides: `MAY PUBLISH WITH A CAVEAT`, and the draft writes the caveat. The owner has said that is enough here. `DO NOT PUBLISH` still means what it says.
+- **Stone walls:** not looked for. This is hedge and wire country; the wall finder is not run and no wall layer is made.
+- **Region:** the Missouri counties round Kansas City go to `kcmo`; Kansas is one region, `ks`. A pit in any other Missouri county leaves `TODO: region`: tell the owner.
+- **Which units:** `python3 tools/lidar.py near 39.10 -94.58 40` lists the unswept public land within 40 miles of Kansas City. The good ground is farm country that was bought up whole: the Army Corps lake lands (Smithville, Longview), the state conservation areas, Fleming Park. Leave alone the units whose name belongs to many places at once ("City Park", "Memorial Park", "Unknown Park"): each is hundreds of scattered town parks under one name.
+- **Access:** Missouri conservation areas are listed `RA` (open, with seasons and rules): take the hours, the hunting seasons and the parking from the Missouri Department of Conservation's own page for the area, and say in the access line that the area is hunted in season.
+- **What the first four units gave (November 23, 2026):** Platte Falls Conservation Area: 135 map buildings, 17 pits beside one, on river bottom where most pits are ditches and levee corners; one farmstead on a lane on the 1910 sheet, still drawn in 1951, is pits and rubble now (`pfca8`, `pfca9`, marked "maybe", ownership checked: state land). Bluffwoods Conservation Area: 51 map buildings, 3 pits; one roadside farm site drawn in 1927 and 1961 is woods now (`bca2`, `bca3`, "maybe"). Watkins Woolen Mill State Park: 7 map buildings, 5 pits, all standing buildings of the historic site or a pond: nothing new, as it should be. Burr Oak Woods Conservation Area: 4 map buildings, 2 pits, not yet judged. No place has been written from any of them yet.
+
 ## Another state
 
 Not a job for a research session: the owner asks for it. A new state needs, in this order:
 
-1. **An entry in `STATES` in `tools/lidar.py`**: its name, a generous box, and where the ground model comes from. `3dep` works anywhere the USGS has 1 m LiDAR; run `python3 tools/lidar_dem.py <lat> <lon>` on a wooded hill there and read whether it says `fine (1 m LiDAR)` or `coarse`, then look at `research/lidar/test.png`.
+1. **An entry in `STATES` in `tools/lidar.py`**: its name, a generous box, where the ground model comes from, and, where the state was not surveyed at 1:62,500 before 1915, which old sheets may be read (`oldmap`; the rule and the numbers are in `tools/lidar_oldmap.py`, and "Missouri and Kansas" above says how that was tested). `3dep` works anywhere the USGS has 1 m LiDAR; run `python3 tools/lidar_dem.py <lat> <lon>` on a wooded hill there and read whether it says `fine (1 m LiDAR)` or `coarse`, then look at `research/lidar/test.png`.
 2. **Its tax parcels in `tools/parcel.py`**: the state's own parcel service, and a rule that turns an owner and a use code into `STATE LAND`, `public ...`, a tax-exempt kind that is not government, or `PRIVATE`. Read the state's own code table; do not guess what a code means. Never print an owner's name.
 3. **Its leaf-off aerial in `tools/ortho.py`**, if the state publishes one. Without it the sheets fall back to a satellite picture with the leaves on, which hides ruins and cannot show "nothing standing" under trees.
 4. **Its counties in `REGION` in `tools/lidar.py`**, each to an Atlas region key from `tools/states.py`.
@@ -275,7 +290,7 @@ A good session: sweep 10,000 to 20,000 acres, look at two or three pictures of 3
 
 ## For the owner: what to paste
 
-> Read `LIDAR.md` in the repository `mrroot3r/Lost-and-Hidden-Atlas` and do one LiDAR session exactly as it says. Area for this session: **[name a state forest in New York or Massachusetts, or "within 15 miles of Middleburgh", or "whatever status says is next"]**. Open one pull request and stop; do not merge it.
+> Read `LIDAR.md` in the repository `mrroot3r/Lost-and-Hidden-Atlas` and do one LiDAR session exactly as it says. Area for this session: **[name a state forest in New York or Massachusetts, or a unit near Kansas City such as "Smithville Recreation Area", or "within 15 miles of Middleburgh", or "whatever status says is next"]**. Open one pull request and stop; do not merge it.
 
 Run one session at a time and merge its pull request before starting the next. If two overlap, the second pull request will say it has conflicts; the paragraph above the table tells a session how to fix that.
 
@@ -286,4 +301,4 @@ Run one session at a time and merge its pull request before starting the next. I
 - `tools/lidar.py` is the front door and owns the ledger: one file per unit in `lidar/units/` (in the repository as `source/lidar/units/`), one candidate per line, so two sessions' changes merge. Candidate ids are the unit's initials and a number in rank order (`brhsf3`) and never change once a unit is swept. `setup.sh` and `publish.sh` fold the repository's ledger and the workspace's together; neither overwrites the other.
 - Rank is depth (capped at 1.5 m) × 1 for a house-sized pit, 0.5 otherwise × 1 within 50 m of the map building, 0.7 beyond.
 - After changing `tools/lidar.py` run `python3 tools/lidar_test.py`. `tools/lidar_examples.py` redraws `lidar/examples.jpg`; add a chip when a new kind of false alarm turns up.
-- Not built: mill races and charcoal hearths as their own detectors, and any state but New York and Massachusetts ("Another state" below).
+- Not built: mill races and charcoal hearths as their own detectors, and any state but New York, Massachusetts, Missouri and Kansas ("Another state" below).

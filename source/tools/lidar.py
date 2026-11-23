@@ -44,8 +44,15 @@ ORDER={'new':0,'no':1,'maybe':2,'yes':3,'published':4}
 # The states this tool is set up for. box: west,south,east,north, generous (it takes in the edges of the neighbours).
 # src: where the ground model comes from (tools/lidar_dem.py). A unit record carries its state as "st"; one without is New York.
 STATES={'ny':{'name':'New York','box':'-79.8,40.45,-71.8,45.05','src':'ny'},
-        'ma':{'name':'Massachusetts','box':'-73.52,41.2,-69.9,42.9','src':'3dep'}}
-ALLBOX='-79.8,40.45,-69.9,45.05'
+        'ma':{'name':'Massachusetts','box':'-73.52,41.2,-69.9,42.9','src':'3dep'},
+        # 'oldmap': the first survey there was at 1:125,000, too coarse to place a building, so the sweep reads the earliest sheet at
+        # 1:62,500 or larger from 1936 or before (the owner's line: a 1950s sheet does not prove a building is old).
+        # Missouri and Kansas (November 23, 2026, for the Kansas City country): ground model from the USGS; no parcel file for the whole of
+        # either state, so the ownership check rests on the federal public-land record, with Missouri's file of state-owned parcels as
+        # a yes where it has one (tools/parcel.py). 'noparcel' is what the place's access line says about that.
+        'mo':{'name':'Missouri','box':'-95.8,35.95,-89.05,40.65','src':'3dep','oldmap':'1936,any','walls':False,'noparcel':'Missouri has no tax-parcel file for the whole state, and the state-owned parcels it does publish have none under the pin'},
+        'ks':{'name':'Kansas','box':'-102.1,36.95,-94.55,40.05','src':'3dep','oldmap':'1936,any','walls':False,'noparcel':'Kansas has no tax-parcel file for the whole state'}}
+ALLBOX='-102.1,35.95,-69.9,45.05'          # every state's box together: used only to find a unit by its exact name
 # county -> the Atlas region key (tools/states.py) a drafted place gets. A county that is split between two regions is left as
 # a TODO naming the choices, so the writer decides from the town.
 REGION={'ny':{'Albany':'albco','Rensselaer':'renss','Schenectady':'sch','Saratoga':'sar','Washington':'wash','Montgomery':'mohw','Schoharie':'scho','Otsego':'scho','Delaware':'scho',
@@ -56,6 +63,12 @@ REGION={'ny':{'Albany':'albco','Rensselaer':'renss','Schenectady':'sch','Saratog
  'Franklin':'TODO: region: pv (Pioneer Valley), or cmass for the Quabbin towns','Hampshire':'TODO: region: pv (Pioneer Valley), or cmass for the Quabbin towns','Hampden':'pv',
  'Worcester':'TODO: region: cmass (Quabbin and central) or worc (Worcester and Blackstone Valley)','Middlesex':'TODO: region: bos (Greater Boston and MetroWest) or nshore (Merrimack Valley)'}}
 for _c in ('Warren','Essex','Hamilton','Franklin','Clinton','Fulton','Herkimer'): REGION['ny'][_c]='adk'
+# Missouri has one Atlas region so far, the Kansas City country; a pit anywhere else in the state leaves a TODO. Kansas is one region ('*': every county).
+REGION['mo']={c:'kcmo' for c in ('Jackson','Clay','Platte','Cass','Ray','Lafayette','Johnson','Clinton','Buchanan','Caldwell','Bates','Henry','Carroll','Saline','Pettis','DeKalb','Andrew')}
+REGION['mo']['*']='TODO: region: Missouri has only kcmo (the Kansas City country) so far; tell the owner this county needs a region'
+REGION['ks']={'*':'ks'}
+def region_of(st,county):
+    R=REGION.get(st,{}); return R.get(county or '') or R.get('*') or 'TODO: region key from tools/states.py'
 def st_of(u): return (u or {}).get('st') or 'ny'
 def unit_state(rings):
     """The state a unit lies in, as a key of STATES or another two-letter code, from the middle of its outline: the Census
@@ -231,9 +244,12 @@ def take_state(a):
     return a,st
 def cmd_find(a):
     a,st=take_state(a)
-    if not a: die('Usage: lidar.py find "part of a name" [--state ny|ma]')
+    if not a: die('Usage: lidar.py find "part of a name" [--state ny|ma|mo|ks]')
     # the service's state field is not filled in for every unit, so a state is taken as a box (it takes in the edges of its neighbours)
-    show_units(pad_units("Unit_Nm LIKE '%"+a[0].replace("'","''")+"%'",{'geometry':STATES[st]['box'] if st else ALLBOX,'geometryType':'esriGeometryEnvelope','inSR':4326,'spatialRel':'esriSpatialRelIntersects'}),load())
+    U={}
+    for k in ([st] if st else list(STATES)):          # a state at a time: one box round all of them would take in every state between New York and Kansas
+        for nm,o in pad_units("Unit_Nm LIKE '%"+a[0].replace("'","''")+"%'",{'geometry':STATES[k]['box'],'geometryType':'esriGeometryEnvelope','inSR':4326,'spatialRel':'esriSpatialRelIntersects'}).items(): U.setdefault(nm,o)
+    show_units(U,load())
     if not st: print('Searched: '+' and '.join(v['name'] for v in STATES.values())+'. To search one only, add  --state '+' or --state '.join(STATES)+'.')
 def cmd_near(a):
     if len(a)<3: die('Usage: lidar.py near <lat> <lon> <miles>')
@@ -300,6 +316,7 @@ def cmd_sweep(a):
         if end-time.time()<20: print(f'NOT FINISHED: {name}: the scan is complete; the old maps are next. Run the same command again.'); return
         print(f'{name}: scan complete. Finding buildings on the old survey sheets (each sheet is a 10 to 20 MB download, once)...',flush=True)
         env=dict(os.environ); env['LIDAR_DEADLINE']=str(end)
+        if STATES[st].get('oldmap'): env['LIDAR_OLDMAP']=STATES[st]['oldmap']
         if u.get('btries',0)>=3: env['LIDAR_ALLOW_GAPS']='1'
         r=subprocess.run([PY,os.path.join(HERE,'lidar_sweep.py'),uf],env=env)
         if r.returncode==3:
@@ -307,7 +324,7 @@ def cmd_sweep(a):
         if r.returncode!=0: print('THE OLD-MAP STEP FAILED for',name,'. Run the same command again; if it fails the same way twice, tell the owner.'); continue
         L=load(); new=sync(L); u=L[name]
         for k in ('btries','tries'): u.pop(k,None)
-        save(u); wl=import_walls(u,pre)
+        save(u); wl=import_walls(u,pre) if STATES[st].get('walls',True) else None          # no stone-wall layer where the straight banks are fence rows and terraces
         if wl: print(f'{name}: {wl[0]} straight pieces of wall, {wl[1]/1000:.1f} km in all, kept for the "Stone walls" map layer.')
         print(f'DONE: {name}: {u.get("buildings",0)} buildings on the old sheets, {new} pits beside one.'+(f' See them:  python3 tools/lidar.py next --unit "{name[:24]}"' if new else ' Nothing to look at here.'))
 
@@ -513,7 +530,7 @@ def cmd_check(a):
         else: k['rule']='none'; say='DO NOT PUBLISH: no public owner in the parcel file and no public-land record. Add a row to LEADS.md, then run:  python3 tools/lidar.py mark %s no noland'%c['id']
         c['check']=k; save(u)
         print(c['id'],'|',k.get('town') or '?','|',(k.get('county') or '?'),'County | nearest named road:',k.get('road') or 'none found')
-        print('   tax parcel:',('%s, class %s, %s acres%s'%(p['kind'],p['class'],p['acres'],(', '+p['addr']) if p['addr'] and p['kind']!='PRIVATE' else '')) if p else ('no record (this county is not in the state file, or the point is on a road)' if st=='ny' else 'no record (the point is on a road, a railway or water)'))
+        print('   tax parcel:',('%s, class %s, %s acres%s'%(p['kind'],p['class'],p['acres'],(', '+p['addr']) if p['addr'] and p['kind']!='PRIVATE' else '')) if p else ('no record (this county is not in the state file, or the point is on a road)' if st=='ny' else 'no record ('+STATES[st]['noparcel']+')' if STATES[st].get('noparcel') else 'no record (the point is on a road, a railway or water)'))
         print('   public-land record:',('%s (%s), access %s'%(pd['unit'],pd['manager'],pd['access'])) if pd else 'nothing at this point')
         if k.get('near'): print('   PRIVATE LAND within about 75 m, to the '+', '.join(k['near'])+'. Look at the aerial for a house there (tools/pincheck.py shows 300 m) and say in the access line which side is public.')
         elif k.get('near') is None: print('   the lots round about could not be read (the parcel service did not answer for all eight points)')
@@ -546,12 +563,13 @@ def cmd_draft(a):
         else:
             if p and p['kind'].startswith('tax-exempt'): lead='The tax parcel under the pin is tax-exempt land that is not government-owned (a land trust, a charity or the like). TODO: who that is, and their own visiting rules, from their own page.'
             elif st=='ny': lead="No tax-parcel record could be checked: %s."%(("%s County is not in the state's public parcel file"%(k.get('county') or 'This')) if not p else "the county's parcel record does not give the owner")
+            elif STATES.get(st,{}).get('noparcel'): lead="No tax-parcel record could be checked: %s."%STATES[st]['noparcel']
             else: lead="No tax-parcel record could be checked: %s."%('no parcel covers the pin (it may sit on an old road layout)' if not p else 'the parcel record does not give the owner')
             acc=lead+" The federal protected-areas database puts the spot inside %s, open to the public%s. Public land is a patchwork with private lots inside it, so confirm with the Owner? button or the state boundary signs before you leave the road."%(pd['unit'],(', and the nearest road OpenStreetMap names is '+road) if road else '. No named road is near')
         tail='+HUNT' if re.search(r'Forest|Wma|Wildlife|Wild Forest|Wilderness|Multiple Use',u['name']) else "+' TODO: the opening hours and any fee, from the managing body\\'s own page.'"
         years=('before %d'%c['year'])+(('–TODO: add "before %d" if the later sheet no longer draws it'%late[0]) if late else '')
         if k.get('near'): acc+=' Private land lies within about 75 m to the %s: TODO: say which side of the road or wall is public, and whether a house stands there (look at the pin check).'%', '.join(k['near'])
-        body.append("# %s  rank %.2f  verdict note: %s\nN(%r,%r,%r,%r,'lidar','traces',%s,%s,%r,'public','hike','',%r,\n  %r,\n  %r,\n  %r,\n  %r%s,SRC,conf='lead',brick='?'),"%(c['id'],rank(c),c.get('note') or '(none)',pid,'TODO: a plain name, what it is and where',k.get('town') or 'TODO: town',REGION.get(st,{}).get(k.get('county') or '','TODO: region key from tools/states.py'),c['lat'],c['lon'],'exact' if c['dist']<=60 else 'site',years,story,look,'TODO: one short line, why it is worth the walk',acc,tail))
+        body.append("# %s  rank %.2f  verdict note: %s\nN(%r,%r,%r,%r,'lidar','traces',%s,%s,%r,'public','hike','',%r,\n  %r,\n  %r,\n  %r,\n  %r%s,SRC,conf='lead',brick='?'),"%(c['id'],rank(c),c.get('note') or '(none)',pid,'TODO: a plain name, what it is and where',k.get('town') or 'TODO: town',region_of(st,k.get('county')),c['lat'],c['lon'],'exact' if c['dist']<=60 else 'site',years,story,look,'TODO: one short line, why it is worth the walk',acc,tail))
         notes.append(" %r:%r,"%(pid,"The pin is the pit on LiDAR. The building on the %d sheet is drawn about %d m away%s. Looked at on LiDAR and the leaf-off aerial; not seen on the ground."%(c['year'],c['dist'],'; sheets of that scale can be 50 to 100 m out' if c['dist']>30 else '')))
         for kk in ('why',): c.pop(kk,None)
         c.update({'status':'published','place':pid,'batch':key,'when':TODAY}); save(u)

@@ -8,6 +8,8 @@ from scipy import ndimage as ndi
 from topocrop import crop
 from lidar_dem import merc,unmerc
 unit=json.load(open(sys.argv[1])); pre=sys.argv[2]; TIF=sys.argv[3]; rings=unit['rings']
+import lidar_oldmap
+RD=lidar_oldmap.reading(TIF); RES=RD['res']        # the step a sheet is read at, and the rule for a building: tools/lidar_oldmap.py
 xs=[p[0] for r in rings for p in r]; ys=[p[1] for r in rings for p in r]
 def inside(lo,la):
     c=False
@@ -17,7 +19,7 @@ def inside(lo,la):
             if ((r[i][1]>la)!=(r[j][1]>la)) and lo<(r[j][0]-r[i][0])*(la-r[i][1])/(r[j][1]-r[i][1])+r[i][0]: c=not c
             j=i
     return c
-clat=(min(ys)+max(ys))/2; clon=(min(xs)+max(xs))/2; HW=max((max(ys)-min(ys))*111320,(max(xs)-min(xs))*111320*math.cos(math.radians(clat)))/2+300; PX=int(2*HW/2.5)
+clat=(min(ys)+max(ys))/2; clon=(min(xs)+max(xs))/2; HW=max((max(ys)-min(ys))*111320,(max(xs)-min(xs))*111320*math.cos(math.radians(clat)))/2+300; PX=int(2*HW/RES)
 out=[]
 def detect(clat,clon,HW,PX,keep=None):
     """Building symbols in one square of the old map, HW metres either side of clat,clon. keep(lo,la) limits them to a block."""
@@ -28,14 +30,17 @@ def detect(clat,clon,HW,PX,keep=None):
     # from the sheet itself when its ink is paler than the rule: a quarter of the way from its darkest ink to its paper.
     ssum=a.sum(2); K=float(np.percentile(ssum,0.2)); P=float(np.median(ssum)); T=max(230.0,K+0.25*(P-K))
     dark=(ssum<T)&(a.max(2)-a.min(2)<(60 if T<=230 else 90))
-    core=ndi.binary_opening(dark,structure=np.ones((6,6)))           # removes road lines and most lettering
+    core=ndi.binary_opening(dark,structure=np.ones((RD['open'],RD['open'])))           # removes road lines and most lettering
     lab,n=ndi.label(core)
     x0,y0=merc(clat,clon); k=1/math.cos(math.radians(clat))
     for i,sl in enumerate(ndi.find_objects(lab),1):
         h=sl[0].stop-sl[0].start; w=sl[1].stop-sl[1].start; area=int((lab[sl]==i).sum())
-        if not(6<=h<=20 and 6<=w<=20) or area/(h*w)<0.6: continue
+        ra,rb,ca,cb=max(0,sl[0].start-6),min(dark.shape[0],sl[0].stop+6),max(0,sl[1].start-6),min(dark.shape[1],sl[1].stop+6)
+        inner=dark[max(0,sl[0].start-1):sl[0].stop+1,max(0,sl[1].start-1):sl[1].stop+1].sum()
+        ring=(dark[ra:rb,ca:cb].sum()-inner)/max(1,((rb-ra)*(cb-ca)-(h+2)*(w+2)))
+        if not lidar_oldmap.keeps(w,h,area/(h*w),ring,RD): continue
         cy=(sl[0].start+sl[0].stop)/2; cx=(sl[1].start+sl[1].stop)/2
-        la,lo=unmerc(x0+(cx-PX/2)*2.5*k, y0+(PX/2-cy)*2.5*k)
+        la,lo=unmerc(x0+(cx-PX/2)*RES*k, y0+(PX/2-cy)*RES*k)
         if (keep is None or keep(lo,la)) and inside(lo,la): out.append({'lat':round(la,5),'lon':round(lo,5),'w':w,'h':h})
 if PX<=6000: detect(clat,clon,HW,PX)
 else:
@@ -46,7 +51,7 @@ else:
     from rasterio.warp import transform_bounds
     with rasterio.open(TIF) as ds: W,S,E,N=transform_bounds(ds.crs,'EPSG:4326',*ds.bounds)
     rb=[(min(p[0] for p in r),min(p[1] for p in r),max(p[0] for p in r),max(p[1] for p in r)) for r in rings]
-    B=6000.0; dla=B/111320; dlo=B/(111320*math.cos(math.radians(clat)))
+    B=6000.0*RES/2.5; dla=B/111320; dlo=B/(111320*math.cos(math.radians(clat)))
     la0=max(min(ys),S); lo0=max(min(xs),W); nblocks=0
     la=la0
     while la<min(max(ys),N):
@@ -54,7 +59,7 @@ else:
         while lo<min(max(xs),E):
             box=(lo,la,lo+dlo,la+dla)
             if any(not(r[2]<box[0] or r[0]>box[2] or r[3]<box[1] or r[1]>box[3]) for r in rb):
-                try: detect(la+dla/2,lo+dlo/2,B/2+150,int((B+300)/2.5),lambda x,y,box=box: box[0]<=x<box[2] and box[1]<=y<box[3]); nblocks+=1
+                try: detect(la+dla/2,lo+dlo/2,B/2+150,int((B+300)/RES),lambda x,y,box=box: box[0]<=x<box[2] and box[1]<=y<box[3]); nblocks+=1
                 except Exception as e: print('  block failed',round(la,3),round(lo,3),str(e)[:80],file=sys.stderr)
             lo+=dlo
         la+=dla

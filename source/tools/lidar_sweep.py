@@ -18,7 +18,9 @@ def pts(rings):
     for r in rings:
         for p in r: yield p
 def sheets(lo,la):
-    """Historic 1:62,500 sheets over a point, oldest first: [(year, name, url, (w,s,e,n))]."""
+    """Old survey sheets over a point that are detailed enough to place a building, oldest first: [(year, name, url, (w,s,e,n))].
+    New York and Massachusetts: the 1:62,500 sheets, as always. A state whose first survey was at 1:125,000, too coarse to say which
+    pit was a house (Missouri, Kansas), takes any sheet at 1:62,500 or larger up to the year the sweeper is told (LIDAR_OLDMAP)."""
     d=0.0005
     u='https://tnmaccess.nationalmap.gov/api/v1/products?'+urllib.parse.urlencode({'datasets':'Historical Topographic Maps','bbox':f'{lo-d},{la-d},{lo+d},{la+d}','prodFormats':'GeoTIFF','max':100})
     for k in range(4):
@@ -29,10 +31,13 @@ def sheets(lo,la):
     out=[]
     for it in j.get('items',[]):
         url=it.get('downloadURL') or ''; m=re.search(r'/([A-Z]{2}_[^/]*?_(\d{4})_(\d+)_geo\.tif)$',url)
-        if not m or m.group(3)!='62500': continue
+        if not m or not lidar_oldmap.sheet_ok(0,int(m.group(3)),LASTYEAR,ANYSCALE): continue
         b=it.get('boundingBox') or {}
         out.append((int(m.group(2)),m.group(1),url,(b.get('minX'),b.get('minY'),b.get('maxX'),b.get('maxY'))))
-    return sorted(out)
+    return sorted(out,key=lambda t:(t[0],int(re.search(r'_(\d+)_geo',t[1]).group(1)),t[1]))          # oldest first; of one year, the more detailed
+# LIDAR_OLDMAP="<last year>,any": the latest year an old sheet may have, and whether scales larger than 1:62,500 count (tools/lidar.py sets it by state)
+import lidar_oldmap
+LASTYEAR,ANYSCALE=lidar_oldmap.rule(os.environ.get('LIDAR_OLDMAP'))
 _INK={}
 def ink(tif):
     """How dark a scanned sheet prints black: red+green+blue of its darkest ink. Under about 100 is a good scan; 250 is pale."""
@@ -78,7 +83,7 @@ for uf in [a for a in sys.argv[1:] if a!='--redo']:
     asks=[(sum(a for a,b in v)/len(v),sum(b for a,b in v)/len(v)) for k,v in sorted(cells.items(),key=lambda kv:-len(kv[1]))[:14]]
     want={}
     for lo,la in asks:
-        ss=[s for s in sheets(lo,la) if s[0]<=1915]
+        ss=[s for s in sheets(lo,la) if s[0]<=LASTYEAR]
         if ss:
             quad=ss[0][1].split('_')[1]
             if quad not in want:

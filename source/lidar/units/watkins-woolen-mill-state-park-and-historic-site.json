@@ -1,0 +1,8 @@
+{"name": "Watkins Woolen Mill State Park And Historic Site", "code": "wwmsp", "st": "mo", "state": "done", "tiles": 12, "swept": "2026-11-23", "buildings": 5, "sheets": ["MO_Kearney_324644_1936_48000_geo.tif"],
+"cands":[
+{"id":"wwmsp1","lat":39.417453,"lon":-94.25551,"depth":0.99,"size":[13,13],"dist":40,"blat":39.41746,"blon":-94.25597,"sheet":"MO_Kearney_324644_1936_48000_geo.tif","year":1936,"status":"no","why":"modern","note":"farm buildings stand here today, a kept farmstead inside the historic site","when":"2026-11-23"},
+{"id":"wwmsp2","lat":39.412453,"lon":-94.261388,"depth":0.85,"size":[6,8],"dist":26,"blat":39.41229,"blon":-94.26161,"sheet":"MO_Kearney_324644_1936_48000_geo.tif","year":1936,"status":"no","why":"modern","note":"the Watkins house yard, standing and already on the map as a place","when":"2026-11-23"},
+{"id":"wwmsp3","lat":39.412939,"lon":-94.260231,"depth":0.87,"size":[13,14],"dist":48,"blat":39.41262,"blon":-94.25986,"sheet":"MO_Kearney_324644_1936_48000_geo.tif","year":1936,"status":"no","why":"modern","note":"the Watkins house yard, standing and already on the map as a place","when":"2026-11-23"},
+{"id":"wwmsp4","lat":39.416927,"lon":-94.255348,"depth":0.61,"size":[7,10],"dist":80,"blat":39.41746,"blon":-94.25597,"sheet":"MO_Kearney_324644_1936_48000_geo.tif","year":1936,"status":"no","why":"modern","note":"same standing farmstead as wwmsp1","when":"2026-11-23"},
+{"id":"wwmsp5","lat":39.408941,"lon":-94.251419,"depth":0.63,"size":[9,14],"dist":38,"blat":39.40879,"blon":-94.25102,"sheet":"MO_Kearney_324644_1936_48000_geo.tif","year":1936,"status":"no","why":"water","note":"a dammed pond; the map mark beside it is lettering, not a building","when":"2026-11-23"}
+]}
