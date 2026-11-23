@@ -1,0 +1,12 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'argyle-courthouse-tusket':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Argyle_County_Court_House_and_Gaol_03.jpg/960px-Argyle_County_Court_House_and_Gaol_03.jpg', 900, 675, 'Fralambert', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Argyle_County_Court_House_and_Gaol_03.jpg', '2026-11-23', 'pin'),
+ 'balmoral-grist-mill':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Balmoral_Mills%2C_Nova_Scotia.jpg/960px-Balmoral_Mills%2C_Nova_Scotia.jpg', 900, 675, 'Derek Andrews', 'CC0', 'https://commons.wikimedia.org/wiki/File:Balmoral_Mills,_Nova_Scotia.jpg', '2026-11-23', 'pin+name'),
+ 'beaubassin-fort-lawrence':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/AmherstNS_BeaubassinMarker_2.jpg/960px-AmherstNS_BeaubassinMarker_2.jpg', 900, 598, 'Magicpiano', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:AmherstNS_BeaubassinMarker_2.jpg', '2026-11-23', 'name'),
+ 'cape-forchu-lightstation':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/YarmouthNS_Lighthouse.jpg/960px-YarmouthNS_Lighthouse.jpg', 900, 694, 'James Somers', 'Public domain', 'https://commons.wikimedia.org/wiki/File:YarmouthNS_Lighthouse.jpg', '2026-11-23', 'pin'),
+ 'chebogue-meeting-house':('', '2026-11-23', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'chignecto-ship-railway-fort-lawrence':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/FortLawrenceNS_ChignectoRailwayTerminus_4.jpg/960px-FortLawrenceNS_ChignectoRailwayTerminus_4.jpg', 900, 598, 'Magicpiano', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:FortLawrenceNS_ChignectoRailwayTerminus_4.jpg', '2026-11-23', 'pin+name'),
+ 'covenanters-church-grand-pre':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/Covenanter_Church%2C_Grand_Pre%2C_Nova_Sctia.jpg/960px-Covenanter_Church%2C_Grand_Pre%2C_Nova_Sctia.jpg', 900, 1200, 'Skinnzy', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Covenanter_Church,_Grand_Pre,_Nova_Sctia.jpg', '2026-11-23', 'name'),
+ 'mcculloch-house-pictou':('', '2026-11-23', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+}
