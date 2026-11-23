@@ -1,0 +1,11 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'german-evangelical-pastors-home-blue-springs-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/German_Evangelical_Pastors_Home_Historic_District%2C_Blue_Springs%2C_MO.jpg/960px-German_Evangelical_Pastors_Home_Historic_District%2C_Blue_Springs%2C_MO.jpg', 900, 600, '25or6to4', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:German_Evangelical_Pastors_Home_Historic_District,_Blue_Springs,_MO.jpg', '2026-11-23', 'pin+name'),
+ 'lees-summit-christian-church-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/62/Lees_Summit_Christian_Church_by_Sharon_Clay_2016-09-04.jpg/960px-Lees_Summit_Christian_Church_by_Sharon_Clay_2016-09-04.jpg', 900, 706, 'Sharonclay022', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Lees_Summit_Christian_Church_by_Sharon_Clay_2016-09-04.jpg', '2026-11-23', 'pin+name'),
+ 'lone-jack-civil-war-museum-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Lone_Jack_battlefield.jpg/960px-Lone_Jack_battlefield.jpg', 900, 675, 'Hog Farm', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Lone_Jack_battlefield.jpg', '2026-11-23', 'pin+name'),
+ 'missouri-town-1855-lees-summit-mo':('', '2026-11-23', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'rice-tremonti-house-raytown-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/8/84/Rice_Tremonti_House.JPG/960px-Rice_Tremonti_House.JPG', 900, 675, 'TBoaN', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Rice_Tremonti_House.JPG', '2026-11-23', 'pin'),
+ 'st-peters-episcopal-harrisonville-mo':('', '2026-11-23', 'other churches of the same name in other states', 3),
+ 'unity-village-tower-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Unity_Village_2024.jpg/960px-Unity_Village_2024.jpg', 900, 675, 'Peterspexarth', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Unity_Village_2024.jpg', '2026-11-23', 'pin+name'),
+}
