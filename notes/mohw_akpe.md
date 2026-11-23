@@ -12,7 +12,6 @@ Nineteen standing places in Utica, with one each in Whitesboro and New Hartford 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Enlarged Erie Canal aqueduct over Oriskany Creek | Oriskany, Town of Whitestown, NY (OpenStreetMap ruin, 43.15628, -75.32998) | Mapped as "Enlarged Erie Canal Aqueduct" | Any written source on what stands; eriecanal.org has no page for it (OriskanyCreek.html and Oriskany.html are 404) |
-| Bagg's Square East Historic District | Utica, by Union Station (Register 43.1030, -75.2233; 100001362) | Register list: buildings that served canal and railroad traffic, late 19th to mid-20th century; the Doyle Hardware, Hurd & Fitzgerald, Daily Press and Hieber (Children's Museum) buildings are listed separately nearby | A source on which buildings stand and are worth a stop; no Wikipedia article |
 | Utica Steam and Mohawk Valley Cotton Mill; Avalon Knitting Mill; Byington Mill | Utica (Register 43.1027, -75.2387; 43.0998, -75.2140; 43.1024, -75.2216) | On the Oneida County Register list, no articles | Present use and a source |
 | Middle Mill Historic District | New York Mills (Wikipedia 43.105, -75.29278) | Wikipedia: Mill No. 2 complex, two churches, workers' rows and a commercial block, 31 buildings, listed 1976 | Whether the mill stands and what it is now |
 | Utica Armory | Utica (Wikipedia 43.07972, -75.20917) | Wikipedia: 1930, William Haugaard, Tudor towers and a drill shed | Present use and owner |
