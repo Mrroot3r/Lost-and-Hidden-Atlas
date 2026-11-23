@@ -284,6 +284,7 @@ A good session: sweep 10,000 to 20,000 acres, look at two or three pictures of 3
 | `sheet` says a map could not be fetched | Run it again. The USGS download service has bad minutes. |
 | The later map panel is blank or shows a margin | No large-scale sheet from 1925 to 1965 covers the spot. Judge on three panels and write "No later map was looked at." |
 | `check` says a service did not answer | Run `check` again for that id. |
+| `sweep` says the public-land service did not answer | Run the same command again in a minute. It is not "no such unit": until November 23, 2026 a bad minute of that service was reported as `NO SUCH UNIT`, and two real units near Kansas City were turned away. |
 | `status` warns that a published candidate has no place | A draft was thrown away. Run the `mark ... yes` line it prints, then draft again. |
 | `check.py` says a text still says TODO | Finish the draft (step 6). |
 | A tool crashes with a Python error twice running | Stop. Do not patch the tool mid-session. Publish what the ledger holds and tell the owner what failed, with the error text. |
@@ -301,4 +302,5 @@ Run one session at a time and merge its pull request before starting the next. I
 - `tools/lidar.py` is the front door and owns the ledger: one file per unit in `lidar/units/` (in the repository as `source/lidar/units/`), one candidate per line, so two sessions' changes merge. Candidate ids are the unit's initials and a number in rank order (`brhsf3`) and never change once a unit is swept. `setup.sh` and `publish.sh` fold the repository's ledger and the workspace's together; neither overwrites the other.
 - Rank is depth (capped at 1.5 m) × 1 for a house-sized pit, 0.5 otherwise × 1 within 50 m of the map building, 0.7 beyond.
 - After changing `tools/lidar.py` run `python3 tools/lidar_test.py`. `tools/lidar_examples.py` redraws `lidar/examples.jpg`; add a chip when a new kind of false alarm turns up.
+- Verdicts are stamped to the second since November 23, 2026 (`stamp()` in `tools/lidar.py`), and when two copies of the ledger are folded together the later one wins. Before that a verdict carried only its date, and of two given on one day the one "further along" won: a session that changed a "maybe" to "no" in the afternoon had it turned back to "maybe" when it published. A LiDAR pull request carries ledger files, so it does not merge by itself: the maintainer or the owner looks at it and merges it.
 - Not built: mill races and charcoal hearths as their own detectors, and any state but New York, Massachusetts, Missouri and Kansas ("Another state" below).
