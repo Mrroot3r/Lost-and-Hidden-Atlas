@@ -23,6 +23,27 @@ const { chromium } = require('playwright');
   const wide=await p.evaluate(()=>{ window.scrollTo(200,200); const s=document.scrollingElement; return {w:s.scrollWidth,h:s.scrollHeight,iw:innerWidth,ih:innerHeight,x:scrollX,y:scrollY,grip:document.querySelector('#swipe .grip').getBoundingClientRect().left}; });
   ok('upright, compare divider at the right edge: the page is still exactly the size of the screen and cannot be scrolled',wide.grip>300&&wide.iw===390&&wide.ih===844&&wide.w<=390&&wide.h<=844&&wide.x===0&&wide.y===0,JSON.stringify(wide));
   await p.evaluate(()=>{ window.scrollTo(0,0); document.getElementById('lb-cmp').click(); }); await p.waitForTimeout(300);
+  // ---- upright: the layer bar is the edge between map and list, and drags up and down (the owner, November 23, 2026: "I always want
+  // to be able to see a little bit of the bottom": more map, with the first entry of the list still showing)
+  const geom=()=>p.evaluate(()=>{ const r=q=>document.querySelector(q).getBoundingClientRect(), st=r('#stage'), sd=r('#side'), v=r('.view:not([hidden])'), ms=window.__atlasMap.getSize(); return {stage:Math.round(st.height),sideTop:Math.round(sd.top),view:Math.round(v.height),map:ms.y,ih:innerHeight}; });
+  const dragBar=async(dx,dy)=>{ const bb=await (await p.$('#lb-opt')).boundingBox(); const x=bb.x+bb.width/2, y=bb.y+bb.height/2; dy=Math.max(3-y,Math.min(841-y,dy)); await p.mouse.move(x,y); await p.mouse.down(); await p.mouse.move(x+dx/2,y+dy/2,{steps:4}); await p.mouse.move(x+dx,y+dy,{steps:4}); await p.mouse.up(); await p.waitForTimeout(350); };
+  const g0=await geom();
+  await dragBar(0,150); const g1=await geom();
+  ok('upright: dragging the layer bar down gives the map that much more room',Math.abs(g1.stage-g0.stage-150)<=3&&Math.abs(g1.sideTop-g0.sideTop-150)<=3,[g0.stage,g1.stage].join(' -> '));
+  ok('upright: the map itself is redrawn at the new size',Math.abs(g1.map-g0.map-150)<=3,[g0.map,g1.map].join(' -> '));
+  ok('upright: letting go on a button after a drag does not press it',await p.evaluate(()=>document.querySelector('#sheet').hidden));
+  await dragBar(0,900); const g2=await geom();
+  ok('upright: dragged to the bottom, the tabs and the first entry of the list still show',g2.view>=150&&g2.view<=200&&g2.stage>g1.stage,JSON.stringify(g2));
+  await dragBar(0,-900); const g3=await geom();
+  ok('upright: dragged to the top, the map keeps a usable strip',g3.stage>=220&&g3.stage<=240,JSON.stringify(g3));
+  await dragBar(-120,6); const g4=await geom();
+  ok('upright: a sideways drag (scrolling the bar) changes nothing',g4.stage===g3.stage,[g3.stage,g4.stage].join(' '));
+  await dragBar(0,200); const g5=await geom(); await p.waitForTimeout(400);
+  await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600); const g6=await geom();
+  ok('upright: the map opens at the size it was left at',Math.abs(g6.stage-g5.stage)<=2,[g5.stage,g6.stage].join(' '));
+  await p.evaluate(()=>document.getElementById('lb-opt').click()); await p.waitForTimeout(400);
+  ok('upright: a plain tap on the bar still works',await p.evaluate(()=>!!document.querySelector('#lb-opt')&&[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Done'&&b.offsetParent!==null)));
+  await p.evaluate(()=>{ const d=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Done'&&b.offsetParent!==null); d&&d.click(); }); await p.waitForTimeout(300);
   // ---- turned on its side, at the two sizes phones come in (under and over the old 820-point switch)
   for(const [W,H,name] of [[780,360,'narrow phone'],[915,412,'wide phone']]){
     await p.setViewportSize({width:W,height:H}); await p.waitForTimeout(500);
