@@ -13,7 +13,6 @@ Fourteen standing places in northeastern Dutchess County, drawn at random by `ch
 |---|---|---|---|
 | Wassaic beehive charcoal kilns | Wassaic, Amenia, NY (woods by NY 22 near Deep Hollow Road; HMdb 138022 marker at 41.80668, -73.56333) | Two stone beehive kilns of the Reed, Gridley and Co. iron works (in business by 1829), about 30 ft across and 16 ft high; Pomeroy marker says they are all that remains (HMdb); Atlas Obscura says they are not visible from the road, and a user comment says they were fenced off in May 2023 | Owner, and whether any public way lets them be seen; exact pin |
 | Irondale (Millerton Iron Company furnace) | Town of North East, NY, north of Millerton on NY 22 | Wikipedia (Millerton): a furnace with two Cooper hot-blast stoves making car-wheel pig iron, 12,000 tons a year in 1890, with a company store, grist mill and post office | Whether anything of the furnace is left, and where |
-| Thorne Memorial School | Millbrook, NY (41.78583, -73.69) | Wikipedia: 1895 buff-brick school given by Samuel Thorne, high school until 1962; the village later found it too costly to keep open | Its present state and use |
 | Dover Stone Church | Dover Plains, NY (41.73816, -73.58851) | On the Register: a waterfall cave shaped like a church window, promoted by the Harlem railroad as a sight | Not a building; add only if a session takes natural sights with a history |
 
 ## Tips
@@ -21,3 +20,4 @@ Fourteen standing places in northeastern Dutchess County, drawn at random by `ch
 - `theharlemvalleynews.net` article addresses now serve a gambling spam page: do not use it as a source.
 - `stissinghouse.com` and the Millbrook Historical Society's event pages are drawn by script; `page.py` gets nothing from them.
 - NPGallery's text for St. Thomas' Amenia Union (05000261) is the placeholder; the parish's own history page (stthomasamenia.com/history) has the architecture.
+
