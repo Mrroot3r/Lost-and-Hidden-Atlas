@@ -1,0 +1,9 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'fort-pemberton-greenwood':('', '2026-11-23', 'only a battle map and Vicksburg prints, no photograph of the site', 2),
+ 'french-camp-historic-village':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Mississippi_Cabin_2_%288729953516%29.jpg/960px-Mississippi_Cabin_2_%288729953516%29.jpg', 900, 675, 'Nick Shields', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Mississippi_Cabin_2_(8729953516).jpg', '2026-11-23', 'pin'),
+ 'hazlehurst-depot':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/ILLINOIS_CENTRAL_RAILROAD_PASSENGER_DEPOT%2C_HAZELHURST%2C_COPIAH_COUNTY%2C_MS.jpg/960px-ILLINOIS_CENTRAL_RAILROAD_PASSENGER_DEPOT%2C_HAZELHURST%2C_COPIAH_COUNTY%2C_MS.jpg', 900, 603, 'Jerrye & Roy Klotz, MD', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:ILLINOIS_CENTRAL_RAILROAD_PASSENGER_DEPOT,_HAZELHURST,_COPIAH_COUNTY,_MS.jpg', '2026-11-23', 'name'),
+ 'verandah-curlee-house-corinth':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Veranda_House_in_Corinth.jpg/960px-Veranda_House_in_Corinth.jpg', 900, 598, 'Nyttend', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Veranda_House_in_Corinth.jpg', '2026-11-23', 'pin'),
+ 'william-johnson-house-natchez':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/NRHP_76001086_William_Johnson_House_front_facing.jpg/960px-NRHP_76001086_William_Johnson_House_front_facing.jpg', 900, 675, 'BobCummings', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:NRHP_76001086_William_Johnson_House_front_facing.jpg', '2026-11-23', 'pin+name'),
+}
