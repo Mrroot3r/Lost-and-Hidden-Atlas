@@ -69,6 +69,21 @@ lidar.merge_from('other'); L=lidar.load()
 t('merge brings in a new unit','Gamma State Forest' in L)
 t('merge takes the later verdict',lidar.get(L,i3)[1]['status']=='no' and lidar.get(L,i3)[1]['why']=='road')
 t('merge keeps the verdict the other copy lacks',lidar.get(L,i2)[1]['status']=='yes')
+# A verdict changed twice in one day: this workspace said "no" after the repository's copy said "maybe", both dated today. The copy
+# being worked in is the newer of the two (a Kansas City session lost three "no" verdicts to this on November 23, 2026).
+shutil.rmtree('other'); shutil.copytree('lidar/units','other'); O=lidar.read_dir('other'); ou=O['Alpha Beta State Forest']
+for c in ou['cands']:
+    if c['id']==i3: c.update({'status':'maybe','why':'','note':'older, same day','when':'2099-01-01'})
+json.dump(ou,open('other/alpha-beta-state-forest.json','w'))
+lidar.merge_from('other'); L=lidar.load()
+t('merge: on the same day, the verdict in the workspace stands (a "no" is not turned back into "maybe")',lidar.get(L,i3)[1]['status']=='no')
+t('a verdict is stamped to the second, and a timed verdict counts as later than a date alone of the same day',len(lidar.stamp())==19 and lidar.stamp()[:10]==lidar.TODAY and lidar.stamp()>lidar.TODAY)
+shutil.rmtree('other'); shutil.copytree('lidar/units','other'); O=lidar.read_dir('other'); ou=O['Alpha Beta State Forest']
+for c in ou['cands']:
+    if c['id']==i3: c.update({'status':'maybe','why':'','note':'later, same day','when':'2099-01-01 15:00:00'})
+json.dump(ou,open('other/alpha-beta-state-forest.json','w'))
+lidar.merge_from('other'); L=lidar.load()
+t('merge: of two verdicts on one day the later by the clock wins, whichever copy holds it',lidar.get(L,i3)[1]['status']=='maybe' and lidar.get(L,i3)[1]['note']=='later, same day')
 t('status runs',('units swept' in out(lidar.cmd_status,[])) and 'report' not in out(lidar.cmd_report,[]))
 # ---- more than one state (New York and Massachusetts)
 t('a unit without a state is New York',lidar.st_of({})=='ny' and lidar.st_of({'st':'ma'})=='ma' and lidar.st_of(None)=='ny')

@@ -85,12 +85,12 @@ echo "$REPO" > "$W/.repo"                                                 # tool
 git -C "$REPO" rev-parse HEAD > "$W/.setup_commit" 2>/dev/null || true    # publish.sh uses it to notice that main has moved on since
 # what this machine can and cannot do
 MISS=""
-PKG() { case $1 in PIL) echo Pillow;; *) echo $1;; esac; }
+PKG() { case $1 in PIL) echo Pillow;; skimage) echo scikit-image;; *) echo $1;; esac; }
 # Each module is tried the way the tools use it, and installed for the python3 that will run them. A bare "import PIL" passes
 # on a machine whose system copy of Pillow is broken (the pin check then dies on "cannot import name '_imaging'"), and plain
 # "pip" may belong to another Python than "python3" does: both cost sessions an hour in November 2026 (their notes say so).
 TRY() { case $1 in cffi) python3 -c "import _cffi_backend" 2>/dev/null;; PIL) python3 -c "from PIL import Image, ImageDraw; Image.new('RGB',(2,2)).resize((1,1))" 2>/dev/null;; *) python3 -c "import $1" 2>/dev/null;; esac; }
-for m in requests PIL rasterio shapely numpy scipy cffi pypdf; do          # cffi: without it the PDF reader dies on a broken cryptography binding
+for m in requests PIL rasterio shapely numpy scipy skimage cffi pypdf; do          # cffi: without it the PDF reader dies on a broken cryptography binding
   TRY $m && continue
   echo "installing the Python module $m ..."; EXTRA=""; [ "$m" = PIL ] && EXTRA="--ignore-installed"
   python3 -m pip install -q --break-system-packages $EXTRA "$(PKG $m)" >/dev/null 2>&1 || python3 -m pip install -q $EXTRA "$(PKG $m)" >/dev/null 2>&1 || pip install -q --break-system-packages "$(PKG $m)" >/dev/null 2>&1 || true

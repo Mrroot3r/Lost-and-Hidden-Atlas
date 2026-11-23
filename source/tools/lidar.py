@@ -82,6 +82,10 @@ def unit_state(rings):
         from lidar_dem import state_of
         return state_of(la,lo)
 TODAY=str(datetime.date.today())
+def stamp():
+    """When a verdict was given, to the second: two sessions, or one session twice, often judge the same candidate on one day, and
+    a date alone cannot say which came later. Older verdicts carry the date only; a timed one of the same day counts as later."""
+    return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def die(msg): print(msg); sys.exit(1)
 
@@ -180,6 +184,9 @@ def merge_from(d):
             o=tc.get(c['id'])
             if not o or o==c: continue
             a=(c.get('when',''),ORDER.get(c['status'],0)); b=(o.get('when',''),ORDER.get(o['status'],0))
+            # stamped the very same (only the old date-only verdicts can be), the workspace's own verdict stands: it is the one being
+            # worked on, and "further along" would turn a "no" given this afternoon back into this morning's "maybe"
+            if a[0] and a[0]==b[0]: continue
             if b>a: m['cands'][i]=o; changed=True
         if changed: save(m); n+=1
     return n
@@ -265,6 +272,7 @@ def outline(name,st=None):
     f=WORK+'/unit_'+''.join(ch for ch in name if ch.isalnum())+'.json'
     if os.path.exists(f): return f
     r=run([os.path.join(HERE,'lidar_unit.py'),name,'save',STATES[st]['box'] if st else ALLBOX]); m=re.search(r'wrote (\S+\.json)',r.stdout)
+    if not m and 'did not answer' in (r.stdout+r.stderr): print('  The public-land service did not answer. This is not "no such unit": run the same command again in a minute.',flush=True)
     return m.group(1) if m else None
 def cmd_sweep(a):
     mins=1.6; wide=False
@@ -471,7 +479,7 @@ def mark_one(L,a):
     for k in ('why','place','batch','note'): c.pop(k,None)
     if st=='no': c['why']=rest[0]; rest=rest[1:]
     if rest: c['note']=' '.join(rest)
-    c['status']=st; c['when']=TODAY; save(u); return True,'%s -> %s %s %s%s'%(c['id'],st,c.get('why',''),c.get('note',''),was)
+    c['status']=st; c['when']=stamp(); save(u); return True,'%s -> %s %s %s%s'%(c['id'],st,c.get('why',''),c.get('note',''),was)
 def cmd_mark(a):
     L=load()
     if a and a[0]=='-':           # many at once: one verdict per line on standard input
@@ -572,7 +580,7 @@ def cmd_draft(a):
         body.append("# %s  rank %.2f  verdict note: %s\nN(%r,%r,%r,%r,'lidar','traces',%s,%s,%r,'public','hike','',%r,\n  %r,\n  %r,\n  %r,\n  %r%s,SRC,conf='lead',brick='?'),"%(c['id'],rank(c),c.get('note') or '(none)',pid,'TODO: a plain name, what it is and where',k.get('town') or 'TODO: town',region_of(st,k.get('county')),c['lat'],c['lon'],'exact' if c['dist']<=60 else 'site',years,story,look,'TODO: one short line, why it is worth the walk',acc,tail))
         notes.append(" %r:%r,"%(pid,"The pin is the pit on LiDAR. The building on the %d sheet is drawn about %d m away%s. Looked at on LiDAR and the leaf-off aerial; not seen on the ground."%(c['year'],c['dist'],'; sheets of that scale can be 50 to 100 m out' if c['dist']>30 else '')))
         for kk in ('why',): c.pop(kk,None)
-        c.update({'status':'published','place':pid,'batch':key,'when':TODAY}); save(u)
+        c.update({'status':'published','place':pid,'batch':key,'when':stamp()}); save(u)
     units=sorted({u['name'] for u,c,pid in todo})
     open(f,'w',encoding='utf-8').write('''# %s: LiDAR finds in %s, drafted by tools/lidar.py (method: LIDAR.md).
 # Every entry is an unverified lead (conf='lead'): a pit on the LiDAR ground model beside a building on an old
@@ -604,7 +612,7 @@ def cmd_report(a):
         mk=[(u,c) for u,c in allc(L) if c['status']!='new' and (c['id'] not in old or old[c['id']]['status']!=c['status'])]
         print('LiDAR work since this workspace was set up')
     else:
-        sw=[u for u in L.values() if u.get('swept')==TODAY and u.get('state')=='done']; mk=[(u,c) for u,c in allc(L) if c.get('when')==TODAY]
+        sw=[u for u in L.values() if u.get('swept')==TODAY and u.get('state')=='done']; mk=[(u,c) for u,c in allc(L) if str(c.get('when','')).startswith(TODAY)]
         print('LiDAR work dated',TODAY)
     if sw: print('Units swept: '+'; '.join('%s (%d buildings on the old sheets, %d pits beside one)'%(u['name'],u.get('buildings',0),len(u['cands'])) for u in sw))
     no=[c for u,c in mk if c['status']=='no']; why={}
