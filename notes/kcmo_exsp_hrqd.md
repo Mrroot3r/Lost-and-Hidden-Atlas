@@ -15,7 +15,6 @@ Fifteen standing places in Excelsior Springs, Kearney, Smithville, Missouri City
 | Claybrook House | Kearney, MO (39.388, -94.336) | c. 1858 Federal frame house; Wikipedia says a 2002 controlled burn destroyed it, so gone | Confirm nothing remains |
 | Liberty courthouse-square districts, Major Hotel, Miller Building (1868), IOOF Liberty Lodge No. 49 | Liberty, MO | National Register 1992 listings, brick fronts | Sources for what each now is and its hours |
 | Mt. Memorial Cemetery, Aker Cemetery | Liberty and Smithville, MO | National Register listings | Reading of their forms |
-| Sears Roebuck warehouse, Armour Theatre, Wheeling Corrugating building | North Kansas City, MO | National Register listings | Not worked: another run's ground |
 | Ray County: Poor Farm, Watkins House, Ray County Courthouse, Dougherty Auditorium, New Hope Primitive Baptist Church | Richmond, MO | National Register list rows | Sources read |
 
 ## Tips
