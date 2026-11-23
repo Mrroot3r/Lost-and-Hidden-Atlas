@@ -14,7 +14,6 @@ Sixteen places spread across Alaska, which before this batch had 21 places, 20 o
 | Chatanika Gold Camp | Chatanika, AK (65.11167, -147.48028) | 1925 Fairbanks Exploration Company camp, 13 buildings, NRHP 1979 (Wikipedia) | Present state and owner; whether it still takes visitors |
 | Sitka Naval Operating Base and Army Coastal Defenses (Fort Rousseau Causeway) | Sitka, AK (57.04941, -135.35963) | WWII defences, National Historic Landmark district 1986 (Wikipedia) | The state park's page; which pieces can be reached and how (boat) |
 | Dutch Harbor Naval Operating Base and Fort Mears | Unalaska, AK (53.88806, -166.54194) | WWII bases bombed June 1942 (Wikipedia) | What survives and who manages it; the Aleutian WWII visitor centre's page |
-| Immaculate Conception Church | Fairbanks, AK (64.84528, -147.72167) | 1904 church moved across the Chena 1911–12, stained glass 1926–28 (Wikipedia) | Parish page (iccfairbanks.org answered 403); service times |
 | Transfiguration of Our Lord Chapel | Nushagak, AK (58.94644, -158.49074) | 1904 Orthodox church, abandoned, NRHP 1980 (Wikipedia) | Owner, access (fly-in), whether it still stands |
 | Chief Shakes Historic Site | Wrangell, AK (56.46571, -132.38062) | 1940 rebuilt Tlingit community house with original house posts (Wikipedia) | The managing tribe's own page inviting visitors (rule for Native sites) |
 
