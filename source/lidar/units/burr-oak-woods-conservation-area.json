@@ -1,0 +1,5 @@
+{"name": "Burr Oak Woods Conservation Area", "code": "bowca", "st": "mo", "state": "done", "tiles": 9, "swept": "2026-11-23", "buildings": 4, "sheets": ["MO_Blue%20Springs_322023_1933_24000_geo.tif"],
+"cands":[
+{"id":"bowca1","lat":39.039774,"lon":-94.303248,"depth":0.68,"size":[6,5],"dist":35,"blat":39.03946,"blon":-94.30327,"sheet":"MO_Blue%20Springs_322023_1933_24000_geo.tif","year":1933,"status":"new"},
+{"id":"bowca2","lat":39.061167,"lon":-94.292479,"depth":0.77,"size":[14,14],"dist":47,"blat":39.06142,"blon":-94.29292,"sheet":"MO_Blue%20Springs_322023_1933_24000_geo.tif","year":1933,"status":"new"}
+]}

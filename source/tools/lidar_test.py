@@ -110,6 +110,28 @@ else:
     calls.clear(); lidar_dem._get=lambda src,x,y,h,px:(calls.append(src),np.full((9,9),-9999.0) if src=='ny' else fine)[1]
     t('so does an empty one',lidar_dem.dem(42.62,-73.30,150,300)[0] is fine and calls==['ny','3dep'])
     lidar_dem._get=_g; os.environ.pop('LIDAR_SRC')
+    # Missouri and Kansas (November 23, 2026): neither state has a parcel file for the whole state. Missouri publishes the parcels the
+    # state itself owns, which is a yes when a pit is on one and says nothing when it is not; Kansas publishes none.
+    MK=getattr(parcel,'mo_kind',None); t('Missouri: the tool can read the state-owned parcels',callable(MK))
+    if callable(MK):
+        t('Missouri: a parcel the state owns is state land, whichever department holds it',MK('MO DEPARTMENT OF NATURAL RESOURCES')=='STATE LAND' and MK('MISSOURI, STATE OF')=='STATE LAND' and MK('CONSERVATION COMMISSION OF THE STATE OF MISSOURI')=='STATE LAND')
+        t('Missouri: a parcel in that file under any other name is still public land, and no parcel at all is no answer (never "private")',MK('CURATORS OF THE UNIVERSITY OF MISSOURI').startswith('public') and MK(None) is None and MK('') is None)
+    t('the sweeper knows Missouri and Kansas, takes their ground model from the USGS, and puts Kansas City\'s counties in their regions','mo' in lidar.STATES and 'ks' in lidar.STATES and lidar.STATES['mo']['src']=='3dep' and lidar.STATES['ks']['src']=='3dep' and lidar.region_of('mo','Jackson')=='kcmo' and lidar.region_of('mo','Platte')=='kcmo' and lidar.region_of('ks','Wyandotte')=='ks' and lidar.region_of('ks','Douglas')=='ks' and lidar.region_of('mo','St. Louis').startswith('TODO') and lidar.region_of('ny','Albany')=='albco')
+    # Which old sheet may be read, and how a sheet of another scale is read (the owner, November 23, 2026: maps up to 1936, none later)
+    try: import lidar_oldmap as OM
+    except Exception: OM=None
+    t('the old-map rules have a file of their own',OM is not None)
+    if OM:
+        t('with no rule set, only 1:62,500 sheets up to 1915 are read (New York and Massachusetts, as before)',OM.rule(None)==(1915,False) and OM.sheet_ok(1904,62500,*OM.rule(None)) and not OM.sheet_ok(1916,62500,*OM.rule(None)) and not OM.sheet_ok(1904,24000,*OM.rule(None)))
+        R=OM.rule(lidar.STATES['mo']['oldmap'])
+        t('Missouri and Kansas: sheets up to 1936 at 1:62,500 or more detailed, never a later one and never a 1:125,000',R==(1936,True) and lidar.STATES['ks']['oldmap']==lidar.STATES['mo']['oldmap'] and OM.sheet_ok(1936,48000,*R) and OM.sheet_ok(1933,24000,*R) and OM.sheet_ok(1914,62500,*R) and not OM.sheet_ok(1955,24000,*R) and not OM.sheet_ok(1937,24000,*R) and not OM.sheet_ok(1894,125000,*R))
+        a=OM.reading('NY_Berne_123269_1900_62500_geo.tif'); b=OM.reading('MO_Kearney_324644_1936_48000_geo.tif'); c=OM.reading('MO_Blue%20Springs_322023_1933_24000_geo.tif')
+        t('a 1:62,500 sheet is read exactly as it always was',a=={'res':2.5,'strict':False,'open':6,'top':20,'fill':0.6})
+        t('a more detailed sheet is read at a finer step, with the stricter rule',abs(b['res']-1.92)<1e-9 and abs(c['res']-0.96)<1e-9 and b['strict'] and c['strict'] and b['open']==8)
+        t('old rule: any solid mark of the size is a building, whatever is round it',OM.keeps(12,7,0.65,0.5,a))
+        t('strict rule: a square with paper round it is a building',OM.keeps(19,20,0.9,0.02,b))
+        t('strict rule: a road junction (ink all round) is not, nor a long tick, nor a ragged blob',not OM.keeps(10,10,1.0,0.3,b) and not OM.keeps(8,20,1.0,0.02,b) and not OM.keeps(16,16,0.6,0.02,b))
+        t('strict rule: a big solid square may have a lane at its door; a small mark may not',OM.keeps(13,16,0.87,0.15,b) and not OM.keeps(10,9,0.98,0.15,b) and not OM.keeps(13,16,0.87,0.2,b))
     K=parcel.ma_kind
     t('Massachusetts: the Commonwealth by name is state land',K('COMMONWEALTH OF MASS','9150')=='STATE LAND' and K('MASS COMMONWEALTH OF DCR','')=='STATE LAND')
     t('Massachusetts: a house lot is private',K('SOMEBODY JANE','101')=='PRIVATE')

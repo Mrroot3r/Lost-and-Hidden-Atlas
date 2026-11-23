@@ -1,5 +1,6 @@
-"""Who owns the ground under a point, from the state's own tax-parcel file. New York and Massachusetts.
-   python3 tools/parcel.py [--state ny|ma] <lat> <lon> [<lat> <lon> ...]
+"""Who owns the ground under a point, from the state's own tax-parcel file. New York and Massachusetts; for Missouri only the
+parcels the state owns; for Kansas nothing (neither state has a file for the whole state).
+   python3 tools/parcel.py [--state ny|ma|mo|ks] <lat> <lon> [<lat> <lon> ...]
 Prints the owner TYPE and property class, never the owner's name: names of private owners do not go in the repository.
 Without --state the state is taken from the coarse outlines (good to a kilometre or two at a border).
 
@@ -28,10 +29,25 @@ def ma_kind(owner,code):
     if c[:1]=='9': return 'tax-exempt but not government (use code 9xx: a land trust, charity, school, church or authority)'
     if not o and not c: return 'owner not published'
     return 'PRIVATE'
+MO='https://gis.mo.gov/arcgis/rest/services/OA/FMDCrealEstate_StateOwnedParcels/MapServer/1/query'      # "State Owned Property": the parcels the state owns, from the counties that give theirs
+def mo_kind(owner):
+    """Missouri publishes no parcel file for the whole state, only the parcels the state itself owns (Office of Administration, from
+    the counties that supply theirs). A point on one is state land. A point on none is NO ANSWER, never "private": the county may
+    simply not be in the file (Jackson County's conservation areas are not), and federal land (the Corps of Engineers' lakes) never is."""
+    o=(owner or '').upper().strip()
+    if not o: return None
+    if re.search(r'CURATORS|UNIVERSITY|COLLEGE',o): return 'public land (in Missouri\'s file of state-owned property: a university or college, whose grounds are not a park)'
+    if re.search(r'MISSOURI|^MO\b|^STATE OF|CONSERVATION COMMISSION|DEP(T|ARTMENT)\.? OF (NATURAL|CONSERVATION)',o): return 'STATE LAND'
+    return 'public land (in Missouri\'s file of state-owned property)'
 def q(url,la,lo,fields):
     return requests.get(url,params={'geometry':f'{lo},{la}','geometryType':'esriGeometryPoint','inSR':4326,'spatialRel':'esriSpatialRelIntersects','outFields':fields,'returnGeometry':'false','f':'json'},timeout=60).json().get('features',[])
 def look(la,lo,st):
     """One printed line for a point; the part after '->' is read by tools/lidar.py check."""
+    if st=='mo':
+        fs=q(MO,la,lo,'NAME1,COUNTY,GIS_ACRES'); p=fs[0]['attributes'] if fs else {}; kind=mo_kind(p.get('NAME1'))
+        if not kind: return f'{la} {lo} no parcel record (Missouri publishes only state-owned parcels, and none is here: the public-land record decides)'
+        return f"{la} {lo} -> {kind} | class state-owned | {round(p.get('GIS_ACRES') or 0,1)} acres | {(p.get('COUNTY') or '').title()} County | "
+    if st=='ks': return f'{la} {lo} no parcel record (Kansas publishes no parcel file for the whole state: the public-land record decides)'
     if st=='ma':
         F='OWNER1,USE_CODE,LOT_SIZE,LOT_UNITS,CITY,SITE_ADDR,POLY_TYPE'
         try: fs=q(MA,la,lo,F)
