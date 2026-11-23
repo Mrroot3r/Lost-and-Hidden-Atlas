@@ -170,8 +170,15 @@ def other_state(text,state):
     if own in t: return False
     return any((' '+fold(n)+' ') in t for n in _states()[1] if n not in('Washington','Georgia',state) and fold(n) not in fold(state) and fold(state) not in fold(n))
 def thumb330(u):
-    """the address of a small copy, for the sheet (a TIFF's JPEG copy is named lossy-page1-960px-...)"""
-    return re.sub(r'(/(?:lossy-page\d+-)?)\d+px-(?=[^/]*$)',r'\g<1>330px-',str(u).split('?')[0])
+    """the address of a small copy, for the sheet (a TIFF's JPEG copy is named lossy-page1-960px-...). For a picture narrower than the
+    width asked of it Commons gives the address of the file itself; a small copy is made of that too, because Commons refuses a tool
+    that fetches files themselves ("instead use thumbnails", with a ten-minute wait)"""
+    u=str(u).split('?')[0]
+    if '/thumb/' in u: return re.sub(r'(/(?:lossy-page\d+-)?)\d+px-(?=[^/]*$)',r'\g<1>330px-',u)
+    m=re.match(r'(https://upload\.wikimedia\.org/wikipedia/[a-z]+)/([0-9a-f]/[0-9a-f]{2})/([^/]+)$',u)
+    if not m: return u
+    n=m.group(3); tif=n.lower().endswith(('.tif','.tiff'))
+    return '%s/thumb/%s/%s/%s330px-%s%s'%(m.group(1),m.group(2),n,'lossy-page1-' if tif else '',n,'.jpg' if tif else '')
 def row_problem(v):
     """'' when a pics file's row is one the Atlas may show or a well-formed "none"; else what is wrong with it (tools/check.py asks)"""
     if not isinstance(v,(list,tuple)) or not v: return 'is not a row'
@@ -340,13 +347,14 @@ PROPS=dict(prop='imageinfo|coordinates|categories',coprimary='all',colimit='max'
 NOBOOKS=' -filemime:pdf -filemime:djvu'      # Commons holds whole scanned books and newspapers, searched by every word in them: without this
                                            # a question like "McIntyre furnace" returned thirty of them and no photograph
 ORDER={'pin+name':0,'name':1,'category':2,'far':3,'pin':4,'loose':5}
+SHOWN=16; SHOWN_LOOSE=4      # candidates on a sheet. Each costs one small preview picture, about a second
 def pick(C):
     """the sixteen shown, best first: those that name the place, those in its category, those taken further off that name it, those
     taken at the pin nearest first, and last those whose name half matches, for which four places are kept however many were at the pin"""
     C=sorted(C,key=lambda c:(ORDER[c['how']],c['m'] if c.get('m') is not None else 99999,c['title']))
     loose=[c for c in C if c['how']=='loose']; rest=[c for c in C if c['how']!='loose']
-    keep=min(len(loose),max(4,16-len(rest)))
-    return rest[:16-keep]+loose[:keep]
+    keep=min(len(loose),max(SHOWN_LOOSE,SHOWN-len(rest)))
+    return rest[:SHOWN-keep]+loose[:keep]
 def _pages(params):
     """one question's pages. Commons answers in parts when there is much to say (the categories of fifty files, say): the parts that
     carry on the same pages are fetched too, two more at most, and put together. Without colimit=max it gave the position of ten files
@@ -445,12 +453,12 @@ def look(s,record=None):
                 r=_sess().get(thumb330(c['src']),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB'); break      # the same session as the questions, so a login, where it counts for pictures, is used
             except Exception as e:
                 ra=getattr(getattr(e,'response',None),'headers',{}).get('Retry-After') if getattr(e,'response',None) is not None else None
-                _w=min(60,int(ra)) if str(ra or '').isdigit() else 6*(k+1); _T['pr']+=1; _T['pw']+=_w; _T['gap']=min(4.0,_T.get('gap',1.0)*2); time.sleep(_w)      # a refusal costs up to a minute: ask more slowly for the rest of the run
+                _w=min(60,int(ra)) if str(ra or '').isdigit() else 6*(k+1); _T['pr']+=1; _T['pw']+=_w; _T['gap']=min(4.0,_T.get('gap',1.0)*2); time.sleep(_w)      # a refusal is rare now that every preview is a small copy; after one, ask more slowly
         _T['ps']+=time.time()-_t0
         if im is None: im=Image.new('RGB',(330,220),(90,90,90)); c['grey']=True
         im.thumbnail((330,250)); t=Image.new('RGB',(340,286),(255,255,255)); t.paste(im,((340-im.width)//2,30+(250-im.height)//2)); d=ImageDraw.Draw(t); d.text((6,4),'%d   %s'%(n,label(c)),fill=(0,0,0) if c['how'] in('pin','pin+name') else (170,0,0) if c['how'] in UNSURE else (0,110,40)); d.text((6,17),c['title'][5:60],fill=(0,70,160)); tiles.append(t)
         print('  %2d  %s  |  %s  |  %s  |  %s, %s%s'%(n,label(c),c['title'][5:95],c['desc'][:110] or '(no description)',credit(c['artist']),c['lic'],', '+c['when'][:4] if c['when'] else ''))
-        time.sleep(_T.get('gap',1.0))          # preview pictures have a limit of their own, apart from the questions': at 0.4 s apart three of sixteen were refused, each a minute's wait (measured November 23, 2026)
+        time.sleep(_T.get('gap',1.0))          # a second between previews
     cols=4; rows=(len(tiles)+cols-1)//cols; sheet=Image.new('RGB',(cols*340,rows*286),(255,255,255))
     for i,t in enumerate(tiles): sheet.paste(t,((i%cols)*340,(i//cols)*286))
     out='research/photofind_%s.jpg'%s['id']; sheet.save(out,quality=82)
