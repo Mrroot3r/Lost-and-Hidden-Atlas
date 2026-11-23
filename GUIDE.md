@@ -648,6 +648,8 @@ Every US state and Canadian province was set up this way in November 2026, so th
 
 The repository and site are public. Do not commit anything personal about the owner or about private landowners: no email addresses, no mailing addresses, no notes exported from someone's browser. The owner lookup deliberately shows owner names from public parcel files but not mailing addresses. `check.py` fails if it finds an email address in the repository.
 
+**The page never scrolls as a whole (November 23, 2026).** The page is exactly one screen; the lists and sheets scroll inside it. `html`, `body` and `#stage` cut off anything that sticks out past an edge (`app.css`, top). Before that, the compare divider's right-hand label stuck out past the screen when the divider was pushed to the right, which made the page wider than the phone: in the Android app the whole page could then be dragged about by the layer bar, with blank beside and below it and the map not filling in. Anything new placed over the map must stay inside `#stage`; `tools/land_test.js` checks that the page is still the size of the screen with the divider at the right edge.
+
 ## 12. The Android app
 
 The app is the same Atlas page inside an Android shell (Capacitor 8), in `android-app/`. It exists for three things a web page cannot do: record a field log with the screen off or the app in the background, open with no signal from the very first launch, and stay installed on the phone.
