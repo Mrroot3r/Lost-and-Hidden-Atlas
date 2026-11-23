@@ -1,0 +1,7 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'oakland-cemetery-shreveport':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Shreveport_September_2015_101_%28Oakland_Cemetery%29.jpg/960px-Shreveport_September_2015_101_%28Oakland_Cemetery%29.jpg', 900, 600, 'Michael Barera', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Shreveport_September_2015_101_(Oakland_Cemetery).jpg', '2026-11-23', 'pin+name'),
+ 'old-commercial-national-bank-shreveport':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Shreveport_September_2015_025_%28Commercial_National_Bank_Building%29.jpg/960px-Shreveport_September_2015_025_%28Commercial_National_Bank_Building%29.jpg', 900, 1350, 'Michael Barera', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Shreveport_September_2015_025_(Commercial_National_Bank_Building).jpg', '2026-11-23', 'pin+name'),
+ 'shreveport-municipal-building-1924':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Construction_Outside_724_McNeill_Street%2C_Shreveport.JPG/960px-Construction_Outside_724_McNeill_Street%2C_Shreveport.JPG', 900, 675, 'Rrleffler', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Construction_Outside_724_McNeill_Street,_Shreveport.JPG', '2026-11-23', 'pin+name'),
+}
