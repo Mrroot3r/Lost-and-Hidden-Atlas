@@ -298,6 +298,12 @@ def _sess():
         if _S['in']: print('Logged in to Commons: questions go faster.')
     return _S['s']
 def pace(): return PACE_IN if _S.get('in') else PACE
+def login_note():
+    """One line for the end of a run, so whoever reads the log can tell which allowance the run had. Names the two settings, never their values."""
+    if not (os.environ.get('ATLAS_COMMONS_USER','').strip() and os.environ.get('ATLAS_COMMONS_PASS','').strip()):
+        return 'Commons login: none set in this environment (ATLAS_COMMONS_USER and ATLAS_COMMONS_PASS), so questions were asked at the slower pace.'
+    if _S.get('in'): return 'Commons login: logged in, so questions were asked at the faster pace.'
+    return 'Commons login: one is set, but Commons did not accept it, so questions were asked at the slower pace.'
 def _get(params,tries=8):
     sess=_sess()
     for k in range(tries):
@@ -546,4 +552,11 @@ def main(a):
             n+=1; sheet.save('research/photosheet_%s_%d.jpg'%(os.path.basename(f)[5:-3],n),quality=82)
         print('%d chosen pictures in %d sheet(s): research/photosheet_%s_*.jpg. %d places had none that fits.'%(len(rows),n,os.path.basename(f)[5:-3],len(P)-len(rows))); return
     sys.exit(__doc__)
-if __name__=='__main__': main(sys.argv[1:])
+if __name__=='__main__':
+    _a=sys.argv[1:]
+    try: main(_a)
+    finally:
+        if not _a or _a[0] in ('next','look','new'):          # the last line of the output, where a cut-off log still shows it
+            try: _sess()
+            except Exception: pass
+            print(login_note())

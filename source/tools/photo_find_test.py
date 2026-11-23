@@ -245,6 +245,9 @@ if callable(lg) and hasattr(pf,'new_session'):
         c=FakeSess('Failed'); pf.new_session=lambda:c; pf._S.clear(); pf._last[0]=0.0
         with contextlib.redirect_stdout(io.StringIO()): pf._get({'action':'query','list':'search'})
         ok('a login that is refused: the tool carries on without it, at the old spacing',pf.pace()==pf.PACE and not any('assert' in x[1] for x in c.calls))
+        note=getattr(pf,'login_note',lambda:'')
+        pf._S.clear(); pf._S.update({'s':1,'in':True}); n1=note(); pf._S.update({'in':False}); n2=note(); os.environ.pop('ATLAS_COMMONS_PASS',None); n3=note()
+        ok('the tool ends by saying, in one line, whether it is logged in, was refused, or found no login set, and never the name or the password','logged in' in n1.lower() and 'did not accept' in n2.lower() and 'none set' in n3.lower() and len({n1,n2,n3})==3 and not any(SECRET in n or 'Someone' in n for n in (n1,n2,n3)),[n1[:40],n2[:40],n3[:40]])
     finally: pf.new_session=real_new; pf.time.sleep=slp; os.environ.clear(); os.environ.update(env); pf._S.clear()
 rp=G('row_problem',lambda v:'missing')
 ok('a chosen row may say how the picture was found, and a "none" under which search',rp(tuple(row)+('loose',))=='' and rp(tuple(row))=='' and rp(('','2026-11-22','nothing on Commons near the pin',2))=='' and rp(('','2026-11-22','only a street sign'))=='',[rp(tuple(row)+('loose',)),rp(('','2026-11-22','nothing on Commons near the pin',2))])
