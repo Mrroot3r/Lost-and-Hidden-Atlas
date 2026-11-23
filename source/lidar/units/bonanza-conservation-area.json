@@ -1,0 +1,9 @@
+{"name": "Bonanza Conservation Area", "code": "boca", "st": "mo", "state": "done", "tiles": 15, "swept": "2026-11-23", "buildings": 61, "sheets": ["MO_Braymer_324756_1924_62500_geo.tif"],
+"cands":[
+{"id":"boca1","lat":39.625949,"lon":-93.949171,"depth":0.66,"size":[9,9],"dist":38,"blat":39.62615,"blon":-93.94882,"sheet":"MO_Braymer_324756_1924_62500_geo.tif","year":1924,"status":"no","when":"2026-11-23","late":null,"seen":"2026-11-23","why":"nomap","note":"the map mark at the ticks is the dot of the 956 spot height by the road, not a building. The pit is at the head of a wooded gully at a crop field edge."},
+{"id":"boca2","lat":39.627669,"lon":-93.954489,"depth":0.6,"size":[9,6],"dist":15,"blat":39.62761,"blon":-93.95464,"sheet":"MO_Braymer_324756_1924_62500_geo.tif","year":1924,"status":"no","why":"water","note":"in the bed of a ravine","when":"2026-11-23"},
+{"id":"boca3","lat":39.627198,"lon":-93.949952,"depth":0.63,"size":[11,7],"dist":65,"blat":39.62726,"blon":-93.9492,"sheet":"MO_Braymer_324756_1924_62500_geo.tif","year":1924,"status":"no","why":"natural","note":"several small pits scattered on rough ground","when":"2026-11-23"},
+{"id":"boca4","lat":39.615246,"lon":-93.925613,"depth":0.73,"size":[5,4],"dist":86,"blat":39.61587,"blon":-93.9262,"sheet":"MO_Braymer_324756_1924_62500_geo.tif","year":1924,"status":"no","why":"road","note":"in the ditch beside a straight road where a gully reaches it","when":"2026-11-23"},
+{"id":"boca5","lat":39.618592,"lon":-93.947107,"depth":0.64,"size":[7,15],"dist":75,"blat":39.61905,"blon":-93.94647,"sheet":"MO_Braymer_324756_1924_62500_geo.tif","year":1924,"status":"no","why":"faint","when":"2026-11-23"},
+{"id":"boca6","lat":39.626349,"lon":-93.951603,"depth":0.6,"size":[10,14],"dist":66,"blat":39.62621,"blon":-93.95235,"sheet":"MO_Braymer_324756_1924_62500_geo.tif","year":1924,"status":"no","why":"road","note":"where a ditch meets a road","when":"2026-11-23"}
+]}

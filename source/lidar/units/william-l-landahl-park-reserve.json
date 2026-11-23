@@ -1,0 +1,6 @@
+{"name": "William L Landahl Park Reserve", "code": "wllpr", "st": "mo", "state": "done", "tiles": 9, "swept": "2026-11-23", "buildings": 11, "sheets": ["MO_Oak%20Grove_323690_1934_24000_geo.tif", "MO_Blue%20Springs_322023_1933_24000_geo.tif"],
+"cands":[
+{"id":"wllpr1","lat":39.066369,"lon":-94.238688,"depth":0.65,"size":[9,6],"dist":25,"blat":39.0662,"blon":-94.23887,"sheet":"MO_Oak%20Grove_323690_1934_24000_geo.tif","year":1934,"status":"no","why":"faint","note":"soft dip on a faint straight bank about 40 m north of a road","when":"2026-11-23"},
+{"id":"wllpr2","lat":39.066545,"lon":-94.233018,"depth":0.71,"size":[11,7],"dist":55,"blat":39.06607,"blon":-94.23318,"sheet":"MO_Oak%20Grove_323690_1934_24000_geo.tif","year":1934,"status":"no","why":"faint","note":"soft dip on a smooth slope","when":"2026-11-23"},
+{"id":"wllpr3","lat":39.066419,"lon":-94.238138,"depth":0.63,"size":[8,7],"dist":68,"blat":39.0662,"blon":-94.23887,"sheet":"MO_Oak%20Grove_323690_1934_24000_geo.tif","year":1934,"status":"no","why":"natural","note":"at the head of a small gully where a faint track crosses it, about 40 m north of a road","when":"2026-11-23"}
+]}
