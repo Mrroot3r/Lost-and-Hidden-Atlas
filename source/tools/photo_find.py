@@ -298,6 +298,11 @@ def _sess():
         if _S['in']: print('Logged in to Commons: questions go faster.')
     return _S['s']
 def pace(): return PACE_IN if _S.get('in') else PACE
+_T=dict(q=0,qs=0.0,qw=0.0,p=0,ps=0.0,pw=0.0,pr=0)      # where a run's time went: questions to Commons, and the preview pictures for the sheets
+def time_note():
+    """One line for the end of a run. A round took ten minutes with the login on (November 23, 2026) and nothing said whether the
+    questions or the preview pictures, which Wikimedia limits separately, had cost the time."""
+    return 'Time: %d questions took %d s (%d s of it waiting); %d preview pictures took %d s (%d s of it waiting, %d refused and tried again).'%(_T['q'],_T['qs'],_T['qw'],_T['p'],_T['ps'],_T['pw'],_T['pr'])
 def login_note():
     """One line for the end of a run, so whoever reads the log can tell which allowance the run had. Names the two settings, never their values."""
     if not (os.environ.get('ATLAS_COMMONS_USER','').strip() and os.environ.get('ATLAS_COMMONS_PASS','').strip()):
@@ -306,20 +311,25 @@ def login_note():
     return 'Commons login: one is set, but Commons did not accept it, so questions were asked at the slower pace.'
 def _get(params,tries=8):
     sess=_sess()
+    t0=time.time(); _T['q']+=1
+    def nap(x): _T['qw']+=x; time.sleep(x)
+    try: return _get1(sess,params,tries,nap)
+    finally: _T['qs']+=time.time()-t0
+def _get1(sess,params,tries,nap):
     for k in range(tries):
         w=pace()-(time.time()-_last[0])
-        if w>0: time.sleep(w)
+        if w>0: nap(w)
         _last[0]=time.time()
         q=dict(params,format='json',formatversion='2')
         if _S.get('in'): q['assert']='user'          # if the login has lapsed Commons says so, where it would otherwise answer at the anonymous allowance without a word
         r=sess.get(API,params=q,headers=UA,timeout=60)
-        if r.status_code==429 or r.status_code>=500: time.sleep(min(90,int(r.headers.get('Retry-After') or 0) or 8*(k+1))); continue
+        if r.status_code==429 or r.status_code>=500: nap(min(90,int(r.headers.get('Retry-After') or 0) or 8*(k+1))); continue
         r.raise_for_status(); j=r.json()
         if refused(j):
             if _S.get('in') and isinstance(j['error'],dict) and j['error'].get('code')=='assertuserfailed':          # logged out part-way: log in again once, or go on without
                 u=os.environ.get('ATLAS_COMMONS_USER','').strip(); pw=os.environ.get('ATLAS_COMMONS_PASS','').strip(); _S['in']=(not _S.get('again')) and login(sess,u,pw); _S['again']=True; continue
             if k>=3: raise SystemExit('Wikimedia Commons answered with an error: %s. Nothing was recorded; run the same command again later.'%str(j['error'].get('code') if isinstance(j['error'],dict) else j['error'])[:80])
-            time.sleep(8*(k+1)); continue        # an error inside a 200 reply (too busy, too many requests): never read it as "nothing here"
+            nap(8*(k+1)); continue        # an error inside a 200 reply (too busy, too many requests): never read it as "nothing here"
         return j
     raise SystemExit('Wikimedia Commons keeps refusing (too many requests). Wait a few minutes and run the same command again.')
 def _hav(a,b,c,d):
@@ -429,17 +439,18 @@ def look(s,record=None):
         return 0
     tiles=[]
     for n,c in enumerate(C,1):
-        im=None
+        im=None; _t0=time.time(); _T['p']+=1
         for k in range(3):          # a refused download (429) is tried again; a grey tile hides a candidate from whoever chooses
             try:
-                r=requests.get(thumb330(c['src']),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB'); break
+                r=_sess().get(thumb330(c['src']),headers=UA,timeout=60); r.raise_for_status(); im=Image.open(io.BytesIO(r.content)).convert('RGB'); break      # the same session as the questions, so a login, where it counts for pictures, is used
             except Exception as e:
                 ra=getattr(getattr(e,'response',None),'headers',{}).get('Retry-After') if getattr(e,'response',None) is not None else None
-                time.sleep(min(60,int(ra)) if str(ra or '').isdigit() else 6*(k+1))
+                _w=min(60,int(ra)) if str(ra or '').isdigit() else 6*(k+1); _T['pr']+=1; _T['pw']+=_w; _T['gap']=min(4.0,_T.get('gap',1.0)*2); time.sleep(_w)      # a refusal costs up to a minute: ask more slowly for the rest of the run
+        _T['ps']+=time.time()-_t0
         if im is None: im=Image.new('RGB',(330,220),(90,90,90)); c['grey']=True
         im.thumbnail((330,250)); t=Image.new('RGB',(340,286),(255,255,255)); t.paste(im,((340-im.width)//2,30+(250-im.height)//2)); d=ImageDraw.Draw(t); d.text((6,4),'%d   %s'%(n,label(c)),fill=(0,0,0) if c['how'] in('pin','pin+name') else (170,0,0) if c['how'] in UNSURE else (0,110,40)); d.text((6,17),c['title'][5:60],fill=(0,70,160)); tiles.append(t)
         print('  %2d  %s  |  %s  |  %s  |  %s, %s%s'%(n,label(c),c['title'][5:95],c['desc'][:110] or '(no description)',credit(c['artist']),c['lic'],', '+c['when'][:4] if c['when'] else ''))
-        time.sleep(0.4)
+        time.sleep(_T.get('gap',1.0))          # preview pictures have a limit of their own, apart from the questions': at 0.4 s apart three of sixteen were refused, each a minute's wait (measured November 23, 2026)
     cols=4; rows=(len(tiles)+cols-1)//cols; sheet=Image.new('RGB',(cols*340,rows*286),(255,255,255))
     for i,t in enumerate(tiles): sheet.paste(t,((i%cols)*340,(i//cols)*286))
     out='research/photofind_%s.jpg'%s['id']; sheet.save(out,quality=82)
@@ -559,4 +570,4 @@ if __name__=='__main__':
         if not _a or _a[0] in ('next','look','new'):          # the last line of the output, where a cut-off log still shows it
             try: _sess()
             except Exception: pass
-            print(login_note())
+            print(time_note()); print(login_note())
