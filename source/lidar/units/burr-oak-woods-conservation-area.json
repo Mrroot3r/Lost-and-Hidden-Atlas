@@ -1,5 +1,5 @@
 {"name": "Burr Oak Woods Conservation Area", "code": "bowca", "st": "mo", "state": "done", "tiles": 9, "swept": "2026-11-23", "buildings": 4, "sheets": ["MO_Blue%20Springs_322023_1933_24000_geo.tif"],
 "cands":[
-{"id":"bowca1","lat":39.039774,"lon":-94.303248,"depth":0.68,"size":[6,5],"dist":35,"blat":39.03946,"blon":-94.30327,"sheet":"MO_Blue%20Springs_322023_1933_24000_geo.tif","year":1933,"status":"new"},
-{"id":"bowca2","lat":39.061167,"lon":-94.292479,"depth":0.77,"size":[14,14],"dist":47,"blat":39.06142,"blon":-94.29292,"sheet":"MO_Blue%20Springs_322023_1933_24000_geo.tif","year":1933,"status":"new"}
+{"id":"bowca1","lat":39.039774,"lon":-94.303248,"depth":0.68,"size":[6,5],"dist":35,"blat":39.03946,"blon":-94.30327,"sheet":"MO_Blue%20Springs_322023_1933_24000_geo.tif","year":1933,"status":"no","why":"natural","note":"soft dip at the head of a gully","when":"2026-11-23"},
+{"id":"bowca2","lat":39.061167,"lon":-94.292479,"depth":0.77,"size":[14,14],"dist":47,"blat":39.06142,"blon":-94.29292,"sheet":"MO_Blue%20Springs_322023_1933_24000_geo.tif","year":1933,"status":"no","when":"2026-11-23","late":[1945,"MO_Blue%20Springs_322018_1945_24000_geo.tif"],"seen":"2026-11-23","check":{"parcel":null,"near":[],"padus":null,"town":"Sni-A-Bar township","county":"Jackson","road":"East Strode Road","rule":"none"},"why":"noland"}
 ]}
