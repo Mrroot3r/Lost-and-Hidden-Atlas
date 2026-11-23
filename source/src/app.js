@@ -62,7 +62,7 @@ const debounce=(f,ms)=>{ let t; return function(){ const a=arguments; clearTimeo
 
 /* ---------- your saved data (this browser only) ---------- */
 const LS='lost-hidden-atlas-v1';
-const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],mute:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:false,canal:false,rail:false}}});
+const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],mute:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:false,canal:false,rail:false},split:0}});
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
@@ -693,7 +693,7 @@ function initMap(){
   map.on('contextmenu',onContext);
   map.on('mousemove',e=>{ const r=$('#readout'); r.hidden=false; r.textContent=e.latlng.lat.toFixed(5)+', '+e.latlng.lng.toFixed(5)+' · z'+map.getZoom(); });
   window.addEventListener('resize',debounce(()=>map.invalidateSize(),150));
-  setupSwipe(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,custom:()=>U.custom,addMine:o=>{ U.custom.push(o); save(); refresh(); },nmGoal:nmGoal,setPref:setPref,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,xlNeed:xlNeed,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
+  setupSwipe(); setupSplit(); drawLines(); drawLand(); drawLots(); drawLeads(); drawPockets(); Object.keys(XL).forEach(drawXL); drawWalls(); try{ window.__atlasMap=map; window.__atlasTiles=TQ; window.__atlasNM={sites:sites,custom:()=>U.custom,addMine:o=>{ U.custom.push(o); save(); refresh(); },nmGoal:nmGoal,setPref:setPref,nmFix:nmFix,nmCollect:nmCollect,nmBuzzes:nmBuzzes,NM:NM,XL:XL,xlLoad:xlLoad,xlNeed:xlNeed,syncMarkers:syncMarkers,visible:()=>visible}; window.__atlasLines=()=>({split:!!LX,got:Object.assign({},lineGot),wide:!!lineWide,wideWait:lineWideWait,n:(LINES||[]).length}); window.__atlasShare=(cfg,kind,f)=>{ const o=Object.assign({},SHARE); Object.assign(SHARE,cfg); try{ return shareLinks(kind,f); } finally{ Object.assign(SHARE,o); } }; }catch(e){}
   syncMarkers(); drawHome();
   map.on('dragstart',()=>{ dragging=true; }); map.on('dragend',()=>{ dragging=false; });
   if(U.last&&U.last.ll) placeDot(U.last.ll,false);
@@ -726,6 +726,26 @@ function clipCmp(){ if(!map) return; const pane=map.getPane('cmp'); if(!cmp.on||
   const sz=map.getSize(),nw=map.containerPointToLayerPoint([0,0]); const x=nw.x+sz.x*cmp.x;
   pane.style.clip='rect('+nw.y+'px,'+(nw.x+sz.x)+'px,'+(nw.y+sz.y)+'px,'+x+'px)'; }
 function placeSwipe(){ $('#swipe').style.left=(cmp.x*100)+'%'; clipCmp(); }
+/* Upright phone: the layer bar is the edge between the map and the list, and can be dragged up and down to share the screen
+   differently (U.ui.split: the map's share of the height; 0 is the layout's own 44%). The map never gets less than its 220-pixel
+   strip, and the list always keeps its tabs and about one entry. Sideways the bar still scrolls its buttons. */
+const SPLITMAP=220, SPLITLIST=230;      /* 230: the tabs, the search row, the count and the first entry */
+function splitClamp(f,H){ const lo=SPLITMAP/H, hi=1-SPLITLIST/H; return Math.min(Math.max(f,lo),Math.max(lo,hi)); }
+function splitApply(){ const a=$('#app'); if(U.ui.split>0) a.style.setProperty('--split',(U.ui.split*100).toFixed(2)+'%'); else a.style.removeProperty('--split'); }
+function setupSplit(){
+  splitApply(); const bar=$('#lbar'), app=$('#app'); let st=null, quiet=0;
+  const stacked=()=>stage.getBoundingClientRect().bottom<=$('#side').getBoundingClientRect().top+1;      /* not side by side, as a wide window and a phone on its side are */
+  bar.addEventListener('pointerdown',e=>{ if((e.pointerType==='mouse'&&e.button!==0)||app.classList.contains('mapbig')||!stacked()) return; st={id:e.pointerId,x:e.clientX,y:e.clientY,on:false,h0:stage.getBoundingClientRect().height,raf:0}; });
+  /* moves and the lift are heard on the window: a finger stays with the bar it touched, but a mouse that leaves the bar would be lost */
+  window.addEventListener('pointermove',e=>{ if(!st||e.pointerId!==st.id) return; const dx=e.clientX-st.x, dy=e.clientY-st.y;
+    if(!st.on){ if(Math.abs(dy)<10||Math.abs(dy)<Math.abs(dx)*1.5) return; st.on=true; try{bar.setPointerCapture(e.pointerId);}catch(x){} bar.classList.add('dragging'); }
+    const H=app.getBoundingClientRect().height; U.ui.split=splitClamp((st.h0+dy)/H,H); splitApply(); e.preventDefault();
+    if(!st.raf){ const s0=st; s0.raf=requestAnimationFrame(()=>{ s0.raf=0; if(map) map.invalidateSize({pan:false}); }); } });
+  const end=e=>{ if(!st||e.pointerId!==st.id) return; const was=st.on; st=null; bar.classList.remove('dragging'); if(!was) return;
+    quiet=Date.now()+400; save(); if(map) map.invalidateSize({pan:false}); };
+  window.addEventListener('pointerup',end); window.addEventListener('pointercancel',end);
+  bar.addEventListener('click',e=>{ if(Date.now()<quiet){ e.stopPropagation(); e.preventDefault(); } },true);      /* letting go over a button after a drag is not a tap on it */
+}
 function setupSwipe(){
   const g=$('#swipe .grip'); let drag=false;
   g.addEventListener('pointerdown',e=>{ drag=true; try{g.setPointerCapture(e.pointerId);}catch(x){} e.preventDefault(); });
