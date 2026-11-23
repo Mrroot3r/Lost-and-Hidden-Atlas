@@ -1,0 +1,158 @@
+# Galveston, Texas: buildings named in a video about the city's old buildings, each checked against the National
+# Register list, Wikipedia, Texas Historical Commission marker texts and the owners' own pages.
+from data_b import N
+from data_ma import W
+
+def THC(n, label): return [label + ' (Texas Historical Commission marker)', 'https://atlas.thc.texas.gov/Details/%d' % n]
+GHF = 'Galveston Historical Foundation'
+
+BATCH={'key':'galveston_rypz','label':'Galveston, Texas: mansions, cathedral, customhouse, orphans\' home, seawall and a gun battery','added':'2026-11-23 02:33'}
+
+PLACES=[
+N('bishops-palace-galveston','Bishop\'s Palace (Gresham\'s Castle)','Galveston','tx','landmark','standing',29.30305,-94.78214,'exact','open','drive','','1887–1892',
+  'A stone mansion with four towers built from 1887 to 1892 for the lawyer and politician Walter Gresham, his wife Josephine and their nine children, to plans by the Galveston architect Nicholas J. Clayton. Built all of stone, it came through the hurricane of 1900. The Catholic diocese bought it in 1923 and used it as the bishop\'s headquarters for four decades, then opened it for tours in 1963. The Galveston Historical Foundation has owned it since 2013.',
+  'Texas granite and sandstone, cut on the site, in four towers four storeys high and a crowd of chimneys. Inside: a library panelled in walnut with a marble fireplace, the stained-glass windows the diocese put in, and a ceiling fresco of the four gospel writers. Open daily for self-guided tours; the house has no ramp for wheelchairs.',
+  'The stone castle that rode out the 1900 storm and became a bishop\'s house.',
+  'Owned and shown by the Galveston Historical Foundation, 1402 Broadway. Self-guided tours daily, last ticket at 4 p.m., hours from the foundation\'s page, read November 2026; fee. Street parking.',
+  [W('Bishop\'s Palace (Galveston, Texas)'),[GHF+': 1892 Bishop\'s Palace','https://www.galvestonhistory.org/sites/1892-bishops-palace']],
+  conf='', th=None, thn=None, brick='no', hours='Daily 10 a.m. to 5 p.m. (last ticket 4 p.m.)'),
+
+N('ashton-villa-galveston','Ashton Villa','Galveston','tx','landmark','standing',29.30028,-94.79297,'exact','view','drive','','1859–',
+  'A three-storey Italianate house of brick built in 1859 for the hardware merchant and banker James Moreau Brown, by enslaved workers and European craftsmen; it was one of the first brick buildings in Texas. Its walls are thirteen inches thick. Both armies used it as a headquarters in the Civil War, and the house sheltered Brown\'s widow and children through the 1900 hurricane. The Galveston Historical Foundation bought it in 1970 under threat of demolition and opened it as a house museum in 1974.',
+  'Brick walls, deep eaves, tall windows and verandas with cast-iron lintels, on the corner of 24th Street and Broadway. Hurricane Ike flooded the first floor in 2008. Wikipedia says it no longer gives public tours and the first floor is hired out for private events; the foundation\'s page lists holiday events inside. Interior not checked.',
+  'An 1859 brick house that served both sides in the Civil War.',
+  'Owned by the Galveston Historical Foundation, 2328 Broadway. Not open for tours (Wikipedia); look from Broadway and 24th Street, or go in for one of the foundation\'s events. Street parking.',
+  [W('Ashton Villa'),[GHF+': 1859 Ashton Villa','https://www.galvestonhistory.org/sites/1859-ashton-villa']],
+  conf='', th=None, thn=None, brick='yes', hours=''),
+
+N('moody-mansion-galveston','Moody Mansion (Willis-Moody Mansion)','Galveston','tx','landmark','standing',29.29955,-94.79626,'exact','open','drive','','1893–1895',
+  'A thirty-one-room Romanesque mansion commissioned in 1893 by the widow Narcissa Willis and finished in 1895, designed by the English architect William H. Tyndall. The financier William Lewis Moody Jr. bought it, and the Moody family lived there until 1986, when it became a museum of the family. Hurricane Ike flooded its basement in 2008.',
+  'Interiors by Pottier and Stymus, the New York decorators. Open daily for tours, with a longer guided tour of the whole house on Fridays and Saturdays (the museum\'s page).',
+  'The Moody family\'s Broadway mansion, kept as they left it.',
+  'Run as a museum, 2618 Broadway. Hours and tours from the museum\'s own page, read November 2026; fee. Street parking.',
+  [W('Moody Mansion'),['Moody Mansion: about','https://www.moodymansion.org/about']],
+  conf='', th=None, thn=None, brick='?', hours='Daily 10 a.m. to 5 p.m. (last ticket 4 p.m.); all-access tour Fridays 3:45 p.m., Saturdays 8:45 a.m. and 3:45 p.m.'),
+
+N('grand-1894-opera-house-galveston','The Grand 1894 Opera House','Galveston','tx','civic','standing',29.30561,-94.79059,'exact','open','drive','','1894–',
+  'An opera house and hotel raised for $100,000 by Henry Greenwall, who closed his Tremont Opera House to build it; it opened on January 3, 1895. It came through the hurricanes of 1900 and 1915, Carla and Ike. After a vaudeville spell it became a cinema, which closed in 1974; the Galveston County Cultural Arts Council bought it that year and restored it as a theatre. The Texas Legislature named it the official opera house of Texas in 1993.',
+  'A Romanesque Revival front of red stone, brick and terra cotta, with glass doors framed by a carved stone arch and a glass box office between the two sets of doors. 1,040 seats. Performances through the year; the building is seen inside by going to a show.',
+  'An 1894 opera house that outlasted four great storms.',
+  'Run as a non-profit theatre, 2020 Postoffice Street (telephone 409-765-1894). Show times on the theatre\'s page; box office hours not checked. Street and lot parking downtown.',
+  [W('Grand 1894 Opera House'),['The Grand 1894 Opera House','https://www.thegrand.com/']],
+  conf='', th=None, thn=None, brick='yes', hours='?'),
+
+N('galveston-orphans-home-bryan-museum','Galveston Orphans Home (The Bryan Museum)','Galveston','tx','inst','standing',29.29742,-94.78903,'exact','open','drive','','1894–1902',
+  'George Dealey founded the orphans\' home in 1878, and it moved to this lot in 1880. Its first Gothic Revival building, paid for by Henry Rosenberg, went up in 1894 and 1895 and was destroyed by the storm of 1900; William Randolph Hearst held a charity bazaar in New York to pay for the rebuilding, finished in 1902. The oilman J. P. Bryan bought the building in 2013, restored it, and opened the Bryan Museum of Texas and Western history there in 2015.',
+  'The rebuilt home of 1902, restored, now holding a large collection on Texas and the American West, with a garden. Inside by museum ticket. Original fabric inside not checked.',
+  'An orphanage rebuilt after the 1900 storm, now a museum of Texas.',
+  'The Bryan Museum, 1315 21st Street. Hours from the museum\'s own page, read November 2026; closed on some holidays; fee.',
+  [W('Galveston Orphans Home'),W('Bryan Museum'),['The Bryan Museum: hours and admission','https://thebryanmuseum.org/hours-admission']],
+  conf='', th=None, thn=None, brick='?', hours='September to February Wednesday to Sunday 10 a.m. to 5 p.m.; March to Labor Day daily except Tuesday 10 a.m. to 5 p.m.'),
+
+N('scottish-rite-cathedral-galveston','Scottish Rite Cathedral','Galveston','tx','civic','standing',29.30434,-94.79185,'exact','view','drive','','1928–',
+  'An Art Deco Masonic hall built in 1928 after fire destroyed Harmony Hall, the Nicholas Clayton building the Scottish Rite Masons had used. Alfred C. Finn\'s firm drew it, with H. Jordan MacKenzie as lead designer. Scottish Rite Masons still meet there.',
+  'Brick and stone, a loggia facing Church Street, copper doors and stone relief carvings. Interior not checked.',
+  '',
+  'A Masonic meeting hall at 2128 Church Street; look from the street. Street parking.',
+  [W('Scottish Rite Cathedral (Galveston, Texas)')],
+  conf='', th=None, thn=None, brick='?', hours=''),
+
+N('old-galveston-customhouse','Old Galveston Customhouse','Galveston','tx','civic','standing',29.30529,-94.78971,'exact','view','drive','','1857–1861',
+  'Congress voted the money in 1855 and the contract was let in 1857 for a custom house to plans from the Treasury\'s supervising architect, Ammi Burnham Young; it was finished in 1861. It held the custom house, the post office and the federal court in the years Galveston was the leading port of Texas. Its cast iron is thought to have saved it in the Galveston fire of 1885. The Galveston Historical Foundation restored it as its headquarters, finishing in 1999; a law firm now owns it.',
+  'A two-storey Classical Revival building of hard-fired red-brown brick with tan brick at the corners and door jambs. Nearly all the outside ornament is cast iron: Ionic columns on a granite base below, taller Corinthian columns and an iron balustrade above. Inside, a cast-iron double stair. Interior not open to the public as far as was checked.',
+  'An 1861 custom house dressed almost entirely in cast iron.',
+  'Owned by a private law firm (Wikipedia); 502 20th Street. Look from 20th Street and Avenue E. Street parking.',
+  [W('United States Customs House and Court House (Galveston, Texas)')],
+  conf='', th=None, thn=None, brick='yes', hours=''),
+
+N('city-national-bank-galveston','City National Bank Building','Galveston','tx','civic','standing',29.30529,-94.79333,'exact','view','drive','','1919–1920',
+  'A bank building of 1919 to 1920 put up for William Lewis Moody Jr.\'s City National Bank (later Moody National Bank), designed by the Chicago architects Weary and Alford; it opened on August 12, 1920. From 1972 it was the Galveston County Historical Museum, until Hurricane Ike damaged it badly in 2008. Ross Moody, who had acquired it, gave it to the Galveston Historical Foundation.',
+  'A pedimented portico of Corinthian columns on Market Street, and a barrel-vaulted banking hall inside. Empty since 2008 according to Wikipedia; what the foundation now does with it was not checked. Interior not open.',
+  'A temple-fronted 1920 bank, closed since Hurricane Ike.',
+  'Owned by the Galveston Historical Foundation, 2219 Market Street (Avenue D). Look from the street. Street parking.',
+  [W('City National Bank (Galveston, Texas)'),[GHF+': GHF becomes steward of 1920 City National Bank Building','https://www.galvestonhistory.org/news/ghf-becomes-steward-of-1920-city-national-bank-building']],
+  conf='', th=None, thn=None, brick='?', hours=''),
+
+N('rosenberg-library-galveston','Rosenberg Library','Galveston','tx','civic','standing',29.30116,-94.79294,'exact','open','drive','','1900–',
+  'The oldest library in Texas still working, founded under the will of Henry Rosenberg. The 1900 hurricane put the project back; Eames and Young of St. Louis won the design competition of 1901, the library was established in 1900, and the building opened a few years later. In 1905 it took in the collection of the old Galveston Free Library of 1871. Under segregation it kept a separate branch for Black readers, built in 1905 onto the west wing of Central High School.',
+  'Walls of light-coloured brick from St. Louis with terra-cotta trim, the names of thirteen authors from Homer to Longfellow high on the piers, and a roof of green glazed tile. A public library: anyone may go in during opening hours.',
+  '',
+  'Public library and headquarters of the Galveston County Library System, 2310 Sealy Street. Opening hours could not be read on the library\'s own page when this was written. Street parking.',
+  [W('Rosenberg Library'),['Rosenberg Library','https://rosenberg-library.org/']],
+  conf='', th=None, thn=None, brick='no', hours='?'),
+
+N('st-mary-cathedral-basilica-galveston','St. Mary Cathedral Basilica','Galveston','tx','worship','standing',29.30418,-94.79024,'exact','open','drive','','1847–',
+  'The mother church of Catholics in Texas. A wooden church of 1842 was replaced by this one, whose cornerstone was laid on March 14, 1847; it was built of half a million bricks shipped from Belgium as ballast, and became a cathedral when it was dedicated. A transept tower went up in 1876 and a cast-iron statue of Mary, Star of the Sea on it in 1878. The 1900 hurricane did little harm, but Hurricane Ike put five feet of water inside in 2008, and it reopened after repairs in 2014. It became a minor basilica in 1979.',
+  'The Belgian-brick church with its central tower; the Mary, Star of the Sea statue was taken down in 2019 for restoration. Mass is open to all. Interior fabric not checked.',
+  'The first Catholic cathedral in Texas, built of ballast bricks from Belgium.',
+  'A church of Holy Family Parish, 2011 Church Street. Mass times from the parish\'s page as archived on October 11, 2025 (the live page could not be opened). Street parking.',
+  [W('St. Mary Cathedral Basilica (Galveston, Texas)'),['Holy Family Parish: Mass times','https://holyfamilygb.com/mass-times']],
+  conf='', th=None, thn=None, brick='?', hours='Mass Sunday 12:30 p.m., Monday to Friday 12:10 p.m., first Saturday 8 a.m. (as of October 2025)'),
+
+N('old-red-ashbel-smith-building-galveston','Ashbel Smith Building (Old Red)','Galveston','tx','inst','standing',29.31155,-94.7791,'exact','view','drive','','1891–',
+  'The first building of the University of Texas Medical Branch, built in 1891 of red brick and sandstone to plans by Nicholas J. Clayton. It came through the 1900 hurricane, one of few buildings that did. Named in 1949 for Ashbel Smith, a diplomat of the Republic of Texas and a founder of the University of Texas system. It was renovated in 1985 and flooded six feet deep by Hurricane Ike in 2008.',
+  'A Romanesque Revival front of red brick banded with sandstone on the medical campus. Interior not checked.',
+  'Clayton\'s red medical school, one of the survivors of 1900.',
+  'A building of the University of Texas Medical Branch, 914 Strand; look from the street on the campus. Parking on the campus not checked.',
+  [W('Ashbel Smith Building')],
+  conf='', th=None, thn=None, brick='yes', hours=''),
+
+N('santa-fe-union-station-galveston','Santa Fe Union Station (Galveston Railroad Museum)','Galveston','tx','rail','standing',29.30601,-94.79808,'exact','open','drive','','1913–1967',
+  'The south half was built in 1913 as the central passenger station of Galveston\'s railways and the offices of the Santa Fe\'s Gulf lines; an eleven-storey Art Deco tower and an eight-storey north wing were added in 1932. The Santa Fe closed its Galveston office in 1964, and the last passenger train stopped here in 1967. The Galveston Railroad Museum, run by the Center for Transportation and Commerce, now uses the station.',
+  'The 1913 station and its 1932 tower, with the museum\'s locomotives and cars on the tracks beside it.',
+  'The island\'s union station, now a railroad museum.',
+  'Galveston Railroad Museum, 2602 Santa Fe Place (25th Street and Strand). Hours from the museum\'s own page, read November 2026; fee.',
+  [W('Galveston Railroad Museum'),THC(5167007178,'Santa Fe Union Station'),['Galveston Railroad Museum','https://galvestonrrmuseum.org']],
+  conf='', th=None, thn=None, brick='?', hours='Daily 10 a.m. to 5 p.m.'),
+
+N('old-central-high-school-galveston','Old Central High School (Old Central Cultural Center)','Galveston','tx','civic','standing',29.29604,-94.79506,'exact','view','drive','','1893–',
+  'Central High School, founded in 1885, was the first high school for Black students in Texas. The Old Central Cultural Center says Nicholas Clayton designed a two-storey brick school with six classrooms here in 1893, and that a stucco wing with classrooms, laboratories, an auditorium and a gymnasium was added on the west side in 1924; Wikipedia gives the original building as about 1900, with additions thirty years later. The high school moved to a new building in 1954; Central was merged with Ball High in 1968.',
+  'The old school, now the home of the Old Central Cultural Center. Interior and opening times not checked.',
+  'The first Black high school in Texas.',
+  'Old Central Cultural Center, 2627 Avenue M. Look from the street; whether and when it opens to visitors not checked. Street parking.',
+  [W('Central High School (Galveston, Texas)'),['Old Central Cultural Center: Old Central High School','https://www.galvestonoldcentral.com/Old_Central_High_School.asp']],
+  conf='mixed', th=None, thn=None, brick='?', hours=''),
+
+N('broadway-cemeteries-galveston','Broadway Cemeteries (Old City Cemetery)','Galveston','tx','burial','standing',29.29422,-94.812,'site','view','walk','cemeteries','1839–',
+  'Seven cemeteries side by side over six blocks and 15 acres on Broadway, listed together on the National Register in 2014. The Old City Cemetery, in the northeast corner, was laid out with the town charter of 1839, and the potter\'s field beside it, later renamed Oleander Cemetery, held the island\'s earliest Jewish burials. Nine yellow fever epidemics between 1839 and 1867 filled them: about six thousand people lie here, most buried before 1865.',
+  'Old tombs, statues and mausoleums across the seven grounds; a few burials still take place.',
+  'Where Galveston buried its yellow fever dead.',
+  'Seven cemeteries with different owners, along Broadway near 40th to 43rd Streets. Owners, gate hours and rules not checked, so this entry says look from Broadway and the side streets. Street parking.',
+  [W('Broadway Cemetery Historic District')],
+  conf='', th=None, thn=None, brick='?', hours=''),
+
+N('galveston-seawall','Galveston Seawall','Galveston','tx','water','standing',29.28791,-94.79025,'site','public','walk','','1902–1963',
+  'Built after the hurricane of 1900: work began in September 1902 and the first stretch was finished on July 29, 1904. Between 1904 and 1963 it was lengthened from 3.3 miles to more than 10. It works as meant, but the beach in front of it washed away, and the resort trade with it; the Corps of Engineers reckoned it saved $100 million of damage in Hurricane Alicia in 1983. Hurricane Ike\'s waves went over it in 2008.',
+  'A concrete wall about 17 feet high and 16 feet thick at the base, with Seawall Boulevard and a long walk along its top. The pin is at 25th Street; the wall runs for miles either way.',
+  'The wall Galveston built so 1900 could not happen again.',
+  'Seawall Boulevard is a public street (OpenStreetMap), and the walk runs along the top of the wall beside it; who looks after the wall itself not checked. Parking along the boulevard; rules and fees not checked.',
+  [W('Galveston Seawall')],
+  conf='', th=None, thn=None, brick='no', hours=''),
+
+N('battery-hoskins-fort-crockett-galveston','Battery Hoskins, Fort Crockett','Galveston','tx','fort','ruins',29.27203,-94.8182,'site','view','drive','forts','1917–1946',
+  'A coast artillery battery of Fort Crockett, the army post that guarded Galveston: begun in August 1917 and finished in April 1921, with two 12-inch guns in the open. From 1942 to 1944 the army roofed the guns and magazines in a massive concrete casemate. It was deactivated in 1946. The casemate proved too costly to remove and stood empty for decades until the San Luis Resort was built on and behind it in the early 1980s.',
+  'The two concrete gun emplacements, still plain to see from Seawall Boulevard; one now carries a swimming pool on top and the other a wedding gazebo.',
+  'A World War II gun bunker with a hotel pool on its roof.',
+  'On the grounds of a private resort, 5222 Seawall Boulevard. Look from Seawall Boulevard and the seawall walk.',
+  [W('Fort Crockett'),['Battery Hoskins (FortWiki)','https://fortwiki.com/Battery_Hoskins'],['Historic Fort Crockett (NOAA Fisheries)','https://www.fisheries.noaa.gov/southeast/historic-fort-crockett-and-galveston-laboratory']],
+  conf='', th=None, thn=None, brick='no', hours=''),
+]
+
+PIN_NOTES={
+ 'bishops-palace-galveston':'Address lookup for 1402 Broadway (ArcGIS, on the address point).',
+ 'ashton-villa-galveston':'Address lookup for 2328 Broadway (ArcGIS, on the address point).',
+ 'moody-mansion-galveston':'Address lookup for 2618 Broadway (ArcGIS, on the address point).',
+ 'grand-1894-opera-house-galveston':'Address lookup for 2020 Postoffice Street (ArcGIS); the Register list point is about 1 km south and off the building.',
+ 'galveston-orphans-home-bryan-museum':'Address lookup for 1315 21st Street (ArcGIS, on the address point).',
+ 'scottish-rite-cathedral-galveston':'Address lookup for 2128 Church Street (ArcGIS, on the address point).',
+ 'old-galveston-customhouse':'OpenStreetMap point for the Old Galveston Customhouse, 502 20th Street.',
+ 'city-national-bank-galveston':'Address lookup for 2219 Market Street (ArcGIS, on the address point).',
+ 'rosenberg-library-galveston':'Address lookup for 2310 Sealy Street (ArcGIS, on the address point).',
+ 'st-mary-cathedral-basilica-galveston':'Address lookup for 2011 Church Street (ArcGIS, on the address point).',
+ 'old-red-ashbel-smith-building-galveston':'OpenStreetMap building for the Ashbel Smith Building, 914 Strand.',
+ 'santa-fe-union-station-galveston':'Address lookup for 2602 Santa Fe Place (ArcGIS, on the address point).',
+ 'old-central-high-school-galveston':'Address lookup for 2627 Avenue M (ArcGIS, on the address point).',
+ 'broadway-cemeteries-galveston':'OpenStreetMap area for the Old City Cemetery; the other six grounds lie to the west and south.',
+ 'galveston-seawall':'Street-corner lookup for Seawall Boulevard and 25th Street, moved onto the seaward edge of the boulevard where the wall meets the sand on the aerial; one point on a wall ten miles long.',
+ 'battery-hoskins-fort-crockett-galveston':'Address lookup for the resort at 5222 Seawall Boulevard, moved to the low terraces between the hotel tower and the boulevard, one with a pool and one with a round gazebo, which fit the description of the two emplacements; the aerial alone does not prove it.',
+}
