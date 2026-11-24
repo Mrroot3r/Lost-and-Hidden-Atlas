@@ -14,7 +14,6 @@ Fourteen places across Nevada (Reno, Virginia City, Austin, Ely, Winnemucca, Elk
 | Bristol Wells | near Pioche, NV (38.1027, -114.6914) | Ghost town with stone charcoal ovens, smelter 1880s; National Register | What stands today and who owns the ground |
 | Gem Theater and Brown's Hall, Pioche | Pioche, NV (37.9301, -114.4511) | National Register listings | Source for what is open |
 | Manhattan School | Manhattan, NV (38.5397, -117.0739) | National Register 2006 | Anything but the list row |
-| Fernley and Lassen Railway Depot | Fernley, NV (39.6058, -119.2367) | National Register 2005 | Article or managing page |
 | Tonopah historic district houses | Tonopah, NV | About 40 Register rows in one district | Pick the best standing ones |
 
 ## Tips
