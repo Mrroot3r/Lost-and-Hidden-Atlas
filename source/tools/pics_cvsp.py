@@ -1,0 +1,14 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'cliff-drive-kessler-park-kc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Cliff_Drive_yellow_limestone_sunset_by_Reservoir_April_2021.jpg/960px-Cliff_Drive_yellow_limestone_sunset_by_Reservoir_April_2021.jpg', 900, 300, 'Smuckola', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Cliff_Drive_yellow_limestone_sunset_by_Reservoir_April_2021.jpg', '2026-11-24', 'name'),
+ 'eblon-theater-facade-18th-vine-kc':('', '2026-11-24', 'the Paseo YMCA, the Blue Room and the Mutual Musicians building, not the Eblon front', 3),
+ 'edward-stevens-house-scarritt-point-kc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Edward_A_Stevens_House.jpg/960px-Edward_A_Stevens_House.jpg', 900, 675, 'Bartokie', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Edward_A_Stevens_House.jpg', '2026-11-24', 'pin'),
+ 'gem-theater-18th-vine-kc':('', '2026-11-24', 'a sign, the Blue Room club interior, the Mutual Musicians building, a Dodge City house', 3),
+ 'heim-fire-station-20-east-bottoms-kc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Heim_Fire_Station_No._20_1.jpg/960px-Heim_Fire_Station_No._20_1.jpg', 900, 405, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Heim_Fire_Station_No._20_1.jpg', '2026-11-24', 'pin'),
+ 'independence-boulevard-christian-church-kc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Independence_Boulevard_Christian_Church.jpg/960px-Independence_Boulevard_Christian_Church.jpg', 900, 675, 'Mwkruse', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Independence_Boulevard_Christian_Church.jpg', '2026-11-24', 'pin+name'),
+ 'pendleton-heights-historic-neighborhood-kc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Mansions_at_Pendleton_Avenue%2C_Kansas_City%2C_Missouri.jpg/960px-Mansions_at_Pendleton_Avenue%2C_Kansas_City%2C_Missouri.jpg', 900, 523, 'Smuckola', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Mansions_at_Pendleton_Avenue,_Kansas_City,_Missouri.jpg', '2026-11-24', 'far'),
+ 'swope-park-shelter-5-kc':('', '2026-11-24', 'zoo animals only', 3),
+ 'thomas-swope-memorial-swope-park-kc':('', '2026-11-24', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'tiffany-castle-pendleton-heights-kc':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/Tiffany_Castle_April_2020.jpg/960px-Tiffany_Castle_April_2020.jpg', 900, 675, 'Smuckola', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Tiffany_Castle_April_2020.jpg', '2026-11-24', 'pin'),
+}
