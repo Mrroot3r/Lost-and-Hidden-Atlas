@@ -17,7 +17,7 @@ Seventeen places in Miami County, Kansas (Paola, Osawatomie, New Lancaster), 45 
 | West Elementary School | 1009 Pacific Avenue, Osawatomie, KS | National Register 2024, part of the Public Schools of Kansas listing | Date and description |
 | Jake's Branch of Middle Creek Bridge | southwest of Louisburg, KS | 1985 form: reinforced concrete arch, 47 ft long, 13.5 ft wide, 14 ft above the stream | A reliable coordinate and a date |
 | Martin Farmstead | 31943 and 31860 W 247th St, Paola vicinity, KS | Register 2019: sixteen farm resources, 1879 to 1964, windmill and silos | Access (private farm) |
-| Johnson County leftovers | Johnson County, KS | Not yet on the map: Horn-Vincent-Russell Estate (Mission Hills), Loomis Historic District (Merriam), Blackfeather Farm (Stilwell), Campbell Dome House (Overland Park), Shawnee Indian Cemetery, Virginia School (Shawnee), Westwood Hills, Hammer and Morrow barns, Spring Hill district | Sources beyond the register summaries; most are private houses |
+| Johnson County leftovers | Johnson County, KS | Not yet on the map: Blackfeather Farm (Stilwell), Shawnee Indian Cemetery, Spring Hill district | Sources beyond the register summaries; most are private houses |
 
 ## Tips
 - Johnson, Douglas, Wyandotte and Leavenworth counties in Kansas were all worked earlier today; Miami County (Paola, Osawatomie) was empty, and so are Franklin (Ottawa) and Linn counties.

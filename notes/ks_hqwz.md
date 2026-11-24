@@ -11,11 +11,8 @@ Fourteen places in Johnson County, Kansas, round Olathe, Shawnee, Merriam, Gardn
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Virginia School (District No. 33) | Shawnee, KS (register address 7301 Mize Road, about 38.9956, -94.880) | One-room school of 1877, National Register 2004; moved (2007 per the register list, 2005 per a blog); a Monticello historical society is said to keep it | The aerial at the address shows only a modern school; where the schoolhouse stands now, and whether it opens |
 | Hodges House and Hyer House (Hycrest) | Olathe, KS (425 S. Harrison; 505 E. Cedar) | State Register houses of 1990 and 1984 (Tudor Revival; Bungalow) | Any source beyond the register summary |
-| Hammer Barn, Morrow Barn | Gardner and Spring Hill, KS | National Register bank barns (2022, 2024), Morrow's cypress and limestone, gambrel roof, 1910 | Forms not on NPGallery text yet; exact pins |
-| Mt. Pleasant Four Corners Burying Grounds | Gardner vicinity, KS | National Register 2021 | Coordinate and owner (still open) |
-| Horn-Vincent-Russell Estate; Loomis Historic District; Shawnee Grade School; Edgerton Grange Hall; Dr. Harkey House | Mission Hills, Merriam, Shawnee, Edgerton, Gardner, KS | Register listings | Sources beyond the register summary; Shawnee Grade School (2023 listing) has no page I could find |
+| Shawnee Grade School; Edgerton Grange Hall; Dr. Harkey House | Shawnee, Edgerton, Gardner, KS | Register listings | Sources beyond the register summary; Shawnee Grade School (2023 listing) has no page I could find |
 
 ## Tips
 - NPGallery text for listings numbered 100000000 and up returns a picture, not text (page.py shows `PNG`): those forms cannot be read this way; the Kansas register summary is all there is.
