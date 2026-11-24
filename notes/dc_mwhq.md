@@ -12,7 +12,7 @@ Thirteen standing buildings the first two District batches left out, spread over
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Old Brick Capitol bricks / Sewall-Belmont garden | Belmont-Paul house, Capitol Hill | Wikipedia: the Party paved its garden patio with bricks saved from the Old Brick Capitol | Whether the patio can be seen on the tours |
-| Howard Theatre | 620 T Street NW (38.91524, -77.02371) | Wikipedia: 1910, restored and reopened 2012 | Whether any old fabric is on show; hours of tours, if any |
+| Howard Theatre | U Street corridor (38.91524, -77.02371) | Wikipedia: 1910, restored and reopened 2012 | Whether any old fabric is on show; hours of tours, if any |
 | Washington Aqueduct and Dalecarlia works | Palisades (38.9358, -77.1118) | Register listing | A source for what can be seen from the public road |
 | Jesse Reno School | Tenleytown (38.9525, -77.0772) | Register row; LEADS.md already has the Fort Reno row | A source opened for the school itself |
 
