@@ -125,6 +125,7 @@ const { chromium } = require('playwright');
     await q.evaluate(()=>{ window.__atlasMap.setZoom(8,{animate:false}); }); await q.waitForTimeout(700); k=await pk();
     ok('at the 20-mile scale (zoom 8) the best town centres show',k.discs>0&&k.discs<200,JSON.stringify(k));
     // over the heat map, with their names (the owner, November 22, 2026): under it the discs were tinted and looked odd, and a town's name is what finds the right town when the street map's own names are too small to read
+    await q.evaluate(()=>window.__atlasSet('heat',true)); await q.waitForTimeout(600);      // the heat map is a choice under the gear since November 24, 2026, no longer what a first visit shows
     const ov=await q.evaluate(()=>{ const m=window.__atlasMap, zi=n=>{ const e=m.getPane(n); return e?+getComputedStyle(e).zIndex:null; }, lab=[...document.querySelectorAll('.leaflet-marker-pane .pocklab span')].map(e=>e.textContent);
       return {heat:document.querySelectorAll('.leaflet-pane img.heatimg').length,zHeat:zi('heat'),zLines:zi('lines'),names:lab.length,blank:lab.filter(t=>!t.trim()).length,first:lab.slice(0,3)}; });
     ok('at zoom 8 the heat map is showing, and the town centres are drawn over it, not under',ov.heat===1&&ov.zHeat!==null&&ov.zLines!==null&&ov.zHeat<ov.zLines,JSON.stringify(ov));

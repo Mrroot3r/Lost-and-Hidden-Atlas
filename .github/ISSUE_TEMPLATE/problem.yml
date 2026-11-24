@@ -1,0 +1,34 @@
+name: Report a problem with a place
+description: A place on the Atlas is wrong, gone, has its pin in the wrong spot, or does not belong there.
+title: "Problem: "
+labels: ["problem"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. In the Atlas itself, "Report a problem with this place" at the foot of a place page fills this form in for you.
+        You need not have been there. **What you write here is public.** Leave out private details.
+  - type: input
+    id: place
+    attributes:
+      label: Place
+      description: Its name on the Atlas, and the town.
+    validations:
+      required: true
+  - type: dropdown
+    id: problem
+    attributes:
+      label: What is the problem?
+      options:
+        - Not what the Atlas is for
+        - It is gone, or has changed
+        - The pin is in the wrong spot
+        - A fact is wrong
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: more
+    attributes:
+      label: More about it
+      description: What is wrong, and how you know. A link helps.

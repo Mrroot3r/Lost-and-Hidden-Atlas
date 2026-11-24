@@ -312,6 +312,10 @@ canvas.pinstand{position:absolute;left:0;top:0;transform-origin:0 0;will-change:
 .ctxflat{position:absolute;z-index:1060;top:6px;left:50%;transform:translateX(-50%);box-sizing:border-box;max-width:calc(100% - 12px);max-height:calc(100% - 12px);overflow:auto;background:#fff;color:#1b221e;border-radius:10px;padding:8px 10px;box-shadow:0 3px 14px rgba(0,0,0,.4);font-size:13px}
 .ctx-x{position:absolute;top:2px;right:4px;width:26px;height:24px;border:0;background:none;font-size:19px;line-height:1;color:#6b756f;cursor:pointer;padding:0}
 .sendrow{margin:8px 0 4px}
+/* "Report a problem with this place": folded away at the foot of a place page */
+.prob summary{cursor:pointer;color:var(--mute);font-size:13px;padding:4px 0} .prob[open] summary{color:var(--ink);font-weight:600;margin-bottom:6px}
+.probwhy{display:flex;flex-direction:column;gap:2px;margin:6px 0 8px} .probwhy label{display:flex;align-items:center;gap:8px;min-height:34px;font-size:14px}
+#prob-note{width:100%;margin-bottom:8px}
 .formpin{width:26px;height:26px;border-radius:50%;background:#ff2d95;border:3px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1.5px rgba(0,0,0,.6),0 2px 5px rgba(0,0,0,.45);cursor:grab}
 .nmring{box-sizing:border-box;border-radius:50%;border:3px solid var(--trk,#2563eb);box-shadow:0 0 0 2px rgba(255,255,255,.85),inset 0 0 0 2px rgba(255,255,255,.85);pointer-events:none}
 .spotpin{width:22px;height:22px;border-radius:50%;background:#ff2d95;border:2px solid #fff;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,.6);color:#fff;font:700 11px/18px system-ui,sans-serif;text-align:center;cursor:pointer}

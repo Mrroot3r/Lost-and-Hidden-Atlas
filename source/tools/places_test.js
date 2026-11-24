@@ -309,11 +309,16 @@ const { chromium } = require('playwright');
     ok('30 minutes: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the heat map (the owner, November 22, 2026: "switch the heat map to the main setting. You can leave the bubbles as a backup").
   //      Zoomed out, colour instead of numbered discs; pins come in one zoom step earlier than they do after the discs.
-  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+  //      Since November 24, 2026 the numbered discs are what a first visit shows again ("the bubbles work a little bit better for actually
+  //      finding buildings"), and the heat map is the choice under the gear.
+  { const c0=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p0=await c0.newPage(); await p0.goto(url); await p0.waitForFunction(()=>window.__atlasMap); await p0.waitForTimeout(2000);
+    const f=await p0.evaluate(()=>({clus:document.querySelectorAll('.leaflet-marker-pane .clus').length,img:document.querySelectorAll('img.heatimg').length}));
+    ok('a first visit shows numbered discs zoomed out, not the heat map',f.clus>3&&f.img===0,JSON.stringify(f)); await c0.close(); }
+  { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); await c.addInitScript(()=>{ try{ if(!localStorage.getItem('lost-hidden-atlas-v1')) localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({set:{heat:true}})); }catch(e){} }); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(2000);
     const st=()=>p.evaluate(()=>({clus:document.querySelectorAll('.leaflet-marker-pane .clus').length,pins:document.querySelectorAll('.leaflet-marker-pane .pin').length,img:document.querySelectorAll('img.heatimg').length,h:window.__atlasHeat?window.__atlasHeat():null,z:window.__atlasMap.getZoom()}));
     let a=await st(); const all=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent); return (D.sites||D).length; });
-    ok('heat: it is what a first visit shows zoomed out: no discs, one picture of the heat, and no crowd of pins',a.clus===0&&a.img===1&&a.pins<=5,JSON.stringify({clus:a.clus,img:a.img,pins:a.pins}));
+    ok('heat: switched on, zoomed out shows no discs, one picture of the heat, and no crowd of pins',a.clus===0&&a.img===1&&a.pins<=5,JSON.stringify({clus:a.clus,img:a.img,pins:a.pins}));
     ok('heat: every place is counted in it',a.h&&Math.abs(a.h.total+a.pins-all)<=2,a.h&&(a.h.total+' + '+a.pins+' of '+all));
     const painted=await p.evaluate(async()=>{ const im=document.querySelector('img.heatimg'); if(!im) return -1; if(!im.complete) await new Promise(r=>{ im.onload=r; }); const cv=document.createElement('canvas'); cv.width=im.naturalWidth; cv.height=im.naturalHeight; const g=cv.getContext('2d'); g.drawImage(im,0,0); const d=g.getImageData(0,0,cv.width,cv.height).data; let n=0,red=0; for(let i=0;i<d.length;i+=4){ if(d[i+3]>20){ n++; if(d[i]>150&&d[i+2]<90) red++; } } return [n/(d.length/4),red]; });
     ok('heat: the picture has colour on part of the map, not all of it, and red where places are thickest',painted[0]>0.02&&painted[0]<0.8&&painted[1]>0,JSON.stringify(painted));
@@ -342,7 +347,7 @@ const { chromium } = require('playwright');
     ok('heat: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the step from heat or discs to pins (the lag the owner felt): a first lot of pins at once, from the middle outwards, then a lot a frame
   { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
-    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(1500);
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(1500); await p.evaluate(()=>window.__atlasSet('heat',true)); await p.waitForTimeout(600);
     await p.evaluate(()=>window.__atlasMap.setView([42.7,-73.8],8,{animate:false})); await p.waitForTimeout(800);
     const r=await p.evaluate(async()=>{ const m=window.__atlasMap, D=JSON.parse(document.getElementById('d-sites').textContent), S=D.sites||D, n=()=>document.querySelectorAll('.leaflet-marker-pane .pin').length;
       m.setView([42.7,-73.8],10,{animate:false}); const vb=m.getBounds(), big=vb.pad(1), c=m.getCenter();
