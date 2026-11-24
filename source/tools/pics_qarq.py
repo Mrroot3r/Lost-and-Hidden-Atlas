@@ -1,0 +1,8 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'christiansburg-institute':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/EALB_and_Baily_Morris_Hall.tif/lossy-page1-960px-EALB_and_Baily_Morris_Hall.tif.jpg', 900, 655, 'Nehrtjl', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:EALB_and_Baily_Morris_Hall.tif', '2026-11-24', 'name'),
+ 'strasburg-museum-pottery-depot':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Strasburg_S%26E_Mfg.jpg/960px-Strasburg_S%26E_Mfg.jpg', 900, 598, 'Nyttend', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Strasburg_S%26E_Mfg.jpg', '2026-11-24', 'pin+name'),
+ 'waterford-village-loudoun':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3b/Waterford%2C_Virginia_town_center.jpg/960px-Waterford%2C_Virginia_town_center.jpg', 900, 653, 'Acroterion', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Waterford,_Virginia_town_center.jpg', '2026-11-24', 'pin'),
+ 'wilson-birthplace-staunton':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/North_View_of_the_Woodrow_Wilson_Birthplace_%284322365109%29.jpg/960px-North_View_of_the_Woodrow_Wilson_Birthplace_%284322365109%29.jpg', 900, 722, 'Woodrow Wilson Presidential Library Archives from Staunton, VA', 'No restrictions', 'https://commons.wikimedia.org/wiki/File:North_View_of_the_Woodrow_Wilson_Birthplace_(4322365109).jpg', '2026-11-24', 'name'),
+}
