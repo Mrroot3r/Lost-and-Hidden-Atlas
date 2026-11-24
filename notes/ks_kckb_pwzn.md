@@ -11,10 +11,8 @@ Sixteen standing places in Kansas City, Kansas and Edwardsville that the Atlas l
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| St. Augustine Hall | 3301 Parallel Ave, Kansas City, KS (39.1275, -94.6689) | Register 1971, college building, Late Victorian; no article read | A source saying what it is and what stands |
-| Judge Louis Gates House | Kansas City, KS (39.0522, -94.6087) | Register 1980 | A summary of it |
 | Immanuel Baptist Church; First AME Church; Huron Building | Kansas City, KS | Register listings, no coordinates in the list | Sources and addresses |
-| St. John's Orphanage; St. Mary's Church; White Church Memorial Church | Kansas City, KS | State Register only, with no summary on the Society's list | Sources read |
+| St. John's Orphanage; White Church Memorial Church | Kansas City, KS | State Register only, with no summary on the Society's list | Sources read |
 | Vernon School | 2700 Sewell Ave, Kansas City, KS | In the Atlas with an area pin | The school's true spot on the aerial |
 
 ## Tips
