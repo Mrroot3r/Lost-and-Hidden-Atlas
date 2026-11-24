@@ -1,0 +1,7 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'fort-morgan-gulf-shores':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Fort_Morgan%2C_Alabama_%2812582928875%29.jpg/960px-Fort_Morgan%2C_Alabama_%2812582928875%29.jpg', 900, 588, 'Gary Todd from Xinzheng, China', 'CC0', 'https://commons.wikimedia.org/wiki/File:Fort_Morgan,_Alabama_(12582928875).jpg', '2026-11-24', 'pin'),
+ 'gorgas-house-tuscaloosa':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/64/Gorgas_House_Tuscaloosa.jpg/960px-Gorgas_House_Tuscaloosa.jpg', 900, 495, 'Altairisfar', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Gorgas_House_Tuscaloosa.jpg', '2026-11-24', 'name'),
+ 'the-oaks-tuskegee':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0d/The_Oaks%2C_home_built_for_Booker_T._Washington_and_his_family_in_Tuskegee%2C_Alabama_LCCN2010640056.tif/lossy-page1-960px-The_Oaks%2C_home_built_for_Booker_T._Washington_and_his_family_in_Tuskegee%2C_Alabama_LCCN2010640056.tif.jpg', 900, 807, 'Carol M. Highsmith', 'Public domain', 'https://commons.wikimedia.org/wiki/File:The_Oaks,_home_built_for_Booker_T._Washington_and_his_family_in_Tuskegee,_Alabama_LCCN2010640056.tif', '2026-11-24', 'name'),
+}
