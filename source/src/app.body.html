@@ -24,6 +24,7 @@
           <button class="btn" type="button" id="filt-btn" aria-expanded="false" aria-controls="filters">Filters<span id="fcount" class="mono"></span></button>
           <button class="btn" type="button" id="add-place" title="Add a place of your own: tap the map to drop a pin" aria-label="Add a place of your own">+ Add</button>
         </div>
+        <div id="goto" hidden></div>   <!-- "go to a spot": pasted coordinates, or a street, town or address looked up when asked (goSync in app.js) -->
         <select id="home" hidden aria-hidden="true" tabindex="-1"></select>   <!-- the start place is chosen under the gear (Settings); this holds the list -->
         <details class="filters" id="filters">
           <summary hidden>Filters</summary>

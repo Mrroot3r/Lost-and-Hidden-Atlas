@@ -144,6 +144,11 @@ button.chip[aria-pressed="true"]:hover{border-color:var(--ink)}
 /* list view */
 .tools{padding-block:10px 8px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line)}
 .findbar{display:flex;gap:6px;align-items:stretch}
+/* under the search box: go to a spot on the map (goSync) */
+#goto{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+#goto .btn{justify-content:flex-start;text-align:left;white-space:normal;line-height:1.25;font-weight:500}
+#goto .btn b{font-weight:700}
+#goto .gonote{font-size:11.5px;color:var(--mute);margin:0 2px}
 .findbar .field{flex:1 1 auto}
 .findbar .btn{flex:none;white-space:nowrap}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
