@@ -26,4 +26,12 @@ ok('the summary says how many were accepted',bool(re.search(r'2 (more )?(warning
 ok('an id in the file that raises no warning is pointed out',bool(re.search(r'no-such-place-id',out)))
 n=lambda s:int(re.search(r'(\d+) errors',s).group(1))
 ok('errors are counted the same either way',n(base)==n(out),f'{n(base)} and {n(out)}')
-print(f'{len(fails)} FAILED' if fails else 'check_ok test: 6 checks passed'); sys.exit(1 if fails else 0)
+# A river town on the far bank of a coarse outline (the outlines come from the Census Bureau's 1:20,000,000 file: Ohio is 98 points).
+# Downtown East Liverpool, Ohio is 1.1 km inside "West Virginia" by them, and until November 24, 2026 that was an error that kept a
+# researched place off the map. A pin up to 3 km over a coarse line is warned about; one deep in the other state is still an error.
+def where(la,lo,reg): return subprocess.run([sys.executable,os.path.join(W,'tools','check.py'),REPO,'--where',str(la),str(lo),reg],capture_output=True,text=True).stdout.strip()
+el=where(40.6187,-80.5773,'oh'); ch=where(38.3498,-81.6326,'oh'); col=where(39.9612,-82.9988,'oh')
+ok('state line: downtown East Liverpool, Ohio is warned about, not refused',el.startswith('warning')and 'oh' in el,el)
+ok('state line: a pin in Charleston, West Virginia filed under Ohio is still an error',ch.startswith('error'),ch)
+ok('state line: a pin in Columbus is simply fine',col.startswith('ok'),col)
+print(f'{len(fails)} FAILED' if fails else 'check_ok test: 9 checks passed'); sys.exit(1 if fails else 0)

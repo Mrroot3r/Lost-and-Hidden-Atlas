@@ -32,6 +32,10 @@ def states_at(lat,lon):
     return [k for k,rs in OUTL.items() if any(_in(r,lon,lat) for r in rs)]
 def state_of(lat,lon):
     s=states_at(lat,lon); return s[0] if s else None
+# How far over a state line a pin may sit and only be warned about. The outlines are the Census Bureau's 1:20,000,000 file, cut down
+# again (Ohio is 98 points), and along a big river they wander: downtown East Liverpool, Ohio is 1.1 km inside "West Virginia" and
+# downtown Steubenville 0.8 km. At 1 km a researched place was refused (November 24, 2026); 3 km clears every river town tried.
+EDGE=3000
 def near_state(lat,lon,k,m=1000):
     """is the point within m metres of state k's outline? The outlines are simplified to about a kilometre and run a few
     hundred metres off border rivers (the Salmon Falls at South Berwick, the Connecticut), so a pin on the right bank can
@@ -49,6 +53,16 @@ mk=open(os.path.join(T,'make.py'),encoding='utf-8').read()
 TAGS=set(re.findall(r"^ \['(\w+)',",mk,re.M))|{'now'}
 BOUNDS=[float(x) for x in re.search(r"MAXB=\[\[([\d.,\-\[\]]+)\]\]",app).group(1).replace('[','').replace(']','').split(',')]
 # ---- place lists ----
+# python3 tools/check.py <clone> --where <lat> <lon> <region>: what the state-line check would say of one pin, for a session
+# that wants to know before it writes the place up
+if '--where' in sys.argv:
+    _i=sys.argv.index('--where'); _la,_lo,_rg=float(sys.argv[_i+1]),float(sys.argv[_i+2]),sys.argv[_i+3]; _w=REG_STATE.get(_rg); _s=states_at(_la,_lo)
+    if _rg not in REG: print(f"error: region '{_rg}' is not listed in tools/states.py")
+    elif not _w or _w in _s: print(f"ok: the pin is in {_w or 'a region with no state'}")
+    elif near_state(_la,_lo,_w,EDGE): print(f"warning: the outlines put the pin in {_s[0] if _s else 'no state'}, within {EDGE//1000} km of {_w}'s line: fine if it is on the {_w} side on the aerial")
+    elif not _s and near_state(_la,_lo,_w,150000): print(f"warning: the pin is outside every state's outline, as an island or a shore can be: fine if it is on {_w}'s shore")
+    else: print(f"error: the pin is in {_s[0] if _s else 'no listed state'} but region '{_rg}' belongs to {_w}")
+    sys.exit(0)
 ids={}; WAS={}      # WAS: old id -> the place that says it replaces it (was=)
 def seen(i,where):
     if i in ids: err.append(f"duplicate id '{i}' in {where} and {ids[i]}: add a town or state suffix to the new one")
@@ -102,7 +116,7 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
             if t not in TAGS: err.append(f"{w}: tag '{t}' is not a series tag ({' '.join(sorted(TAGS))})"+(" (a burial ground's series tag is cemeteries; burial is a category)" if t=='burial' else " (a railroad building's series tag is stations; a freight house or a line fits none: leave tags empty)" if t=='rail' else " ('"+t+"' is a category, cat=, not a tag)" if t in CAT else ''))
         if not(BOUNDS[0]<=p['lat']<=BOUNDS[2] and BOUNDS[1]<=p['lon']<=BOUNDS[3]): err.append(f"{w}: pin {p['lat']},{p['lon']} is outside the map bounds; widen maxBounds in app.js if this is a new area")
         sts=states_at(p['lat'],p['lon']); stt=sts[0] if sts else None; want=REG_STATE.get(p['reg'])
-        if want and want not in sts and near_state(p['lat'],p['lon'],want): warn.append(f"{w}: the pin is just outside {want}'s outline, which is coarse along borders; fine if the pin is on the {want} side on the aerial")
+        if want and want not in sts and near_state(p['lat'],p['lon'],want,EDGE): warn.append(f"{w}: the pin is just outside {want}'s outline, which is coarse along borders; fine if the pin is on the {want} side on the aerial")
         # a pin in no state's outline at all is at sea by the outlines' reckoning: an island or a shore they leave out (the Dry Tortugas, Ship
         # Island, Dauphin Island and Mobile Point all stopped a session). If its own state's outline is within 150 km it is taken for that
         # state's island or shore and only warned about; a pin inside ANOTHER state's outline is still an error.
