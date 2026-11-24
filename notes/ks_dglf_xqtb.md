@@ -15,7 +15,7 @@ Ten places, a scheduled run aimed at the Kansas City area. I tried Johnson Count
 | Parmenter Hall pictures and hours | Baker University, Baldwin City, KS | Already on the Atlas | Nothing to add; noted only because it was found twice |
 | Houses in Lexington, MO (Catron, Cheatham, Gosewisch, Tevis, Stramcke, Spratt-Allen-Aull, Dinwiddie, Houx-Hoefer-Rehkop) | Lafayette County, MO | Register listings, with addresses on the Missouri State Parks list | A readable source for each; the forms are not on line and a web search found only list pages |
 | Machpelah Cemetery | 900 S. 20th St., Lexington, MO | City page: first burial 1839, made a corporation in 1849, Saluda steamboat victims' mass grave, Register 2022 | Not added in this batch; ready to add from the city and chamber pages |
-| Old West Lawrence, Pinkney I and II, Breezedale, Johnson Block historic districts | Lawrence, KS | Register residential districts | Sources beyond the Society's summaries; they are houses |
+| Old West Lawrence, Pinkney I and II, Johnson Block historic districts | Lawrence, KS | Register residential districts | Sources beyond the Society's summaries; they are houses |
 | Lee's Summit and Independence house districts (Bayles, Howard, Morningside and others), Georgen, Hughes and Lewis-Webb houses | Jackson County, MO | Register list | Readable forms and a reason to go |
 
 ## Tips

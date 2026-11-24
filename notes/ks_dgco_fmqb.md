@@ -15,7 +15,7 @@ Fourteen places in and around Lawrence, Lecompton, Baldwin City and Vinland, tak
 | Elmwood Stock Farm Barn | Baldwin City, 571 E 1000 Road (38.822, -95.3171) | 2022 nomination: dairy barn built before 1901 with milking parlour, on a private farm with 2-3 miles of ruined stone fences | Whether it can be seen from the road |
 | Sowers/Crawford Farms and O'Sullivan Farmstead | Overbrook, Douglas County | 2023 and 2018 listings: family farms with stone cellar and dry-stacked stone fences | Any public view |
 | Akers House | Lawrence (38.9538, -95.2420) | Commons captions call it a two-story brick Italianate house, listed 2022 | A source for its history and owner |
-| Dr. Morse House, Benedict House, Pilla House, Clinton School District 25 | Lawrence and Eudora | Register listings (Second Empire 1041 Tennessee; Stick/Eastlake 923 Tennessee; Queen Anne in Eudora; former school now Clinton city hall) | The nomination forms are scans with no text; no other source read |
+| Pilla House, Clinton School District 25 | Eudora | Register listings (Queen Anne in Eudora; former school now Clinton city hall) | The nomination forms are scans with no text; no other source read (Morse and Benedict houses were added in ks_lawh_dwpt, from forms that do have a text layer) |
 | Kansas Homestead of Thomas McQuillan, Appanoose Church of the Brethren | Baldwin City and Overbrook areas | Register listings only | A source describing each |
 
 ## Tips
