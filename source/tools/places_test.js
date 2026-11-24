@@ -371,5 +371,37 @@ const { chromium } = require('playwright');
     ok('drive times: with Boston chosen, Boston\'s file is fetched and no other',seen.join()==='bost',seen.join());
     ok('drive times: and the list then shows a routed time, not an estimate marked ~',row.n>50&&/\d/.test(row.mins)&&!/~/.test(row.mins),JSON.stringify(row));
     ok('drive times: no script errors',x.errs.length===0,x.errs.join(' | ').slice(0,200)); await x.c.close(); }
+  // ---- the search box also goes to a spot: pasted coordinates, a Google Maps link, or a street, town or address looked up when asked
+  // (the owner, November 23, 2026: find a street in Google Maps, copy the coordinates, paste them here and be taken there)
+  { const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message)); const asked=[];
+    await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>{ const u=r.request().url();
+      if(/nominatim\.openstreetmap\.org\/search/.test(u)){ asked.push(u); const q=decodeURIComponent((u.match(/[?&]q=([^&]*)/)||[])[1]||'');
+        return r.fulfill({status:200,contentType:'application/json',headers:{'access-control-allow-origin':'*'},body:JSON.stringify(/nowhere/.test(q)?[]:[{lat:'39.6321',lon:'-94.9441',display_name:'Lewis School Road, Wayne Township, Buchanan County, Missouri, 64484, United States',boundingbox:['39.6290','39.6350','-94.9460','-94.9420']},{lat:'38.9',lon:'-92.3',display_name:'Lewis Road, Boone County, Missouri, United States',boundingbox:['38.89','38.91','-92.31','-92.29']}])}); }
+      return r.fulfill({status:204,body:''}); });
+    await p.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); }catch(e){} });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(700);
+    const R=t=>p.evaluate(t=>{ const r=window.__atlasGo.read(t); return r?[+r.lat.toFixed(5),+r.lon.toFixed(5)].join(','):null; },t);
+    ok('go to: plain coordinates are read',(await R('42.65508, -73.75792'))==='42.65508,-73.75792'&&(await R(' 42.65508 -73.75792 '))==='42.65508,-73.75792');
+    ok('go to: with degree signs and letters, and a west longitude given without its minus',(await R('42.65508° N, 73.75792° W'))==='42.65508,-73.75792'&&(await R('42.65508, 73.75792'))==='42.65508,-73.75792');
+    ok('go to: a Google Maps link, the place\'s own point before the camera\'s',(await R('https://www.google.com/maps/place/Some+Place/@42.6500,-73.7500,17z/data=!3m1!4b1!4m6!3m5!1s0x0:0x0!8m2!3d42.65508!4d-73.75792'))==='42.65508,-73.75792'&&(await R('https://www.google.com/maps/@42.65508,-73.75792,17z'))==='42.65508,-73.75792'&&(await R('https://maps.google.com/?q=42.65508,-73.75792'))==='42.65508,-73.75792');
+    ok('go to: words, a year or a house number are not coordinates',(await R('mill'))===null&&(await R('1836'))===null&&(await R('12 Main Street'))===null&&(await R('fort 1812, 1814'))===null);
+    const cen=()=>p.evaluate(()=>{ const m=window.__atlasMap, c=m.getCenter(); return {lat:c.lat,lon:c.lng,z:m.getZoom(),mark:document.querySelectorAll('.gomark').length,rows:[...document.querySelectorAll('#goto button')].map(b=>b.textContent.trim()),note:(document.querySelector('#goto .gonote')||{}).textContent||'',count:document.querySelector('#count').textContent,goto:!document.querySelector('#goto').hidden}; });
+    const before=await cen();
+    await p.fill('#q','42.65508, -73.75792'); await p.waitForTimeout(900); let g=await cen();
+    ok('go to: pasting coordinates takes the map there, close in, with a mark on the spot',Math.abs(g.lat-42.65508)<0.002&&Math.abs(g.lon+73.75792)<0.002&&g.z>=15&&g.mark===1,JSON.stringify([g.lat.toFixed(4),g.lon.toFixed(4),g.z,g.mark]));
+    ok('go to: coordinates do not empty the list of places',g.count===before.count,g.count);
+    await p.click('.gomark',{force:true}).catch(()=>{}); await p.waitForTimeout(400);
+    ok('go to: a tap on the mark opens the small box for that spot',await p.evaluate(()=>{ const n=document.querySelector('.leaflet-popup .ctx-ll, .ctxflat .ctx-ll'); return !!n&&n.textContent.trim()==='42.65508, -73.75792'; }));
+    await p.evaluate(()=>window.__atlasMap.closePopup()); await p.fill('#q',''); await p.waitForTimeout(400); g=await cen();
+    ok('go to: clearing the box takes the mark away',g.mark===0&&!g.goto);
+    await p.fill('#q','lewis school road'); await p.waitForTimeout(500); g=await cen();
+    ok('go to: typing words offers to look them up on the map, and asks nobody until told to',g.goto&&g.rows.length===1&&/lewis school road/i.test(g.rows[0])&&asked.length===0,JSON.stringify([g.rows,asked.length]));
+    await p.click('#goto button'); await p.waitForTimeout(700); g=await cen();
+    ok('go to: one question is asked, and the answers are listed, shortened, with their source named',asked.length===1&&/countrycodes=us,ca/.test(asked[0])&&g.rows.length===2&&g.rows[0]==='Lewis School Road, Wayne Township, Buchanan County, Missouri'&&/OpenStreetMap/.test(g.note),JSON.stringify([asked.length,g.rows,g.note]));
+    await p.click('#goto button'); await p.waitForTimeout(900); g=await cen();
+    ok('go to: choosing an answer takes the map there with a mark',Math.abs(g.lat-39.6321)<0.003&&Math.abs(g.lon+94.9441)<0.003&&g.z>=14&&g.mark===1,JSON.stringify([g.lat.toFixed(4),g.lon.toFixed(4),g.z,g.mark]));
+    await p.fill('#q','nowhere at all'); await p.waitForTimeout(400); await p.press('#q','Enter'); await p.waitForTimeout(700); g=await cen();
+    ok('go to: Enter looks it up too, and nothing found is said plainly',asked.length===2&&/Nothing found/.test(g.note),g.note);
+    ok('go to: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();
