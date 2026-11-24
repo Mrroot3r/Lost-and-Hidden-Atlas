@@ -15,8 +15,6 @@ Places you read about and could not finish. One row each.
 
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Emily Carr House | 207 Government Street, Victoria, BC (Wikipedia 48.4138, -123.37) | National Historic Site, built 1863 for the Carr family; Register id 10705 | Current opening days: listings disagree and the house's own page was not read |
-| Esquimalt and Nanaimo Railway Roundhouse | Victoria West, BC | National Historic Site, 1913; Register id 7416 | Register page would not open; who owns it now and whether it can be seen |
 | Greenwood Courthouse | Greenwood, BC | City of Greenwood page: a 1903 wooden courthouse with stained-glass windows, guided visits through the Greenwood Museum | Pin, a register entry and visiting times |
 | Walhachin flumes | Walhachin, BC, south shore of the Thompson (Wikipedia 50.74972, -120.98444) | Wikipedia describes the 1910s orchard flumes and their abandonment | A source on what is left today and where to see it |
 | Atlin Courthouse | Atlin, BC | Wikipedia photo caption: built 1900, now an art gallery; kept by the Atlin Historical Society | Pin and a page of the gallery's own |
