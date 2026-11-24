@@ -98,13 +98,39 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   ok('the spots are still there, and on the map, after the page is opened again',((await U(p)).spots||[]).length===2&&(await p.locator('.spotpin').count())>=1);
   await p.click('#tab-list'); await p.waitForTimeout(200); await p.click('#spots-clear'); await p.waitForTimeout(150); await p.click('#spots-clear'); await p.waitForTimeout(300);
   ok('Clear asks twice, then empties them and takes the card away',((await U(p)).spots||[]).length===0&&(await p.locator('.spotpin').count())===0&&!(await vis(p,'#spotcard')));
-  // ---- a long press on the map: a short box that fits the map on a phone, the other maps folded away (the owner, November 21, 2026)
+  // ---- a long press on the map: a small box (the owner, November 23, 2026). Coordinates as one small line that copies; Add and Send
+  // side by side; Google Maps, Street View and Earth 3D in one row; the rest under "More"; no paragraph, no drive times.
   await p.click('#tab-list'); await p.waitForTimeout(200);
-  await p.evaluate(()=>{ const m=window.__atlasMap; m.closePopup(); m.fire('contextmenu',{latlng:m.getCenter()}); }); await p.waitForTimeout(500);
-  const cx2=await p.evaluate(()=>{ const pop=document.querySelector('.leaflet-popup'), m=document.querySelector('#map').getBoundingClientRect(), r=pop.getBoundingClientRect(), d=pop.querySelector('details');
-    const vis=t=>[...pop.querySelectorAll('a,button')].some(b=>b.textContent.trim()===t&&b.offsetParent!==null&&b.getBoundingClientRect().height>0&&!(d&&d.contains(b)&&!d.open));
-    return {fits:r.top>=m.top-1&&r.bottom<=m.bottom+1,h:Math.round(r.height),mh:Math.round(m.height),add:vis('+ Add to my places'),send:vis('Send this spot to the public Atlas'),gm:vis('Google Maps'),folded:!!d&&!d.open&&[...d.querySelectorAll('a')].some(a=>a.textContent.trim()==='Google Maps')}; });
-  ok('a long press opens a box that fits inside the map, with Add and Send showing and the other maps folded away',cx2.fits&&cx2.add&&cx2.send&&!cx2.gm&&cx2.folded,JSON.stringify(cx2));
+  const ctxRead=pg=>pg.evaluate(()=>{ const pop=document.querySelector('.leaflet-popup, .ctxflat'), m=document.querySelector('#map').getBoundingClientRect(), r=pop.getBoundingClientRect(), d=pop.querySelector('details');
+    const all=[...pop.querySelectorAll('a,button')].filter(b=>!b.classList.contains('leaflet-popup-close-button')&&!b.classList.contains('ctx-x'));
+    const shown=b=>b.offsetParent!==null&&b.getBoundingClientRect().height>0&&!(d&&d.contains(b)&&!d.open);
+    const top=t=>{ const n=all.find(b=>b.textContent.trim()===t); return n&&shown(n)?Math.round(n.getBoundingClientRect().top):null; };
+    const ll=pop.querySelector('.ctx-ll'), sc=pop.querySelector('.leaflet-popup-content')||pop;
+    return {flat:pop.classList.contains('ctxflat'),fits:r.top>=m.top-1&&r.bottom<=m.bottom+1,h:Math.round(r.height),mh:Math.round(m.height),order:all.map(b=>b.textContent.trim()),
+      add:top('+ My places'),send:top('Send to Atlas'),gm:top('Google Maps'),sv:top('Street View'),ge:top('Earth 3D'),sat:top('Google satellite'),air:top('Old air photos'),who:top('Whose land is it?'),
+      open:!!d&&d.open,text:pop.textContent,ll:ll?ll.textContent.trim():'',llSize:ll?parseFloat(getComputedStyle(ll).fontSize):99,llH:ll?Math.round(ll.getBoundingClientRect().height):99,scrolls:sc.scrollHeight>sc.clientHeight+1}; });
+  const LL=await p.evaluate(()=>{ const m=window.__atlasMap; m.closePopup(); const c=m.getCenter(); m.fire('contextmenu',{latlng:c}); return c.lat.toFixed(5)+', '+c.lng.toFixed(5); }); await p.waitForTimeout(500);
+  const cx2=await ctxRead(p);
+  ok('a long press opens a small box that fits inside the map',cx2.fits&&cx2.h<=215&&!cx2.scrolls,cx2.h+' of '+cx2.mh);
+  ok('long press: Add and Send side by side',cx2.add!==null&&cx2.add===cx2.send,[cx2.add,cx2.send].join(' '));
+  ok('long press: Google Maps, Street View and Earth 3D in one row, showing at once',cx2.gm!==null&&cx2.gm===cx2.sv&&cx2.sv===cx2.ge&&cx2.gm>cx2.add,[cx2.gm,cx2.sv,cx2.ge].join(' '));
+  ok('long press, phone: satellite, old air photos and "Whose land is it?" are folded under More',!cx2.open&&cx2.sat===null&&cx2.air===null&&cx2.who===null&&cx2.order.includes('Google satellite')&&cx2.order.includes('Old air photos')&&cx2.order.includes('Whose land is it?'),cx2.order.join(' | '));
+  ok('long press: in the order asked for',cx2.order.join(' | ')===LL+' | + My places | Send to Atlas | Google Maps | Street View | Earth 3D | Google satellite | Old air photos | Whose land is it?',cx2.order.join(' | '));
+  ok('long press: no paragraph and no drive times',!/My places stay on this device/.test(cx2.text)&&!/drive times/i.test(cx2.text));
+  ok('long press: the coordinates are one small line',cx2.ll===LL&&cx2.llSize<=12.5&&cx2.llH<=26,[cx2.ll,cx2.llSize,cx2.llH].join(' '));
+  await p.click('.ctx-ll'); await p.waitForTimeout(200);
+  ok('long press: a tap on the coordinates copies them',(await p.evaluate(()=>navigator.clipboard.readText()))===LL);
+  await p.click('.leaflet-popup details summary'); await p.waitForTimeout(400); const cx3=await ctxRead(p);
+  ok('long press: More opens the rest, still inside the map',cx3.open&&cx3.sat!==null&&cx3.air!==null&&cx3.who!==null&&cx3.fits,JSON.stringify([cx3.h,cx3.mh,cx3.fits]));
+  // the map dragged down to its smallest strip: the box sits flat against the top of the map, whole, and does not scroll
+  await p.evaluate(()=>{ window.__atlasMap.closePopup(); document.querySelector('#app').style.setProperty('--split','5%'); window.__atlasMap.invalidateSize({pan:false}); }); await p.waitForTimeout(300);
+  await p.evaluate(()=>{ const m=window.__atlasMap; m.fire('contextmenu',{latlng:m.getCenter()}); }); await p.waitForTimeout(500);
+  const cx4=await ctxRead(p);
+  ok('short map: the box sits flat at the top of the map, whole, without scrolling',cx4.flat&&cx4.fits&&!cx4.scrolls&&cx4.gm!==null&&cx4.add!==null&&cx4.mh<200,JSON.stringify([cx4.flat,cx4.h,cx4.mh,cx4.fits,cx4.scrolls]));
+  ok('short map: a mark shows which spot it is about',await p.evaluate(()=>!!document.querySelector('.ctxmark')));
+  await p.click('.ctxflat .ctx-x'); await p.waitForTimeout(200);
+  ok('short map: its close button takes the box and the mark away',await p.evaluate(()=>!document.querySelector('.ctxflat')&&!document.querySelector('.ctxmark')));
+  await p.evaluate(()=>{ document.querySelector('#app').style.removeProperty('--split'); window.__atlasMap.invalidateSize({pan:false}); }); await p.waitForTimeout(300);
   await p.evaluate(()=>window.__atlasMap.closePopup());
   // ---- a place of your own: the button that sends it to the public Atlas is at the top of its page
   const mineId=await p.evaluate(()=>{ const u=JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')); return (u.custom||[]).slice(-1)[0].id; });
@@ -148,6 +174,12 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
   const cu=((await U(q)).custom||[]).slice(-1)[0]||{}, av=(after.match(/-?\d+\.\d+/g)||[]).map(Number);
   ok('the place is saved where the pin was dragged to, and the loose pin is gone',av.length===2&&near([cu.lat,cu.lon],av,2)&&(await q.locator('.formpin').count())===0,JSON.stringify([cu.lat,cu.lon])+' '+after);
   ok('no script errors on the desktop',errs2.length===0,errs2.join(' | '));
+  { const cd=await b.newContext({viewport:{width:1280,height:800}}); const pd=await cd.newPage(); await pd.goto(url); await pd.waitForFunction(()=>window.__atlasMap); await pd.waitForTimeout(900);
+    await pd.evaluate(()=>{ const m=window.__atlasMap; m.setView([42.6526,-73.7573],17,{animate:false}); }); await pd.waitForTimeout(300);
+    await pd.evaluate(()=>{ const m=window.__atlasMap; m.fire('contextmenu',{latlng:m.getCenter()}); }); await pd.waitForTimeout(500);
+    const d=await pd.evaluate(()=>{ const pop=document.querySelector('.leaflet-popup'), dt=pop.querySelector('details'); const t=x=>{ const n=[...pop.querySelectorAll('a,button')].find(b=>b.textContent.trim()===x); return n?Math.round(n.getBoundingClientRect().top):null; };
+      return {open:dt.open,gm:t('Google Maps'),sat:t('Google satellite'),who:t('Whose land is it?'),h:Math.round(pop.getBoundingClientRect().height)}; });
+    ok('right click on a desktop: the same box with More already open, the three maps above the rest',d.open&&d.gm!==null&&d.sat>d.gm&&d.who>=d.sat&&d.h<=330,JSON.stringify(d)); await cd.close(); }
   await b.close();
   console.log(fails.length?fails.length+' FAILED':'spots test passed'); process.exit(fails.length?1:0);
 })();
