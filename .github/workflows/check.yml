@@ -3,6 +3,9 @@ name: check
 # and the checks then look at what was built. Nothing is published from here; that is site.yml, after the merge.
 on:
   pull_request:
+    # ready_for_review: a pull request opened as a draft and later marked ready is checked again then, so a research one
+    # can merge by itself. With GitHub's default three it sat until the next push (the Sitka batch, November 23, 2026).
+    types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   check:
     runs-on: ubuntu-latest
