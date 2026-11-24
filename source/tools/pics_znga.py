@@ -1,0 +1,9 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'boynton-hall-wpi':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Boynton_Hall_%28Worcester_Polytechnic_Institute%29.jpg/960px-Boynton_Hall_%28Worcester_Polytechnic_Institute%29.jpg', 900, 695, 'Kenneth C. Zirkel', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Boynton_Hall_(Worcester_Polytechnic_Institute).jpg', '2026-11-24', 'pin+name'),
+ 'central-congregational-church-worcester':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Worcester_Area_Mission_Society_%28WAMS%29_building.jpg/960px-Worcester_Area_Mission_Society_%28WAMS%29_building.jpg', 900, 1012, 'Kenneth C. Zirkel', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Worcester_Area_Mission_Society_(WAMS)_building.jpg', '2026-11-24', 'pin+name'),
+ 'fenwick-hall-holy-cross':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Fenwick_Hall_CollegeOfTheHolyCross.jpg/960px-Fenwick_Hall_CollegeOfTheHolyCross.jpg', 900, 1200, 'George Rypysc III', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Fenwick_Hall_CollegeOfTheHolyCross.jpg', '2026-11-24', 'pin+name'),
+ 'worcester-armory-salisbury-street':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Veterans_Inc._Headquarters%2C_Worcester.jpg/960px-Veterans_Inc._Headquarters%2C_Worcester.jpg', 900, 675, 'Nvss132', 'CC0', 'https://commons.wikimedia.org/wiki/File:Veterans_Inc._Headquarters,_Worcester.jpg', '2026-11-24', 'pin'),
+ 'worcester-city-hall':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/City_Hall_-_Worcester.jpg/960px-City_Hall_-_Worcester.jpg', 900, 858, 'Farragutful', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:City_Hall_-_Worcester.jpg', '2026-11-24', 'pin+name'),
+}
