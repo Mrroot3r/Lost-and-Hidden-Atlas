@@ -1,0 +1,98 @@
+# November 24, 2026: a third scatter of places across South Carolina (region sc, claimed with choose.py --thinnest at
+# 52 places, the fewest of any region). Ground the first three batches left empty: the Ashley River (Colonial
+# Dorchester and the Old White Meeting House), the Pee Dee rice coast (Prince Frederick's Chapel), the Lowcountry
+# (Colleton and Hampton counties), the Santee, the Upstate (Greenville and Spartanburg counties) and the Fairfield
+# granite country. Facts come only from sources opened in this session: Wikipedia read as raw text, the pages of South
+# Carolina State Parks, Greenville County Recreation, Conestee Nature Preserve, the Liberty Trail and the South Carolina
+# Railroad Museum, and web search summaries (named in each access note) where a page could not be read.
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+
+BATCH={'key':'sc_mzkq','label':'South Carolina: a third scatter, Ashley River to the Upstate','added':'2026-11-24 15:30'}
+
+PLACES=[
+N('old-white-meeting-house-summerville','Old White Meeting House ruins and cemetery','Summerville','sc','worship','ruins',32.96594,-80.19430,'area','view','drive','','c.1700–1886',
+  "A meeting house of the Dorchester settlers, built about 1700, burned during the Revolution in 1781, rebuilt in 1794 and left in ruins by the Charleston earthquake of 1886. Portions of each corner stand, the largest about 9 feet high, with remnants of the foundation walls, and a cemetery lies beside it. Listed on the National Register in 2005.",
+  "The corner fragments of the walls and the foundation lines, with the graves. Not checked: what the walls are made of, and whether the cemetery is open to visitors.",
+  'Corner walls of a 1790s meeting house, brought down by the 1886 earthquake.',
+  "On Dorchester Road (SC 642) south of Summerville. Who owns or manages the site was not found, and no parking or hours were found: see it from the road and ask before going in.",
+  [W('Old White Meeting House Ruins and Cemetery')],
+  conf='mixed',brick='?',hours=''),
+N('prince-frederick-chapel-ruins','Prince Frederick\'s Chapel ruins','Plantersville','sc','worship','ruins',33.50556,-79.18028,'exact','view','drive','','1859–1966',
+  "The front wall and tower of a Gothic Revival church for the rice planters of the Pee Dee River. An earlier chapel was built here in 1848 on land given in 1834; the church whose ruins stand was begun in 1859, stopped by the Civil War, and finished in 1876, to a design by Louis J. Barbot. As rice planting declined it fell into disrepair, was judged unsafe and was demolished in 1966, leaving the front wall and tower. Listed on the National Register in 1974.",
+  "The tall front wall and tower standing alone. Search results describe the site as fenced and not to be entered, with little parking. There is also a standing summer chapel for the same congregation nearby, not covered here.",
+  'A Gothic church of the rice planters, down to its front wall and tower.',
+  "On Plantersville Road southeast of Plantersville, Georgetown County. Reports describe a fence round the ruins, minimal roadside parking and no fee. The owner was not found, so look from the road. The pin is the Wikipedia point, not checked on the ground.",
+  [W("Prince Frederick's Chapel Ruins"),L('South Carolina Department of Archives and History: Prince Frederick\'s Chapel Ruins','https://schpr.sc.gov/index.php/Detail/objects/S10817722008')],
+  conf='mixed',brick='?',hours=''),
+N('pelham-mill-greer','Pelham Mill ruins and dam','Greer','sc','industry','ruins',34.8571,-82.2266,'site','public','walk','','1820–1940s',
+  "The site of the first cotton mill in the Greenville District, founded in 1820 by the Rev. Thomas Hutchings, later called Lester Factory and Buena Vista Factory, and from 1882 Pelham Mills. It had been vacated by 1940 and a fire in the 1940s destroyed the whole complex. What is left on the Enoree River: stone and brick foundations, the bases of two steam smokestacks, brick pilings and a mortared stone dam with six sluice gates. Part of the property was given to the county in 1988 and became Pelham Mill Park.",
+  "The masonry dam and an overlook from which the old mill's remains and the shoals of the Enoree can be seen, plus the foundations. The park also has a dog park.",
+  "The ruins of the Greenville District's first cotton mill, above the Enoree shoals.",
+  "Pelham Mill Park, 2770 East Phillips Road, Greer, run by Greenville County Parks, Recreation & Tourism, which gives no hours on its page. Parking at the park not checked.",
+  [W('Pelham Mills Site'),L('Greenville County Rec: Pelham Mill Park','https://www.greenvillerec.com/pelham-mill')],
+  conf='',brick='some',hours=''),
+N('conestee-mill-greenville','Conestee Mill and dam','Greenville','sc','industry','standing',34.77018,-82.34822,'site','view','walk','','1790s–1971',
+  "A mill site on the Reedy River where grist and saw mills ran in the 1790s. Vardry McBee bought it before 1833 and it made paper, wool and cotton cloth; the existing mill building dates from the 1890s and the dam was raised about 1892. The mill closed for good in 1971 and its buildings were later used as a distribution centre and for storage. Years of upstream waste filled most of the lake with sediment, and the lake, dam and mill are now part of a nature preserve. The mill and dam were listed on the National Register in 2014.",
+  "The dam and mill building, with the preserve's trails and boardwalks round them. Web search results describe the mill itself as fenced off with no-trespassing signs: look from the preserve's paths. The dam was found in poor condition in 2016 and a replacement was begun in 2025.",
+  'A Reedy River cotton, paper and wool mill, now beside a nature preserve.',
+  "The preserve (Conestee Nature Preserve, a non-profit) is open sunrise to sunset daily with a suggested $3 donation, and has a Conestee Mill entrance; the mill property itself is not open. Hours from the preserve's own page, November 2026. The parking point marks the Swamp Rabbit Trail lot nearest the mill.",
+  [W('Conestee Mill'),L('Conestee Nature Preserve: plan a visit','https://www.conesteepreserve.org/plan-a-visit')],
+  conf='',brick='?',hours='Preserve open daily sunrise to sunset; the mill itself is not open',th=[34.76999,-82.34925],thn='Swamp Rabbit Trail lot beside the mill'),
+N('walnut-grove-plantation-sc','Walnut Grove Plantation','Roebuck','sc','landmark','standing',34.82638,-81.95992,'site','open','drive','','1765–',
+  "The home of Charles and Mary Moore, built in 1765 on a land grant from King George III, on a 3,000-acre farm. Their eldest daughter Kate Barry served as a scout for General Daniel Morgan before the Battle of Cowpens, and local militia gathered here beforehand. A restoration costing $1.5 million reopened it in October 2025. Besides the manor there are a doctor's office, a kitchen cabin, the Rocky Spring Academy, a dry cellar, a blacksmith forge, barn, smokehouse, wheat house, gardens, a family cemetery and a nature trail.",
+  "Guided tours of the manor, the doctor's office, the kitchen cabin and the academy; the grounds can be walked on a self-guided ticket, which does not include the buildings.",
+  'A 1765 backcountry plantation where Morgan\'s militia gathered before Cowpens.',
+  "Run by the Spartanburg County Historical Association, 1200 Otts Shoals Road, Roebuck. Guided tours $10 adults, $8 seniors, $6 ages 5 to 16; self-guided grounds $5; picnics and leashed pets welcome. Closed Easter, July 4, Thanksgiving and the days around Christmas and New Year. Hours from the Liberty Trail's page, November 2026; the association's own page could not be opened. Parking not checked.",
+  [W('Walnut Grove Plantation'),L('The Liberty Trail: Walnut Grove Plantation','https://thelibertytrail.org/sc/trail-sites/historic-sites/walnut-grove-plantation/visit')],
+  conf='',brick='?',hours='Thursday to Saturday 10 a.m. to 5 p.m.; Sunday noon to 5 p.m.; last tour 4 p.m.; closed Monday to Wednesday'),
+N('fort-watson-santee-mound','Santee Indian Mound and Fort Watson','Summerton','sc','fort','traces',33.53896,-80.43783,'site','public','drive','forts','c.1200–1500; 1780',
+  "A mound that was part of a Santee mound village, probably a burial or temple mound built between 1200 and 1500. In the Revolution the British built Fort Watson on top of it, 30 to 50 feet up. In 1780 Francis Marion and Light Horse Harry Lee besieged it, and it was the first fortified British post in South Carolina retaken by the patriots after the British occupation of 1780. None of the fort remains. Listed on the National Register in 1969; the site lies in the Santee National Wildlife Refuge.",
+  "A grassed earth mound with signs. Nothing of the fort is left to see.",
+  'A Santee Indian mound the British fortified, and Marion took in 1780.',
+  "Santee National Wildlife Refuge, Bluff Unit, 2125 Fort Watson Road, Summerton. Refuge grounds are generally open sunrise to sunset and the visitor centre Tuesday to Friday 8 a.m. to 4 p.m., from a web search summary of the refuge's pages; the site has no hours of its own.",
+  [W('Santee Indian Mound and Fort Watson'),L('U.S. Fish and Wildlife Service: Santee National Wildlife Refuge','https://www.fws.gov/refuge/santee')],
+  conf='mixed',brick='no',hours='Refuge grounds sunrise to sunset'),
+N('old-colleton-county-jail','Old Colleton County Jail','Walterboro','sc','civic','standing',32.90694,-80.65556,'area','view','drive','','1855–1937',
+  "A Gothic Revival jail built in 1855–56 to a design by the Charleston architects Edward C. Jones and Francis D. Lee, and built by J. & B. Lucas. It is a stuccoed brick building that looks like a small fortified castle, with crenellated parapets, turrets at the corners and a central tower with a tall pointed window over the entrance. The jail was used until 1937 and was then county offices; one summary says it now houses the Colleton County Probate Court. Listed on the National Register in 1971.",
+  "The crenellated front and tower, from the street. It is an office building, so the interior was not checked.",
+  'A county jail built as a miniature castle.',
+  "In central Walterboro; street parking. A county office building: look from the street, and the opening of the interior was not checked.",
+  [W('Old Colleton County Jail'),L('South Carolina Department of Archives and History: Old Colleton County Jail','https://schpr.sc.gov/index.php/Detail/objects/S10817715004')],
+  conf='mixed',brick='no',hours=''),
+N('stoney-creek-chapel-mcphersonville','Stoney Creek Independent Presbyterian Chapel (McPhersonville)','McPhersonville','sc','worship','standing',32.69207,-80.91472,'exact','view','drive','','c.1833',
+  "A summer chapel built about 1833 on an acre set aside in 1832 by rice planters of Prince William Parish, who spent summers at McPhersonville on higher ground away from malaria. The parent Stoney Creek church, founded in 1743 by followers of George Whitefield, was taken down by the Union Army's men for a bridge and other works. The chapel served the Union Army as a hospital and camp, then the congregation until it dissolved in 1967, after which the First Presbyterian Church of Beaufort held it. It stood in for the Four Square Baptist Church in the film Forrest Gump. Listed on the National Register in 2002.",
+  "A plain Greek Revival chapel, about 40 by 24 feet, with a front portico of four Doric columns of solid heart pine and a pedimented gable. It is the only antebellum building left in McPhersonville. Interior not checked.",
+  'A planters\' summer chapel in the pines, and Forrest Gump\'s Baptist church.',
+  "One block north of Pocotaligo Road (SC 25-17) on SC 25-286, about four miles west of Yemassee. Its custodian is the First Presbyterian Church of Beaufort (Wikipedia); whether visitors may go in was not found, so view from the road.",
+  [W('Stoney Creek Independent Presbyterian Chapel of Prince William Parish')],
+  conf='mixed',brick='?',hours=''),
+N('sc-railroad-museum-rockton','South Carolina Railroad Museum and the Rockton & Rion line','Winnsboro','sc','rail','standing',34.33953,-81.08077,'site','open','drive','stations','1883–1945',
+  "The Rockton and Rion Railroad carried Winnsboro blue granite from the quarries at Rockton and Rion. The National Register district (1984) holds forty buildings, six structures and two objects built about 1883 to 1945 round the Anderson Quarry and Phillips Granite Works and the Rion Quarry and Brooks Granite Company, most of them of the blue granite, with two steam locomotives and the railroad's line and sidings. The whole right-of-way was given to the South Carolina Railroad Museum in 1983, which runs excursion trains on it.",
+  "The museum's buildings, locomotives and rolling stock at Industrial Park Road in Rockton, and the excursion train on the old granite line. The quarries and the district's other buildings were not checked.",
+  'A blue-granite quarry railroad, run again as a museum.',
+  "South Carolina Railroad Museum, 110 Industrial Park Road, Rockton. Admission is free, per the museum's own page, November 2026; the page lists closures November 25 to December 1 and December 20 to January 5, and ticketed train rides on set dates. The pin is the museum, not the quarries.",
+  [W('Rockton and Rion Railroad Historic District'),L('South Carolina Railroad Museum','https://www.scrm.org')],
+  conf='',brick='?',hours='Wednesday to Saturday 10 a.m. to 4 p.m.; free admission; closed some holidays'),
+N('rembert-church-woodrow','Rembert Church','Woodrow','sc','worship','standing',34.09738,-80.35286,'area','view','drive','','c.1835',
+  "A Methodist meeting house built about 1835, one of the earliest Methodist congregations in South Carolina: a Methodist society met here as early as 1785, and Bishop Francis Asbury, the first bishop of the Methodist Church in the United States, often visited. It is a plain rectangular clapboard building, and the cemetery beside it was begun in 1800. Listed on the National Register in 1975.",
+  "A simple clapboard meeting house in the country with its old graveyard beside it. Whether the church is open, and its services, were not checked.",
+  'A clapboard Methodist meeting house Bishop Asbury used to visit.',
+  "In the country near Woodrow, Lee County. Who looks after it, its parking and any services were not found: see it from the road, and ask before going in. The pin is the Wikipedia point and was not checked on the ground.",
+  [W('Rembert Church')],
+  conf='mixed',brick='no',hours=''),
+]
+
+PIN_NOTES={
+'rembert-church-woodrow':'OpenStreetMap\'s point for the church on Rembert Church Road; the aerial shows only fields at the point, so the pin marks the area.',
+'old-white-meeting-house-summerville':'The Wikipedia point fell on the road; the pin was moved about 60 m to a small structure on the bare-ground LiDAR picture, so it marks the area, not the walls.',
+'prince-frederick-chapel-ruins':'The Wikipedia point, on the ruined church.',
+'pelham-mill-greer':'The Wikipedia point for the mill ruins by the Enoree dam.',
+'conestee-mill-greenville':'The Wikipedia point for the mill; the parking point is the nearest mapped Swamp Rabbit Trail lot.',
+'walnut-grove-plantation-sc':'The Wikipedia point fell on the edge of a field; the pin was moved 60 m north onto the cluster of buildings seen on the aerial.',
+'fort-watson-santee-mound':'The Wikipedia point; the bare-ground LiDAR picture shows the mound at the pin on the lakeshore.',
+'old-colleton-county-jail':'The Wikipedia point; no building could be matched to it on the aerial, so the pin marks the area of central Walterboro.',
+'stoney-creek-chapel-mcphersonville':'The Wikipedia point for the chapel.',
+'sc-railroad-museum-rockton':'The OpenStreetMap point for the South Carolina Railroad Museum on Industrial Park Road.',
+}
