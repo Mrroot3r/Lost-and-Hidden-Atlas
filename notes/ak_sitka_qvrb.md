@@ -25,3 +25,4 @@ Not checked: anything on the ground; every interior; the Sheldon Jackson Museum'
 - `tools/start.py "Sitka, Alaska"` answered "Could not find"; a latitude and longitude worked.
 - Alaska State Parks pages (`dnr.alaska.gov/parks/aspunits/southeast/...`) give access and fees but no hours for the Sitka units.
 - The Sitka National Historical Park brochure page (`nps.gov/sitk/planyourvisit/park-brochure.htm`) and the 2025 compendium give the current hours; the park's news releases about winter hours are old and disagree with them.
+- A pull request opened as a draft does not merge by itself when it is later marked ready: `check.yml` runs on `pull_request` with GitHub's default event types (opened, synchronize, reopened), so marking it ready starts no new run, and the run made while it was a draft skipped the merge job. The merge job runs again on the next push to the branch.
