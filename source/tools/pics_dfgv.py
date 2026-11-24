@@ -1,0 +1,6 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'home-chapel-dayton-va':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Perspective_view_from_west_-_National_Home_for_Disabled_Volunteer_Soldiers%2C_Central_Branch%2C_Protestant_Chapel%2C_4100_West_Third_Street%2C_Dayton%2C_Montgomery_County%2C_OH_HABS_OH-2364-X-4_%28cropped%29.tif/lossy-page1-960px-thumbnail.tif.jpg', 900, 1265, 'James W. Rosenthal', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Perspective_view_from_west_-_National_Home_for_Disabled_Volunteer_Soldiers,_Central_Branch,_Protestant_Chapel,_4100_West_Third_Street,_Dayton,_Montgomery_County,_OH_HABS_OH-2364-X-4_(cropped).tif', '2026-11-24', 'name'),
+ 'victoria-theatre-dayton':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/Main_Street_Dayton_2023c.jpg/960px-Main_Street_Dayton_2023c.jpg', 900, 600, 'Antony-22', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Main_Street_Dayton_2023c.jpg', '2026-11-24', 'pin+name'),
+}
