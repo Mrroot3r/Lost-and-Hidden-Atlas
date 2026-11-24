@@ -1,0 +1,9 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'albert-doege-house-leavenworth-ks':('', '2026-11-24', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'leavenworth-downtown-historic-district-ks':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Downtown_Leavenworth%2C_Kansas.jpg/960px-Downtown_Leavenworth%2C_Kansas.jpg', 900, 598, 'Melissa Bower', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Downtown_Leavenworth,_Kansas.jpg', '2026-11-24', 'category'),
+ 'north-broadway-district-leavenworth-ks':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/North_Broadway_Historic_District_NRHP_02000719_Leavenworth_County%2C_KS.jpg/960px-North_Broadway_Historic_District_NRHP_02000719_Leavenworth_County%2C_KS.jpg', 900, 675, 'Jon Roanhaus', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:North_Broadway_Historic_District_NRHP_02000719_Leavenworth_County,_KS.jpg', '2026-11-24', 'pin+name'),
+ 'south-esplanade-district-leavenworth-ks':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/South_Esplanade_Historic_District_NRHP_02000720_Leavenworth_County%2C_KS.jpg/960px-South_Esplanade_Historic_District_NRHP_02000720_Leavenworth_County%2C_KS.jpg', 900, 675, 'Jon Roanhaus', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:South_Esplanade_Historic_District_NRHP_02000720_Leavenworth_County,_KS.jpg', '2026-11-24', 'pin+name'),
+ 'union-park-district-leavenworth-ks':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Union_Park.jpg/960px-Union_Park.jpg', 900, 675, 'Melissa Bower', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Union_Park.jpg', '2026-11-24', 'pin+name'),
+}
