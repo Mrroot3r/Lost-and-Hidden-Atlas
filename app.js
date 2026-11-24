@@ -3046,7 +3046,45 @@ $('#home').addEventListener('change',e=>{
   if(v==='custom') return;
   U.home={id:v,by:1}; save(); buildHome(); drawHome(); refresh(); if(sel) renderDetail(sel); { const H=homeObj(); if(map&&e.go) map.setView([H.lat,H.lon],10); }
 });
-$('#q').addEventListener('input',debounce(e=>{ F.q=e.target.value.trim(); renderList(); syncMarkers(); syncFcount(); },150));
+/* The search box also goes to a spot (the owner, November 23, 2026: find a street in Google Maps, copy the coordinates, paste them
+   here and be taken there). Coordinates, or a Google Maps link that carries them, move the map at once and are not a search of the
+   places. Words still narrow the list as before, and a row under the box offers to look them up as a street, town or address:
+   one question to OpenStreetMap's Nominatim, asked only on that tap or on Enter, never as you type (its rules forbid that). */
+function readCoords(t){ t=String(t||'').trim(); if(!t) return null; let m, la, lo;
+  if(/^https?:\/\//i.test(t)){ m=t.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/)||t.match(/[?&](?:q|ll|query|center|destination|viewpoint)=(-?\d+(?:\.\d+)?)(?:,|%2C)\s*(-?\d+(?:\.\d+)?)/i)||t.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/); if(!m) return null; la=+m[1]; lo=+m[2]; }
+  else { m=t.match(/^\(?\s*(-?\d{1,2}\.\d+|-?\d{1,2})\s*°?\s*([NS])?\s*[,;\s]\s*(-?\d{1,3}\.\d+|-?\d{1,3})\s*°?\s*([EW])?\s*\)?$/i); if(!m) return null;
+    if(m[1].indexOf('.')<0&&m[3].indexOf('.')<0) return null;                     /* "12 34" is not a place on the map */
+    la=+m[1]; lo=+m[3]; if(m[2]&&/s/i.test(m[2])) la=-la; if(m[4]&&/w/i.test(m[4])) lo=-Math.abs(lo); }
+  if(lo>0) lo=-lo;                                                                /* everything the Atlas covers is west of Greenwich */
+  if(!isFinite(la)||!isFinite(lo)||!inMap(la,lo)) return null;
+  return {lat:la,lon:lo}; }
+let goMark=null, goSeq=0;
+function goClear(){ if(goMark&&map) map.removeLayer(goMark); goMark=null; }
+function goTo(la,lo,label,box){ if(!map) return; goClear(); ctxClose();
+  if(box&&box.length===4&&isFinite(+box[0])&&Math.abs(box[1]-box[0])<0.5&&Math.abs(box[3]-box[2])<0.5) map.fitBounds([[+box[0],+box[2]],[+box[1],+box[3]]],{maxZoom:17,animate:false}); else map.setView([la,lo],Math.max(map.getZoom(),16),{animate:false});
+  goMark=L.circleMarker([la,lo],{radius:11,color:'#ff2d95',weight:4,fillColor:'#ff2d95',fillOpacity:.15,className:'gomark',bubblingMouseEvents:false}).addTo(map);
+  if(label) goMark.bindTooltip(label,{direction:'top',offset:[0,-10]});
+  goMark.on('click',()=>onContext({latlng:L.latLng(la,lo)}));                     /* the small box: add it, send it, see it in other maps */ }
+function goRow(html,fn){ const b=el('button',{class:'btn sm',type:'button'}); b.innerHTML=html; b.addEventListener('click',fn); return b; }
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function goShort(name){ return String(name||'').split(',').map(x=>x.trim()).filter(x=>x&&!/^\d{5}(-\d{4})?$/.test(x)&&!/^(United States|Canada)$/i.test(x)&&!/^[A-Z]\d[A-Z] ?\d[A-Z]\d$/.test(x)).slice(0,4).join(', '); }
+async function goLook(q){ const g=$('#goto'), my=++goSeq; g.replaceChildren(el('p',{class:'gonote',text:'Looking up "'+q+'"…'}));
+  let j=null; try{ const b=map?map.getBounds():null, vb=b?'&viewbox='+[b.getWest(),b.getNorth(),b.getEast(),b.getSouth()].map(x=>x.toFixed(4)).join(','):'';
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=4&countrycodes=us,ca'+vb+'&q='+encodeURIComponent(q)); j=await r.json(); }catch(e){ j=null; }
+  if(my!==goSeq) return;
+  if(!j){ g.replaceChildren(el('p',{class:'gonote',text:'Could not look that up (no connection?). Pasted coordinates work without one.'})); return; }
+  const hits=j.filter(x=>inMap(+x.lat,+x.lon));
+  if(!hits.length){ g.replaceChildren(el('p',{class:'gonote',text:'Nothing found on the map for "'+q+'". Try adding the town and state, or paste coordinates.'})); return; }
+  g.replaceChildren(...hits.map(x=>goRow(esc(goShort(x.display_name)),()=>goTo(+x.lat,+x.lon,goShort(x.display_name),x.boundingbox))),el('p',{class:'gonote',text:'Streets and towns from OpenStreetMap. The places below are the Atlas\'s own.'})); }
+function goSync(v,auto){ const g=$('#goto'); goSeq++; const c=readCoords(v);
+  if(!v){ g.hidden=true; g.replaceChildren(); goClear(); return false; }
+  if(c){ g.hidden=false; g.replaceChildren(goRow('Go to <b>'+ll(c)+'</b>',()=>goTo(c.lat,c.lon,ll(c)))); if(auto) goTo(c.lat,c.lon,ll(c)); return true; }
+  if(/^https?:\/\//i.test(v)){ g.hidden=false; g.replaceChildren(el('p',{class:'gonote',text:'That link carries no coordinates. In Google Maps, press and hold the spot, copy the two numbers it shows, and paste them here.'})); return true; }
+  if(v.length<3){ g.hidden=true; g.replaceChildren(); return false; }
+  g.hidden=false; g.replaceChildren(goRow('Find <b>'+esc(v)+'</b> on the map: street, town or address',()=>goLook(v))); return false; }
+try{ window.__atlasGo={read:readCoords}; }catch(e){}
+$('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
+$('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });
 /* the Filters button opens the panel under the search box and shows how many filters are on (the search box is not counted) */
 $('#filt-btn').addEventListener('click',()=>{ const d=$('#filters'); d.open=!d.open; syncFcount(); });
 $('#sort').addEventListener('change',e=>{ U.ui.sort=e.target.value; save(); renderList(); });
