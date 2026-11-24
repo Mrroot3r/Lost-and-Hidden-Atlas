@@ -63,9 +63,9 @@ REGION={'ny':{'Albany':'albco','Rensselaer':'renss','Schenectady':'sch','Saratog
  'Franklin':'TODO: region: pv (Pioneer Valley), or cmass for the Quabbin towns','Hampshire':'TODO: region: pv (Pioneer Valley), or cmass for the Quabbin towns','Hampden':'pv',
  'Worcester':'TODO: region: cmass (Quabbin and central) or worc (Worcester and Blackstone Valley)','Middlesex':'TODO: region: bos (Greater Boston and MetroWest) or nshore (Merrimack Valley)'}}
 for _c in ('Warren','Essex','Hamilton','Franklin','Clinton','Fulton','Herkimer'): REGION['ny'][_c]='adk'
-# Missouri has one Atlas region so far, the Kansas City country; a pit anywhere else in the state leaves a TODO. Kansas is one region ('*': every county).
+# Missouri has two Atlas regions: the Kansas City country (kcmo) and the rest of the state (mo, '*': every other county). Kansas is one region.
 REGION['mo']={c:'kcmo' for c in ('Jackson','Clay','Platte','Cass','Ray','Lafayette','Johnson','Clinton','Buchanan','Caldwell','Bates','Henry','Carroll','Saline','Pettis','DeKalb','Andrew')}
-REGION['mo']['*']='TODO: region: Missouri has only kcmo (the Kansas City country) so far; tell the owner this county needs a region'
+REGION['mo']['*']='mo'
 REGION['ks']={'*':'ks'}
 def region_of(st,county):
     R=REGION.get(st,{}); return R.get(county or '') or R.get('*') or 'TODO: region key from tools/states.py'
