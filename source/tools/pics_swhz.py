@@ -1,0 +1,8 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'buckhorn-flat-lime-kiln-ut':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Denver_and_Rio_Grande_Lime_Kiln.jpeg/960px-Denver_and_Rio_Grande_Lime_Kiln.jpeg', 900, 675, 'Tricia Simpson', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Denver_and_Rio_Grande_Lime_Kiln.jpeg', '2026-11-24', 'pin+name'),
+ 'camp-floyd-state-park-ut':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Stagecoach_Inn%2C_Fairfield%2C_Utah_-_23_Jun_2015.jpg/960px-Stagecoach_Inn%2C_Fairfield%2C_Utah_-_23_Jun_2015.jpg', 900, 477, 'Beneathtimp', 'CC0', 'https://commons.wikimedia.org/wiki/File:Stagecoach_Inn,_Fairfield,_Utah_-_23_Jun_2015.jpg', '2026-11-24', 'pin+name'),
+ 'dalton-wells-moab-isolation-center':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bf/Dalton_wells_ccc_camp_in_grand_county_utah.jpg/960px-Dalton_wells_ccc_camp_in_grand_county_utah.jpg', 900, 599, 'NoeHill', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Dalton_wells_ccc_camp_in_grand_county_utah.jpg', '2026-11-24', 'pin+name'),
+ 'manti-temple-ut':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fb/Manti_Temple_East_Wall_Distance.jpg/960px-Manti_Temple_East_Wall_Distance.jpg', 900, 675, 'Itsetsyoufree32', 'CC BY 4.0', 'https://commons.wikimedia.org/wiki/File:Manti_Temple_East_Wall_Distance.jpg', '2026-11-24', 'name'),
+}
