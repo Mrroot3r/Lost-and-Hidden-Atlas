@@ -17,7 +17,6 @@ Eighteen places in southern Lewis County, New York, the first pass in that count
 | Lyons Falls depot | 6819 McAlpine Street, Lyons Falls, NY | Former station, now a private feed-store building (2019 BOA report) | Date, what survives of the station |
 | St. John's Church, Lyons Falls | 5838 McAlpine Street, Lyons Falls, NY | Gothic church of brick with limestone trim, after 1909 (lyonsfallshistory.org) | Building date, service times from the parish's own page |
 | Osceola Town Hall | Osceola, Lewis County, NY (43.50306, -75.7225) | 1882 Methodist church, town hall since the 1920s (Wikipedia) | Use today, hours |
-| Lowville: Franklin B. Hough House, Lowville Presbyterian (stone church), Bateman Hotel, Soldiers' and Sailors' Monument | Lowville, NY | Register rows with coordinates; HMdb 80308 (Stone Church), 50519 | Left for a North Country (`nny`) session; nothing read |
 | Alpina and Lewisburg iron-furnace districts | Town of Diana, Lewis County, NY | Register archaeological districts (95000068, 95000071), "rural iron furnace and village site" | Address restricted; a public way in |
 
 ## Tips
