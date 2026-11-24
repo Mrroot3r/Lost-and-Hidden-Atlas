@@ -2314,19 +2314,37 @@ function scoutLinks(p,town){
     town?['Sanborn fire maps','https://www.loc.gov/collections/sanborn-maps/?q='+encodeURIComponent(town+' New York')]:null
   ].filter(Boolean);
 }
+/* The box a long press or a right click opens: a small one (the owner, November 23, 2026). The coordinates are one small line that
+   copies; Add and Send side by side; the three maps he uses in one row; the rest under "More", which a desktop opens by itself.
+   Which of Add and Send is which is said in each button's own hint and no longer in a paragraph. "Measure drive times from here"
+   is gone from here: the start place is chosen on the Places tab. On a map too short to hold the box above the point (the map
+   dragged down to its strip) it sits flat against the top of the map instead of becoming a scrolling bubble, with a ring on the spot. */
+let ctxFlat=null;
+function ctxFlatOff(){ if(!ctxFlat) return; ctxFlat.box.remove(); if(map){ map.removeLayer(ctxFlat.mark); map.off('click popupopen',ctxFlatOff); } ctxFlat=null; }
+function ctxClose(){ ctxFlatOff(); if(map) map.closePopup(); }
 function onContext(e){
-  const p={lat:e.latlng.lat,lon:e.latlng.lng}; const box=el('div',{class:'ctx'});
-  const cb=el('button',{class:'btn sm',type:'button'},ll(p)); cb.addEventListener('click',()=>copy(ll(p),cb)); box.append(cb);
-  /* Short enough to fit the map on a phone: adding and sending first, the links to other maps folded away. With all of them
-     in a column the box was taller than the map and its lower half could not be reached (the owner, November 21, 2026). */
-  box.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); quickAdd({lat:+p.lat.toFixed(6),lon:+p.lon.toFixed(6)}); }},'+ Add to my places'));
-  box.append(spotLink('',p.lat,p.lon,'')); box.lastChild.title='Opens a short form with these coordinates filled in. You say what is there; it is researched later.'; box.append(WHICH());
-  if(!schematic) box.append(el('button',{class:'btn sm',type:'button',onclick:()=>whoPopup(p)},'Whose land is it?'));
-  const more=el('details',{class:'ctxmore'},el('summary',{text:'See this spot in other maps'}));
-  scoutLinks(p).slice(0,5).forEach(l=>more.append(ext(l[1],l[0],'btn sm')));
-  more.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ map.closePopup(); pickingHome=true; onMapClick(e); }},'Measure drive times from here'));
+  ctxClose();
+  const p={lat:e.latlng.lat,lon:e.latlng.lng}; const box=el('div',{class:'ctx spot'});
+  const cb=el('button',{class:'ctx-ll',type:'button',title:'Copy these coordinates','aria-label':'Copy the coordinates '+ll(p)},ll(p)); cb.addEventListener('click',()=>copy(ll(p),cb)); box.append(cb);
+  const add=el('button',{class:'btn sm',type:'button',title:'Add a place of your own here. It stays on this device.','aria-label':'Add to my places',onclick:()=>{ ctxClose(); quickAdd({lat:+p.lat.toFixed(6),lon:+p.lon.toFixed(6)}); }},'+ My places');
+  const send=spotLink('',p.lat,p.lon,'','Send to Atlas'); send.title='Send this spot to the public Atlas, the map everyone sees. A short form opens with these coordinates filled in; what you send is checked before it goes on.'; send.setAttribute('aria-label','Send this spot to the public Atlas');
+  box.append(el('div',{class:'ctx-row two'},add,send));
+  const S=scoutLinks(p), by=n=>S.find(l=>l[0]===n), lk=(n,label)=>{ const a=ext(by(n)[1],label||n,'btn sm'); if(label) a.title=n; return a; };
+  box.append(el('div',{class:'ctx-row three'},lk('Google Maps'),lk('Street View'),lk('Google Earth 3D','Earth 3D')));
+  const more=el('details',{class:'ctxmore'},el('summary',{text:'More'})); more.open=!!(window.matchMedia&&matchMedia('(hover:hover) and (pointer:fine)').matches);
+  more.append(el('div',{class:'ctx-row two'},lk('Google satellite'),lk('Old air photos')));
+  if(!schematic) more.append(el('button',{class:'btn sm',type:'button',onclick:()=>{ ctxClose(); whoPopup(p); }},'Whose land is it?'));
   box.append(more);
-  const pop=L.popup({maxWidth:260,maxHeight:Math.max(150,map.getSize().y-70)}).setLatLng(e.latlng).setContent(box).openOn(map);
+  /* how tall will it be? measured off the page, at the width it will have */
+  const probe=el('div',{style:'position:absolute;left:-9999px;top:0;width:252px;font-size:13px'},box); document.body.append(probe); const h=box.offsetHeight; box.remove(); probe.remove();
+  const mh=map.getSize().y;
+  if(mh<h+62){
+    const x=el('button',{class:'ctx-x',type:'button','aria-label':'Close',onclick:ctxClose},'\u00d7'), flat=el('div',{class:'ctxflat'},x,box);
+    L.DomEvent.disableClickPropagation(flat); L.DomEvent.disableScrollPropagation(flat); $('#map').append(flat);
+    const mark=L.circleMarker(e.latlng,{radius:9,color:'#ff2d95',weight:3,fill:false,interactive:false,className:'ctxmark'}).addTo(map);
+    ctxFlat={box:flat,mark}; setTimeout(()=>{ if(ctxFlat&&ctxFlat.box===flat) map.on('click popupopen',ctxFlatOff); },0);      /* a tap on the map, or anything else opening, puts it away */
+    return; }
+  const pop=L.popup({maxWidth:252,minWidth:252,maxHeight:Math.max(150,mh-40)}).setLatLng(e.latlng).setContent(box).openOn(map);
   more.addEventListener('toggle',()=>pop.update());
 }
 
