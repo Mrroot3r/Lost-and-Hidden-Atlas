@@ -11,7 +11,6 @@ Fifteen places in Johnson County, Kansas (Olathe, Shawnee, Lenexa, Gardner, Edge
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Mt. Pleasant Four Corners Burying Grounds | Gardner vicinity, KS (about 38.832, -94.976 by address lookup) | Register summary: deeded 1870; last piece left of the settlement of Mount Pleasant, which had three churches, a school and a store | Exact coordinate, owner, and whether visitors are welcome |
 | Downtown Gardner Historic District | Gardner, KS (Main and Elm) | Register 2023: 19 buildings from 1905 to about 1967 | Which buildings stand out; pins |
 | Spring Hill Historic District, Edgerton Grange Hall, John McCarthy House, Turner Barn | Spring Hill and Edgerton, KS | State or National Register listings | Not read |
 | Shawnee Indian Cemetery | Shawnee, KS | Register 2022; designated a Shawnee sacred site in 2020 | Whether the Shawnee Tribe invites visitors; left out on purpose |
