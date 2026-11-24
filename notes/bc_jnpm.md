@@ -14,7 +14,6 @@ Places you read about and could not finish. One row each.
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | Glacier House ruins | Rogers Pass, Glacier National Park, BC, near Illecillewaet campground | Parks Canada itinerary page: guided walks pass "the stone ruins of western Canada's first mountain resort hotel" | A pin on the ruins and a source on what is left |
-| Craigflower Schoolhouse | Admirals Road, Saanich, BC (OpenStreetMap 48.45263, -123.42173) | Register id 12918 and 1449; built by the Hudson's Bay Company in the 1850s, 200 m from Craigflower Manor | Who runs it now and whether it opens |
 | Fort Rodd Hill batteries as separate pins | Colwood, BC (OpenStreetMap leads: Upper, Lower and Belmont batteries, Golf Hill Battery) | Register listings for the Lower Battery casemate barracks (4296), canteen (4346), battery commander's post (4348) | Separate entries would need each battery pinned; Golf Hill Battery and McLoughlin Point need an owner |
 | Chee Kung Tong building, Barkerville | Barkerville, BC (Register id 11971) | A National Historic Site of its own inside Barkerville | Could be its own entry with the building pinned |
 | Old Yale Wagon Road | Yale, BC (Register id 25189) | Listed on the Register | Not read |
