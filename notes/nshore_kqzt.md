@@ -13,9 +13,7 @@ Twenty-three places in Salem and Marblehead, where the Atlas had nothing within 
 |---|---|---|---|
 | Salem Diner | Salem, MA (Register coordinate 42.50111, -70.89639) | Wikipedia: 1941 Sterling Streamliner, car #4106, one of two left in Massachusetts; closed May 31, 2019, with plans in October 2019 to move it and add a roof deck | Whether it still stands where it was, and in what use |
 | Salem Willows park and carousel | Salem Neck, Salem, MA (42.535, -70.86944) | Wikipedia: willows planted 1801 for a smallpox hospital walk; public park from 1858; amusement park from 1880 by the Naumkeag Street Railway; a carousel survives at Kiddieland | The City's park page (salemma.gov would not open) and what of the old trolley-park buildings stands |
-| Greenlawn Cemetery | 57 Orne Street, Salem, MA (42.5329, -70.9041) | Wikipedia: founded 1807, redesigned as a rural cemetery in the 1880s, about 100 acres with notable specimen trees; Register 2015 | Hours and owner from the City; what buildings (chapel) stand |
 | Winter Island seaplane hangar | Winter Island, Salem, MA | Wikipedia: Coast Guard Air Station Salem 1935 to 1971; a photograph of the abandoned hangar in 2016 | Whether it still stands after the City's master plan; could be added to fort-pickering-salem's text |
-| Old Town Hall, Salem (1816) | Derby Square, Salem, MA | Named in the Register list as the Downtown Salem District (originally the Old Town Hall Historic District) | No Wikipedia article found under the titles tried; the hall's own page and hours |
 
 ## Tips
 - salemma.gov (City of Salem) answered 404 or connection reset to page.py for every node address a search gave, with no archived copy; Destination Salem's pages (salem.org) read cleanly and carry hours for City-run sites.
