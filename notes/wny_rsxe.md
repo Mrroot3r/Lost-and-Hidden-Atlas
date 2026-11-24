@@ -17,7 +17,6 @@ Places you read about and could not finish. One row each; delete the example row
 | Lattin-Crandall Octagon Barn | Catharine, NY (42.311944, -76.767778 Register list) | On the Register (84002970) | The form is an NPGallery placeholder; no other source opened; owner and view from the road |
 | Lee School | Montour, NY, 1952 Route 14 | Register listing; Schuyler County Historical Society says it opens for scheduled events and by appointment | A source for its history (Wikipedia article exists, not read) |
 | Chemung District School No. 10 | Lowman, NY (42.028889, -76.715556) | On the Register (08000449) | The form is a placeholder; no other source found |
-| Erste Deutsche Evangelische Kirche | Elmira, NY (42.090833, -76.798889) | 1898–1899 German church, Register 07001121 | The form is a placeholder; present use and a source for the building |
 | Glen Mountain House | Watkins Glen State Park, NY (HMdb 261001, 42.37378, -76.87580) | The private resort before the state park; marker text read | What is left of the hotel, if anything |
 
 ## Tips
