@@ -66,7 +66,7 @@ const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[]
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
-const SET0={heat:true,pinchStand:true,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
+const SET0={heat:false,pinchStand:true,addMore:false,dbl:3,wikiPhotos:true,quietGone:true,hideGone:false,nativeLeads:false,buzzVanished:false,theme:'auto',themeL:'brick',themeD:'tomorrow',units:'mi',clock:'auto',trk:'#2563eb',open:'last',start:'last',follow:true,autoPhotos:true,near:25,detail:'normal',buzz:true,trim:0,previews:true,autoBackup:true,kitBase:'topo',kitSign:'',cluster:true,tripStop:45};
 const pref=k=>(U.set&&k in U.set)?U.set[k]:SET0[k];
 const H12=()=>pref('clock')==='24'?false:pref('clock')==='12'?true:undefined;   /* undefined lets the phone's own setting decide */
 const KM=()=>pref('units')==='km';
@@ -868,7 +868,7 @@ function buildSettings(){ const lb=$('#sheet-b'); lb.textContent=''; lb.classLis
     H('Map'),
     pick('open','The map opens showing',[['last','Whatever was last showing']].concat(['streets','leaf','lidar','sat','topo'].filter(k=>LD[k]).map(k=>[k,LD[k].n]))),
     tog('cluster','Zoomed out, stand in for the pins','The heat map below, or numbered discs, in place of hundreds of pins. Off: every pin at every zoom, which is slow where places are thick.'),
-    tog('heat','Zoomed out, show a heat map','Colour shows where places are thick: blue for a few, red for many. Tap it for a count, double-tap to zoom in. Off: numbered discs instead, each standing for the pins under it.'),
+    tog('heat','Zoomed out, show a heat map','Off: numbered discs, each standing for the pins under it; tap one to open it up. On: colour shows where places are thick, blue for a few, red for many; tap it for a count, double-tap to zoom in.'),
     tog('pinchStand','Smooth pinching','While two fingers are down the pins are shown as one picture that stretches with the map, and they come back when you let go. Off: every pin is moved on its own, which is slow where places are thick.'),
     pick('dbl','A double tap on the map zooms in',[[1,'One step'],[2,'Two steps'],[3,'Three steps'],[4,'Four steps']],'A double tap on a pin goes straight to street level.'),
     tog('hideGone','Hide places with nothing to see','Takes places marked "Nothing visible" or "Marker only" off the map, the Places list and the Near tab. Choosing either one in Filters still shows them. Drowned places stay: something can show at low water.'),
@@ -2564,7 +2564,7 @@ function renderDetail(s){
   if(s.look) st.append(el('p',null,el('b',{text:'Look for: '}),s.look));
   if(s.hook) st.append(el('p',{class:'hook',text:s.hook}));
   if(s.story||s.look||s.hook||s.fr) v.append(st);
-  v.append(visitSection(s));
+  v.append(visitSection(s)); if(!s.mine) v.append(problemSection(s));
   /* mine */
   const sv=el('span',{class:'note-saved',text:''});
   const stSel=el('select',{id:'my-status',onchange:e=>{ if(e.target.value) U.status[s.id]=e.target.value; else delete U.status[s.id]; save(); syncMarkers(); sv.textContent='Saved'; }},Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})));
@@ -2722,17 +2722,18 @@ const SHARE={gh:'https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new',
   ent:{kind:'entry.1512318193',place:'entry.1603685238',where:'entry.1784127289',text:'entry.245411565',source:'entry.1131631114',access:'entry.2120312031'}};
 const cut=(t,n)=>{ t=String(t||''); return t.length>n?t.slice(0,n-1)+'…':t; };
 /* f: {place, where, text, source, access} for a lead; for a visit also {id, when, found, spot} */
-function shareText(kind,f){ return (kind==='visit'?['Visit report for the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Visited: '+(f.when||''),'Found: '+(f.found||''),'What is there: '+(f.text||''),'Access as found: '+(f.access||''),'True spot: '+(f.spot||'the pin is right, or not known')]
+function shareText(kind,f){ if(kind==='problem') return ['A problem with a place on the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Problem: '+(f.reason||''),'More: '+(f.text||'')].join('\n');
+  return (kind==='visit'?['Visit report for the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Visited: '+(f.when||''),'Found: '+(f.found||''),'What is there: '+(f.text||''),'Access as found: '+(f.access||''),'True spot: '+(f.spot||'the pin is right, or not known')]
     :['A place for the Lost & Hidden Atlas','Place: '+(f.place||''),'Where: '+(f.where||''),'What I know: '+(f.text||''),'Source or how I know: '+(f.source||''),'Can the public go there: '+(f.access||'')]).join('\n'); }
 function shareLinks(kind,f){ const q=o=>Object.keys(o).filter(k=>o[k]).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(cut(o[k],1500))).join('&');
-  const gh=SHARE.gh+'?'+(kind==='visit'
+  const gh=SHARE.gh+'?'+(kind==='problem'?q({template:'problem.yml',title:'Problem: '+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),problem:f.reason,more:f.text}):kind==='visit'
     ?q({template:'visit.yml',title:'Visit: '+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),when:f.when,found:f.found,there:f.text,access:f.access,spot:f.spot})
     :q({template:'lead.yml',title:'Lead: '+cut(f.place||'a place',80),place:f.place,where:f.where,know:f.text,source:f.source}));
   let form='';
   if(SHARE.form&&SHARE.ent.place){ const e=SHARE.ent, o={}; const put=(k,v)=>{ if(e[k]&&v) o[e[k]]=v; };
-    put('kind',kind==='visit'?'A visit report':'A place I know about'); put('place',f.place+(kind==='visit'&&f.id?' ('+f.id+')':''));
-    put('where',kind==='visit'?[f.when?'Visited '+f.when:'',f.spot?'true spot '+f.spot:''].filter(Boolean).join('; '):f.where);
-    put('text',kind==='visit'?[f.found,f.text].filter(Boolean).join('. '):f.text); put('source',f.source); put('access',f.access);
+    put('kind',kind==='problem'?'A problem with a place':kind==='visit'?'A visit report':'A place I know about'); put('place',f.place+(kind!=='lead'&&f.id?' ('+f.id+')':''));
+    put('where',kind==='problem'?'':kind==='visit'?[f.when?'Visited '+f.when:'',f.spot?'true spot '+f.spot:''].filter(Boolean).join('; '):f.where);
+    put('text',kind==='problem'?['Problem: '+(f.reason||''),f.text].filter(Boolean).join('. '):kind==='visit'?[f.found,f.text].filter(Boolean).join('. '):f.text); put('source',f.source); put('access',f.access);
     form=SHARE.form+(SHARE.form.indexOf('?')<0?'?':'&')+'usp=pp_url&'+q(o); }
   return {gh:gh,form:form}; }
 /* one link that sends a spot, coordinates already filled in: from a field-log note or a long press on the map */
@@ -2741,7 +2742,7 @@ const WHICH=()=>el('p',{class:'which',text:'My places stay on this device. The p
 function spotLink(name,la,lo,text,label){ const L=shareLinks('lead',{place:name||'',where:(+la).toFixed(5)+', '+(+lo).toFixed(5),text:text||'',source:'I was there',access:''}); return ext(L.form||L.gh,label||'Send this spot to the public Atlas','btn sm spot-send'); }
 function shareBox(kind,f){ const L=shareLinks(kind,f), cp=el('button',{class:'btn sm',type:'button'},'Copy as text'); cp.addEventListener('click',()=>copy(shareText(kind,f),cp));
   return el('div',{class:'sharebox'},
-    el('p',{class:'snote',style:'display:block',text:(kind==='visit'?'Send this report':'Send this place')+' so the map can be corrected for everyone. A page opens with it filled in; nothing is sent until you press Submit there. What you send is public, so leave out anything private. Reports are checked before the map changes.'}),
+    el('p',{class:'snote',style:'display:block',text:(kind==='problem'?'Send this':kind==='visit'?'Send this report':'Send this place')+' so the map can be corrected for everyone. A page opens with it filled in; nothing is sent until you press Submit there. What you send is public, so leave out anything private. Reports are checked before the map changes.'}),
     el('div',{class:'row'},
       L.form?ext(L.form,'Send it (no account needed)','btn pri share-form'):null,
       ext(L.gh,L.form?'Post it on GitHub':'Post it on GitHub (free account)','btn sm share-gh'),cp)); }
@@ -2751,6 +2752,16 @@ function shareBox(kind,f){ const L=shareLinks(kind,f), cp=el('button',{class:'bt
    (Settings, Your data) and tools/visits.py turns that into a list of corrections to pins, texts and the LiDAR ledger. */
 const VISIT={found:'Found it',else:'Something else is there',nothing:'Nothing there',blocked:'Could not get to it'};
 let visitOpen=null;      /* {id, i} while a report is being written or edited; i is its place in the list, -1 for a new one */
+/* "Report a problem with this place" (the owner, November 24, 2026, after meeting a modern church among the old buildings): the place is
+   not what the Atlas is for, is gone or changed, has its pin or a fact wrong. Not a visit report: nobody has to have been there.
+   It goes the way the other reports go (the form or a GitHub issue, kind "A problem with a place") and waits in the same inbox. */
+const PROBLEMS=['Not what the Atlas is for','It is gone, or has changed','The pin is in the wrong spot','A fact is wrong','Something else'];
+function problemSection(s){ const d=el('details',{class:'sec pad prob',id:'prob'},el('summary',{text:'Report a problem with this place'})), out=el('div',{id:'prob-out'});
+  const note=el('input',{type:'text',id:'prob-note',placeholder:'One line more, if you like',maxlength:'300','aria-label':'More about the problem'});
+  const sync=()=>{ const w=d.querySelector('input[name=prob-why]:checked'); out.replaceChildren(); if(w) out.append(shareBox('problem',{place:s.name+(s.town?', '+s.town:''),id:s.id,reason:w.value,text:note.value.trim()})); };
+  d.append(el('p',{class:'snote',style:'display:block',text:'Tell whoever keeps the map. You need not have been there.'}),
+    el('div',{class:'probwhy'},...PROBLEMS.map(t=>{ const i=el('input',{type:'radio',name:'prob-why',value:t}); i.addEventListener('change',sync); return el('label',null,i,' '+t); })),note,out);
+  note.addEventListener('input',debounce(sync,200)); return d; }
 function visitSection(s){ if(!U.visits) U.visits={}; const list=U.visits[s.id]||[], pin=pos(s), sec=el('div',{class:'sec pad',id:'visits'},el('h3',{text:'Visit reports'}));
   const dist=at=>hav(pin.lat,pin.lon,at[0],at[1])*1609.344, far=m=>KM()?Math.round(m)+' m':Math.round(m*3.28084)+' ft';
   list.forEach((r,i)=>{ if(visitOpen&&visitOpen.id===s.id&&visitOpen.i===i) return;
@@ -3083,6 +3094,7 @@ function goSync(v,auto){ const g=$('#goto'); goSeq++; const c=readCoords(v);
   if(v.length<3){ g.hidden=true; g.replaceChildren(); return false; }
   g.hidden=false; g.replaceChildren(goRow('Find <b>'+esc(v)+'</b> on the map: street, town or address',()=>goLook(v))); return false; }
 try{ window.__atlasGo={read:readCoords}; }catch(e){}
+try{ window.__atlasSet=(k,v)=>setPref(k,v); }catch(e){}      /* for the tests: a setting changed as the Settings sheet changes it */
 $('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
 $('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });
 /* the Filters button opens the panel under the search box and shows how many filters are on (the search box is not counted) */
