@@ -32,7 +32,7 @@ STATES=[
   'regions':[('pae','Philadelphia & southeast Pennsylvania'),('pane','Northeast Pennsylvania & the Poconos'),('pac','Central Pennsylvania'),('paw','Western Pennsylvania')],
   'hubs':[('harr','Harrisburg',40.2732,-76.8867),('phil','Philadelphia',39.9526,-75.1652),('pitt','Pittsburgh',40.4406,-79.9959)]},
  {'k':'mo','name':'Missouri','imagery':'fallback (Esri satellite and world hillshade)','owners':'not built','legal':False,
-  'regions':[('kcmo','Kansas City, Missouri')],
+  'regions':[('kcmo','Kansas City, Missouri'),('mo','Missouri outside Kansas City')],      # mo: St. Louis, Springfield, the river towns and the Ozarks, added November 24, 2026 when a Carnegie pass had nowhere to file them
   'hubs':[('kc','Kansas City',39.0997,-94.5786)]},
  # ---- 'fallback' below means Esri satellite for the aerial. LiDAR in every US state comes from the USGS 3DEP service from
  #      zoom 16 (the world hillshade below that); the Canadian provinces have the world hillshade only.
