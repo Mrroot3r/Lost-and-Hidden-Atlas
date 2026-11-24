@@ -11,6 +11,16 @@ def PL(path,label): return ['Placeography: '+label,'https://placeography.net/'+p
 LIB='Still the public library.'
 SPPL='Mon 12–8; Tue 10–8; Wed 12–8; Thu 10–8; Fri–Sat 10–5:30; Sun closed.'
 PLACES=[
+N('grand-rapids-carnegie-library-mn','Old Grand Rapids Carnegie Library, now the Carnegie Business Center','Grand Rapids','mn','civic','standing',47.23729,-93.52723,'exact','view','walk','','1905–2002',
+  "A brick library with stone trim, opened in February 1906 with a $10,000 grant. A WPA remodelling of 1938 gave it an Art Deco front, and an expansion of 1971 by Williams and O'Brian closed in almost all of the old building. The library moved out in 2002 and it holds offices now, as the Carnegie Business Center. Little of the first building shows from outside.",
+  'Most of the 1906 building is wrapped inside the 1971 expansion.',
+  '','21 5th Street NE. Offices: look from the street.',
+  [PL('Grand_Rapids_Public_Library,_21_5th_Street_North_East,_Grand_Rapids,_Minnesota','Grand Rapids'),L],brick='?'),
+N('hamline-carnegie-library-mn','Hamline University Carnegie Library entrance, in the Giddens Learning Center','St. Paul','mn','civic','standing',44.96577,-93.16527,'exact','view','walk','','1906–',
+  "The college library Hamline University built with a $30,000 Carnegie grant, designed by Clarence H. Johnston and finished in 1907; James J. Hill and Governor Johnson came to lay the cornerstone. In 1972 parts of it were taken down and a modern building was put up around the old entrance. What survives is that entrance: the main arches greet visitors, and the foyer keeps the first round columns and fanlights. The building is the Giddens Learning Center now, with admissions, classrooms, an auditorium and a gallery.",
+  'The 1907 arches, columns and fanlights at the entrance, inside the 1972 building.',
+  '','1536 Hewitt Avenue, on the Hamline campus. Look from the street; hours were not found.',
+  [['The Oracle (Hamline): Hamline\'s library','https://www.nokohaha.com/2021/07/13/hamlines-library/'],['Placeography: Giddens Learning Center','https://placeography.net/Giddens_Learning_Center,_1536_Hewitt_Avenue,_Saint_Paul,_Minnesota'],['Hamline University: Giddens Learning Center','https://www.hamline.edu/about/virtual-tour/giddens-learning-center/'],L],brick='?'),
 N('madison-carnegie-library-mn','Madison Carnegie Library','Madison','mn','civic','standing',45.01247,-96.19365,'exact','open','walk','','1905–',
   "A Classical Revival library by Ralph D. Church, opened on January 22, 1906, with a polygonal iron-clad dome on a flat roof. Its first librarian was also its janitor. A large addition went on the back in 2001 and 2002. Still the public library, and on the National Register since 1985.",
   'Tan and dark brown brick with Kasota stone trim, and the small dome.',
@@ -193,6 +203,8 @@ N('zumbrota-carnegie-library-mn','Zumbrota Carnegie Library','Zumbrota','mn','ci
   [W('Zumbrota Public Library'),PL('Zumbrota_Carnegie_Library,_320_East_Avenue,_Zumbrota,_Minnesota','Zumbrota'),L],brick='?'),
 ]
 PIN_NOTES={
+  'grand-rapids-carnegie-library-mn':'On the building, from the address, checked on the aerial.',
+  'hamline-carnegie-library-mn':'On the building, from the address, checked on the aerial.',
   'madison-carnegie-library-mn':'On the building, from the address, checked on the aerial.',
   'mankato-carnegie-library-mn':'From the address; the aerial here is too blurred to see the building.',
   'mapleton-carnegie-library-mn':'On the building, from the address, checked on the aerial.',

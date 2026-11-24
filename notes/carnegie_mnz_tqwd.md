@@ -2,13 +2,15 @@
 state: Minnesota
 region: mn
 date: 2026-11-24
-places: 32
+places: 34
 file: data_carnegie_mnz_tqwd.py
 
 
 ## What this batch is
 
-Carnegie libraries of Minnesota, public towns M to Z (32 places): 25 standing buildings and 7 sites of torn-down ones, from Wikipedia's state list, Placeography's Minnesota Carnegie Libraries Tour pages, National Register forms, local papers and the operators' own sites. Hours only from the operators' pages.
+Carnegie libraries of Minnesota, public towns M to Z (34 places): 27 standing buildings and 7 sites of torn-down ones, from Wikipedia's state list, Placeography's Minnesota Carnegie Libraries Tour pages, National Register forms, local papers and the operators' own sites. Hours only from the operators' pages.
+
+It also adds two left out of the A to L batch, on the owner's word: Grand Rapids, whose 1906 library is mostly wrapped in a 1971 expansion, and Hamline University's library, of which only the 1907 entrance survives inside a 1972 building. Each place says what is left.
 
 ## What was not checked
 
