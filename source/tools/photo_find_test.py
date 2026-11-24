@@ -65,6 +65,11 @@ ro=getattr(pf,'refused',lambda j:None)
 ok('a reply from Commons that carries an error is a refusal, not "no photographs here"',ro({'error':{'code':'ratelimited'}})is True and ro({'batchcomplete':True})is False and ro({'query':{'pages':[]}})is False)
 # ---- a research session looks for pictures for its own new places (November 20, 2026) ----
 na=getattr(pf,'no_article',lambda p:None)
+# A link to one of Wikipedia's lists ("List of Carnegie libraries in Wisconsin") is not the place's own article: the page takes no
+# picture from a list (wikiTitle() in app.js), so such a place waits for a look like any place with no article. Until November 24,
+# 2026 the finder counted the list as an article and 28 Wisconsin libraries were never offered a search.
+ok('a place whose only Wikipedia link is a list has no article of its own',na({'links':[['Wikipedia: List of Carnegie libraries in Wisconsin','https://en.wikipedia.org/wiki/List_of_Carnegie_libraries_in_Wisconsin']]}) is True and na({'links':[['Register listings','https://en.wikipedia.org/wiki/National_Register_of_Historic_Places_listings_in_Dane_County,_Wisconsin']]}) is True and na({'links':[['Category','https://en.wikipedia.org/wiki/Category:Carnegie_libraries']]}) is True)
+ok('a place with its own article beside the list still has one',na({'links':[['list','https://en.wikipedia.org/wiki/List_of_Carnegie_libraries_in_Wisconsin'],['own','https://en.wikipedia.org/wiki/Carnegie_Free_Library_(Sturgeon_Bay,_Wisconsin)']]}) is False)
 ok('a new place with no Wikipedia article is one to look for a picture for',na({'links':[['Old mill (National Register nomination)','https://npgallery.nps.gov/x']]})is True and na({'links':[]})is True and na({})is True)
 ok('one with an article is left to its article',na({'links':[['Wikipedia: Old Mill','https://en.wikipedia.org/wiki/Old_Mill'],['Other','https://example.org']]})is False)
 pn=getattr(pf,'new_places',lambda P,done:None)

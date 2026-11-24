@@ -44,7 +44,7 @@ Choices go in tools/pics_<four letters>.py (PICS = {place id: (address, width, h
 day chosen, how it was found)} or ('', day, why, which search) for "none fits"), which tools/make.py folds into
 data/photos.json. A "none" recorded under an earlier, narrower search is asked again (SEARCH). A picture from a place's own
 Wikipedia article still wins. Nothing is copied but an address and a credit. Test: tools/photo_find_test.py."""
-import sys,os,re,json,math,time,html,random,datetime,glob,importlib
+import sys,os,re,json,math,time,html,random,datetime,glob,importlib,urllib.parse
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE)
 UA={'User-Agent':'lost-hidden-atlas-photos/1.0 (https://github.com/Mrroot3r/Lost-and-Hidden-Atlas)'}
 API='https://commons.wikimedia.org/w/api.php'
@@ -245,7 +245,15 @@ def rank(C,nw,town):
     return sorted(C,key=key)
 def no_article(p):
     """a place with no Wikipedia article of its own: the page has no article picture to show, so a session looks for one"""
-    return not any('en.wikipedia.org/wiki/' in str(l[1] if isinstance(l,(list,tuple)) and len(l)>1 else l) for l in (p.get('links') or []))
+    # by the rule the page itself uses (wikiTitle() in app.js, title_of() in photos.py): a link to one of Wikipedia's lists, to a Register
+    # listings page or to a Category is not the place's article, and the page takes no picture from it
+    for l in (p.get('links') or []):
+        m=re.match(r'https?://en\.(?:m\.)?wikipedia\.org/wiki/([^#?]+)',str(l[1] if isinstance(l,(list,tuple)) and len(l)>1 else l) or '')
+        if not m: continue
+        t=urllib.parse.unquote(m.group(1)).replace('_',' ')
+        if re.match(r'(list of|lists of|national register of historic places listings)',t,re.I) or ':' in t: continue
+        return False
+    return True
 def new_places(P,done,nopic=()):
     """of one batch's places, those a research session should look for a picture for: something still there, no answer yet, and either
     no article or (nopic) an article that turned out to have no picture the Atlas may show"""
