@@ -14,7 +14,7 @@ Eleven places on the east side of Kansas City, Missouri: the 18th and Vine distr
 | Heim Fire Station No. 20 | 2701 Guinotte Ave, Kansas City, MO (39.1192, -94.5491) | Register-listed 2024; vacant; beside the Heim plant | State Parks nomination PDF would not open (404 live, archive not fetchable): no date or description read |
 | Independence Boulevard Christian Church | Kansas City, MO (39.1058, -94.5463) | Register-listed 2015 | No source read |
 | St. Stephen Baptist Church | 39.0953, -94.5650 | Register-listed 2026 | No source read |
-| Spofford Home for Children; Seven Oaks School; Sanford B. Ladd School; Linwood Presbyterian Church | East side of Kansas City, MO | Register listings, 2012 to 2021 | No source read |
+| Seven Oaks School; Linwood Presbyterian Church | East side of Kansas City, MO | Register listings, 2012 to 2021 | No source read |
 | Byram's Ford, Santa Fe Trail swales, Walt Disney House (Bellefontaine) | Kansas City, MO | Register listings | Disney house and swales not on the Atlas; no source read |
 
 ## Tips
