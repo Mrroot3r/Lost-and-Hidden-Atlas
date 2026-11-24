@@ -1,0 +1,111 @@
+# November 24, 2026: La Crosse, Wisconsin. Fifteen standing buildings and sites in the city, taken as leads from the
+# names in one walk-through video and then each checked in sources opened for this batch: the Wisconsin Historical
+# Society's Architecture and History Inventory records, Wikipedia read as raw text (and the La Crosse County Register
+# list), the La Crosse Public Library Archives' architecture blog, the Oak Grove Cemetery's own tour page, the
+# Wisconsin Historical Society's 2024 notice of the cemetery's listing, WIZM news, and the pages of the Franciscan
+# Sisters of Perpetual Adoration and of Christ Episcopal Church. Nothing in an entry comes from the video.
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+
+BATCH={'key':'lacrosse_dcyv','label':'La Crosse, Wisconsin: churches, breweries and downtown blocks','added':'2026-11-24 11:43'}
+
+LC_NR=W('National Register of Historic Places listings in La Crosse County, Wisconsin')
+def AHI(n,label): return L('Wisconsin Historical Society property record: '+label,'https://www.wisconsinhistory.org/Records/Property/HI'+n)
+ROM=L('La Crosse Public Library Archives: Religious Romanesque','https://archives.lacrosselibrary.org/blog/architectural-styles-and-revivals-religious-romanesque/')
+
+PLACES=[
+N('st-james-church-la-crosse','St. James Catholic Church','La Crosse','wi','worship','standing',43.83941,-91.24613,'exact','view','drive','','1900–1901',
+  "A brick Romanesque Revival parish church on the north side, built in 1900 and 1901 after the parish's first frame church burned in 1900. Andrew Roth was the architect. The parish was set up in the 1880s (the state record gives both 1884 and 1886).",
+  look="Red brick (from Winona) banded and outlined in white brick (from Merrimac) round the arched windows, the blind arcades and the front gable, with two unequal towers: one with a pyramid roof, the taller one domed with a belfry. The first stained glass came from a La Crosse art-glass firm. A 2016 survey found it little changed since 1996. Interior not checked.",
+  accn="Active Catholic parish church on Caledonia Street; seen from the street. Service times not checked from the parish's own page. St. Clara's Convent, built for the parish, is next door to the north.",
+  links=[AHI('33584','St. James Catholic Church'),ROM],conf='mixed',brick='yes',hours='?'),
+N('st-clara-convent-la-crosse',"St. Clara's Convent",'La Crosse','wi','worship','standing',43.83979,-91.24652,'exact','view','drive','','1893',
+  "A two-storey red brick convent built in 1893 by St. James parish, which used it as its school after the church burned in 1900. The sisters left in 1986, and in 1988 the building was made into a home and offices.",
+  look="Red brick with white stone belt courses, round-arched windows, paired brackets under the eaves and a pedimented porch and gable in the middle of the front. The front door was moved to the sides of the porch in the 1988 remodelling and the gabled dormers are gone. A 2016 survey found the outside much as in 1996.",
+  accn="Private home and offices next to St. James Church: look from Caledonia Street only.",
+  links=[AHI('33588',"St. Clara's Convent"),AHI('33584','St. James Catholic Church')],brick='yes',hours=''),
+N('christ-episcopal-church-la-crosse','Christ Episcopal Church','La Crosse','wi','worship','standing',43.81192,-91.24433,'exact','open','drive','','1898–1899',
+  "An Episcopal church of white limestone from Grandad Bluff trimmed in red sandstone, built in 1898 and 1899 to replace the parish's wooden church on the same corner. M. S. Detweiler designed it and died before it was finished. The state record says it was built in the hope of becoming the cathedral of a new western Wisconsin diocese; it was listed on the National Register in 1985.",
+  look="Romanesque Revival: a 92-foot square entrance tower with an octagonal roof and open belfry on short Corinthian columns, a second square tower, a rose window in the west gable and a round-arched Tiffany window in the south transept. Interior not checked beyond those windows.",
+  accn="Active parish at Ninth and Main streets (its address is 111 Ninth Street North). Anyone may come to the Sunday service; times from the parish's own page.",
+  links=[W('Christ Episcopal Church (La Crosse, Wisconsin)'),AHI('29573','Christ Church of La Crosse'),L('Christ Episcopal Church','https://ceclax.org'),LC_NR],brick='no',hours='Sunday 9 a.m. Holy Eucharist'),
+N('mary-of-the-angels-chapel-la-crosse','Mary of the Angels Chapel (St. Rose Convent)','La Crosse','wi','worship','standing',43.80422,-91.24413,'exact','open','drive','','1901–1906',
+  "The chapel of the Franciscan Sisters of Perpetual Adoration at St. Rose of Viterbo Convent, their motherhouse since 1871. The Register gives the chapel to Eugene R. Liebert, built 1901 to 1906; it is on the National Register as Maria Angelorum Chapel. The convent's original building was gutted by fire in 1923.",
+  look="Romanesque inside and out: Corinthian columns, Bavarian stained glass, and altars of Italian marble with onyx pillars and mosaics of Venetian glass and mother of pearl, per the sisters' page. Guided tours show the interior.",
+  accn="Owned by the Franciscan Sisters of Perpetual Adoration. Tour visitors use the entrance at 701 Franciscan Way. The sisters' page said the chapel closes for restoration from November 30, 2026 to March 2027 with no tours January to March; groups of eight or more book by email through the sisters' page.",
+  links=[W('St. Rose of Viterbo Convent'),L('FSPA: Tours and Mass','https://fspa.org/content/chapel/tours-and-mass'),ROM,LC_NR],brick='?',hours='Closed for restoration Nov 30, 2026 to March 2027; tours (April to Nov 21) Fri and Sat 9 to 10:45 a.m. and 1 to 2:45 p.m.'),
+N('mcmillan-building-la-crosse','McMillan Building','La Crosse','wi','civic','standing',43.81247,-91.25099,'exact','view','walk','','1886',
+  "A five-storey Romanesque Revival office and shop block at Fourth and Main, built in 1886 to a design by Long & Kees of Minneapolis. A brown marble front put on the ground floor around the early 1960s has since been taken off, showing the original entrance again.",
+  look="Four wide round arches each spanning three storeys of windows, a row of square windows along the fifth storey, and a thick-arched entrance on stubby columns in rough-faced stone.",
+  accn="Private commercial building downtown: seen from Main and Fourth streets.",
+  links=[L('La Crosse Public Library Archives: Romanesque Revival commercial buildings','https://archives.lacrosselibrary.org/blog/architectural-styles-and-revivals-romanesque-revival-commercial-buildings')],brick='no',hours=''),
+N('solberg-building-la-crosse','Charles B. Solberg Building','La Crosse','wi','civic','standing',43.81200,-91.25286,'exact','view','walk','','1870',
+  "Built in 1870 as Charles Solberg's grocery and enlarged in 1876 and 1880 for his wholesale trade. Drs. Adolf Gundersen and Christen Christensen had their office here in the 1890s, the beginning of the Gundersen clinic. The state record calls it the most elaborate Italianate commercial building downtown.",
+  look="A projecting metal cornice with brackets and medallions, carved round-arched stone window heads on the third floor and floral-carved flat heads on the second, an iron stair outside; the shop front has been altered. It stands in the La Crosse Commercial Historic District.",
+  accn="Private building at 127-129 South Third Street, in the downtown historic district: seen from the street.",
+  links=[AHI('32147','Charles B. Solberg Building'),W('La Crosse Commercial Historic District')],brick='no',hours=''),
+N('wesley-methodist-church-la-crosse','First Methodist Church (Wesley United Methodist)','La Crosse','wi','worship','standing',43.81032,-91.24562,'exact','view','walk','','1886',
+  "Dedicated in August 1886 as the First Methodist Episcopal Church, now Wesley United Methodist. The state record calls it the oldest Protestant church in La Crosse still serving the same denomination, and one of the city's four most important 19th-century churches. It was damaged by fire in 1922; an annex was added in 1907 and a modern wing in 1953.",
+  look="Brick Victorian Romanesque: a massive square entrance tower with a pyramid roof, rose windows in the gable ends, blind arches over stained glass windows and white stone accents. A 2017 survey found it much as in 1996. Interior not checked.",
+  accn="Active church at 721 King Street: seen from the street. Service times not checked from the church's own page.",
+  links=[AHI('32999','First Methodist Episcopal Church')],brick='?',hours='?'),
+N('emmanuel-lutheran-church-la-crosse','Emmanuel Lutheran Church','La Crosse','wi','worship','standing',43.84047,-91.24573,'exact','view','drive','','1906–1908',
+  "A cream-brick Gothic Revival church built by north-side German Lutherans who had left the south side's First German Lutheran church. The state record dates it from map evidence: begun in 1906, finished by 1908 or 1909. Albert J. Gutzke was the builder.",
+  look="Paired square towers with six-sided tops and stepped buttresses flank the front, with pointed-arch doors, a large Tudor-arched window above them and stained glass windows. Interior not checked.",
+  accn="Active church at Avon and St. Paul streets on the north side: seen from the street. Service times not checked from a page that names this church's address.",
+  links=[AHI('33509','Evangelical Immanuel Lutheran Church')],brick='no',hours='?'),
+N('first-lutheran-church-west-ave-la-crosse','First Evangelical Lutheran Church','La Crosse','wi','worship','standing',43.80754,-91.23961,'site','view','walk','','1904',
+  "A brick Romanesque Revival church at West and Cameron avenues, built in 1904 to a design by Andrew Roth Jr. and Hugo Schick for a German Lutheran congregation formed in 1859.",
+  look="Red brick. Two towers of different heights flank the gable, with stone trim; the taller has an open octagonal lantern under a pointed octagonal dome. Three stone entrance arches on carved capitals, three great windows above them and a Palladian window high in the gable. Interior not checked.",
+  accn="Church at West and Cameron avenues (400 West Avenue South): seen from the street. Who uses the building now and its service times were not checked.",
+  links=[ROM,L('La Crosse Public Library Archives: First Evangelical Lutheran Church records','https://lplarchives.libraryhost.com/repositories/2/resources/807')],conf='mixed',brick='yes',hours=''),
+N('losey-memorial-arch-la-crosse','Losey Memorial Arch','La Crosse','wi','landmark','standing',43.81826,-91.23548,'exact','public','walk','','1901–1902',
+  "The limestone gateway to Oak Grove Cemetery, built in memory of Joseph W. Losey (1834–1901), a lawyer and long-time head of the cemetery association. Hugo Schick and Andrew Roth designed it on the model of the Arch of Constantine and the Crosby and Hynne Granite Company built it. The state record gives 1901; the cemetery says it was dedicated on Memorial Day 1902.",
+  look="A wide middle arch for the cemetery drive with a narrower walkers' arch each side, limestone on a darker sandstone base. A fountain once stood nearby; it was wrecked by vandals and taken away in the 1940s.",
+  accn="At the southwest entrance of Oak Grove Cemetery on La Crosse Street; the cemetery association owns it. The cemetery's own self-guided walking tour starts here.",
+  links=[AHI('42198','Losey Memorial Arch'),L('Oak Grove Cemetery: Losey Memorial Arch','https://www.oakgrovecemetery.com/?p=374'),LC_NR],conf='mixed',brick='no',hours=''),
+N('oak-grove-cemetery-la-crosse','Oak Grove Cemetery','La Crosse','wi','burial','standing',43.81920,-91.23400,'area','public','walk','','1850s',
+  "A rural-style cemetery of about 80 acres. It began as a private secular burying ground called Wautonga (the cemetery gives 1852 as its founding); the Oak Grove Cemetery Association took it over in 1872 and laid it out with winding drives and planting. It has a community mausoleum of 1912 and memorials to Governor C. C. Washburn, Joseph Losey and Civil War veterans, and was listed on the National Register in December 2023.",
+  look="Family mausoleums, the 1912 community mausoleum, and a wide range of 19th- and early 20th-century monuments; the Heileman family grave is on the cemetery's walking tour.",
+  accn="Owned by the Oak Grove Cemetery Association, 1407 La Crosse Street; enter by the Losey Arch. Visiting hours were not given on its page.",
+  links=[L('Wisconsin Historical Society: Oak Grove Cemetery listed on the National Register','https://wisconsinhistory.org/Records/Article/CS17098'),L('Oak Grove Cemetery','https://www.oakgrovecemetery.com/'),LC_NR],brick='?',hours='?'),
+N('main-hall-uw-la-crosse','Main Hall, La Crosse State Normal School','La Crosse','wi','civic','standing',43.81348,-91.22999,'site','view','walk','','1908–1909',
+  "The first building of the La Crosse State Normal School, a college for training teachers that grew into the University of Wisconsin–La Crosse. Van Ryn & DeGelleke designed it and it was built in 1908 and 1909 for $260,000; for the school's first eleven years it held everything. It now holds the chancellor's offices, classrooms and a 600-seat auditorium.",
+  look="Brick, in a restrained classical manner: pilasters at the entrances, massive end piers, a short octagonal tower on the west side, white masonry bands and segmental-arched windows with keystones.",
+  accn="On the University of Wisconsin–La Crosse campus at State Street; seen from the campus walks. Inside visits and parking rules not checked.",
+  links=[W('Main Hall/La Crosse State Normal School'),AHI('29574','Main Hall / La Crosse State Normal School'),LC_NR],brick='yes',hours=''),
+N('gund-bottling-works-la-crosse','Gund Brewing Company Bottling Works','La Crosse','wi','industry','standing',43.79200,-91.24318,'exact','view','drive','','1903',
+  "A bottling plant built in 1903 for John Gund's Empire Brewery, designed by the brewery architect Louis Lehle with up-to-date washing and pasteurising machines. It is on the National Register and has been made into apartments, the Gund Brewery Lofts. Gund founded the Empire Brewery in 1872; it burned in 1897, was rebuilt, and Heileman took it over in 1920.",
+  look="Nearby on South Avenue and Sims Place stand other Gund buildings: the 1902 stable later used as the armory, and a four-storey racking and wash house with round-arched windows and a tower.",
+  accn="Private apartments at 2130 South Avenue: seen from the street.",
+  links=[W('Gund Brewing Company Bottling Works'),AHI('33476','John Gund Brewery Racking and Wash House'),W('La Crosse Armory'),LC_NR],brick='?',hours=''),
+N('heileman-old-brewery-la-crosse','Old Gund and Heileman brewery (City Brewery offices)','La Crosse','wi','industry','standing',43.80231,-91.25310,'site','view','drive','','1850s',
+  "The limestone middle section of the brewery offices on South Third Street is the last part of the stone brewery that John Gund and Gottlieb Heileman began in the 1850s, the start of the Heileman company. The state record gives 1857 for the founding and calls the 1859 business the Buck Brewery; Heileman ran it alone after Gund left in 1871. The brick office wing with its corner tower dates from 1886.",
+  look="Three stone bays in the middle with carved stone and metal plaques and red brick round the windows; a three-storey brick section with a corner tower, stone quoins and a pediment; stained glass on the first floor.",
+  accn="Working brewery premises on South Third Street: seen from the street.",
+  links=[AHI('32181','Heilemann Brewery')],conf='mixed',brick='some',hours=''),
+N('exchange-state-bank-la-crosse','Exchange State Bank and Masonic hall','La Crosse','wi','civic','standing',43.83586,-91.24794,'exact','view','drive','','1880s',
+  "The first bank in north La Crosse, with a Masonic hall joined to it, at Rose and St. Cloud streets. WIZM gives the building as 1887; other accounts give 1884, and this was not settled. The city bought it in 2016 as Buzz's Bike Shop and sought a buyer to restore it, having put over $300,000 into it.",
+  look="The corner bank building of the 1880s; how much of the Masonic part still stands was not checked.",
+  accn="At 800 Rose Street; a business occupied it when this was written (not checked). Seen from the street.",
+  links=[L('WIZM: City hoping someone will restore old Buzz\'s Bike Shop','https://www.wizmnews.com/2015/12/07/city-hoping-someone-will-restore-old-buzz-s-bike-shop/'),L('WIZM: Old Buzz\'s Bike Shop worth more than just dollars','https://www.wizmnews.com/2016/03/27/old-buzz-s-bike-shop-worth-more-than-just-dollars-to-la-crosse/')],conf='mixed',brick='?',hours=''),
+]
+
+PIN_NOTES={
+ 'st-james-church-la-crosse':'OpenStreetMap outline of the church (it gives the parish address, 1032 Caledonia Street; the state record gives 1102); the plain address point fell in the street.',
+ 'st-clara-convent-la-crosse':'Address point for 1120 Caledonia Street.',
+ 'christ-episcopal-church-la-crosse':'Address point for 831 Main Street, the address the state record gives.',
+ 'mary-of-the-angels-chapel-la-crosse':'OpenStreetMap point for the chapel, inside the convent block; the 901 Franciscan Way address point is about 40 m southeast.',
+ 'mcmillan-building-la-crosse':'Address point for 401 Main Street.',
+ 'solberg-building-la-crosse':'Address point for 127 South Third Street.',
+ 'wesley-methodist-church-la-crosse':'Address point for 721 King Street.',
+ 'emmanuel-lutheran-church-la-crosse':'Address point for 1201 Avon Street.',
+ 'first-lutheran-church-west-ave-la-crosse':'The address lookup for 400 West Avenue put it 800 m north on the wrong block; the church stands at West and Cameron avenues, so the pin is on the building at the southwest corner of that crossing that throws a tall tower shadow on the aerial. Wikimedia Commons photographs of the church are placed in this part of town.',
+ 'losey-memorial-arch-la-crosse':'OpenStreetMap point for the arch on La Crosse Street; the cemetery address point was on the office building about 60 m west.',
+ 'oak-grove-cemetery-la-crosse':'In the cemetery grounds, northeast of the arch.',
+ 'main-hall-uw-la-crosse':'Address point for 1725 State Street, the address the state record gives.',
+ 'gund-bottling-works-la-crosse':'Address point for 2130 South Avenue.',
+ 'heileman-old-brewery-la-crosse':'Address point for 1111 South Third Street, the brewery premises.',
+ 'exchange-state-bank-la-crosse':'Address point for 800 Rose Street.',
+}
