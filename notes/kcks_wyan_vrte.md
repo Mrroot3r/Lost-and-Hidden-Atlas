@@ -12,10 +12,9 @@ Fourteen places in Kansas City, Kansas (Wyandotte County), where the Atlas had o
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
 | White Feather Spring | Argentine, Kansas City, KS (39.0717, -94.6736 register point, on house lots) | National Register 1975; Wikipedia says private property, home and death place of the Shawnee Prophet, 1836 | where the spring is; no public way in |
-| St. Augustine Hall | 3301 Parallel Ave, Kansas City, KS (39.1275, -94.6689) | National Register 1971, college building; no Wikipedia article under that title | a source saying what it is and what stands |
 | Brotherhood Block, Kansas City, KS YMCA, Town House Hotel, Granada neighbours | downtown Kansas City, KS (39.1165, -94.6293) | National Register 2014 and 2019 listings, 1910 to 1951 | read the register summaries; pins |
-| Welborn Community Congregational Church, Whittier, Horace Mann and Lowell schools, Wyandotte High, Roy Williamson House (Edwardsville), Bonner Springs High School | Wyandotte County | register summaries read, all standing | pins, photos, access |
-| Simmons Funeral Home, Saint Margaret's Hospital, Judge Louis Gates House, H.W. Gates Funeral Home | Kansas City, KS | register summaries read | pins, photos |
+| Welborn Community Congregational Church, Whittier, Horace Mann and Lowell schools, Roy Williamson House (Edwardsville) | Wyandotte County | register summaries read, all standing | pins, photos, access |
+| Simmons Funeral Home, Saint Margaret's Hospital, H.W. Gates Funeral Home | Kansas City, KS | register summaries read | pins, photos |
 
 ## Tips
 - The Kansas Historical Society register search takes county code WY for Wyandotte; six pages of ten.
