@@ -19,8 +19,6 @@ The Carnegie libraries of Minnesota in towns A to L: 26 places, from Wikipedia's
 
 ## Leads not finished
 
-- Hamline University's Carnegie library (1536 Hewitt Ave, St. Paul): only the 1907 entrance survives, inside a 1972 modern building, so it was left out under the no-modernist rule. A person could judge it.
-- Grand Rapids (21 5th St NE): the Carnegie building is almost wholly enclosed by a 1938 front and a 1971 expansion; left out.
 - West Duluth branch (torn down 1992): site not found.
 - Hibbing (closed 1954, torn down later): site on 3rd Avenue SW not pinned down; its murals are at the First Settlers Museum.
 - Lake City (Carnegie-Tryon library, razed 1966 or 1967): exact site not settled.
