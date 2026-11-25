@@ -11,7 +11,6 @@ Twenty standing places in Douglas County, Kansas, that the earlier batches (ks_k
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| John Kelly Stone Building | 777 N 1750 Rd, Lawrence, KS | State Register 2021: a limestone farm building rebuilt stone by stone, on a farmstead with Oregon-California Trail ruts | Whether the public can see it, and a precise pin |
 | Fernand-Strong House | 1515 University Dr, Lawrence, KS | Register 2008: Italianate frame house, c. 1872, once lived in by Chancellor Strong and James Naismith | Not written up; a source on its use today |
 | Samuel Riggs House, Shalor Eldridge House, Benedict House | Lawrence, KS | Register houses (Italian Villa; Greek Revival; Stick/Eastlake) | Descriptions beyond the style |
 | Oregon-California Trail segments at First Methodist Church | 867 US-40, Lawrence, KS | Register summary read | Public access |
