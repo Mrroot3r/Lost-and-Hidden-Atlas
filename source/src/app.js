@@ -62,7 +62,7 @@ const debounce=(f,ms)=>{ let t; return function(){ const a=arguments; clearTimeo
 
 /* ---------- your saved data (this browser only) ---------- */
 const LS='lost-hidden-atlas-v1';
-const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],mute:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:false,canal:false,rail:false},split:0}});
+const U0=()=>({v:1,home:{id:'alb'},status:{},notes:{},moved:{},custom:[],trip:[],fav:[],mute:[],visits:{},saved:{},dtc:null,me:{},logs:[],last:null,ui:{base:'streets',year:'Latest',light:'nw',hist:true,histOp:0.8,sort:'time',land:false,lots:false,leads:false,lines:{oldrail:false,canal:false,rail:false},split:0,yrs:false}});
 let U=U0(), storeOK=true;
 try{ const raw=localStorage.getItem(LS); if(raw){ const j=JSON.parse(raw); U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); U.ui.lines=Object.assign(U0().ui.lines,(j.ui||{}).lines||{}); if(U.ui.base==='lidar1') U.ui.base='lidar'; if(!U.me||typeof U.me!=='object') U.me={}; } }catch(e){ storeOK=false; }
 /* ---- settings (the gear in the map options sheet). Stored in U.set; anything missing falls back to SET0. ---- */
@@ -229,7 +229,7 @@ function match0(s){
   if(F.now&&!s.now) return false;
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
-  if(F.y0||F.y1){ const y=yearOf(s); if(!y||(F.y0&&y<F.y0)||(F.y1&&y>F.y1)) return false; }      /* the year it dates from, within the range asked for; a place with no year is left out, not guessed */
+  if(F.y0||F.y1){ const y=yearOf(s); if(y<0){ if(F.y0||!F.y1||-y>F.y1) return false; } else if(!y||(F.y0&&y<F.y0)||(F.y1&&y>F.y1)) return false; }      /* the year it dates from, within the range asked for; a place with no year is left out, not guessed */
   if(F.fav&&!isFav(s.id)) return false;
   if(F.tip&&!s.tip) return false;      /* a place that began as a reader's tip carries the day it was sent */
   if(F.brick&&s.bk!=='y'&&s.bk!=='s') return false;      /* red brick: bk is y (mostly), s (some), n (none); absent when nobody has looked */
@@ -243,7 +243,11 @@ function match0(s){
 /* The year a place dates from: the earliest year in its "years" text ("1764", "c. 1750–1924", "1840s", "18th century").
    Text that opens with what ended it ("razed 1962", "flooded 1950s") gives none: that year is not when it was built. */
 const YEAR=new Map();
+/* The year a place dates from: the first year in its dates. 0: none known. A NEGATIVE number: the dates begin "before 1900" or "by
+   1800", so no year is known, only the latest it can be (-1899, -1800). Such a place answers "up to a year" and never a range with a
+   first year, and is in no bar of the chart: a LiDAR find dated "before 1900–after 1946" was being listed under 1900 to 1915. */
 function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.years||''); let y=0;
+  { const b=/^\s*(before|by|pre-?)\s*(1[5-9]\d\d|20[0-2]\d)/i.exec(t); if(b){ y=-(+b[2]-(/^by$/i.test(b[1])?0:1)); YEAR.set(s.id,y); return y; } }
   if(!/^\s*(razed|burned|flooded|filled|piped|closed|demolished|drowned|lost|gone|removed)/i.test(t)){
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
@@ -272,6 +276,24 @@ function chipGroup(label,map,set,colors){
   });
   g.append(box); return g;
 }
+/* The bar of years (the owner, November 24, 2026): shut until asked for, behind one word on the count line, so it adds no clutter.
+   Open, it is one bar a span of years for whatever is listed: 50 years across centuries, 25 across a couple, a decade across about
+   one, and single years inside a decade or so. A tap on a bar sets the year range to it (the same two numbers as in Filters), and
+   the bars then show that span more finely: 50 years, then decades, then years, which is how to see what one town built in one year.
+   Places with no year, or only "before ...", are in no bar and are counted in the caption. */
+function yearSpan(lo,hi){ const d=hi-lo+1; return d<=12?1:d<=130?10:d<=300?25:50; }
+function yearsBar(){ const box=$('#yrs'), btn=$('#yrs-btn'); if(!box||!btn) return; const open=!!U.ui.yrs; btn.setAttribute('aria-expanded',String(open)); box.hidden=!open; box.replaceChildren(); if(!open) return;
+  const ys=[]; let none=0; visible.forEach(s=>{ const y=yearOf(s); if(y>0) ys.push(y); else none++; }); box.dataset.none=String(none);
+  const on=!!(F.y0||F.y1), all=el('button',{class:'linkbtn yall',type:'button',hidden:on?null:'',onclick:()=>{ F.y0=0; F.y1=0; refresh(); }},'All years');
+  if(!ys.length){ box.append(el('p',{class:'ycap'},'None of these places has a year. ',all)); return; }
+  let lo=Math.min(...ys), hi=Math.max(...ys); if(F.y0) lo=Math.min(lo,F.y0); if(F.y1) hi=Math.max(hi,F.y1);
+  const st=yearSpan(lo,hi), a0=Math.floor(lo/st)*st, bars=[]; for(let a=a0;a<=hi;a+=st) bars.push({a:a,z:a+st-1,n:0});
+  ys.forEach(y=>{ bars[Math.floor((y-a0)/st)].n++; }); const max=Math.max(...bars.map(b=>b.n)), row=el('div',{class:'ybars'});
+  bars.forEach(b=>{ const lab=st===1?String(b.a):st===10?b.a+'s':String(b.a), sel=on&&F.y0===b.a&&F.y1===b.z;
+    row.append(el('button',{class:'ybar',type:'button','data-a':String(b.a),'data-z':String(b.z),'data-n':String(b.n),'aria-pressed':String(sel),disabled:b.n?null:'',title:(st===1?b.a:b.a+' to '+b.z)+': '+b.n+(b.n===1?' place':' places'),
+      onclick:()=>{ if(sel){ F.y0=0; F.y1=0; } else { F.y0=b.a; F.y1=b.z; } refresh(); }},
+      el('span',{class:'ynum',text:b.n?String(b.n):''}),el('span',{class:'yfill',style:'height:'+(b.n?Math.max(3,Math.round(46*b.n/max)):0)+'px'}),el('span',{class:'ylab',text:lab}))); });
+  box.append(row,el('p',{class:'ycap'},(on?(F.y0&&F.y1?(F.y0===F.y1?String(F.y0):F.y0+' to '+F.y1):F.y0?'From '+F.y0:'Up to '+F.y1)+'. ':'')+'Tap a bar to narrow to it.'+(none?' '+none+(none===1?' place has':' places have')+' no year.':'')+' ',all)); }
 /* after a change to the year range: the list, the map and the counts, without rebuilding the panel the reader is typing in */
 function yearApply(){ renderList(); syncMarkers(); syncFcount(); const d=$('#f-done'); if(d) d.textContent='Show '+visible.length+(visible.length===1?' place':' places'); const c=$('#f-clear-top'); if(c) c.hidden=!activeCount(); }
 function buildFilters(){
@@ -345,6 +367,7 @@ function renderList(){
   syncFcount();
   $('#count').textContent=visible.length+' of '+sites().length+' places';
   { const fd=$('#f-done'); if(fd) fd.textContent='Show '+visible.length+(visible.length===1?' place':' places'); }
+  yearsBar();
   const lc=$('#linechip'); lc.textContent=''; lc.hidden=!F.line; if(F.line){ lc.append(el('span',{class:'chip','aria-pressed':'true'},el('span',{class:'sw',style:'--c:'+LK[F.line.k][1]}),'Along '+F.line.label,el('button',{type:'button',class:'x','aria-label':'Stop following this line',onclick:()=>{setLine(null);refresh();}},'✕'))); }
   /* places that fit the search and the filters but are kept off by the setting: say so, or a search for one looks like a gap in the Atlas */
   const hid=pref('hideGone')?sites().filter(s=>goneHid(s)&&match0(s)).length:0;
@@ -3111,6 +3134,7 @@ try{ window.__atlasSet=(k,v)=>setPref(k,v); }catch(e){}      /* for the tests: a
 $('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
 $('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });
 /* the Filters button opens the panel under the search box and shows how many filters are on (the search box is not counted) */
+$('#yrs-btn').addEventListener('click',()=>{ U.ui.yrs=!U.ui.yrs; save(); yearsBar(); });
 $('#fclear').addEventListener('click',()=>{ clearF(); $('#q').value=''; goSync(''); refresh(); });      /* beside the count: clear without opening the panel and scrolling to its foot */
 $('#filt-btn').addEventListener('click',()=>{ const d=$('#filters'); d.open=!d.open; syncFcount(); });
 $('#sort').addEventListener('change',e=>{ U.ui.sort=e.target.value; save(); renderList(); });
