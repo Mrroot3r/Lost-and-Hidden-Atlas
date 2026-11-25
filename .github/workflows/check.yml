@@ -74,7 +74,14 @@ jobs:
           if gh api "repos/$GITHUB_REPOSITORY/issues/$PR/labels" --jq '.[].name' | grep -qx 'hold'; then echo "Labelled hold. It waits for the owner."; exit 0; fi
           gh api -X POST "repos/$GITHUB_REPOSITORY/labels" -f name='not double-checked' -f color='fbca04' -f description='Research that merged by itself: nobody has looked at its pins and sources a second time' > /dev/null 2>&1 || true
           gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$PR/labels" -f 'labels[]=not double-checked' > /dev/null
-          gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$PR/merge" -f merge_method=merge -f sha="$SHA" > /dev/null
+          # GitHub now and then answers the merge with a 502 (November 25, 2026: a Kansas batch sat open for hours, and its open pull
+          # request kept the hourly research off Kansas). Ask up to four times; a try that did merge, whatever it answered, ends the asking.
+          for i in 1 2 3 4; do
+            if gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$PR/merge" -f merge_method=merge -f sha="$SHA" > /dev/null; then break; fi
+            if [ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR" --jq .merged)" = "true" ]; then break; fi
+            if [ "$i" = 4 ]; then echo "The merge was refused four times."; exit 1; fi
+            sleep $((i*20))
+          done
           echo "Merged #$PR as research only, labelled not double-checked."
           # a merge made by a workflow starts no other workflow, so ask for the site build by name
           gh workflow run site.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "Started the site build."
