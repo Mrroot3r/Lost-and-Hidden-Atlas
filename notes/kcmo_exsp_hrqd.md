@@ -11,7 +11,6 @@ Fifteen standing places in Excelsior Springs, Kearney, Smithville, Missouri City
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Boarding House District | Excelsior Springs, MO | National Register 2017 (ref 100002791); coordinates withheld | A source locating it and saying what survives |
 | Claybrook House | Kearney, MO (39.388, -94.336) | c. 1858 Federal frame house; Wikipedia says a 2002 controlled burn destroyed it, so gone | Confirm nothing remains |
 | Liberty courthouse-square districts, Major Hotel, Miller Building (1868), IOOF Liberty Lodge No. 49 | Liberty, MO | National Register 1992 listings, brick fronts | Sources for what each now is and its hours |
 | Mt. Memorial Cemetery, Aker Cemetery | Liberty and Smithville, MO | National Register listings | Reading of their forms |

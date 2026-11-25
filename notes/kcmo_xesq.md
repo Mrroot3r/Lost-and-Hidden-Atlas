@@ -13,7 +13,6 @@ Thirteen standing buildings: nine in downtown Excelsior Springs (the Atlas had o
 |---|---|---|---|
 | The Oaks (rebuilt Snapp Hotel, 1913) | Excelsior Springs, MO | ACHP page: built 1913 after a fire, burned again in 1991, rebuilt 2005-2007 as 38 senior apartments. | A street address or a pin; the sources found give none. |
 | Snapp's Hotel (117-119 South Street) and Ideal Hotel | Excelsior Springs, MO | Named in the West district form as notable hotels of the 1900s. | A source for their present state and pin check. |
-| Boarding House District | Excelsior Springs, MO | National Register listing 100002791, no coordinates on Wikipedia. | The form and boundary. |
 | Arthur-Leonard and Dougherty-Prospect Heights districts | Liberty, MO | National Register districts, no coordinates or articles. | Forms and a reason to pick a building in each. |
 
 ## Tips
