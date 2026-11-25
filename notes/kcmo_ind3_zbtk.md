@@ -11,7 +11,6 @@ Seven National Register houses in Independence that the two earlier passes left 
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Blue Mills (gristmill 1834, sawmill 1835) | Little Blue River, 3101 Lentz Rd, Independence, MO (about 39.1576, -94.3093, an address point only) | Santa Fe Trail provisioning point, mills in ruins by the 1920s (Santa Fe Trail Historic Sites page); on the Register 1994 | Whether anything is visible on the ground, who owns it, where a visitor may stand |
 | Bailey Family Farm Historic District | SW corner of Bailey and Ranson Rds, Lee's Summit, MO (38.8958, -94.3414) | Register 2006, Prairie School farm; a realty page says the farmstead is being built over | The nomination text (the state PDF 404s) and what still stands |
 | Englewood Theater | 10917 E. Winner Rd, Independence, MO | Opened 1949, Register 2024-25, Streamline Moderne; nonprofit now plans a restoration (JCHS, KSHB) | Left out as possibly mid-century modern under rule 8; the owner may decide |
 | Woodson-Sawyer House ("Araby West") | 1604 W. Lexington, Independence, MO | Italianate brick house of about 1866 per its marker (search summary only) | A page of its own to read |
