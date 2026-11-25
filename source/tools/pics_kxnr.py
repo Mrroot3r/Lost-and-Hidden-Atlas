@@ -1,0 +1,15 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'bertrand-rockwell-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8e/Bertrand_Rockwell_House_01.jpg/960px-Bertrand_Rockwell_House_01.jpg', 900, 405, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Bertrand_Rockwell_House_01.jpg', '2026-11-25', 'pin+name'),
+ 'charles-s-keith-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/Charles_S._Keith_House.jpg/960px-Charles_S._Keith_House.jpg', 900, 405, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Charles_S._Keith_House.jpg', '2026-11-25', 'pin+name'),
+ 'dr-generous-henderson-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Dr_Generous_Henderson_House_Kansas_City_MO.jpg/960px-Dr_Generous_Henderson_House_Kansas_City_MO.jpg', 900, 680, 'User:Charvex', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Dr_Generous_Henderson_House_Kansas_City_MO.jpg', '2026-11-25', 'pin+name'),
+ 'emily-rockwell-love-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Emily_Rockwell_Love_House_01.jpg/960px-Emily_Rockwell_Love_House_01.jpg', 900, 406, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Emily_Rockwell_Love_House_01.jpg', '2026-11-25', 'pin+name'),
+ 'epperson-house-kc-mo':('', '2026-11-25', 'campus buildings, a window and other UMKC halls, not the mansion', 3),
+ 'floyd-jacobs-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b1/Jacobs_Floyd_House_01.jpg/960px-Jacobs_Floyd_House_01.jpg', 900, 406, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Jacobs_Floyd_House_01.jpg', '2026-11-25', 'pin+name'),
+ 'house-5011-sunset-drive-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/House_at_5011_Sunset_Drive_02.jpg/960px-House_at_5011_Sunset_Drive_02.jpg', 900, 406, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:House_at_5011_Sunset_Drive_02.jpg', '2026-11-25', 'pin+name'),
+ 'mack-b-nelson-house-kc-mo':('', '2026-11-25', 'only a different house (Hunter Gary House) 132 m away', 3),
+ 'mary-rockwell-hook-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Mary_Rockwell_Hook_House_01.jpg/960px-Mary_Rockwell_Hook_House_01.jpg', 900, 405, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Mary_Rockwell_Hook_House_01.jpg', '2026-11-25', 'pin'),
+ 'robert-ostertag-house-kc-mo':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Robert_Ostertag_House.jpg/960px-Robert_Ostertag_House.jpg', 900, 406, 'Roseisuppose', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Robert_Ostertag_House.jpg', '2026-11-25', 'pin+name'),
+ 'tom-pendergast-house-kc-mo':('', '2026-11-25', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+}
