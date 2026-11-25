@@ -21,5 +21,5 @@ Facts come from Clio's West Bottoms Walking Tour pages and its Richards and Cono
 ## Tips
 - Clio's tour pages (theclio.com/tour/3025/<n>, n = 1 to 31) open with tools/page.py --all and give year, builder, later tenants and current use for every West Bottoms building: a fast way to a batch.
 - The Esri geocoder gives each West Bottoms address a point on the right block but sometimes the wrong one (a gas station; the same point for two addresses). Look at every pin.
-- Of 18 places sent to photo_find, Commons had a likely picture for six. The Commons photographer Mwkruse photographed most Kansas City Register listings; his files are named for the building.
+- Of 18 places sent to photo_find, Commons had a likely picture for seven. The Commons photographer Mwkruse photographed most Kansas City Register listings; his files are named for the building.
 - Many National Register districts and buildings in "Kansas City other" are plain apartment blocks; the list is a poor guide to what is worth a visit.
