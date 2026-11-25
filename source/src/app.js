@@ -204,7 +204,7 @@ async function fetchDT(){
    map is, and is never hidden as "nothing to see". Filters has "My favourites" to list them. */
 const isFav=id=>Array.isArray(U.fav)&&U.fav.indexOf(id)>=0;
 function favToggle(s){ if(!Array.isArray(U.fav)) U.fav=[]; const i=U.fav.indexOf(s.id); if(i>=0) U.fav.splice(i,1); else U.fav.push(s.id); save(); refresh(); return i<0; }
-const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,tip:false,before:0,fresh:'',my:'any',hideDone:false};
+const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,tip:false,y0:0,y1:0,fresh:'',my:'any',hideDone:false};
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
@@ -229,7 +229,7 @@ function match0(s){
   if(F.now&&!s.now) return false;
   if(F.lead&&!(s.conf==='lead'||s.conf==='mixed'||s.prec==='area')) return false;
   if(F.oldmap&&!s.tm) return false;
-  if(F.before){ const y=yearOf(s); if(!y||y>=F.before) return false; }      /* a place with no year it dates from is left out, not guessed */
+  if(F.y0||F.y1){ const y=yearOf(s); if(!y||(F.y0&&y<F.y0)||(F.y1&&y>F.y1)) return false; }      /* the year it dates from, within the range asked for; a place with no year is left out, not guessed */
   if(F.fav&&!isFav(s.id)) return false;
   if(F.tip&&!s.tip) return false;      /* a place that began as a reader's tip carries the day it was sent */
   if(F.brick&&s.bk!=='y'&&s.bk!=='s') return false;      /* red brick: bk is y (mostly), s (some), n (none); absent when nobody has looked */
@@ -248,21 +248,17 @@ function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.y
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
   YEAR.set(s.id,y); return y; }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.before?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
-function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.fav=false;F.before=0;F.fresh='';F.my='any';F.hideDone=false; }
+function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.y0||F.y1?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); { const fc=$('#fclear'), ct=$('#f-clear-top'); if(fc) fc.hidden=!activeCount(); if(ct) ct.hidden=!activeCount(); } $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.fav=false;F.y0=0;F.y1=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 const BATCHES=D.batches||[];
+/* Five shortcuts (the owner, November 24, 2026: the row had become clutter). Gone: ruins you can walk to and within 30 minutes (the Near
+   tab does that), standing from before 1800 (the year range does), and the two that only repeated a chip under Kind of place. */
 const PRESETS=(BATCHES.length?[['Newest: '+BATCHES[BATCHES.length-1].label,()=>{ F.fresh=BATCHES[BATCHES.length-1].key; }]]:[]).concat([
   ['My favourites',()=>{ F.fav=true; }],
-  ['Ruins you can walk to',()=>{ F.st.add('ruins');F.st.add('traces');F.acc.add('public'); }],
-  ['Standing, from before 1800',()=>{ F.st.add('standing'); F.before=1800; }],
   ['Red brick',()=>{ F.brick=true; }],
-  /* with no start place there is nothing to count 30 minutes from: it used to switch on, show "Filters 1" and leave every place in the list */
-  ['Within 30 min',()=>{ if(!fromOK()){ banner('Say where you start first: "Use my location" or "Choose a place" on the Places tab. Drive times count from there.',true,8000); return; } F.max=30; }],
   ['Changing now',()=>{ F.now=true; }],
-  ['Places of worship',()=>{ F.cat.add('worship'); }],
-  ['Houses, bridges & landmarks',()=>{ F.cat.add('landmark'); }],
   ['Pins to confirm',()=>{ F.lead=true; }]
 ]);
 function chipGroup(label,map,set,colors){
@@ -276,25 +272,38 @@ function chipGroup(label,map,set,colors){
   });
   g.append(box); return g;
 }
+/* after a change to the year range: the list, the map and the counts, without rebuilding the panel the reader is typing in */
+function yearApply(){ renderList(); syncMarkers(); syncFcount(); const d=$('#f-done'); if(d) d.textContent='Show '+visible.length+(visible.length===1?' place':' places'); const c=$('#f-clear-top'); if(c) c.hidden=!activeCount(); }
 function buildFilters(){
   const fb=$('#fbody'); fb.textContent='';
+  /* the way back, first: on a phone the panel is several screens long and its own Clear button is at the foot */
+  fb.append(el('div',{class:'row fclear-top'},el('button',{class:'btn sm',type:'button',id:'f-clear-top',hidden:activeCount()?null:'',onclick:()=>{clearF();$('#q').value='';goSync('');refresh();}},'Clear all filters')));
   /* shortcuts: each clears the filters and sets one common combination */
   fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Shortcuts'}),el('div',{class:'chips',id:'presets'},PRESETS.map(p=>el('button',{class:'chip',type:'button',onclick:()=>{clearF();$('#q').value='';p[1]();refresh();}},p[0])))));
   fb.append(chipGroup("What's left to see",STS,F.st));
   fb.append(chipGroup('Kind of place',CAT,F.cat,true));
   const reg=el('select',{id:'f-reg',onchange:e=>{F.reg=e.target.value;refresh();}},el('option',{value:'',text:'All regions'}),STATES.map(st=>{ const used=st.regions.filter(r=>BASE.some(x=>x.reg===r[0])); return used.length?el('optgroup',{label:st.name},used.map(r=>el('option',{value:r[0],text:r[1]}))):null; }));
   reg.value=F.reg;
-  const max=el('select',{id:'f-max',onchange:e=>{F.max=+e.target.value;refresh();}},[[0,'Any drive'],[15,'15 min or less'],[30,'30 min or less'],[45,'45 min or less'],[60,'1 hour or less'],[90,'1½ hours or less'],[120,'2 hours or less']].map(o=>el('option',{value:String(o[0]),text:o[1]})));
+  const max=el('select',{id:'f-max',onchange:e=>{ /* with no start place there is nothing to count minutes from: it used to switch on, show "Filters 1" and leave every place in the list */
+      if(+e.target.value&&!fromOK()){ e.target.value='0'; banner('Say where you start first: "Use my location" or "Choose a place" on the Places tab. Drive times count from there.',true,8000); return; } F.max=+e.target.value;refresh();}},[[0,'Any drive'],[15,'15 min or less'],[30,'30 min or less'],[45,'45 min or less'],[60,'1 hour or less'],[90,'1½ hours or less'],[120,'2 hours or less']].map(o=>el('option',{value:String(o[0]),text:o[1]})));
   max.value=String(F.max);
   fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'Region'}),reg),el('label',{class:'field'},el('span',{text:'Drive time'}),max)));
   fb.append(chipGroup('Access',ACC,F.acc));
   fb.append(chipGroup('Effort',EFF,F.eff));
   const my=el('select',{id:'f-my',onchange:e=>{F.my=e.target.value;refresh();}},el('option',{value:'any',text:'Any'}),Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})),el('option',{value:'mine',text:'Places I added'}));
   my.value=F.my;
-  const bef=el('select',{id:'f-before',onchange:e=>{F.before=+e.target.value;refresh();}},[[0,'Any age'],[1700,'Before 1700'],[1750,'Before 1750'],[1800,'Before 1800'],[1850,'Before 1850'],[1900,'Before 1900']].map(o=>el('option',{value:String(o[0]),text:o[1]})));
-  bef.value=String(F.before);
   fb.append(el('div',{class:'row'},el('label',{class:'field'},el('span',{text:'My progress'}),my)));
-  fb.append(el('label',{class:'field'},el('span',{text:'Dates from'}),bef));
+  /* the year a place dates from (yearOf: the first year in its dates), as a range: either end may be left empty. The quick picks only
+     fill the two boxes. Typing waits a moment before the list is made again, and the panel is not rebuilt under the fingers. */
+  const AGES=[['','Any age'],['0-1699','Before 1700'],['0-1799','Before 1800'],['1800-1849','1800 to 1849'],['1850-1899','1850 to 1899'],['1900-1919','1900 to 1919'],['1920-1945','1920 to 1945'],['1946-0','After 1945']];
+  const yBox=(id,k,ph)=>{ const i=el('input',{type:'text',inputmode:'numeric',maxlength:'4',id:id,placeholder:ph,'aria-label':ph+' year',value:F[k]?String(F[k]):''});
+    i.addEventListener('input',debounce(()=>{ const v=+i.value.replace(/\D/g,''); F[k]=(v>=1000&&v<=2100)?v:0; ageSync(); yearApply(); },350)); return i; };
+  const age=el('select',{id:'f-age','aria-label':'Quick picks for the years',onchange:e=>{ if(e.target.value==='own') return; const m=e.target.value.split('-'); F.y0=+m[0]||0; F.y1=+m[1]||0; $('#f-y0').value=F.y0?String(F.y0):''; $('#f-y1').value=F.y1?String(F.y1):''; yearApply(); }},AGES.map(a=>el('option',{value:a[0],text:a[1]})));
+  /* years typed by hand that match no quick pick: the list says so, where it would otherwise go on saying "Any age" */
+  const own=el('option',{value:'own',text:'The years typed',hidden:''}); age.append(own);
+  const ageSync=()=>{ const k=(F.y0||0)+'-'+(F.y1||0), hit=AGES.some(a=>a[0]===k); own.hidden=hit||!(F.y0||F.y1); age.value=!(F.y0||F.y1)?'':hit?k:'own'; };
+  ageSync();
+  fb.append(el('div',{class:'field'},el('span',{text:'Dates from (years)'}),el('div',{class:'yrow'},yBox('f-y0','y0','from'),el('span',{text:'to'}),yBox('f-y1','y1','to'),age)));
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
   fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('My favourites','fav'),tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('Sent in by readers','tip'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
@@ -2090,7 +2099,11 @@ function pinIcon(s,far,dx,dy){      /* far: a favourite while the numbered discs
    A cell of the screen with four or more pins becomes a disc; the selected place always keeps its own pin. */
 const CLUSZ=9, HEATZ=9, CLUSPX=58, CLUSMIN=4;      /* HEATZ was 8 for a day (pins from zoom 9): round Albany that put 1,350 pins on the map and a pinch crawled, so the owner had it put back (November 22, 2026) */
 const clusSize=n=>{ const st=n<10?0:n<30?1:n<100?2:n<300?3:4; return [st,[30,36,42,46,52][st]]; };      /* a disc's colour step and width by its count */
-function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>(pref('heat')?HEATZ:CLUSZ)) return null;      /* the heat and the discs give way to pins at the same step, zoom 10 */
+/* When a search or a filter leaves few places, every one is its own pin however far out the map is: the discs and the heat stand in
+   for a crowd, and FEWPINS pins is no crowd for a phone (the owner, November 24, 2026). With nothing narrowed the rule does not apply. */
+const FEWPINS=400;
+function clusterPlan(show){ if(!pref('cluster')||map.getZoom()>(pref('heat')?HEATZ:CLUSZ)) return null;
+  if(activeCount()>0&&visible.length<=FEWPINS) return null;      /* the heat and the discs give way to pins at the same step, zoom 10 */
   if(pref('heat')) return heatPlan(show);
   const z=map.getZoom(), cells=new Map();
   sites().forEach(s=>{ if(!show.has(s.id)||(sel&&sel.id===s.id)||isFav(s.id)) return; const p=pos(s), q=map.project([p.lat,p.lon],z), k=Math.floor(q.x/CLUSPX)+','+Math.floor(q.y/CLUSPX);
@@ -3098,6 +3111,7 @@ try{ window.__atlasSet=(k,v)=>setPref(k,v); }catch(e){}      /* for the tests: a
 $('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
 $('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });
 /* the Filters button opens the panel under the search box and shows how many filters are on (the search box is not counted) */
+$('#fclear').addEventListener('click',()=>{ clearF(); $('#q').value=''; goSync(''); refresh(); });      /* beside the count: clear without opening the panel and scrolling to its foot */
 $('#filt-btn').addEventListener('click',()=>{ const d=$('#filters'); d.open=!d.open; syncFcount(); });
 $('#sort').addEventListener('change',e=>{ U.ui.sort=e.target.value; save(); renderList(); });
 $('#sort').value=U.ui.sort||'time';

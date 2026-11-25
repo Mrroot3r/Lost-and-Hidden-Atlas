@@ -24,7 +24,7 @@ const { chromium } = require('playwright');
     await p.click('#filt-btn'); ok(name+': Filters opens the panel',await vis('#fbody')&&await p.evaluate(()=>document.querySelector('#filt-btn').getAttribute('aria-expanded')==='true'));
     ok(name+': the shortcuts are inside it',await vis('#presets')&&await p.evaluate(()=>document.querySelectorAll('#presets .chip').length>=4));
     const look=sel=>p.evaluate(sel=>{ const n=document.querySelector(sel), s=getComputedStyle(n); return s.backgroundColor+'|'+s.color+'|'+s.fontWeight; },sel);
-    const chip='#fbody .fgrp:nth-child(2) .chip:nth-child(1)', off=await look(chip); await p.click(chip); await p.waitForTimeout(250); const on=await look(chip);
+    const chip='#fbody .fgrp:nth-child(3) .chip:nth-child(1)', off=await look(chip); await p.click(chip); await p.waitForTimeout(250); const on=await look(chip);
     const lum=c=>{ const m=c.match(/\d+(\.\d+)?/g).map(Number).slice(0,3).map(v=>{ v/=255; return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4); }); return 0.2126*m[0]+0.7152*m[1]+0.0722*m[2]; };
     const cr=(a,b)=>{ const x=lum(a),y=lum(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05); };
     ok(name+': a switched-on filter is plainly different from one that is off',cr(on.split('|')[0],off.split('|')[0])>=3,'fill contrast '+cr(on.split('|')[0],off.split('|')[0]).toFixed(1));
@@ -62,14 +62,21 @@ const { chromium } = require('playwright');
       await p.setViewportSize(vp); await p.waitForTimeout(500);
       const n=await p.evaluate(()=>{ const mo=document.querySelector('#lbar .lmore'), sc=document.querySelector('#lscroll'); return {hidden:mo.hidden,more:sc.scrollWidth>sc.clientWidth+4}; });
       ok(name+': narrowed again, it is back',!n.more||!n.hidden,JSON.stringify(n)); }
-    // the age filter: "Standing, from before 1800" lists standing places whose years begin before 1800, and no others
+    // the year range (the owner, November 24, 2026: "search a specific date year-wise or date range"): from and to, or a quick pick
     { await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
-      await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(b=>b.textContent==='Standing, from before 1800').click(); }); await p.waitForTimeout(300);
-      const r=await p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), by={}; D.sites.forEach(x=>{ by[x.id]=x; });
-        const rows=[...document.querySelectorAll('#list li button[data-id]')].map(b=>by[b.dataset.id]); const yr=x=>{ const t=String(x.years), c=/(\d\d)(st|nd|rd|th) century/i.exec(t); return Math.min(...(t.match(/(1[5-9]\d\d)(?!\d)/g)||['9999']).map(Number),c?(+c[1]-1)*100:9999); };      /* "18th century" is 1700, as yearOf() reads it */
-        return {n:+document.querySelector('#count').textContent.split(' ')[0],rows:rows.length,bad:rows.filter(x=>x.st!=='standing'||yr(x)>=1800).map(x=>x.id+' '+x.years),sel:document.querySelector('#f-before').value,
-          razed:D.sites.filter(x=>/^razed/.test(x.years||'')).length}; });
-      ok(name+': "Standing, from before 1800" lists standing places from before 1800 and no others',r.n>20&&r.rows>0&&r.bad.length===0&&r.sel==='1800',r.n+' listed; wrong: '+(r.bad.slice(0,3).join(', ')||'none')); }
+      const setF=(sel,v,ev)=>p.evaluate(a=>{ const n=document.querySelector(a[0]); n.value=a[1]; n.dispatchEvent(new Event(a[2],{bubbles:true})); },[sel,v,ev]);      /* as the earlier checks here do: the panel may be scrolled out of sight */
+      const yrs=()=>p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), by={}; D.sites.forEach(x=>{ by[x.id]=x; });
+        const yr=x=>{ const t=String(x.years), c=/(\d\d)(st|nd|rd|th) century/i.exec(t); return Math.min(...(t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||['9999']).map(Number),c?(+c[1]-1)*100:9999); };      /* "18th century" is 1700, as yearOf() reads it */
+        const v=window.__atlasNM.visible().filter(x=>by[x.id]).map(x=>yr(by[x.id])); return {n:v.length,lo:Math.min(...v),hi:Math.max(...v),count:+document.querySelector('#count').textContent.split(' ')[0],btn:document.querySelector('#filt-btn').textContent.trim()}; });
+      await setF('#f-y0','1900','input'); await setF('#f-y1','1915','input'); await p.waitForTimeout(500); let r=await yrs();
+      ok(name+': year range 1900 to 1915 lists places that date from those years and no others, and counts as one filter',r.n>20&&r.lo>=1900&&r.hi<=1915&&r.count===r.n&&/1$/.test(r.btn),JSON.stringify(r));
+      await setF('#f-y0','1904','input'); await setF('#f-y1','1904','input'); await p.waitForTimeout(500); r=await yrs();
+      ok(name+': the same year twice is that one year',r.n>0&&r.lo===1904&&r.hi===1904,JSON.stringify(r));
+      await setF('#f-y0','','input'); await p.waitForTimeout(400); r=await yrs();
+      ok(name+': "to" alone is everything up to that year',r.n>100&&r.hi<=1904&&r.lo<1800,JSON.stringify(r));
+      await setF('#f-age','0-1799','change'); await p.waitForTimeout(400); r=await yrs(); const boxes=await p.evaluate(()=>[document.querySelector('#f-y0').value,document.querySelector('#f-y1').value].join('|'));
+      ok(name+': a quick pick fills the two boxes ("Before 1800")',r.n>20&&r.hi<1800&&boxes==='|1799',boxes+' '+JSON.stringify(r));
+      await setF('#f-age','','change'); await p.waitForTimeout(300); }
     // the Red brick shortcut: only places marked yes or some, and the place page says so
     { const want=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.filter(x=>x.bk==='y'||x.bk==='s').length);
       await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
@@ -195,9 +202,10 @@ const { chromium } = require('playwright');
       return {names,dupCol:cols.length-new Set(cols).size,kinds:[...new Set(D.map(x=>x.cat))].length,worship:D.filter(x=>x.cat==='worship').length,churchElsewhere:D.filter(x=>x.cat==='civic'&&/\b(church|meeting ?house|synagogue)\b/i.test(x.name)).map(x=>x.name)}; });
     ok('Filters lists every kind of place, each in a colour of its own',k.names.length===k.kinds&&k.dupCol===0&&k.names.indexOf('Places of worship')>=0&&k.names.indexOf('Downtown losses')<0,k.names.join(' | '));
     ok('churches and meeting houses are filed under Places of worship, not under civic buildings',k.worship>150&&k.churchElsewhere.length<=Math.max(8,k.worship*0.05),k.worship+' places of worship; '+k.churchElsewhere.length+' with church in the name are civic (a church park, a civic centre in an old church): '+k.churchElsewhere.slice(0,3).join('; '));      /* a few are right to stay; many would mean sessions are not using the kind */
-    await p.evaluate(()=>{ [...document.querySelectorAll('#presets .chip')].find(x=>x.textContent==='Places of worship').click(); }); await p.waitForTimeout(350);
+    ok('the shortcuts are the five kept (the owner, November 24, 2026): newest, favourites, red brick, changing now, pins to confirm',await p.evaluate(()=>{ const t=[...document.querySelectorAll('#presets .chip')].map(x=>x.textContent.trim()); return t.length===5&&/^Newest: /.test(t[0])&&t.slice(1).join('|')==='My favourites|Red brick|Changing now|Pins to confirm'; }));
+    await p.evaluate(()=>{ [...document.querySelectorAll('#fbody .fgrp')].find(g=>/Kind of place/.test(g.textContent)).querySelectorAll('.chip').forEach(x=>{ if(x.textContent.trim()==='Places of worship') x.click(); }); }); await p.waitForTimeout(350);
     const w=await p.evaluate(()=>{ const v=window.__atlasNM.visible(); return {n:v.length,other:v.filter(s=>s.cat!=='worship').length}; });
-    ok('the "Places of worship" shortcut lists them and nothing else',w.n===k.worship&&w.other===0,w.n+' listed');
+    ok('the "Places of worship" chip under Kind of place lists them and nothing else',w.n===k.worship&&w.other===0,w.n+' listed');
     ok('kinds of place: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- an older thin pin that a full entry replaced (was=): the pin is gone, a reader's notes moved, and an old link opens the new entry
   { const c=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
@@ -303,9 +311,9 @@ const { chromium } = require('playwright');
   // ---- "Within 30 min" with no start place: there is nothing to count from, so it says so instead of switching on and changing nothing
   { const c=await b.newContext({viewport:{width:412,height:915},deviceScaleFactor:2,hasTouch:true,isMobile:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
     await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(1500);
-    await p.click('#filt-btn'); await p.waitForTimeout(300); await p.click('#presets button:has-text("Within 30 min")'); await p.waitForTimeout(500);
+    await p.click('#filt-btn'); await p.waitForTimeout(300); await p.selectOption('#f-max','30'); await p.waitForTimeout(500);
     const st=await p.evaluate(()=>({ban:(document.querySelector('#banner')||{}).hidden===false?document.querySelector('#banner').textContent:'', btn:document.querySelector('#filt-btn').textContent.trim()}));
-    ok('no start place: "Within 30 min" asks for one and switches no filter on',/where you start/i.test(st.ban)&&!/\d/.test(st.btn),st.btn+' | '+st.ban.slice(0,60));
+    ok('no start place: choosing a drive time asks for one and switches no filter on',/where you start/i.test(st.ban)&&!/\d/.test(st.btn),st.btn+' | '+st.ban.slice(0,60));
     ok('30 minutes: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the heat map (the owner, November 22, 2026: "switch the heat map to the main setting. You can leave the bubbles as a backup").
   //      Zoomed out, colour instead of numbered discs; pins come in one zoom step earlier than they do after the discs.
@@ -376,6 +384,29 @@ const { chromium } = require('playwright');
     ok('drive times: with Boston chosen, Boston\'s file is fetched and no other',seen.join()==='bost',seen.join());
     ok('drive times: and the list then shows a routed time, not an estimate marked ~',row.n>50&&/\d/.test(row.mins)&&!/~/.test(row.mins),JSON.stringify(row));
     ok('drive times: no script errors',x.errs.length===0,x.errs.join(' | ').slice(0,200)); await x.c.close(); }
+  // ---- clearing filters without scrolling, and every pin shown when a search or filter leaves few (the owner, November 24, 2026)
+  { const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+    await c.route(u=>!/^http:\/\/localhost/.test(u.href),r=>r.fulfill({status:204,body:''}));
+    await p.addInitScript(()=>{ try{ localStorage.setItem('lost-hidden-atlas-v1',JSON.stringify({v:1,home:{id:'alb',by:1}})); }catch(e){} });
+    await p.goto(url); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900);
+    const all=await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0]);
+    ok('clear: with no filter on there is nothing to clear by the count',!(await p.evaluate(()=>{ const n=document.querySelector('#fclear'); return !!n&&!n.hidden; })));
+    await p.click('#filt-btn'); await p.waitForTimeout(250);
+    await p.evaluate(()=>{ [...document.querySelectorAll('#fbody .fgrp')].find(g=>/Kind of place/.test(g.textContent)).querySelector('.chip').click(); }); await p.waitForTimeout(350);
+    const top=await p.evaluate(()=>{ const n=document.querySelector('#f-clear-top'), f=document.querySelector('#fbody'); if(!n||n.hidden) return null; return Math.round(n.getBoundingClientRect().top-f.getBoundingClientRect().top); });
+    ok('clear: with a filter on, "Clear all filters" is at the very top of the panel',top!==null&&top<60,top);
+    await p.click('#filt-btn'); await p.waitForTimeout(250);
+    ok('clear: and with the panel shut it is beside the count of places',await p.evaluate(()=>{ const n=document.querySelector('#fclear'), k=document.querySelector('#count'); return !!n&&!n.hidden&&Math.abs(n.getBoundingClientRect().top-k.getBoundingClientRect().top)<30; }));      /* on a narrow phone it wraps to the line under the count */
+    await p.click('#fclear'); await p.waitForTimeout(350);
+    ok('clear: one tap there brings every place back and takes the button away',await p.evaluate(n=>+document.querySelector('#count').textContent.split(' ')[0]===n&&document.querySelector('#fclear').hidden,all));
+    const st=()=>p.evaluate(()=>({clus:document.querySelectorAll('.leaflet-marker-pane .clus').length,pins:document.querySelectorAll('.leaflet-marker-pane .pin').length,n:window.__atlasNM.visible().length}));
+    await p.evaluate(()=>window.__atlasMap.setView([40,-95],4,{animate:false})); await p.waitForTimeout(900); const a0=await st();
+    ok('few: with everything showing, the whole country is numbered discs',a0.clus>5&&a0.n>1000,JSON.stringify(a0));
+    await p.fill('#q','covered bridge'); await p.waitForTimeout(900); const a1=await st();
+    ok('few: a search that leaves a few hundred places or fewer shows every one as its own pin, zoomed right out',a1.n>5&&a1.n<=400&&a1.clus===0&&a1.pins>=Math.min(a1.n,5),JSON.stringify(a1));
+    await p.fill('#q',''); await p.waitForTimeout(900); const a2=await st();
+    ok('few: clearing it brings the discs back',a2.clus>5,JSON.stringify(a2));
+    ok('clear and few: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the search box also goes to a spot: pasted coordinates, a Google Maps link, or a street, town or address looked up when asked
   // (the owner, November 23, 2026: find a street in Google Maps, copy the coordinates, paste them here and be taken there)
   { const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,isMobile:true,hasTouch:true}); const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message)); const asked=[];
