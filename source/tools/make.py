@@ -73,7 +73,7 @@ scripts=('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaf
 os.makedirs(R+'dist',exist_ok=True)
 open(R+'dist/atlas-artifact.html','w').write(head+body+scripts)
 full_scripts=scripts.replace('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>','<script>'+open(R+'cache/leaflet.min.js').read()+'</script>')
-full=('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
+full=('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">\n'
  '<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+head+'</head>\n<body>\n'+body+full_scripts+'</body>\n</html>\n')
 open(R+'dist/Lost-and-Hidden-Atlas.html','w').write(full)
 print(len(S),'sites',len(topo),'topo',len(tk),'toolkit',len(tells),len(rules),'bytes',len(full))
@@ -159,7 +159,7 @@ web_scripts=('<script src="leaflet.js?v=1.9.4"></script>\n'
  '<script type="application/json" id="d-sites">'+js(data)+'</script>\n'
  '<script type="application/json" id="d-base">'+open(R+'build/base.json').read().replace('</','<\\/')+'</script>\n'
  '<script src="app.js?v='+V+'"></script>\n')
-web=('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n<meta name="theme-color" content="#a33a24">\n'
+web=('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">\n<meta name="theme-color" content="#a33a24">\n'
  '<style>:root{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>\n'+head+'</head>\n<body>\n'+body+web_scripts+'</body>\n</html>\n')
 open(WEB+'index.html','w').write(web)
 open(WEB+'.nojekyll','w').write('')

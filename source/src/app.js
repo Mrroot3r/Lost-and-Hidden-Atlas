@@ -764,6 +764,15 @@ function placeSwipe(){ $('#swipe').style.left=(cmp.x*100)+'%'; clipCmp(); }
 const SPLITMAP=220, SPLITLIST=230;      /* 230: the tabs, the search row, the count and the first entry */
 function splitClamp(f,H){ const lo=SPLITMAP/H, hi=1-SPLITLIST/H; return Math.min(Math.max(f,lo),Math.max(lo,hi)); }
 function splitApply(){ const a=$('#app'); if(U.ui.split>0) a.style.setProperty('--split',(U.ui.split*100).toFixed(2)+'%'); else a.style.removeProperty('--split'); }
+/* If the page is magnified all the same (the owner, November 25, 2026: tapping through places, the whole screen "zoomed in a hair and
+   cut off the edges" and would not go back), the Atlas draws itself inside the part of the page that shows: fixed to the visual
+   viewport, at its size. Everything is then a little bigger, as with a larger text setting, and nothing is cut off. At normal size
+   this does nothing; the keyboard coming up changes the height only, not the scale, and is left alone. */
+function vvFit(){ const v=window.visualViewport, a=$('#app'); if(!v||!a) return; const on=v.scale>1.01, was=a.classList.contains('vvfit');
+  if(on){ a.classList.add('vvfit'); a.style.left=v.offsetLeft+'px'; a.style.top=v.offsetTop+'px'; a.style.width=v.width+'px'; a.style.height=v.height+'px'; }
+  else if(was){ a.classList.remove('vvfit'); a.style.left=a.style.top=a.style.width=a.style.height=''; }
+  if((on||was)&&map){ clearTimeout(vvFit.t); vvFit.t=setTimeout(()=>map.invalidateSize({pan:false}),80); } }
+if(window.visualViewport){ visualViewport.addEventListener('resize',vvFit); visualViewport.addEventListener('scroll',vvFit); }
 function setupSplit(){
   splitApply(); const bar=$('#lbar'), app=$('#app'); let st=null, quiet=0;
   const stacked=()=>stage.getBoundingClientRect().bottom<=$('#side').getBoundingClientRect().top+1;      /* not side by side, as a wide window and a phone on its side are */
