@@ -46,6 +46,15 @@ jobs:
           python3 -m http.server 8766 &
           sleep 2
           NODE_PATH="$RUNNER_TEMP/node_modules" node source/tools/smoke.js http://localhost:8766/
+      - name: Retake the front page's first picture when another hundred places are on the map
+        if: steps.build.outputs.changed == 'yes'
+        continue-on-error: true          # a picture that cannot be taken never holds up the site
+        run: |
+          if python3 source/tools/first_picture.py . need; then
+            curl -s -o /dev/null http://localhost:8766/ || { python3 -m http.server 8766 & sleep 2; }
+            NODE_PATH="$RUNNER_TEMP/node_modules" node source/tools/shots.js http://localhost:8766/ "$RUNNER_TEMP/shots" 01-map
+            if [ -s "$RUNNER_TEMP/shots/01-map.jpg" ]; then cp "$RUNNER_TEMP/shots/01-map.jpg" docs/features/01-map.jpg && python3 source/tools/first_picture.py . done; fi
+          fi
       - name: Publish
         id: publish
         if: steps.build.outputs.changed == 'yes'
