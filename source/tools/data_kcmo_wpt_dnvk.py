@@ -138,6 +138,15 @@ N('raphael-hotel-kc', 'Raphael Hotel (Villa Serena Apartments)', 'Kansas City', 
   links=[W('Raphael Hotel'), ['Raphael Hotel (official site)', 'https://www.raphaelkc.com'], NRL],
   conf='mixed', brick='?', hours='?'),
 
+N('community-christian-church-kc', 'Community Christian Church (Frank Lloyd Wright)', 'Kansas City', 'kcmo', 'worship', 'standing',
+  39.04323, -94.58639, 'exact', 'open', 'drive', '', '1940–1942',
+  "The congregation asked Frank Lloyd Wright in April 1940 for a church to replace one lost to fire. He planned a parallelogram with a \"spire of light\"; high costs shrank the auditorium from 1,200 to 900 seats, details were dropped, and the walls were sprayed with gunite over his objections. It was dedicated on January 4, 1942. "
+  "The Steeple of Light was only finished in 1994, by the artist Dale Eldred's partner Roberta Lord, and is lit on Fridays, Saturdays and Sundays. It is across from the Plaza.",
+  look="A Wright design in gunite with a parallelogram plan; the Steeple of Light in a perforated dome on the northwest corner. Wikipedia says walk-in tours are free and guided tours can be arranged two weeks ahead.",
+  accn="Church at 4601 Main Street. Wikipedia and a search summary of third-party listings disagree on days and times for walk-in visits, and the church's own pages were not read, so hours are not given; call ahead. Parking not checked.",
+  links=[W('Community Christian Church (Kansas City, Missouri)'), NRL],
+  conf='mixed', brick='no', hours='?'),
+
 N('pink-house-hook-kc', 'Pink House (Mary Rockwell Hook)', 'Kansas City', 'kcmo', 'landmark', 'standing',
   39.03667, -94.59639, 'site', 'view', 'drive', '', '1922',
   "Mary Rockwell Hook, a pioneer woman architect who worked mostly from Kansas City, designed this house, built in 1922. Its pink plaster refers to San Francisco, whose 1915 world's fair she had visited. It has two stories, stucco walls, red clay tile roofing, three balconies and a brick chimney with an arcaded, roofed opening. "
@@ -163,5 +172,6 @@ PIN_NOTES = {
  'newbern-hotel-kc': 'Street address 525 East Armour Boulevard, geocoded.',
  'sophian-plaza-kc': 'Street address 4618 Warwick Boulevard, geocoded.',
  'raphael-hotel-kc': 'Street address 325 Ward Parkway, geocoded.',
+ 'community-christian-church-kc': 'Street address 4601 Main Street, geocoded.',
  'pink-house-hook-kc': 'Register and Wikipedia coordinate; no street address in a source read.',
 }

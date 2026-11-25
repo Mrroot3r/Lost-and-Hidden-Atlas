@@ -11,11 +11,7 @@ Twelve places in Lafayette County, about 40 miles east of Kansas City, from the 
 ## Leads
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Madonna of the Trail statue | Lexington, MO (OpenStreetMap point 39.18662, -93.8863) | 1928 statue; sources give three different corners (Highland and Broadway, Highland and Cliff Drive, Commerce Street) | A source or look at the aerial that settles where it stands now |
 | Other Lexington Register houses | Lexington, MO | Minatree Catron, John E. Cheatham, Gosewisch (39.15778, -93.89167), Tevis, Stramcke, Spratt-Allen-Aull houses and others on the Register list | Coordinates (most are address-restricted) and a source on what is left and who owns each |
-| Machpelah Cemetery and Forest Grove Cemetery | Lexington, MO | Both Register-listed in recent years | No Wikipedia article; Register forms not read |
-| Houx-Hoefer-Rehkop House | Higginsville, MO (39.07583, -93.71861) | Register listing | A source describing it |
-| James M. Dinwiddie House | Dover, MO (39.19222, -93.70167) | Register listing | A source describing it |
 | Lexington Battlefield earthworks and Masonic College site | Lexington, MO | Within the Anderson House entry's grounds | Whether they deserve their own entries |
 
 ## Tips
