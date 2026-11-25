@@ -7,3 +7,4 @@ form-26e05d6e70  "Buried Brick walkway", Albany (sent as a visit report on the r
 form-dc8d9efc9a  lead "Womens club of albany", Albany: added as womans-club-of-albany (the club's own history page), November 21, 2026
 form-361a5b5b9c  lead "School", Albany: added as former-albany-high-school-western-avenue (University at Albany pages), November 21, 2026
 form-018de7349b  lead "Red brick house", Albany (south side of Madison Avenue): no source names it; a Reader's tip row in notes/alb_inbox_ugzq.md, November 21, 2026
+form-da3fd17537  lead "Church", Albany (Central Avenue): added as church-of-the-blessed-sacrament-albany (parish history page, The Evangelist), November 25, 2026
