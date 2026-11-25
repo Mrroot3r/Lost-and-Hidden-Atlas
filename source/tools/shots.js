@@ -25,7 +25,27 @@ const HERE = { latitude: 42.7742, longitude: -73.7005, accuracy: 10 };
   };
   const tap = (page, sel) => page.evaluate(s => document.querySelector(s).click(), sel);       // a bar button may be scrolled out of sight
   const view = (page, lat, lon, z) => page.evaluate(([a, b, c]) => window.__atlasMap.setView([a, b], c, { animate: false }), [lat, lon, z]);
-  await shot('01-map', '', async p => { await p.waitForTimeout(3000); });
+  // The first picture shows both ways the map can stand in for a crowd of pins (the owner, November 25, 2026: the numbered bubbles
+  // "show off just how many places there actually are", the heat map is the other choice): one map, the heat map on one side of a
+  // slanted line and the bubbles on the other. The heat map is photographed first and laid over its half of the bubbles.
+  await shot('01-map', '', async p => {
+    await p.waitForTimeout(3000);
+    const r = await p.evaluate(() => { const b = document.querySelector('#map').getBoundingClientRect(); return { x: b.left, y: b.top, width: b.width, height: b.height }; });
+    await p.evaluate(() => window.__atlasSet('heat', true)); await p.waitForTimeout(3000);
+    const heat = (await p.screenshot({ clip: r, type: 'png' })).toString('base64');
+    await p.evaluate(() => window.__atlasSet('heat', false)); await p.waitForTimeout(3000);
+    await p.evaluate(([png, r, cut]) => {
+      const pill = 'position:fixed;z-index:100000;font:600 12px/1 system-ui,sans-serif;color:#fff;background:rgba(20,24,22,.82);padding:5px 9px;border-radius:11px;pointer-events:none';
+      const d = document.createElement('div');
+      d.style.cssText = `position:fixed;left:${r.x}px;top:${r.y}px;width:${r.width}px;height:${r.height}px;z-index:99999;pointer-events:none;background:url(data:image/png;base64,${png}) 0 0/${r.width}px ${r.height}px no-repeat;clip-path:polygon(0 0,${cut[0]}% 0,${cut[1]}% 100%,0 100%)`;
+      const l = document.createElement('div');
+      l.style.cssText = `position:fixed;left:${r.x}px;top:${r.y}px;width:${r.width}px;height:${r.height}px;z-index:99999;pointer-events:none;background:#fff;clip-path:polygon(${cut[0] - 0.5}% 0,${cut[0] + 0.5}% 0,${cut[1] + 0.5}% 100%,${cut[1] - 0.5}% 100%)`;
+      const a = document.createElement('div'); a.textContent = 'Heat map'; a.style.cssText = pill + `;left:${r.x + 8}px;top:${r.y + 8}px`;
+      const b = document.createElement('div'); b.textContent = 'Numbered bubbles'; b.style.cssText = pill + `;right:${innerWidth - r.x - r.width + 8}px;top:${r.y + 8}px`;
+      document.body.append(d, l, a, b);
+    }, [heat, r, [58, 42]]);
+    await p.waitForTimeout(300);
+  });
   await shot('02-place', '#kinzua-bridge', async p => { await p.waitForTimeout(4000); });
   // the same place twice: 02 with the old map laid over it (as a place opens), 03 with it switched off, so the two can be compared (the owner, November 22, 2026)
   await shot('03-access', '#kinzua-bridge', async p => { await p.evaluate(() => { const c = document.querySelector('#d-hist'); if (c && c.checked) c.click(); }); await p.waitForTimeout(2500); await p.evaluate(() => { const h = [...document.querySelectorAll('#v-detail h3, #v-detail dt')].find(x => /Getting there/.test(x.textContent)); h.scrollIntoView(); let e = h.parentElement; while (e && e.scrollHeight <= e.clientHeight + 5) e = e.parentElement; if (e) e.scrollTop -= 14; }); await p.waitForTimeout(1500); });
