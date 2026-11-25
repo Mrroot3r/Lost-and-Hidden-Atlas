@@ -1,0 +1,33 @@
+# November 25, 2026: four more Kansas City, Missouri places that Wikipedia's building lists and the Register name and the Atlas lacked.
+# The Register lists round Kansas City were already used up by earlier batches; these are the named leftovers.
+from data_b import N
+from data_ma import W
+BATCH={'key':'mo_kcm_pjvd','label':'Kansas City: more leftovers','added':'2026-11-25 07:50'}
+PLACES=[
+N('mutual-ice-company-building-westport-kc','Mutual Ice Company Building (Westport Ice House, former City Ice plant), Kansas City','Kansas City, Missouri','kcmo','industry','standing',39.05306,-94.59056,'site','open','walk','','1907',
+  'An ice plant of 1907 in Westport, listed on the National Register in 2004 under the names Mutual Ice Company Building and City Ice Company Plant. Rudolf Markgraf is given as its architect. Later it was part of the City Ice Company. A recent renovation, with preservation tax credits, turned it into the Westport Ice House, which holds restaurants and bars.',
+  look='A limestone-walled building with a wood-frame interior on heavy timbers, per the firm that designed the renovation, who cut new openings in the central limestone wall. Look at the exterior from Pennsylvania Avenue and Mill Street. Inside it is a food and drink venue; what old fabric shows in the rooms was not checked.',
+  accn='Private commercial building in the Westport entertainment district. You may go in when the businesses are open; their hours were not found on a page of their own, so they are not given here (hours not checked). Street parking and paid lots nearby. The address is 4142-4144 Pennsylvania in the Register listing; a news item on the sale gives 4141 Mill Street.',
+  hours='?',links=[W('Mutual Ice Company Building'),['Tessere: Westport Ice House renovation','https://tessere.com/?p=12266'],['Flatland KC: Atomic Provisions buys the City Ice Building','https://flatlandkc.org/eats-drinks/westport-gets-new-master-plan-and-denver-biscuits-too/']],brick='?',conf='mixed'),
+N('louis-curtiss-studio-building-kc','Louis Curtiss Studio Building, 1116-1120 McGee, Kansas City','Kansas City, Missouri','kcmo','civic','standing',39.10036,-94.58005,'exact','view','walk','','1909',
+  'A three-story building of 1909 that the architect Louis Curtiss designed as his own studio and lived in. He died there in 1924. Curtiss, a pioneer of the glass curtain wall, was called "the Frank Lloyd Wright of Kansas City", and about 30 of his buildings still stand in the city. The studio has been on the National Register since 1972.',
+  look='Look at the front on McGee Street from the sidewalk. One source calls it the second of Curtiss\'s glass curtain wall buildings; the Wikipedia article on the building does not say what the front is made of, so that is not confirmed. Interior and present use not checked.',
+  accn='Private downtown building; look from the public sidewalk. Paid garages and lots within a few blocks. No hours found; it is not a visitor site.',
+  links=[W('Louis Curtiss Studio Building'),W('Louis Curtiss')],brick='?',conf='mixed'),
+N('union-confederate-monument-kc','Union Confederate Monument, Union Cemetery, Kansas City','Kansas City, Missouri','kcmo','curio','marker',39.07597,-94.58069,'exact','public','walk','','1911',
+  'A 15-foot granite obelisk put up by the U.S. government in 1911 over the burial place of 15 Confederate prisoners of war, captured in the Battle of Westport in 1864. Two bronze tablets give their names. The exact graves are not known. It stands in Union Cemetery, the oldest surviving public cemetery in Kansas City, founded in 1857.',
+  look='A plain obelisk with a plaque telling its story, inside Union Cemetery. It is a memorial to Confederate dead, one of several Civil War sites in the cemetery; the visit is about the history, not a grand monument.',
+  accn='The monument site is run by the federal National Cemetery Administration (overseen from Leavenworth National Cemetery), address 227 E. 28th Terrace; there are no burials at the site. The VA page gives visiting hours as sunrise to sunset daily. The cemetery around it is a public park kept by Kansas City Parks and Recreation. Street parking on the cemetery roads.',
+  hours='Daily, sunrise to sunset.',links=[W('Union Confederate Monument'),['National Cemetery Administration: Union Confederate Monument Site','https://www.cem.va.gov/cems/lots/union_confed.asp'],W('Union Cemetery (Kansas City, Missouri)')],brick='no'),
+N('red-crown-tavern-site-platte-county-mo','Red Crown Tavern and Tourist Court site (Bonnie and Clyde shootout), Kansas City','Kansas City, Missouri','kcmo','curio','gone',39.3124,-94.6826,'area','view','drive','','1931–1968',
+  'The Red Crown Tavern, a red brick and tile roadhouse with a tourist court of two cabins and garages, was built in 1931 at the junction of U.S. 71 and Route 35 in Platte County. On July 20, 1933, lawmen fired on Bonnie and Clyde and three of their gang here; the outlaws escaped. The buildings are gone, the sources differ on when: a Platte County newspaper says the Red Crown burned in 1967 and was stripped by souvenir hunters, and Wikipedia says demolition came in 1968, for the access roads of the nearby interstate. An interstate ramp now runs through the property.',
+  look='Nothing of the buildings is left. A historical marker put up in 2011 by the Platte County Historical Society, to the lawmen who took part, stands in the far southeastern corner of the parking lot of a company building (WireCo WorldGroup in the sources), east of where the tavern stood. The marker\'s own text and exact spot were not read.',
+  accn='The ground is a private business lot beside the airport interchange of I-29, now inside Kansas City. Look from the public road; do not walk on the ramps. Parking and any access to the marker through the lot were not checked.',
+  links=[W('Red Crown Tourist Court'),['Platte County Landmark: Bonnie and Clyde series, the Red Crown','https://plattecountylandmark.com/?p=4654']],brick='no',conf='mixed'),
+]
+PIN_NOTES={
+'mutual-ice-company-building-westport-kc':'Wikipedia coordinate; checked on the aerial for the building footprint at Pennsylvania and Mill.',
+'louis-curtiss-studio-building-kc':'OpenStreetMap lookup of the address 1118 McGee. Wikipedia gives a different coordinate about 400 m south; the address and the OpenStreetMap building were used.',
+'union-confederate-monument-kc':'Wikipedia coordinate inside Union Cemetery; checked on the aerial.',
+'red-crown-tavern-site-platte-county-mo':'Wikipedia coordinate for the site. The buildings are gone, so the pin marks the area near the interstate ramp, not a structure.',
+}
