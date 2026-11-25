@@ -35,10 +35,11 @@
       <div id="spotcard" hidden></div>   <!-- spots waiting to be sent for research (spotCard in app.js) -->   <!-- asks a new reader where they start from (startCard in app.js) -->
       <div class="pad">
         <div class="count" style="padding-block:8px 4px">
-          <span><span id="count"></span> <button class="linkbtn" type="button" id="fclear" hidden>Clear filters</button></span>
+          <span><span id="count"></span> <button class="linkbtn" type="button" id="fclear" hidden>Clear filters</button> <button class="linkbtn" type="button" id="yrs-btn" aria-expanded="false" aria-controls="yrs" title="A bar chart of the years these places date from">Years</button></span>
           <label class="row" style="gap:5px;flex-wrap:nowrap"><span class="lbl">Sort</span>
             <select id="sort"><option value="time">Nearest first</option><option value="name">Name</option><option value="reg">Region</option><option value="left">Most left to see</option></select></label>
         </div>
+        <div id="yrs" hidden></div>
       </div>
       <div class="pad" id="linechip" hidden style="padding-bottom:6px"></div>
       <ul id="list"></ul>

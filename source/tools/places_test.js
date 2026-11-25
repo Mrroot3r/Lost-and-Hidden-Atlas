@@ -66,7 +66,7 @@ const { chromium } = require('playwright');
     { await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
       const setF=(sel,v,ev)=>p.evaluate(a=>{ const n=document.querySelector(a[0]); n.value=a[1]; n.dispatchEvent(new Event(a[2],{bubbles:true})); },[sel,v,ev]);      /* as the earlier checks here do: the panel may be scrolled out of sight */
       const yrs=()=>p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), by={}; D.sites.forEach(x=>{ by[x.id]=x; });
-        const yr=x=>{ const t=String(x.years), c=/(\d\d)(st|nd|rd|th) century/i.exec(t); return Math.min(...(t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||['9999']).map(Number),c?(+c[1]-1)*100:9999); };      /* "18th century" is 1700, as yearOf() reads it */
+        const yr=x=>{ const t=String(x.years), c=/(\d\d)(st|nd|rd|th) century/i.exec(t); return Math.min(...(t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||['9999']).map(Number),c?(+c[1]-1)*100:9999)-(/^\s*before\b/i.test(t)?1:0); };      /* "18th century" is 1700, and "before 1800" is 1799 at the latest, as yearOf() reads them */
         const v=window.__atlasNM.visible().filter(x=>by[x.id]).map(x=>yr(by[x.id])); return {n:v.length,lo:Math.min(...v),hi:Math.max(...v),count:+document.querySelector('#count').textContent.split(' ')[0],btn:document.querySelector('#filt-btn').textContent.trim()}; });
       await setF('#f-y0','1900','input'); await setF('#f-y1','1915','input'); await p.waitForTimeout(500); let r=await yrs();
       ok(name+': year range 1900 to 1915 lists places that date from those years and no others, and counts as one filter',r.n>20&&r.lo>=1900&&r.hi<=1915&&r.count===r.n&&/1$/.test(r.btn),JSON.stringify(r));
@@ -406,6 +406,42 @@ const { chromium } = require('playwright');
     ok('few: a search that leaves a few hundred places or fewer shows every one as its own pin, zoomed right out',a1.n>5&&a1.n<=400&&a1.clus===0&&a1.pins>=Math.min(a1.n,5),JSON.stringify(a1));
     await p.fill('#q',''); await p.waitForTimeout(900); const a2=await st();
     ok('few: clearing it brings the discs back',a2.clus>5,JSON.stringify(a2));
+    // ---- a date that begins "before" or "by" gives no year, only a latest one (the owner, November 24, 2026: LiDAR finds dated
+    // "before 1900–after 1946" were turning up in 1900 to 1915). Such a place answers "up to a year" and no range with a first year.
+    const setF=(sel,v,ev)=>p.evaluate(a=>{ const n=document.querySelector(a[0]); n.value=a[1]; n.dispatchEvent(new Event(a[2],{bubbles:true})); },[sel,v,ev]);
+    const bef=()=>p.evaluate(()=>{ const D=JSON.parse(document.getElementById('d-sites').textContent), by={}; D.sites.forEach(x=>{ by[x.id]=x; }); const v=window.__atlasNM.visible().filter(x=>by[x.id]).map(x=>String(by[x.id].years||'')); return {n:v.length,before:v.filter(t=>/^\s*(before|by)\b/i.test(t)).length,b1900:v.filter(t=>/^\s*before 1900/i.test(t)).length}; });
+    await setF('#f-y0','1900','input'); await setF('#f-y1','1915','input'); await p.waitForTimeout(600); let bf=await bef();
+    ok('before: 1900 to 1915 lists no place dated "before ..." or "by ..."',bf.n>100&&bf.before===0,JSON.stringify(bf));
+    await setF('#f-y0','','input'); await setF('#f-y1','1900','input'); await p.waitForTimeout(600); bf=await bef();
+    ok('before: "up to 1900" does list the places dated "before 1900"',bf.b1900>0,JSON.stringify(bf));
+    await setF('#f-y1','1850','input'); await p.waitForTimeout(600); bf=await bef();
+    ok('before: "up to 1850" does not',bf.n>100&&bf.b1900===0&&bf.before>0,JSON.stringify(bf));
+    await p.click('#fclear'); await p.waitForTimeout(400);
+    // ---- the bar of years: shut until asked for, one bar a span of years for whatever is listed, a tap narrows to that bar
+    const yb=()=>p.evaluate(()=>{ const s=document.querySelector('#yrs'), b=document.querySelector('#yrs-btn'); const bars=s&&!s.hidden?[...s.querySelectorAll('.ybar')].map(x=>({n:+x.dataset.n,a:+x.dataset.a,z:+x.dataset.z,l:x.querySelector('.ylab').textContent,h:Math.round(x.querySelector('.yfill').getBoundingClientRect().height),on:x.getAttribute('aria-pressed')==='true'})):null;
+      return {btn:!!b&&b.offsetParent!==null,pressed:b&&b.getAttribute('aria-expanded'),bars:bars,none:s&&!s.hidden?+(s.dataset.none||0):0,vis:window.__atlasNM.visible().length,cap:s&&!s.hidden?(s.querySelector('.ycap')||{}).textContent||'':'',w:s&&!s.hidden?Math.round(s.getBoundingClientRect().width):0,y:[document.querySelector('#f-y0').value,document.querySelector('#f-y1').value].join('-')}; });
+    let y=await yb();
+    ok('years: a small "Years" button by the count, and no chart until it is tapped',y.btn&&y.pressed==='false'&&y.bars===null,JSON.stringify(y).slice(0,120));
+    await p.click('#yrs-btn'); await p.waitForTimeout(400); y=await yb();
+    ok('years: tapped, the chart opens: with every place listed, a bar every 50 years, at most 14 of them, inside the screen',y.bars&&y.bars.length>=5&&y.bars.length<=14&&y.bars.every(b=>b.z-b.a===49)&&y.w<=390,JSON.stringify((y.bars||[]).map(b=>b.l)));
+    ok('years: every listed place is in a bar or counted as having no year',y.bars.reduce((a,b)=>a+b.n,0)+y.none===y.vis&&y.none>0&&/no year/.test(y.cap),[y.bars.reduce((a,b)=>a+b.n,0),y.none,y.vis].join(' '));
+    ok('years: the tallest bar is the fullest, and an empty span has no height',(()=>{ const m=y.bars.reduce((a,b)=>b.n>a.n?b:a); return m.h>=40&&y.bars.every(b=>b.h<=m.h)&&y.bars.filter(b=>b.n===0).every(b=>b.h===0); })());
+    await p.fill('#q','carnegie'); await p.waitForTimeout(900); y=await yb();
+    const step0=y.bars?y.bars[0].z-y.bars[0].a+1:0;
+    ok('years: a search spanning a century or two is shown in finer bars, 25 years or a decade',y.bars&&y.bars.length>=3&&y.bars.length<=14&&(step0===25||step0===10),JSON.stringify((y.bars||[]).map(b=>b.l+':'+b.n)));
+    const tall=y.bars.reduce((a,b)=>b.n>a.n?b:a), before=y.vis;
+    await p.evaluate(a=>document.querySelector('#yrs .ybar[data-a="'+a+'"]').click(),tall.a); await p.waitForTimeout(700); y=await yb();
+    ok('years: a tap on a bar narrows the list to its years, the same as typing them in Filters',y.vis===tall.n&&y.vis<before&&y.y===tall.a+'-'+tall.z,[y.vis,tall.n,y.y].join(' '));
+    ok('years: and the bars then show that span more finely',y.bars&&y.bars.length>=2&&(y.bars[0].z-y.bars[0].a+1)<step0,JSON.stringify((y.bars||[]).map(b=>b.l+':'+b.n)));
+    for(let k=0;k<2&&y.bars[0].z!==y.bars[0].a;k++){ const t2=y.bars.reduce((a,b)=>b.n>a.n?b:a); await p.evaluate(a=>document.querySelector('#yrs .ybar[data-a="'+a+'"]').click(),t2.a); await p.waitForTimeout(700); y=await yb(); }
+    ok('years: tapping on down reaches single years, each with its count',y.bars&&y.bars.length<=12&&y.bars.every(b=>b.z===b.a)&&/^\d{4}$/.test(y.bars[0].l)&&y.bars.reduce((a,b)=>a+b.n,0)===y.vis,JSON.stringify((y.bars||[]).map(b=>b.l+':'+b.n)));
+    await p.click('#yrs .yall'); await p.waitForTimeout(600); y=await yb();
+    ok('years: "All years" takes the range off again and leaves the search',y.vis===before&&y.y==='-',[y.vis,before,y.y].join(' '));
+    await p.waitForTimeout(400);
+    ok('years: left open, that is kept for the next visit',await p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).ui.yrs===true));
+    await p.click('#yrs-btn'); await p.waitForTimeout(500); y=await yb();
+    ok('years: and tapped again it shuts',y.pressed==='false'&&y.bars===null&&await p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).ui.yrs===false));
+    await p.fill('#q',''); await p.waitForTimeout(400);
     ok('clear and few: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   // ---- the search box also goes to a spot: pasted coordinates, a Google Maps link, or a street, town or address looked up when asked
   // (the owner, November 23, 2026: find a street in Google Maps, copy the coordinates, paste them here and be taken there)
