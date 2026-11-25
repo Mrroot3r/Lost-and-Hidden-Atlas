@@ -1,6 +1,7 @@
 {
  "alumni-hall-alfred": "An academy hall with a chapel in it: civic is right.",
  "barter-theatre-abingdon": "A theatre since 1933 in a former church building; the entry is about the theatre: civic stands.",
+ "basswood-island-quarry": "Read the entry: a quarry on Basswood Island in the Apostle Islands, Lake Superior, Wisconsin; the island lies outside the coarse outline. Stands.",
  "belvidere-church-mansion-belmont": "\"Church\" is the owner's surname (John Barker Church): landmark is right.",
  "boght-road-dutch-houses-colonie": "The entry is two houses and the site of a church: landmark is right.",
  "brownville-bridge": "A place on the river that is the state line; the state outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026.",
@@ -24,12 +25,17 @@
  "highball-signal-delmar": "Looked at the aerial: the pin is in Railroad Park beside the tracks, north of State Street, which is the Delaware-Maryland line; on the Delaware side.",
  "hotel-metropole-cincinnati": "Sample check, wide aerial: the pin is in downtown Cincinnati about 700 m north of the Ohio River, which is the state line; it is on the Ohio bank.",
  "lanier-mansion-madison-in": "A place on the river that is the state line; the state outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026.",
+ "metropolis-carnegie-library": "Looked at on the aerial: on the library in downtown Metropolis, on the Illinois bank of the Ohio River; the state outline is coarse there.",
+ "middleport-public-library-carnegie": "On the Ohio side of the Ohio River in Middleport on the aerial; the state outline is coarse along the river.",
+ "montclair-carnegie-library": "Read the entry: it is about the 1904 Carnegie library building, now an annex of the church next door; the word church is only in the present use. civic stands.",
  "mount-orne-covered-bridge": "A place on the river that is the state line; the state outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026.",
  "nauvoo-historic-district": "Sample check, wide aerial: the pin is on the east bank of the Mississippi River, which is the state line; it is on the Illinois side.",
  "newtonville-post-office": "Built as a church in 1852 but a post office for some eighty years, and the entry is about the post office: civic stands. The owner was told it is a judgement call.",
+ "nypl-high-bridge-carnegie-site": "Read the entry: the site of a Carnegie branch library; High Bridge is the neighbourhood's name, not a bridge. civic stands.",
  "olana-greenport": "Read the entry: it is the house and 250-acre landscape of the painter Frederic Church, a great estate, not a place of worship; the name trips the check only because of his surname. The kind inst stands.",
  "overton-corners-border-station": "Looked at the aerial: the pin is on the station building just south of the cleared boundary line, with the Canadian station to the north; a New York port of entry on the land border.",
  "patowmack-canal-great-falls": "A place on the river that is the state line; the state outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026.",
+ "portsmouth-public-library-carnegie": "On the Ohio side of the Ohio River in downtown Portsmouth on the aerial; the state outline is coarse along the river.",
  "powers-opera-house-site-lansingburgh": "Read the entry: a Baptist meetinghouse of 1845 that was a church until 1877 and then the Powers Opera House, a theatre and picture house, for forty years until it burned in 1917. The entry is named for and written about the opera house, and the guide's table puts theatres and opera houses under civic, so civic stands.",
  "roebling-delaware-aqueduct": "A place on the river that is the state line; the state outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026.",
  "sault-ste-marie-canal": "Sample check, wide aerial: the pin is on the canal along the north shore of the St. Marys River, which is the border; it is on the Ontario side, with the American locks across the river to the south.",
@@ -37,5 +43,6 @@
  "scottish-rite-cathedral-indianapolis": "Read the entry: a Masonic meeting house of the Scottish Rite, shown by guided tour, not a place of worship; civic stands.",
  "springer-opera-house": "Looked at the aerial: a downtown Columbus block a few streets from the Chattahoochee, which is the Georgia-Alabama line; on the Georgia side.",
  "ss-meteor-superior": "Sample check, wide aerial: the pin is on the island in Superior Bay beside the Superior waterfront, on the Wisconsin side of the bay that is the state line.",
- "st-john-evangelist-lahave-islands": "On an island off the coast; the province outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026."
+ "st-john-evangelist-lahave-islands": "On an island off the coast; the province outline the check uses is coarse there. Accepted by the maintainer, November 20, 2026.",
+ "union-city-carnegie-library": "Indiana address point on North Columbia Street, west of State Line Street; on the Indiana side on the aerial"
 }
