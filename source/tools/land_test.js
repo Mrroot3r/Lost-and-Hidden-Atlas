@@ -44,6 +44,26 @@ const { chromium } = require('playwright');
   await p.evaluate(()=>document.getElementById('lb-opt').click()); await p.waitForTimeout(400);
   ok('upright: a plain tap on the bar still works',await p.evaluate(()=>!!document.querySelector('#lb-opt')&&[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Done'&&b.offsetParent!==null)));
   await p.evaluate(()=>{ const d=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Done'&&b.offsetParent!==null); d&&d.click(); }); await p.waitForTimeout(300);
+  // ---- the page itself is never zoomed (the owner, November 25, 2026: while he tapped through places the whole screen "zoomed in a hair
+  // and cut off the edges", and he could not undo it). Two guards: nothing outside the map may pinch or double-tap the page bigger,
+  // and if the page is magnified all the same, the Atlas draws itself inside the part of the page that shows, so nothing is cut off.
+  { const z=await p.evaluate(()=>({ta:getComputedStyle(document.documentElement).touchAction,meta:document.querySelector('meta[name=viewport]').content}));
+    ok('zoom: the page takes no pinch or double-tap zoom, by its touch setting and by its viewport line',/pan-x/.test(z.ta)&&/pan-y/.test(z.ta)&&!/pinch/.test(z.ta)&&/maximum-scale=1(\D|$)/.test(z.meta)&&/user-scalable=no/.test(z.meta),JSON.stringify(z));
+    const cdp=await c.newCDPSession(p); const fit=()=>p.evaluate(()=>{ const v=visualViewport, r=q=>document.querySelector(q).getBoundingClientRect(), a=r('#app'), t=[...document.querySelectorAll('[role=tab]')].filter(x=>x.offsetParent!==null).map(x=>x.getBoundingClientRect());
+      return {scale:+v.scale.toFixed(2),vx:Math.round(v.offsetLeft),vw:Math.round(v.width),vh:Math.round(v.height),ax:Math.round(a.left),aw:Math.round(a.width),ah:Math.round(a.height),tabL:Math.round(Math.min(...t.map(x=>x.left))),tabR:Math.round(Math.max(...t.map(x=>x.right))),map:window.__atlasMap.getSize().x}; });
+    await cdp.send('Emulation.setPageScaleFactor',{pageScaleFactor:1.25}); await p.waitForTimeout(700); let f=await fit();
+    ok('zoom: with that viewport line the page cannot be magnified even when told to be',f.scale===1&&f.aw===390,JSON.stringify(f));
+    await cdp.detach();
+    // the second guard, for a browser that magnifies anyway: the same page served without the limit in its viewport line
+    const c2=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,hasTouch:true,isMobile:true,serviceWorkers:'block'}); const p2=await c2.newPage(); await p2.route(/index\.html/,async r=>{ const res=await r.fetch(); r.fulfill({response:res,body:(await res.text()).replace(',maximum-scale=1,user-scalable=no','')}); });
+    await p2.goto(process.argv[2]||'http://localhost:8766/index.html'); await p2.waitForFunction(()=>window.__atlasMap); await p2.waitForTimeout(800); const cdp2=await c2.newCDPSession(p2);
+    const fit2=()=>p2.evaluate(()=>{ const v=visualViewport, r=q=>document.querySelector(q).getBoundingClientRect(), a=r('#app'), t=[...document.querySelectorAll('[role=tab]')].filter(x=>x.offsetParent!==null).map(x=>x.getBoundingClientRect());
+      return {scale:+v.scale.toFixed(2),vx:Math.round(v.offsetLeft),vw:Math.round(v.width),vh:Math.round(v.height),ax:Math.round(a.left),aw:Math.round(a.width),ah:Math.round(a.height),tabL:Math.round(Math.min(...t.map(x=>x.left))),tabR:Math.round(Math.max(...t.map(x=>x.right))),map:window.__atlasMap.getSize().x}; });
+    await cdp2.send('Emulation.setPageScaleFactor',{pageScaleFactor:1.25}); await p2.waitForTimeout(700); f=await fit2();
+    ok('zoom: magnified all the same, the Atlas fits the part of the page that shows: no edge is cut off',f.scale===1.25&&Math.abs(f.aw-f.vw)<=1&&Math.abs(f.ax-f.vx)<=1&&Math.abs(f.ah-f.vh)<=1&&f.tabL>=f.vx-1&&f.tabR<=f.vx+f.vw+1,JSON.stringify(f));
+    ok('zoom: and the map is redrawn at that width',Math.abs(f.map-f.vw)<=1,f.map+' of '+f.vw);
+    await cdp2.send('Emulation.setPageScaleFactor',{pageScaleFactor:1}); await p2.waitForTimeout(700); f=await fit2();
+    ok('zoom: back at normal size the Atlas fills the screen again',f.scale===1&&f.aw===390&&f.ax===0&&f.map===390,JSON.stringify(f)); await cdp2.detach(); await c2.close(); }
   // ---- turned on its side, at the two sizes phones come in (under and over the old 820-point switch)
   for(const [W,H,name] of [[780,360,'narrow phone'],[915,412,'wide phone']]){
     await p.setViewportSize({width:W,height:H}); await p.waitForTimeout(500);

@@ -70,6 +70,11 @@ html,body{height:100%}
    (the compare divider's label did, pushed to the right) is cut off there. Left visible it made the page wider than the phone,
    and in the Android app the whole page could be dragged about by the layer bar, with blank beside and below it. */
 @media screen{ html,body{overflow:hidden} #stage{overflow:hidden} }
+/* The page itself is never zoomed: the map has its own zoom, and text size follows the phone's setting. A pinch or a double tap
+   anywhere outside the map used to be able to magnify the whole page, which cut its edges off with no way back (vvFit in app.js
+   is the second guard). pan-x pan-y: scrolling stays, pinch-zoom and double-tap zoom go. */
+html{touch-action:pan-x pan-y}
+#app.vvfit{position:fixed}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 var(--ff);-webkit-text-size-adjust:100%}
 *{box-sizing:border-box}
 button,input,select,textarea{font:inherit;color:inherit}
