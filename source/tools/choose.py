@@ -72,11 +72,9 @@ def taken(clone=None):
             import base64; out=live(base64.b64decode(api('contents/claims.txt?ref='+BR)['content']).decode().split('\n'))
         except Exception: pass
     try:
+        import claims_pr      # which regions a title and a branch name take: tools/claims_pr.py (test tools/choose_test.py)
         for p in open_prs():
-            txt=(p['title']+' '+p['head']['ref']).lower()
-            for c,l,sn,k in REG:
-                words=[w for w in re.split(r'[^a-z]+',l.lower()) if len(w)>4 and w not in ('county','valley','north','south','western','eastern','central','northern','southern','places','massachusetts','connecticut','vermont','hampshire','jersey','pennsylvania','island','maine')]
-                if c in re.split(r'[^a-z0-9]+',p['head']['ref'].lower()) or (words and any(w in txt for w in words)): out.setdefault(c,[]).append('open pull request #%d'%p['number'])
+            for c in claims_pr.regions_named(p['title'],p['head']['ref'],STATES): out.setdefault(c,[]).append('open pull request #%d'%p['number'])
     except Exception as e: print('(The open pull requests could not be listed: %s. Look at them on GitHub before trusting this list.)'%str(e)[:60])
     return out
 def lead_states(clone):
