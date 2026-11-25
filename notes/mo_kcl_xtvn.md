@@ -15,7 +15,7 @@ Three places: the Liquid Carbonic Company Building and the Kansas City Club Buil
 | Gorrill Farmstead (1880s limestone house by Mark Migliario) and O'Sullivan Farmstead (1866) | Lawrence and Overbrook, Douglas County, KS | Register forms list them; both private working farms with addresses not for publication | Coordinates and any public way to see them |
 | Mugan-Olmsted House (stone, about 1866), Fox House, McCurdy House | Lawrence, KS | Register listings (2017, 2023, 2001); KSHS summary only | A readable nomination and a public view |
 | Smallwood V. Noland House | Independence, MO (39.0817, -94.4369 per the Register list) | Register 1994, Greek Revival | A source that says what stands |
-| Louis Curtiss Studio Building, Mutual Ice Company Building, Kessler Apartments, Kansas City Water Department Building, Police Station Number 4, Union Confederate Monument, Red Crown Tourist Court | Kansas City, MO | Named in Wikipedia's building list for the city; Wikipedia articles are one or two sentences | A fuller source (nomination forms, city pages) for each |
+| Kessler Apartments, Kansas City Water Department Building, Police Station Number 4 | Kansas City, MO | Named in Wikipedia's building list for the city; Wikipedia articles are one or two sentences | A fuller source (nomination forms, city pages) for each |
 | Jake's Branch of Middle Creek Bridge | Louisburg, KS (38.5197, -94.7158 per the Register list) | Masonry arch bridge, Register 1985 | Its form is a scan with no text |
 
 ## Tips
