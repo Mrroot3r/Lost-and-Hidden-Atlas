@@ -1,0 +1,8 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'mackie-building-milwaukee':('https://thumb.wikimedia.org/wikipedia/commons/thumb/d/db/Milwaukee_August_2022_047_%28Mackie_Building%29.jpg/960px-Milwaukee_August_2022_047_%28Mackie_Building%29.jpg', 900, 600, 'Michael Barera', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Milwaukee_August_2022_047_(Mackie_Building).jpg', '2026-11-26', 'pin+name'),
+ 'mayer-boot-shoe-building-milwaukee':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Mayer-Boot-and-Shoe_Mar10.jpg/960px-Mayer-Boot-and-Shoe_Mar10.jpg', 900, 595, 'Freekee', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Mayer-Boot-and-Shoe_Mar10.jpg', '2026-11-26', 'pin+name'),
+ 'schlitz-brewery-complex-milwaukee':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Milwaukee_February_2025_44_%28former_Joseph_Schlitz_Brewing_Company_brewery%29.jpg/960px-Milwaukee_February_2025_44_%28former_Joseph_Schlitz_Brewing_Company_brewery%29.jpg', 900, 1200, 'Michael Barera', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Milwaukee_February_2025_44_(former_Joseph_Schlitz_Brewing_Company_brewery).jpg', '2026-11-26', 'pin+name'),
+ 'soldiers-home-old-main-milwaukee':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Soldiers_Home_Milwaukee.jpg/960px-Soldiers_Home_Milwaukee.jpg', 900, 675, 'James Steakley', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Soldiers_Home_Milwaukee.jpg', '2026-11-26', 'name'),
+}
