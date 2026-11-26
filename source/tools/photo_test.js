@@ -116,8 +116,33 @@ const { chromium } = require('playwright');
     await tap(); await p.waitForTimeout(400); const g=await big();
     ok('a tap on the picture opens it large over the page, asking for a bigger copy',!!g&&/\/1280px-Stored\.jpg$/.test(g.src),g?g.src:'no large view');
     ok('the large view carries the credit',!!g&&/Sam Stored/.test(g.cap)&&/CC BY 4\.0/.test(g.cap),g?g.cap.slice(0,80):'');
-    await p.evaluate(()=>{ const n=document.querySelector('#photobig'); if(n) n.click(); }); await p.waitForTimeout(300);
+    await p.touchscreen.tap(200,700); await p.waitForTimeout(500);
     ok('a tap on it puts it away again',(await big())===null);
+    // ---- the large picture can be pinched bigger (the owner, November 25, 2026), dragged about, and put away with its own button
+    { const cdp=await p.context().newCDPSession(p); const tp=pts=>pts.map((q,i)=>({x:q[0],y:q[1],id:i}));
+      const touch=async(type,pts)=>{ await cdp.send('Input.dispatchTouchEvent',{type,touchPoints:tp(pts)}); await p.waitForTimeout(40); };
+      const st=()=>p.evaluate(()=>{ const n=document.querySelector('#photobig'); if(!n||n.hidden) return null; const i=n.querySelector('img'), m=new DOMMatrix(getComputedStyle(i).transform); return {w:m.a,l:m.e,page:visualViewport.scale,x:!!n.querySelector('button.pbx'),cap:n.querySelector('p').textContent}; });
+      await tap(); await p.waitForTimeout(400); await p.evaluate(()=>{ const i=document.querySelector('#photobig img'); i.style.width=i.style.height='300px'; });   /* the test's picture is a dot: give it a size */
+      const s0=await st();
+      ok('pinch: the large view says it can be pinched and has a button to close it',!!s0&&s0.x&&/pinch/i.test(s0.cap),JSON.stringify(s0));
+      await touch('touchStart',[[170,400],[220,400]]); await touch('touchMove',[[140,400],[250,400]]); await touch('touchMove',[[95,400],[295,400]]); await touch('touchEnd',[]); await p.waitForTimeout(200); const s1=await st();
+      ok('pinch: two fingers spread apart make the picture bigger, not the page',!!s1&&s1.w>s0.w*2.5&&s1.page===1,JSON.stringify([s0&&s0.w,s1]));
+      await touch('touchStart',[[200,400]]); await touch('touchMove',[[160,400]]); await touch('touchMove',[[120,400]]); await touch('touchEnd',[]); await p.waitForTimeout(200); const s2=await st();
+      ok('pinch: one finger then slides the bigger picture about',!!s2&&s2.l<s1.l-50&&Math.abs(s2.w-s1.w)<.02,JSON.stringify([s1&&s1.l,s2&&s2.l]));
+      await touch('touchStart',[[200,300]]); await touch('touchEnd',[]); await p.waitForTimeout(450);
+      ok('pinch: a tap does not put a zoomed picture away',(await st())!==null);
+      await touch('touchStart',[[200,300]]); await touch('touchEnd',[]); await touch('touchStart',[[200,300]]); await touch('touchEnd',[]); await p.waitForTimeout(450); const s3=await st();
+      ok('pinch: a double tap takes it back to its first size',!!s3&&Math.abs(s3.w-1)<.02&&Math.abs(s3.l)<2,JSON.stringify([s0,s3]));
+      await touch('touchStart',[[200,300]]); await touch('touchEnd',[]); await touch('touchStart',[[200,300]]); await touch('touchEnd',[]); await p.waitForTimeout(450); const s4=await st();
+      ok('pinch: and a double tap on a picture at its first size makes it bigger',!!s4&&s4.w>s0.w*1.8,JSON.stringify(s4));
+      await p.evaluate(()=>{ const x=document.querySelector('#photobig button.pbx'); x&&x.click(); }); await p.waitForTimeout(200);
+      ok('pinch: the close button puts it away, zoomed or not',(await st())===null);
+      await tap(); await p.waitForTimeout(400); const s5=await st();
+      ok('pinch: opened again it is back at its first size',!!s5&&Math.abs(s5.w-1)<.02,JSON.stringify(s5));
+      await touch('touchStart',[[200,700]]); await touch('touchEnd',[]); await p.waitForTimeout(450);
+      ok('pinch: a single tap still puts an unzoomed picture away',(await st())===null); await cdp.detach();
+      await tap(); await p.waitForTimeout(400); const bk=await p.evaluate(()=>window.atlasBack()); await p.waitForTimeout(150);
+      ok('the phone\'s Back button puts the large picture away and leaves the place page open',bk===true&&(await st())===null&&await p.evaluate(()=>!!document.querySelector('#v-detail .dphoto img'))); }
     const more=await p.evaluate(()=>{ const a=document.querySelector('#v-detail #d-morephotos'); return a?{href:a.getAttribute('href'),t:a.textContent,target:a.getAttribute('target')}:null; });
     const nm=await p.evaluate(()=>document.querySelector('#v-detail h2').textContent);
     ok('the place page has a "More photos" link that searches for pictures of it by name, outside the Atlas',!!more&&/^https:\/\/www\.google\.com\/search\?/.test(more.href)&&/udm=2|tbm=isch/.test(more.href)&&decodeURIComponent(more.href.replace(/\+/g,' ')).indexOf(nm)>=0&&more.target==='_blank',more?more.href.slice(0,120):'no link'); }
