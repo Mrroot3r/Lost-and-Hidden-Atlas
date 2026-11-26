@@ -2465,12 +2465,38 @@ function placePhoto(s){ if(PHOTO.has(s.id)) return PHOTO.get(s.id);
   PHOTO.set(s.id,pr); return pr; }
 /* a tap on the picture: the same photo large over the page, with its credit; a tap anywhere (or Escape) puts it away.
    A bigger copy (1280 px, one of the sizes Wikimedia serves) is asked for where the address is a Wikimedia thumbnail; if that fails the copy already shown is used. */
+/* The picture, large. It can be pinched bigger (up to 6 times), slid about with one finger, and double-tapped bigger or back; a mouse
+   wheel does the same. The page itself never zooms (vvFit), so this is done by hand: PZ holds the size and the shift of the picture. */
+const PZ={k:1,x:0,y:0,pts:new Map(),moved:false,last:0,tapT:0};
+function pzSet(k,x,y){ const n=$('#photobig'), i=n&&n.querySelector('img'); if(!i) return; k=Math.max(1,Math.min(6,k));
+  const mx=Math.max(0,(i.offsetWidth*k-n.clientWidth)/2+(k>1?40:0)), my=Math.max(0,(i.offsetHeight*k-n.clientHeight)/2+(k>1?40:0));
+  PZ.k=k; PZ.x=k===1?0:Math.max(-mx,Math.min(mx,x)); PZ.y=k===1?0:Math.max(-my,Math.min(my,y));
+  i.style.transform=k===1?'':'translate('+PZ.x+'px,'+PZ.y+'px) scale('+k+')'; n.classList.toggle('zoomed',k>1);
+  if(k>1.5&&i.dataset.more){ const more=i.dataset.more, was=i.src; delete i.dataset.more; const t=new Image(); t.onload=()=>{ if(i.src===was) i.src=more; }; t.src=more; } }
+/* make the picture k times its first size, keeping the point (fx,fy) of the screen under the finger */
+function pzAt(k,fx,fy){ const n=$('#photobig'), i=n.querySelector('img'); k=Math.max(1,Math.min(6,k));
+  const cx=i.offsetLeft+i.offsetWidth/2, cy=i.offsetTop+i.offsetHeight/2, r=k/PZ.k; pzSet(k,fx-cx-(fx-cx-PZ.x)*r,fy-cy-(fy-cy-PZ.y)*r); }
 function photoBig(ph){ let n=$('#photobig');
   if(!n){ n=el('div',{id:'photobig',hidden:true,role:'dialog','aria-label':'The photograph, larger'}); document.body.append(n);
-    n.addEventListener('click',e=>{ if(e.target.tagName!=='A') n.hidden=true; }); document.addEventListener('keydown',e=>{ if(e.key==='Escape') n.hidden=true; }); }
-  n.textContent=''; const big=/\/\d+px-[^/]+$/.test(ph.src)?ph.src.replace(/\/\d+px-([^/]+)$/,'/1280px-$1'):ph.src;
-  const img=el('img',{src:big,alt:ph.title?'Photograph from the Wikipedia article '+ph.title:'Photograph of this place from Wikimedia Commons'}); img.addEventListener('error',()=>{ if(img.getAttribute('src')!==ph.src) img.src=ph.src; });
-  n.append(img,el('p',null,'Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where),el('span',{text:' · Tap to close'}))); n.hidden=false; }
+    const shut=()=>{ n.hidden=true; PZ.pts.clear(); clearTimeout(PZ.tapT); };
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape') shut(); });
+    n.addEventListener('click',e=>{ if(e.target.closest('.pbx')) shut(); });
+    const two=()=>{ const [a,b]=[...PZ.pts.values()]; return {d:Math.hypot(a.x-b.x,a.y-b.y)||1,x:(a.x+b.x)/2,y:(a.y+b.y)/2}; };
+    n.addEventListener('pointerdown',e=>{ if(e.target.closest('a,button')) return; PZ.pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); if(PZ.pts.size===1) PZ.moved=false; else PZ.moved=true; if(PZ.pts.size===2) PZ.g=two(); });
+    n.addEventListener('pointermove',e=>{ const q=PZ.pts.get(e.pointerId); if(!q) return; const dx=e.clientX-q.x, dy=e.clientY-q.y;
+      if(PZ.pts.size===1){ if(!PZ.moved&&Math.hypot(dx,dy)<8) return; PZ.moved=true; q.x=e.clientX; q.y=e.clientY; if(PZ.k>1) pzSet(PZ.k,PZ.x+dx,PZ.y+dy); return; }
+      q.x=e.clientX; q.y=e.clientY; if(PZ.pts.size===2){ const g=two(); pzAt(PZ.k*g.d/PZ.g.d,g.x,g.y); pzSet(PZ.k,PZ.x+g.x-PZ.g.x,PZ.y+g.y-PZ.g.y); PZ.g=g; } });
+    const up=e=>{ if(!PZ.pts.delete(e.pointerId)) return; if(PZ.pts.size||PZ.moved||e.type==='pointercancel') return; const now=Date.now();
+      if(now-PZ.last<320){ PZ.last=0; clearTimeout(PZ.tapT); pzAt(PZ.k>1?1:2.5,e.clientX,e.clientY); return; }     /* a double tap */
+      PZ.last=now; clearTimeout(PZ.tapT); if(PZ.k===1) PZ.tapT=setTimeout(shut,330); };                              /* a single tap puts an unzoomed picture away */
+    n.addEventListener('pointerup',up); n.addEventListener('pointercancel',up);
+    n.addEventListener('wheel',e=>{ e.preventDefault(); pzAt(PZ.k*(e.deltaY<0?1.25:.8),e.clientX,e.clientY); },{passive:false}); }
+  n.textContent=''; PZ.pts.clear(); PZ.k=1; PZ.x=PZ.y=0; PZ.last=0; n.classList.remove('zoomed');
+  const sized=/\/\d+px-[^/]+$/.test(ph.src), big=sized?ph.src.replace(/\/\d+px-([^/]+)$/,'/1280px-$1'):ph.src;
+  const img=el('img',{src:big,draggable:false,alt:ph.title?'Photograph from the Wikipedia article '+ph.title:'Photograph of this place from Wikimedia Commons'}); img.addEventListener('error',()=>{ if(img.getAttribute('src')!==ph.src) img.src=ph.src; });
+  if(sized) img.dataset.more=ph.src.replace(/\/\d+px-([^/]+)$/,'/1920px-$1');       /* a sharper copy, asked for only once the picture is pinched bigger */
+  n.append(el('button',{class:'pbx',type:'button','aria-label':'Close the photograph',text:'✕'}),img,
+    el('p',null,'Photo: '+ph.who+' · '+ph.lic+' · ',ext(ph.page,ph.where),el('span',{class:'pbhint',text:' · Pinch to zoom · Tap to close'}))); n.hidden=false; }
 /* pictures of the place from elsewhere: an image search by name in the reader's browser. Nothing of it comes into the Atlas. */
 const morePhotos=s=>ext('https://www.google.com/search?udm=2&q='+encodeURIComponent([s.name,s.town,STATE[REG_STATE[s.reg]]].filter(Boolean).join(' ')),'More photos','btn sm');
 function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false) return null;
@@ -3170,6 +3196,7 @@ setTimeout(()=>{ if(pref('wikiPhotos')&&navigator.onLine!==false) phxLoad(); },2
 if(HOSTED&&!AT&&'serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* the phone's Back button, in the app: close whatever is open; returning false lets Android put the app in the background */
 window.atlasBack=()=>{
+  { const pb=$('#photobig'); if(pb&&!pb.hidden){ pb.hidden=true; PZ.pts.clear(); clearTimeout(PZ.tapT); return true; } }
   if(!$('#sheet').hidden){ closeSheet(); return true; }
   if(adding||spotting||pickingHome||asking){ $('#add-cancel').click(); return true; }
   if(!$('#rec-form').hidden){ $('#rec-form').hidden=true; return true; }
