@@ -28,6 +28,8 @@ jobs:
           python-version: '3.12'
       - name: Build the site
         id: build
+        env:
+          ATLAS_PHOTOS: '1'          # look up the Wikipedia picture of places written since the last build (source/tools/ci_build.sh)
         run: |
           set -o pipefail
           pip install --quiet requests Pillow numpy rasterio

@@ -109,6 +109,7 @@ def main():
     P={k:v for k,v in P.items() if k in live}
     todo=[(s,title_of(s)) for s in S if title_of(s) and s['id'] not in P][:n]
     print(len(todo),'places to look up;',len(P),'already known')
+    if not todo and len(P)==len(D['p']): print('src/photos.json: nothing new to look up; left as it is'); return      # so a build that runs this every time does not rewrite the file for nothing
     def save():
         json.dump({'asof':datetime.date.today().isoformat(),'p':dict(sorted(P.items()))},open(F+'.part','w',encoding='utf-8'),ensure_ascii=False,separators=(',',':')); os.replace(F+'.part',F)      # whole or not at all: a build may be reading it
     lookup(todo,P,lambda k:(save(),print('  %d of %d looked up; %d with a picture so far'%(k,len(todo),sum(1 for v in P.values() if v)))))
