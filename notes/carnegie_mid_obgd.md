@@ -4,6 +4,7 @@ region: dc, md, va, wv
 date: 2026-11-24
 places: 29
 file: data_carnegie_mid_obgd.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -29,12 +30,10 @@ Delaware had no Carnegie library, by Wikipedia's state lists.
 - **Brick:** red brick read only for Waynesboro (dark red brick, SAH Archipedia). Pale or stone walls from the sources for Huntington, Parkersburg, the Mount Vernon Square library and Mount Pleasant. The rest are not checked; Commons refused picture requests while the batch was researched.
 
 ## Leads not finished
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (1 row). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town | What is known | Why it was not added |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Homestead (Waverly) branch, 1443 Gorsuch Avenue | Baltimore | Carnegie branch opened December 1911; moved to East 33rd Street in 1971 | whether the old building stands was not found |
 
 ## Tips for the next session
-
-- **Baltimore:** the Pratt library's location history page (prattlibrary.org/about-us/history/location-history) gives opening and closing dates for every branch, and the Maryland Historical Trust form B-1387 (filed under that name, though it is B-1384 inside) gives branch numbers and architects.
-- **Lookalike:** Randolph College in Lynchburg is not Randolph-Macon College in Ashland.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

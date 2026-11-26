@@ -1,4 +1,5 @@
 # Pictures batch thyb (2026-11-22)
+tidied: 2026-11-26
 
 ## What this batch is
 

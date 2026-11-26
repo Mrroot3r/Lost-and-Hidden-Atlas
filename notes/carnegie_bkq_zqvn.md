@@ -4,6 +4,7 @@ region: nyc
 date: 2026-11-24
 places: 28
 file: data_carnegie_bkq_zqvn.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -19,12 +20,10 @@ Not checked: opening hours (none taken; "?" everywhere); whether Brownsville and
 Pictures: chosen on Wikimedia Commons for all 22 standing buildings; the six sites have none. Brownsville (tan brick), Bushwick, Carroll Gardens, Park Slope and Saratoga (red brick) have their brick from those pictures.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (1 row). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Red Hook Carnegie library (1915–1946) | Brooklyn, New York | Street number on Visitation Place; the pin is approximate | bklynlibrary.org/locations/red-hook/history |
 
 ## Tips
-
-- The Historic Districts Council's labels ("Library, no designation") are from about 2009 and miss later designations (Stone Avenue, 2015).
-- Wikipedia's list and the library's own history pages often differ by a year on opening dates; the notes give both.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

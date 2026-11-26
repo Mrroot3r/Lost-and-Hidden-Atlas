@@ -4,17 +4,16 @@ region: mb
 date: 2026-11-19
 places: 17
 file: data_mb_xums.py
+tidied: 2026-11-26
 
 ## What this batch is
 Seventeen places spread over Manitoba, which had one (the Old Pinawa Dam): in Winnipeg the Trappist monastery ruins at St. Norbert, the burned St. Boniface Cathedral façade, Seven Oaks House and Dalnavert; on the lower Red River Lower Fort Garry, St. Andrew's on the Red and the St. Peter Dynevor Old Stone Church; in the east and south the Cooks Creek church and grotto, Old St. Michael's at Gardenton (the first Ukrainian church in Canada) and the Neubergthal street village; in the west the Criddle/Vane homestead, the Neepawa court house, Riding Mountain's East Gate and the Inglis elevator row; in the north Christ Church at The Pas, Prince of Wales Fort and the York Factory Depot. Facts and a site coordinate for each came from the Manitoba Historical Society's "Historic Sites of Manitoba" pages (mhs.mb.ca, read with `page.py --all`), with Canadian Register statements, the Province's heritage pages, Wikipedia (`wiki_raw.py`) and the operators' own pages for hours (Parks Canada, Manitoba Parks, Seven Oaks House Museum, Friends of Dalnavert, ingliselevators.com, immaculatechurch.ca). Nothing was checked on the ground. Not checked: service times at St. Andrew's on the Red, St. Peter Dynevor, St. Boniface Cathedral and Christ Church (no parish page found or the cathedral's site would not connect); when Old St. Michael's opens beyond its annual pilgrimage; Neubergthal tour times (the Heritage Foundation's tour and visit pages answer 404); opening dates at Prince of Wales Fort and York Factory and the Lower Fort Garry hours page (404; hours taken from its visit pages); park hours at the Trappist and Criddle/Vane provincial heritage parks; when the present Christ Church at The Pas was built. Pins moved after the pin check: Lower Fort Garry (the MHS coordinate was on the riverbank; moved to MHS's own Big House coordinate), Dalnavert and Inglis (to OpenStreetMap points), Gardenton (38 m onto the church with `pix.py`). Neubergthal's pin is the village street (prec area). There is no 1 m LiDAR in Manitoba and no public-land layer, so every `CHECK ACCESS` line is expected; access notes name the owner from the operators' pages. Red brick from sources or Wikimedia photos: Dalnavert yes; Cooks Creek no (painted yellow); Neepawa no (buff brick); stone, log and wood buildings no; six left '?'.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (1 row). New leads for this ground go in the note of the batch that finds them.
+
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Quarry Superintendent's House ruins | Garson, MB (50.07879, -96.69302, MHS coordinate) | Limestone-block house of 1916 for the Wallace Sandstone Company's superintendent; disused after the mill burned January 22, 1917; wall remnants stand (MHS page `quarryhouse`, photos 2019) | The coordinate is in woods beside the highway with nothing visible on the aerial; owner and any public way in not found |
 
 ## Tips
-- The Manitoba Historical Society's "Historic Sites of Manitoba" pages (`https://mhs.mb.ca/docs/sites/<slug>.shtml`) read well with `page.py --all -n 30000` and give a "Site Coordinates (lat/long): N.., W.." line; the slug is often guessable (`lowerfortgarry`, `rielhouse`) and `page.py` returns "MHS Page not found" when it is not, so a `site:mhs.mb.ca` web search finds the rest. Two of seventeen MHS coordinates were off the building (Lower Fort Garry on the riverbank, Inglis on grass); Lower Fort Garry's page also lists each building's coordinate.
-- historicplaces.ca reset the connection on the first try for two statements and read on a second try a few seconds later.
-- Parks Canada hours pages (`.../visit/heures-hours`, `.../visit/installations-facilities`) answered 404 or reset for Lower Fort Garry, Prince of Wales Fort and York Factory; the plain `.../visit` page read and gives the season notices.
-- `parking.py` listed an "Avenue de la Cathédrale" lot at St. Boniface and an East Gate lot at Riding Mountain that the aerial showed as a roof and as trees; they were not used.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

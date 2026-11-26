@@ -1,4 +1,5 @@
 # Pictures batch eqqg
+tidied: 2026-11-26
 
 Photo choices only (tools/pics_eqqg.py); no places, pins or text changed.
 

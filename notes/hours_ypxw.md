@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-19
 places: 0
 file: hours_ypxw.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. Twenty-eight New York places from `tools/hours.py list "New York" --kind worship` were looked up. Nineteen got service times or opening hours from the page of whoever runs them, each read in the session; nine are recorded `?` because no page of their own gave any.
@@ -40,8 +41,4 @@ No church in this batch was found to be closed or sold.
 None.
 
 ## Tips
-- Churches share names: three of the first sites a search offered were namesakes in other states (Indiana, Iowa, Ohio) and one a Zion in Douglaston, Queens. `hours.py page` prints the address line; read it before the times.
-- For Episcopal churches in the Diocese of Albany try `albanyepiscopaldiocese.org/<name>-church-<town>-ny/` first; when it gives no times, the same church's episcopalassetmap.org page often does.
-- unyumc.org/find-a-church/<town>-umc works for Upper New York Methodist churches, but "Main Service" is often blank.
-- Not tried this session and likely to have pages of their own: First Presbyterian, Cooperstown; Reformed Church on Staten Island; Zion, Rome; St. Andrew's, Walden; Woodrow Methodist; Sand Lake Center for the Arts (slca.org is not it).
-- Batchellerville Presbyterian: the Town of Edinburg's page says services there are in July and August at 9:00 a.m. (Northville the rest of the year). That is a town list, not the church's page, so it was not recorded; the Northville church's own page is the one to find.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (5 tips).

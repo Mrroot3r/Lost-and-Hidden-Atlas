@@ -4,6 +4,7 @@ region: in
 date: 2026-11-24
 places: 30
 file: data_carnegie_inc_hxmd.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -35,6 +36,4 @@ Indiana's Carnegie libraries for towns R to W, and Earlham College's Carnegie li
 - The A to P leads are in carnegie_ina_rbqw.md and carnegie_inb_vkzt.md.
 
 ## Tips for the next session
-
-- Indiana state historical marker pages give dates, architects and materials for many Carnegie libraries.
-- Watch for same-named towns in other states (Rockport, Shelbyville, Winchester).
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_awyp.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. New York had no church left that this session could do (its two waiting churches, Smith Clove and the Old School Baptist Meeting House in Warwick, open only once a year or for rentals), so the list came from `tools/hours.py list --kind worship` across every state: 42 churches were waiting, 30 were looked up.
@@ -47,6 +48,4 @@ Not looked up this session (still waiting): German Evangelical St. John's, Hebro
 No church was found to be closed or sold.
 
 ## Tips for the next session
-- The Diocese of Alexandria's parish pages (diocesealex.org/church/...) list each mission church's address and Mass times under its parent parish; read the whole page with `tools/page.py -g`, not only `hours.py page`.
-- episcopalassetmap.org node numbers found by search are often for another church of the same name: check the address line it prints.
-- `tools/page.py` takes `-g pattern` before the address, not after.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

@@ -1,4 +1,5 @@
 # Pictures batch ymhs (2026-11-20, scheduled run)
+tidied: 2026-11-26
 
 Thirty places already on the map that had no picture were looked at with `tools/photo_find.py`. Nine got a picture and twenty-one got none. The pictures and their credits come from Wikimedia Commons; nothing was typed by hand.
 
@@ -26,6 +27,4 @@ Thirty places already on the map that had no picture were looked at with `tools/
 - Wikimedia answered slowly; the look step for some batches ran past the shell's time limit and was re-run in the background. No look failed with a 429.
 
 ## Tips for the next session
-
-- Re-run `photo_find.py look` for a batch in the background and poll the output file: a batch of five can take several minutes.
-- Blank grey candidates on a sheet mean the thumbnail did not load, not that the photo is empty. Re-run the look for that place alone before deciding.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

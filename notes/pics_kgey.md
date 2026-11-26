@@ -1,4 +1,5 @@
 # Pictures batch kgey
+tidied: 2026-11-26
 
 A pictures run (job 8): 34 places came up; 23 got a picture, 7 were answered "none" by me, 4 were recorded as none by the tool itself (nothing on Commons, including Kaubisch Memorial Library, Osceola and Owensville; a Lansingburgh church was an earlier none the tool kept).
 

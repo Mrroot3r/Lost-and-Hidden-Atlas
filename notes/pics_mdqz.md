@@ -1,4 +1,5 @@
 # Pictures batch mdqz (scheduled pictures run, 22 November 2026)
+tidied: 2026-11-26
 
 What this is: a pictures-only pull request. It adds tools/pics_mdqz.py and no new places, pins or text about places. The first 30 places listed as waiting by `photo_find.py list --n 30` were looked at, five at a time, from their candidate sheets.
 

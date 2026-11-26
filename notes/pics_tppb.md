@@ -1,4 +1,5 @@
 # pics_tppb: photograph search (job 8, pictures)
+tidied: 2026-11-26
 
 30 places that had no photograph were checked against Wikimedia Commons candidates.
 

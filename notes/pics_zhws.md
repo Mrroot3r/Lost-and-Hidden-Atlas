@@ -1,4 +1,5 @@
 # Pictures batch zhws (2026-11-21, scheduled run)
+tidied: 2026-11-26
 
 What this batch is: a pictures job (PROMPTS.md job 8). No new places, no pins, no text. It chose photographs for 30 places already on the map that had none, by looking at the candidate sheets from tools/photo_find.py. Only tools/pics_zhws.py is new.
 

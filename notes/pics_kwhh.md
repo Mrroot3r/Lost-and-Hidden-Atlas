@@ -1,4 +1,5 @@
 # pics_kwhh: pictures for places that had none
+tidied: 2026-11-26
 
 30 places looked at (six rounds of `photo_find.py next 5`): 18 got a picture, 12 got "none" from the session. The tool recorded another 6 as "none" by itself (nothing on Commons, or an earlier none stood).
 

@@ -1,4 +1,5 @@
 # Pictures batch pics_wcac (2026-11-25)
+tidied: 2026-11-26
 
 Pictures job: two rounds of `photo_find.py next 15`, 30 places looked at.
 

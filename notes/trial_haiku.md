@@ -1,4 +1,5 @@
 # Pictures trial: Claude Haiku 5.5 (claude-haiku-5-5), 20 November 2026
+tidied: 2026-11-26
 
 blackstone-canal-uxbridge | none | no candidates: nothing on Commons within 250 m
 kessler-park-reservoir | none | no candidates: nothing on Commons within 150 m

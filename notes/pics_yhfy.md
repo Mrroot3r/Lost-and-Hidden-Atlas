@@ -1,4 +1,5 @@
 # Pictures batch yhfy (scheduled "pictures" job)
+tidied: 2026-11-26
 
 Picked 30 places waiting for a photograph from `photo_find.py list --n 30`, looked at five at a time with `photo_find.py look`, and recorded one answer for each.
 

@@ -1,4 +1,5 @@
 # Pictures batch rjhy
+tidied: 2026-11-26
 
 Photographs chosen for places already on the map that had none. No places, pins or text changed.
 

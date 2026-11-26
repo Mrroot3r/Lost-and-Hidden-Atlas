@@ -4,6 +4,7 @@ region: njc, njn, njs
 date: 2026-11-24
 places: 30
 file: data_carnegie_nj_rwbk.py
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -18,19 +19,10 @@ Not checked: Lakewood's pin is 200 Monmouth Avenue, given in a directory for Cat
 Pictures: from Wikimedia Commons for the East Orange Elmwood branch, Long Branch, Verona and the Musto Center (West Hoboken); fourteen more places show their Wikipedia article's picture. None fitted East Orange's main and Franklin buildings, Avon, Caldwell, Elizabeth's Liberty Square branch, Lakewood, Nutley, Vineland or Westfield. The finder ran without the Commons login, at the slow pace.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (6 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| East Camden Carnegie branch | Camden, New Jersey | Which building it was; the Wikipedia list says torn down. A city library with the firehouse at Federal Street, Westfield Avenue and 27th Street (standing in 2003) is a candidate, not tied to Carnegie by any source | dvrbs.camdenhistory.com/camden-streets/camdennj-streets-federalstreet.htm |
-| Englewood Carnegie library (1914–1968) | Englewood, New Jersey | Stands just east of the Lyceum on Palisade Avenue, set back (local paper, January 2024); NJ Monthly 2013 says torn down. Street number not found | thepressgroup.net/?p=23420 |
-| Little Falls Carnegie library (1918) | Little Falls, New Jersey | Torn down (Wikipedia list, NJ Monthly); site not found. Architect H. P. Crosby | Dubicki 2017 |
-| Orange Carnegie library | Orange, New Jersey | The $1,500 grant bought an existing building; which one is not found. The Stickler library at 348 Main Street is not Carnegie's | Dubicki 2017 |
-| Plainfield Carnegie library (1913–1968) | Plainfield, New Jersey | Torn down after 1968; faced Library Park, entrance on College Place, joined to the Job Male library. Whether the present library at 800 Park Avenue is on the same ground not found | plainfieldlibrarynj.org/OnlineExhibits/LBNF/Library.html |
-| Summit Carnegie library (1911–1964) | Summit, New Jersey | On Maple Street, replaced in 1964 by the library next door (75 Maple Street); the old lot and its demolition year not found | Wikipedia, Summit Free Public Library |
 
 ## Tips
-
-- Dubicki's article (New Jersey Studies 3, 2017, free PDF on njs.libraries.rutgers.edu) has a table of every New Jersey grant with dates, amounts, opening years and whether each building is still a library; better than the Wikipedia list, whose "razed" marks come from a 1996 walking club survey.
-- The Wikipedia list is wrong in places: Union Hill was torn down in 2026; Orange's 348 Main Street is the Stickler library, not Carnegie's; Lakewood may stand.
-- Lookalikes: Wikipedia's "Union City Public Library" is Union City, Indiana; lakewoodhistory.org is Lakewood, Ohio; littlefallshistoricalsociety.org is Little Falls, New York.
-- Wikipedia's point for Camden's main library is a block off; OpenStreetMap maps the ruin as a building.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

@@ -4,6 +4,7 @@ region: several
 date: 2026-11-22
 places: 0
 file: hours_pqjp.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py list --kind worship` showed 11 churches still waiting (9 in New York, 2 in Kentucky); all were looked up, so no church waits anywhere now. Then 11 museums and historic sites from `tools/hours.py list` without `--kind`. 22 places recorded: 13 with times from the page of whoever runs the place, 9 recorded `?`. Pages were read with `tools/hours.py page` / `tools/page.py`, and where those could not read a page (TLS failure, script-drawn page, 403) with the web fetch tool; the address or town on each page was checked against the place.
@@ -41,5 +42,4 @@ Not checked: nothing was seen on the ground and no telephone call was made. No c
 |---|---|---|---|
 
 ## Tips
-- `hours.py page` failed outright on huntersynagogue.org (TLS: certificate chain) and unyumc.org (connection reset), and gave nothing on parks.canada.ca (script-drawn); the web fetch tool read all three.
-- Looked up but not recorded, for the next session: Fordyce Bathhouse (the NPS Hot Springs hours page does not mention it), White Hall, Richmond KY (eku.edu/whitehall now redirects to a visitors' bureau listing), Fort Hartsuff (only a 2025 event-day notice found).
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

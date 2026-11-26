@@ -1,4 +1,5 @@
 # Pictures batch pics_cmrv
+tidied: 2026-11-26
 
 - Places given a picture: 0
 - Places I said none for: 1 (farmers-state-bank-ryckerts-lenexa-ks: candidates were locomotives and trains photographed near the pin, and banks in other towns and states)

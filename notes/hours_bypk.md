@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-20
 places: 0
 file: hours_bypk.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. Thirty-one New York places of worship from `tools/hours.py list "New York" --kind worship` were looked up. Four got service times from the page of whoever runs them, each read in the session with `hours.py page`; twenty-seven are recorded `?` because no page of their own gave any after two searches. Most of the `?` ones are small rural or museum-held churches that seem to have no web page of their own at all.
@@ -32,5 +33,4 @@ Not checked: nothing was seen on the ground, and no telephone call was made. No 
 | Christian Church, East Delhi; White Store Church; Union Valley; Otsdawa Baptist; Second Old School Baptist, Roxbury; Snells Bush; Christ Episcopal, Belvidere; East Genoa; Trinity, Fairfield; Nelson Welsh; Heritage Hall, Cincinnatus; Reformed Dutch, Latham | searches | Only Wikipedia, NRHP, HMdb and history pages; none gives opening times |
 
 ## Tips for the next session
-- The search engine available here returns few small-church sites; the denomination listings work best: episcopalassetmap.org/node/<n> (Episcopal) and unyumc.org/find-a-church/<slug> (Upper New York Methodists).
-- White Store Church holds a public Memorial Day service and summer socials (Evening Sun news, 2018 and 2019); an annual event page of its own would give it hours.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

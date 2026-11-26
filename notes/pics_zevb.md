@@ -1,4 +1,5 @@
 # Pictures batch pics_zevb
+tidied: 2026-11-26
 
 Photographs chosen for places already on the map; no new places, pins or text.
 

@@ -1,4 +1,5 @@
 # Pictures batch pics_gkmc
+tidied: 2026-11-26
 
 Pictures job: 30 places looked at over six rounds of `photo_find.py next 5`.
 

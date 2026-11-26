@@ -1,4 +1,5 @@
 # Pictures run, November 22, 2026 (pics_akhr)
+tidied: 2026-11-26
 
 Scheduled pictures job (job 8). About 30 places were meant to get a look; the run stopped at 40 minutes with 12 looked at by eye and 5 more recorded as "nothing on Commons" by the tool itself.
 

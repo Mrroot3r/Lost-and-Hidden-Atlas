@@ -1,4 +1,5 @@
 # Pictures batch ndkt
+tidied: 2026-11-26
 
 Job 8 (pictures). 30 places had a look from a session, in six rounds of `next 5`. Commons login: logged in.
 

@@ -1,4 +1,5 @@
 # Pictures batch cfrf (scheduled pictures run, 23 November 2026)
+tidied: 2026-11-26
 
 What this batch is: a photograph chosen for places already on the map that had none. No new places, no pins, no text. The file is `tools/pics_cfrf.py`.
 

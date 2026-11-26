@@ -1,4 +1,5 @@
 # Pictures batch pgdj
+tidied: 2026-11-26
 
 Photographs chosen from Wikimedia Commons for places that had none (`tools/pics_pgdj.py`). No places, pins or text changed.
 

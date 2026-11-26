@@ -1,4 +1,5 @@
 # Pictures batch pics_jydz
+tidied: 2026-11-26
 
 30 places already on the map were looked at for a photograph. 8 got a picture, 22 got none.
 

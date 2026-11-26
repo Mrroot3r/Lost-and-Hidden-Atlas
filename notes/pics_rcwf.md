@@ -1,4 +1,5 @@
 # Pictures batch rcwf (scheduled pictures run, 22 November 2026)
+tidied: 2026-11-26
 
 23 places from the waiting list were looked at, in three rounds of `photo_find.py next 5`, and the run stopped at about 40 minutes.
 

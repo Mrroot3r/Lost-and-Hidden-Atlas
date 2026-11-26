@@ -18,6 +18,7 @@ for f in sorted(glob.glob('tools/data_*.py')):
     bt=dict(m.BATCH); bt['n']=len(m.PLACES); bt['file']=name; BATCHES.append(bt)
     for p in m.PLACES:
         if not m.PIN_NOTES.get(p['id']): raise SystemExit(f"{name}.py: place '{p['id']}' has no pin note")
+        if p.get('st') not in ('ruins','traces','standing','marker','gone','water'): raise SystemExit(f"{name}.py: place '{p['id']}' has st='{p.get('st')}': it must be one of ruins, traces, standing, marker, gone, water (a wrong one used to stop the build later with a bare KeyError)")
         if re.search(r'\d|\s',p.get('tags') or ''): raise SystemExit(f"{name}.py: place '{p['id']}' has tags='{p['tags']}', which looks like years: an N(...) line is probably missing its tags argument ('' between eff and years), so every later field has moved one place along")
         BATCH_OF[p['id']]=bt['key']
     C+=m.PLACES; PNC.update(m.PIN_NOTES)

@@ -4,6 +4,7 @@ region: az, ca, fl, ga, il, men, njc, oh, on, pae, qc, riprov, tn, va, wy
 date: 2026-11-24
 places: 28
 file: data_rockefeller_zplo.py
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -50,15 +51,10 @@ Pictures:
 - **From their own Wikipedia article:** the other eleven.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (4 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Jordan Pond Gate Lodge | Mount Desert Island, Maine | Not added; staff housing, and the National Park Service asks visitors not to go near the windows, so it needs a careful access line | nps.gov/places/jordan-pond-gatehouse.htm |
-| Rockefeller Hall (1886) and Packard Hall (1888), Spelman College | Atlanta, Georgia | Funding read (Wikipedia; the Rockefeller Foundation's page for Packard); pins, access and pictures not done | en.wikipedia.org/wiki/Spelman_College |
-| Medical Center North, Vanderbilt University | Nashville, Tennessee | The General Education Board gave $4.5 million; opened 1925; pin, access and picture not done | news.vanderbilt.edu (2018); news.vumc.org (2025) |
-| Fisk University's Carnegie library | Nashville, Tennessee | A Carnegie library; a Commons picture showed it next to Cravath Hall; for the next Carnegie batch | Wikimedia Commons |
 
 ## Tips
-
-- Many Rockefeller buildings are named for him without his money, or the other way round. Read the gift in a source.
-- The park museums of the 1920s (Yosemite, Grand Canyon, Yellowstone) were paid for by grants from the Laura Spelman Rockefeller Memorial (for Yosemite, given through the American Association of Museums). Look for that fund's name, not the family's.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

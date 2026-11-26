@@ -1,4 +1,5 @@
 # Pictures batch zbrq
+tidied: 2026-11-26
 
 Pictures job, four rounds of `photo_find.py next 5` (every waiting place was taken; none wait now).
 

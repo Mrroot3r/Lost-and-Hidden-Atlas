@@ -1,4 +1,5 @@
 # Pictures batch pics_hkpv (2026-11-22)
+tidied: 2026-11-26
 
 What this batch is: a pictures job (PROMPTS.md job 8). No new places and no pins. It gives a photograph to places already on the map that had none, by looking at Wikimedia Commons candidates from `tools/photo_find.py next 5`. The only file is `source/tools/pics_hkpv.py`.
 

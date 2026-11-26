@@ -4,7 +4,9 @@
    stop, share, delete, and the Back button.
      cd android-app && node scripts/make-www.js && python3 -m http.server -d www 8772 &
      node source/tools/app_smoke.js http://localhost:8772/
-   Needs Playwright (npm install playwright; npx playwright install chromium). Exits 1 on any failure. */
+   Needs Playwright (npm install playwright; npx playwright install chromium). Exits 1 on any failure.
+   NOT for dist/web: pointed at the hosted build it waits for "Start a field log" and fails. The phone-size test of the
+   hosted build is tools/smoke.js. A pull request that changes no app code (place lists, pictures, hours) does not need this one. */
 const { chromium, devices } = require('playwright');
 const URL0 = process.argv[2] || 'http://localhost:8772/';
 (async () => {

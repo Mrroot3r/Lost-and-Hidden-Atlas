@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-20
 places: 0
 file: hours_gwqn.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. All 17 New York places of worship still waiting were looked up, then all 11 in Quebec, from `tools/hours.py list "<state>" --kind worship`. Twelve got times from the page of whoever runs them, each read in the session with `hours.py page` or `page.py --all`; 16 are recorded `?`.
@@ -40,7 +41,4 @@ Closed or sold: none found in this batch.
 None.
 
 ## Tips
-- The Episcopal Asset Map (episcopalassetmap.org/dioceses/<diocese>/list/<church>) gives Sunday times and a street address for Episcopal churches, and `hours.py page` reads it well. Search with allowed_domains set to it.
-- Archdiocese of Quebec church pages (ecdq.org/eglise-<name>/) give the address and link the parish's own mass page; read them with `page.py --all` and look at the end of the text, or grep the raw HTML for "Horaire des messes".
-- Quebec rural parishes now say Mass every second week in each church and publish dates by month or season; record the pattern and say the dates go stale.
-- unyumc.org church pages answered 404 or reset the connection in this session.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

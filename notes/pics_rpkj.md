@@ -1,4 +1,5 @@
 # Pictures batch rpkj
+tidied: 2026-11-26
 
 30 places looked at: 8 pictures recorded in the file, 18 recorded as none (nothing nearby on Commons, or only wrong subjects), and 4 landmark pins (ids starting `lm-`) dropped from the file because check.py does not accept `lm-` ids in a pics list. One of the four, lm-thomas-cole-house, had a good picture chosen (Thomas Cole NHS 09, the house with its porch) that is therefore not in this pull request; the other three were none.
 

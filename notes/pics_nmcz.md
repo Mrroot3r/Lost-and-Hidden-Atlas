@@ -1,4 +1,5 @@
 # Pictures batch nmcz
+tidied: 2026-11-26
 
 Job 8 (pictures): 30 places already on the map with no photograph, taken five at a time from `photo_find.py list --n 30`. No new places, no pins, no text about places. Every picture below was chosen by looking at its sheet; the address, credit and licence come from Wikimedia Commons through the tool.
 

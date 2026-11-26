@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-19
 places: 0
 file: hours_nrwn.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. Thirty New York places of worship from `tools/hours.py list "New York" --kind worship --n 30` were looked up. Nine got service times or opening hours from the page of whoever runs them, each read in the session with `hours.py page`; twenty-one are recorded `?` because no page of their own gave any.
@@ -39,6 +40,4 @@ No church was found to be closed or sold.
 ## Leads
 
 ## Tips
-- Web search gave titles only, and for a small rural congregation it returns directories almost every time. What worked: the denomination's own lists. The Diocese of Albany's pages (albanyepiscopaldiocese.org/<name>-<town>-ny/) and its county list at /447-2/; the Episcopal Church's episcopalassetmap.org (check the street address: a search for "St. Paul's" offers other towns' nodes); the Maronite eparchy's stmaron.org/parishes-n, which has a "Liturgical Schedule" for every parish.
-- A village's or town's own site sometimes links the congregation (hollandpatentny.gov/religious-organizations led to twinchurches.org).
-- pcusa.org and rca.org gave nothing usable for single congregations in this session.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

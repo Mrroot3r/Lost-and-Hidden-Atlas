@@ -1,4 +1,5 @@
 # Pictures batch fyma (2026-11-22)
+tidied: 2026-11-26
 
 A scheduled pictures run. It chose photographs for 13 places that had none, in three rounds of `photo_find.py next 5`. The run stopped at the 40-minute limit, so about 30 places were not reached.
 

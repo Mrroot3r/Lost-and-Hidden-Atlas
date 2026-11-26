@@ -1,4 +1,5 @@
 # Pictures batch hbzr (2026-11-21)
+tidied: 2026-11-26
 
 Scheduled pictures run: 30 places waiting, 15 given a picture, 15 given none. Each choice was made by looking at the sheet from `tools/photo_find.py look`; addresses, credits and licences come from Wikimedia Commons.
 

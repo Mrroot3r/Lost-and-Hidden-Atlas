@@ -4,6 +4,7 @@ region: in
 date: 2026-11-24
 places: 34
 file: data_carnegie_inb_vkzt.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -34,6 +35,4 @@ Indiana's Carnegie libraries for towns L to P, part of the owner's pass to put e
 - Rows Q to Z and Earlham College: not started yet.
 
 ## Tips for the next session
-
-- The Indiana Libraries journal article on Orange County's Carnegie libraries covers Orleans and Paoli in detail.
-- Many Indiana libraries put hours and history on their own sites; Waymarking is good for materials.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

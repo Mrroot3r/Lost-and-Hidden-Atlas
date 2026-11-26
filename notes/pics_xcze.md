@@ -1,4 +1,5 @@
 # Pictures batch xcze (2026-11-21)
+tidied: 2026-11-26
 
 ## What this batch is
 A scheduled pictures run (job 8). It looked at the first 30 places from `photo_find.py list` that had no picture, and recorded one answer for each in `tools/pics_xcze.py`. No places, pins or text were added.
@@ -25,6 +26,4 @@ A scheduled pictures run (job 8). It looked at the first 30 places from `photo_f
 - The first attempt to look at one batch of five timed out and was run again with a longer limit; no place was skipped.
 
 ## Tips
-- `photo_find.py look` on five places can take more than two minutes when Commons is slow. Running it with a longer timeout, and writing the output to a file, worked.
-- `publish.sh` stopped once because main had moved; `resync.sh` kept the pics file and the rebuild passed.
-- `tools/app_smoke.js` expects the Android build (its page has a "Start a field log" button), so it cannot be pointed at `dist/web`. This batch changes no app code, so it was not run against the web build.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

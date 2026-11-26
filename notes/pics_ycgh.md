@@ -1,4 +1,5 @@
 # Pictures batch ycgh (pictures job, 2026-11-21 to 22)
+tidied: 2026-11-26
 
 Thirty places already on the map that had no photograph were looked at. Eleven got a picture and nineteen got none.
 Pictures were taken only from Wikimedia Commons by the photo tool; credits and licences come from Commons. No place, pin or text was added.

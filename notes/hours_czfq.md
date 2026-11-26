@@ -4,6 +4,7 @@ region: several
 date: 2026-11-22
 places: 0
 file: hours_czfq.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. It took the last churches waiting anywhere (seven in New York, two in Minnesota), then museums and other open places from `tools/hours.py list` without `--kind worship`. Twenty-nine were looked up: fourteen got times or a visiting arrangement from the page of whoever runs them, read in the session; fifteen are recorded `?`.
@@ -40,5 +41,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 No church was found to be closed or sold.
 
 ## Tips for the next session
-- No church waits anywhere now; the rest of the list is museums, theatres, post offices and capitols.
-- The Fosterfields and Clemence-Irons archived copies could be read by a session that can approve the web fetch tool.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

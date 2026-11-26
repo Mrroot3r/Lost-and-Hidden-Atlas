@@ -1,4 +1,5 @@
 # Pictures batch pics_qwcz (2026-11-22, scheduled run)
+tidied: 2026-11-26
 
 What this batch is: pictures only, for places already on the map that had none. No new places, no pins, no text. The file is source/tools/pics_qwcz.py (the tool wrote it; not edited by hand). Credits and addresses were taken from Wikimedia Commons by the tool.
 

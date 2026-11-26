@@ -52,7 +52,7 @@ if mode=='--leads':
     for n in notes:
         for r in n['leads']:
             k=norm(first(r))
-            if k in have: skipped.append((n['key'],first(r)))
+            if k in have: skipped.append((n['key'],first(r),r.strip()))
             else: have.add(k); add.append(r.strip())
     if add:
         t=open(LEADS,encoding='utf-8').read()
@@ -63,7 +63,7 @@ if mode=='--leads':
         t=n['text'][:s[0]]+'Moved to `LEADS.md` on '+TODAY+' by the tidy job ('+str(len(n['leads']))+(' rows' if len(n['leads'])!=1 else ' row')+'). New leads for this ground go in the note of the batch that finds them.\n\n'+HEAD_ROW+'\n|---|---|---|---|\n\n'+n['text'][s[1]:]
         open(n['path'],'w',encoding='utf-8').write(t)
     print('%d lead row(s) moved into LEADS.md from %d note(s).'%(len(add),sum(1 for n in notes if n['leads'])))
-    for k,nm in skipped: print('  not copied, LEADS.md already has a row of that name: %s (from notes/%s.md). Compare the two and keep the fuller in LEADS.md.'%(nm,k))
+    for k,nm,row in skipped: print('  not copied, LEADS.md already has a row of that name: %s (from notes/%s.md). Compare the two and keep the fuller in LEADS.md; a place of the same name in another town is another place: add it. The note\'s row (the note no longer holds it):\n    %s'%(nm,k,row))
     print('Next: the tips. Run  python3 tools/tidy.py %s  again for the list.'%clone); sys.exit(0)
 
 if mode=='--done':

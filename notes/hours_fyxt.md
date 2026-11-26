@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_fyxt.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py list --kind worship` showed only 3 churches waiting anywhere, all in Columbia County, New York; none had a page of its own, so all 3 are recorded `?` and no church now waits. Then 27 museums, state capitols and other public buildings from `tools/hours.py list` without `--kind`, each from the page of whoever runs the place, read in this session (`tools/hours.py page`, and the page's plain text where the tool's clock-line filter dropped the season or day lines). 30 places recorded: 27 with hours, 3 `?`.
@@ -33,6 +34,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 - Post offices (most of New York's waiting "others"): the USPS pages give the tools nothing, as earlier notes say; skipped.
 
 ## Tips for the next session
-- `hours.py set` refuses a row with no digit (and not "noon", "appointment", "services", "closed"): a page that gives a season but no times needs a phone number or "closed" from the page in the row, or `?`.
-- `hours.py page` prints only clock-time lines, so season lines ("July to August", "first weekend in April") are dropped; read the page's plain text for them before recording.
-- State capitols have good official pages; about a dozen more wait (California, Arizona, Oklahoma, West Virginia, Missouri, Michigan, Alabama, Georgia, Tennessee, Florida and the old capitols in Louisiana, Arkansas, Georgia, Mississippi, Wisconsin, Missouri).
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

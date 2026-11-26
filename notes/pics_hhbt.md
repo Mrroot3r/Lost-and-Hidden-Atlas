@@ -1,4 +1,5 @@
 # Pictures batch pics_hhbt
+tidied: 2026-11-26
 
 Seven rounds of `photo_find.py next 5` (35 places looked at). 23 places got a picture, 12 were answered "none" after looking, and the tool recorded 33 more as none by itself (nothing on Commons, or nothing new since an earlier look).
 

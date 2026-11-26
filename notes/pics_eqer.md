@@ -1,4 +1,5 @@
 # Pictures batch eqer (pictures job, 23 November 2026)
+tidied: 2026-11-26
 
 Photographs chosen for 38 places already on the map that had none. No new places, no pins, no text about places.
 

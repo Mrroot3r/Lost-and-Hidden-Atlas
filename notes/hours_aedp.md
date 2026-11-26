@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_aedp.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. New York had one church left waiting (Dundee); the rest came from `tools/hours.py list "<state>" --kind worship` for the states with the most churches still waiting. Twenty-seven were looked up: ten got times or a visiting arrangement from the page of whoever runs them, read in the session; seventeen are recorded `?`.
@@ -39,6 +40,4 @@ Not looked up this session (still waiting): Bethel Presbyterian, Alcorn MS; Bric
 No church was found to be closed or sold.
 
 ## Tips for the next session
-- Boston Avenue Methodist, Tulsa, is worth another try by a session that can open web.archive.org (or if bostonavenue.org stops refusing).
-- For BC Anglican churches, kootenayanglican.ca/west-kootenay-region/<church> pages print service times and street addresses cleanly.
-- Small rural Tennessee, Oklahoma and Idaho churches on the National Register mostly have no web page at all; expect `?`.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

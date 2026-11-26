@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_pcbn.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The last nine churches waiting anywhere (all in New York) were looked up first; with no church left waiting, the rest were museums, house museums and theatres from `tools/hours.py list` for New York, Massachusetts, New Hampshire and Florida. Thirty-eight places in all: 12 got days and times from the page of whoever runs them, read in the session; 26 are recorded `?`.
@@ -43,5 +44,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 Florida state parks' pages (floridastateparks.org) answered 403, so Fort Clinch, Fort Zachary Taylor and Koreshan were left waiting, not recorded.
 
 ## Tips for the next session
-- Post offices make up most of New York's remaining "open" places. USPS pages give the tools nothing; leave them.
-- No church waits anywhere now. The next places are museums: New York (about 22 left, mostly post offices), Massachusetts, New Hampshire, Florida, Nebraska.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

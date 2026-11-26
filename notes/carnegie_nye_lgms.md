@@ -4,6 +4,7 @@ region: cat, hud, midh, mohawk, nny, nyc, sch, wny
 date: 2026-11-24
 places: 15
 file: data_carnegie_nye_lgms.py
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -18,15 +19,10 @@ Not checked: Mount Vernon's hours (its page gives two tables without saying whic
 Pictures: found on Wikimedia Commons for Chatham, Johnstown, Saugerties, Port Jervis, Patchogue and Webster House (Kingston and Nyack show their Wikipedia articles' pictures); none fitted Catskill, Theresa, Mount Vernon, New Rochelle, Rockville Centre or Jordan Hall. The finder ran without the Commons login, at the slow pace.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (4 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Hamburg Carnegie library (1915–1966) | Hamburg, New York | On Center Street; whether it stands and its use today not found | buffalolib.org/hamburg-public-library/legacy-nineteenth-century-club |
-| Wells College Carnegie library (Cleveland Hall) | Aurora, New York | Not found on OpenStreetMap by name; the college closed in 2024 | Wikipedia, List of Carnegie libraries in New York |
-| Yonkers Carnegie library | Yonkers, New York | Torn down in May 1982; site not placed | Wikipedia, List of Carnegie libraries in New York |
-| White Plains Carnegie library | White Plains, New York | On Grand Avenue; whether it stands not found | Wikipedia, List of Carnegie libraries in New York |
 
 ## Tips
-
-- OpenStreetMap library points agreed with the geocoder within 35 metres for every working library in this batch.
-- HMdb marker pages can refuse the fetch; the marker's place then stays unchecked.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

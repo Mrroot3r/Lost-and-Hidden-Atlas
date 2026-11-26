@@ -1,4 +1,5 @@
 # Pictures batch arkp (2026-11-23, scheduled run)
+tidied: 2026-11-26
 
 What this batch is: pictures only, for places already on the map with none. No new places, no pins, no text. Chosen by looking at Wikimedia Commons sheets; the tool took each address, credit and licence from Commons.
 

@@ -4,6 +4,7 @@ region: oh
 date: 2026-11-24
 places: 30
 file: data_carnegie_ohnw_wjcj.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -22,13 +23,10 @@ Not checked:
 - Pictures: Commons pictures were chosen for the five places that had no Wikipedia picture (Jermain, Maumee, Marion, Norwalk, Sandusky); red brick on Jermain, Maumee and Norwalk and part brick on Marion was read off those pictures. The other 25 take their picture from Wikipedia or have none.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (2 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Lima Carnegie Library | Lima, Ohio | Whether and when it was pulled down; the site was the northeast corner of Market and McDonel (McDonald) Streets | History of Allen County (ldsgenealogy.com); Wikipedia's list says razed |
-| Rockford Carnegie Library | Rockford, Ohio | Whether the library at 162 South Main Street is the Carnegie building of 1910; no history page found | rcpubliclibrary.org |
 
 ## Tips
-
-- Lookalike library sites for same-named towns: lima.owwl.org (New York), marionpubliclibrary.org (Iowa), milanlibrary.org (Michigan), norwalklibrary.org (Iowa), wellsville-pl.ploud.net (another state).
-- The Toledo library's architecture site (tlcplarchitecture.omeka.net) has a page for every branch, retired ones included, with architect and opening date.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

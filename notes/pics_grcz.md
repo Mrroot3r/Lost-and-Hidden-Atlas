@@ -1,4 +1,5 @@
 # Pictures batch grcz (2026-11-21)
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -33,7 +34,4 @@ Sources read: the candidate sheets (`research/photofind_<id>.jpg`) for every pla
 - wcsr-remains: candidates are downtown Worcester views and a sidewalk star; no former streetcar building is shown.
 
 ## Tips for the next session
-
-- Commons answered 429 at the start of this run. Waiting a few minutes and then retrying worked.
-- `photo_find.py look` with five places ran past a two-minute foreground limit in this environment. Running it in the background with output to a file, then reading the file and the sheets, worked well.
-- `publish.sh` stopped once because `main` moved. `resync.sh` kept the new pics file, and the rebuild and publish then went through.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

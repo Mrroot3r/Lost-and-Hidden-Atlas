@@ -1,4 +1,5 @@
 # Pictures batch pics_yejz
+tidied: 2026-11-26
 
 30 places already on the map were looked at for a photograph (scheduled run, 21 November 2026). 13 got a picture, 17 got none. The choices are in tools/pics_yejz.py; every address, credit and licence was taken from Wikimedia Commons by the tool.
 

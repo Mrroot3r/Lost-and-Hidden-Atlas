@@ -4,6 +4,7 @@ region: wi
 date: 2026-11-24
 places: 51
 file: data_carnegie_wi_hnpo.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -29,6 +30,4 @@ file: data_carnegie_wi_hnpo.py
 - Gone, sites not found: Beloit public, Chippewa Falls (W Central St; its columns are said to stand at a furniture store), Fond du Lac, Manitowoc (North 8th St), Neenah, South Milwaukee (razed 1965), Wauwatosa.
 
 ## Tips for the next session
-
-- The Wisconsin Historical Society property records (wisconsinhistory.org/Records/Property/HI…) give walls, architect and other names in one page and load from here.
-- The Wisconsin Library Heritage Center's "razed Carnegies" page lists 14 gone buildings.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

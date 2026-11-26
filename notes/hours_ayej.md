@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-21
 places: 0
 file: hours_ayej.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py` showed only nine places of worship waiting anywhere (seven in New York, Sharon Temple in Ontario, Midway Church in Georgia); all nine were looked up, then New York museums and libraries from `hours.py list "New York"`. Every page was read in the session with `hours.py page` or `page.py`, and its street address or town checked against the place.
@@ -38,6 +39,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 | Glove Theatre, Proctors, Spencertown Academy, Fountain Arts Center, Fireman's Hall Alfred, Albany Pump Station | own sites / searches | Event venues with no standing hours on the pages read, or no page of their own; not recorded, left waiting |
 
 ## Tips for the next session
-- No church waits anywhere now (once this merges); the next hours sessions are museums and house museums.
-- `hours.py list` offers landmark pins (`lm-…`) that `check.py` then refuses in an hours file; skip them until that is fixed.
-- New York State Parks pages (parks.ny.gov/historic-sites/<name>/details.aspx) read well and give seasons and tour times.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

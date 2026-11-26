@@ -4,26 +4,16 @@ region: cny
 date: 2026-11-22
 places: 22
 file: data_cny_wayn.py
+tidied: 2026-11-26
 
 ## What this batch is
 Twenty-two places in Wayne County, New York, the first pass there (region `cny`, drawn at random by `choose.py --state ny`, which offered Lyons; the Atlas had nothing in the county). Canal: Enlarged Erie Lock 60 at Macedon (a cleared park), the Mud Creek aqueduct and the 1858 Aldrich iron change bridge in Pal-Mac Aqueduct Park, the Lockville locks 58 and 59 in Newark, Lock 56 (Poorhouse Lock) west of Lyons, Lock 54 at Lock Berlin, the 1821 Lock 64 ruins and glass works site in Clyde, and the Lyons dry dock with Dipper Dredge No. 3. Standing: Sodus Bay Lighthouse Museum (with the stones of the 1825 light), the Red Brick Church at Sodus Center, Alasa Farms (Sodus Bay Shakers, now Cracker Box Palace), the Wallington cobblestone schoolhouse and tavern, the Roe cobblestone schoolhouse in Butler, Pultneyville and Gates Hall, Heritage Square Museum in Ontario, the Grandin Printshop and the Smith Family Farm (Palmyra), the Historic Palmyra museums on Market Street, Zion Episcopal (Palmyra), the Museum of Wayne County History (the 1856 jail) and Grace Episcopal in Lyons, and the Hotchkiss peppermint oil building (museum). One marker site: the Fox sisters' Hydesville cottage. Sources: Wikipedia raw text (the county Register list and articles), HMdb marker pages found through HMdb's nearby lists round Palmyra, Lyons, Clyde, Newark, Sodus Point and Pultneyville, eriecanal.org's Traces pages for each lock, Trail Works' trail pages, the Erie Canalway heritage award page, and each museum's own page for hours (Sodus Bay Historical Society, Wayne County Historical Society, Lyons Heritage Society, Historic Palmyra, Heritage Square, the Church of Jesus Christ of Latter-day Saints' site pages, the Cobblestone Museum's catalogue for the Roe schoolhouse). Not checked: anything on the ground; who owns the ground at Lock 54, Lock 56, Lock 64 and Lockville (Trail Works lists Lock 56 and Lockville as public trails; Lock 54 and Lock 64 are view-only); parking at most places; service times at Zion and Grace Episcopal (no page of their own found: a search for each finds namesakes in Douglaston and Nyack); Alasa Farms' opening hours (only a state tourism listing gives any); the Red Brick Church's present owner. Pins that are not on the thing itself: Lock 54 (area; the marker on the Empire State Trail), Lock 64 (the marker at the end of Elm Street), Alasa Farms (on the farm buildings, which is a large property). The Grandin building's brick is red-glazed paint over brick, recorded 'no' by the rule for painted brick, though it looks red.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (9 rows). New leads for this ground go in the note of the batch that finds them.
+
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Old Customs House, Sodus Point | Sodus Point, Wayne County, NY (Register point 43.266944, -76.993611 falls on a road in a marina area) | 1874 Italianate brick bank, customs house and post office 1885 to 1968 (Wikipedia, Register 80002787) | The building's address or position, present use |
-| Enlarged Erie Lock 61 | Macedon, Wayne County, NY, north of Route 31 and 31F/350 | Double lock used as a spillway for Lock 30, not maintained; undisturbed stretch of the enlarged canal west of it (eriecanal.org, MacedonPalmyra.html) | Owner and a legal place to see it from |
-| Enlarged Erie Lock 53 | West of Clyde, Wayne County, NY | Double lock on private property, minimal maintenance (eriecanal.org Lock53.html) | Position; private, so view from the road only if one passes it |
-| Furnaceville iron furnace | Furnace Road at Bailey Road, Ontario, Wayne County, NY (43.2514, -77.2748) | Blast furnace built 1880 by the Furnaceville Iron Company, local ore (HMdb 172358, a town marker) | Whether anything is left |
-| Galen Historical Society Museum | 31 North Park Street, Clyde, NY | First brick building in Clyde, Baptist church 1833 to 1954, library 1955 to 1995 (HMdb 131853) | Hours from the society's own page |
-| Newark-Arcadia Historical Society museum and Hoffman Clock Museum | 120 High Street (society) and the Newark Public Library opposite, Newark, NY | Society museum open Saturdays 1 to 3 p.m., free; clock museum in the 1900 library since 1954 (newarkarcadiamuseum.org) | The clock museum's own hours page |
-| Lyons downtown and Broad Street–Water Street districts | Lyons, NY | Two Register districts (Wayne County courthouse in OpenStreetMap at 43.06374, -76.99285) | The courthouse's date and a source for what stands |
-| Clyde downtown and Smith-Ely Mansion | Clyde, NY | Register district and mansion (Erie Mansion, 39 West Genesee Street, by an HMdb marker) | Sources for dates and use |
-| Sodus Point coal trestle | NY 14 south of Sentell Street, Sodus Point, NY | Pennsylvania Railroad coal dock 1873, rebuilt 1927 to 800 ft (HMdb 79660) | Whether anything is left |
 
 ## Tips
-- HMdb nearby lists round six town centres gave most of this batch; the cached-page grep in GUIDE.md section 16 lists marker numbers, titles and positions at once.
-- eriecanal.org (Frank Sadowski's Traces pages, `eriecanal.org/Lock<n>.html` and `MacedonPalmyra.html`) reads in full with `page.py --all` and says what is left of each enlarged lock and who owns it.
-- Several Register list points in Wayne County fall off the building, on roads or in woods (Alasa Farms 2.5 km off in Alton, Wallington schoolhouse, Red Brick Church, Grace Episcopal); the ArcGIS geocoder found Cracker Box Palace, the Wallington schoolhouse and Grace Episcopal as POIs by name.
-- `nom.py` (OpenStreetMap search) answered "HTTP Error 629" twice in a row; waiting a few seconds and the ArcGIS geocoder worked.
-- The rule for red brick says painted brick is 'no'; the Grandin building is brick repainted in a red glaze, which reads as red brick. The rule might say what to do with red paint.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (5 tips).

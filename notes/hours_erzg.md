@@ -4,6 +4,7 @@ region: nm
 date: 2026-11-22
 places: 0
 file: hours_erzg.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The four places of worship still waiting anywhere (`tools/hours.py list --kind worship`), then museums, hotels and other open places in New Mexico (all 10), Newfoundland and Labrador (all 8), Florida (5 of 6) and Ohio (3 of 6). New York's 23 that wait are nearly all working post offices, whose Postal Service pages earlier sessions found unreadable, so they were left. 30 places are recorded: 10 with hours, each read in the session with `tools/hours.py page` from the page of whoever runs the place and its address or town checked; 20 as `?`.
@@ -41,6 +42,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 Nothing was found closed or sold.
 
 ## Tips for the next session
-- Hotel and restaurant sites often keep the hours in a separate page (`/restaurant/`, `hours.htm`): grep the home page's links for "hour", "dine", "restaurant".
-- `tools/hours.py page` shows only lines with clock times; when it shows a time without saying what it is for, read the page with a plain fetch to see the heading above it.
-- Left waiting: Great Southern Hotel, Columbus OH (its site is drawn by script), Hotel Cleveland (its page gives no hours), Home Building Association Bank, Newark OH (theoldhome.org is drawn by script), Huguenot Cemetery FL.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

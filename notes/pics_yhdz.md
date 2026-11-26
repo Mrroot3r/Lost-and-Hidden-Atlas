@@ -1,4 +1,5 @@
 # pics_yhdz: pictures for places with none
+tidied: 2026-11-26
 
 29 places looked at, 7 got a picture, 21 got none. One place (republic-mine-observation-site) was skipped: Commons answered "urlparamnormal" three times for it.
 
@@ -13,5 +14,4 @@ cedar-hill-schoolhouse, deposit-first-presbyterian, goliad-county-courthouse, ir
 - burke-idaho: none; only close-ups of mill details and an auto-shop front.
 
 ## Tips
-- Several overlapping ids (otis-incline, homer-village-green, johnson-ranch-big-bend) also appear in other sessions' pics files; all of mine are "none".
-- `look` on a batch fails entirely if one place errors; rerun the others without it.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read a web page as text and print the sentences that match a pattern.
-   python3 tools/page.py [-n CHARS] [-g pattern] URL ...     (cached in research/pages/)
+   python3 tools/page.py [-n CHARS] [-g pattern] URL ...     (cached in research/pages/; the options may also follow the URL)
    python3 tools/page.py --all [-n CHARS] URL ...            the whole text in reading order, for a history page you
                                                              need to read through (default 12,000 characters: a Register
                                                              form's description is usually further in, so add -n 200000)
@@ -17,11 +17,25 @@ limited to that site: search results often link a plain copy of the same page th
 import sys,re,os,hashlib,html,requests
 a=sys.argv[1:]; N=1500; ALL='--all' in a
 if ALL: a.remove('--all'); N=12000
-pat=r'hours|fee|admission|open |closed|parking|trail|mile|permit|gate|daily|season|free|access|road|owned|managed|private|ruin|remain'
-while a and a[0] in('-n','-g'):
-    if a[0]=='-n': N=int(a[1])
-    else: pat=a[1]
-    a=a[2:]
+DEFAULT=r'hours|fee|admission|open |closed|parking|trail|mile|permit|gate|daily|season|free|access|road|owned|managed|private|ruin|remain'
+pat=DEFAULT; rest=[]
+while a:                                  # -n and -g may come before or after the addresses (after them they used to be read as addresses)
+    if a[0] in('-n','-g') and len(a)>1:
+        if a[0]=='-n': N=int(a[1])
+        else: pat=a[1]
+        a=a[2:]
+    else: rest.append(a.pop(0))
+a=rest
+DAYTIME=re.compile(r'\b(mon|tues?|wed(nes)?|thu(rs)?|fri|sat(ur)?|sun)(day)?s?\b|\b\d{1,2}(:\d\d)?\s*(a\.?m\.?|p\.?m\.?|noon)',re.I)
+ABBR=re.compile(r'(?:\b(?:a\.m|p\.m|No|Nos|St|Ste|Mt|Ft|Dr|Mr|Mrs|Jr|Sr|Ave|Rd|Co|Inc|vs|etc|U\.S|ca|approx)|\b[A-Z])\.$')
+def sentences(t):
+    """Split text into sentences, but not after a.m., p.m., No., St. and the like when a small letter or a digit follows,
+    nor after a single capital (an initial): "9 a.m. to 5 p.m.", "Lock No. 1", "Charles E. Smith" stay whole."""
+    out=[]
+    for piece in re.split(r'(?<=[.!?])\s+',t):
+        if out and ABBR.search(out[-1]) and (re.match(r'[a-z0-9]',piece) or re.search(r'\b[A-Z]\.$',out[-1])): out[-1]+=' '+piece
+        else: out.append(piece)
+    return out
 os.makedirs('research/pages',exist_ok=True)
 def nexts(u):
     """a page would not open: say what to try next, so nobody stops here (tools/form.py holds the list)"""
@@ -72,6 +86,9 @@ for u in a:
         t=None; why=''
         try:
             r=requests.get(u,headers=UA,timeout=90)
+            if r.status_code==200 and r.content[:8].startswith((b'\x89PNG',b'\xff\xd8\xff',b'GIF8')):      # a picture, not a page: NPGallery's _text route answers a small PNG (about 893 bytes) for a listing it has no text for
+                print('##',u,'-> a PICTURE (%d bytes), not text: there is nothing to read at this address.%s'%(len(r.content),' NPGallery serves this small image for a listing whose form it has no text for (often those numbered 100...): count the form as not read this way and look for the state\'s own copy or another source.' if 'npgallery' in u else ''))
+                print(); continue
             if r.status_code==200: t=pdf_text(r.content,u) if r.content[:5]==b'%PDF-' else r.text
             else: why='HTTP %d'%r.status_code
         except Exception as e: why='ERROR '+str(e)[:90]
@@ -86,11 +103,13 @@ for u in a:
     t=re.sub(r'(?i)<(br|/p|/div|/li|/h\d|/tr)[^>]*>','. ',t); t=html.unescape(re.sub(r'<[^>]+>',' ',t)); t=re.sub(r'\s+',' ',t)
     if len(t)<600 and raw.lower().count('<script')>=3: print('##',u,'-> this page is DRAWN BY SCRIPT: only %d characters of text came back ("%s"). Search the web for its title limited to this site and read the plain copy a result links to, or use another source.'%(len(t),t.strip()[:80]))
     if ALL: print('##',u,f'({len(t)} chars of text)\n'+t[:N]+('\n[... %d more characters; raise -n to see them]'%(len(t)-N) if len(t)>N else '')+'\n'); continue
-    sents=[s.strip(' .') for s in re.split(r'(?<=[.!?])\s+',t)]; seen=set(); out=[]; used=0
+    sents=[s.strip(' .') for s in sentences(t)]; seen=set(); out=[]; used=0
+    short=lambda x:len(x)<25 and not (pat==DEFAULT and len(x)>=6 and DAYTIME.search(x))      # with the default pattern a short line with a day or a clock time ("Monday 9 a.m.-5 p.m.") is kept
+    keep=lambda x:re.search(pat,x,re.I) or (pat==DEFAULT and DAYTIME.search(x))
     for s in sents:
-        if len(s)<25 or len(s)>420 or s in seen or not re.search(pat,s,re.I): continue
+        if short(s) or len(s)>420 or s in seen or not keep(s): continue
         seen.add(s)
         if used+len(s)>N: break
         out.append(' - '+s); used+=len(s)
-    cut=used+sum(len(x) for x in sents if x not in seen and 25<=len(x)<=420 and re.search(pat,x,re.I))>N
+    cut=used+sum(len(x) for x in sents if x not in seen and not short(x) and len(x)<=420 and keep(x))>N
     print('##',u,f'({len(t)} chars of text)\n'+'\n'.join(out)+('\n[CUT SHORT at %d characters of matching sentences: more of them follow. Raise -n (for a long form, -n 200000), or read the kept copy in research/pages/.]'%N if cut else '')+'\n')

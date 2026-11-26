@@ -1,4 +1,5 @@
 # Pictures batch pics_wjvk (20 November 2026)
+tidied: 2026-11-26
 
 This batch is a pictures run (job 8): photographs for 30 places already on the map that had none. No new places, no pins, no text. The tool took each address, credit and licence from Wikimedia Commons; the session only chose, by looking at each sheet.
 

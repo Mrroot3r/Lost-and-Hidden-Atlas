@@ -1,4 +1,5 @@
 # Pictures batch sttx (2026-11-22)
+tidied: 2026-11-26
 
 Scheduled pictures run. Target was about 30 places looked at; the run reached 19 (13 looked at by hand, 6 recorded as none by the tool itself). It stopped at the 40-minute limit because Wikimedia Commons answered slowly, and one round was cut short by the command timeout, so the remaining places still wait.
 

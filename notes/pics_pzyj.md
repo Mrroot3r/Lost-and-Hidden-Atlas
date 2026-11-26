@@ -1,4 +1,5 @@
 # Pictures batch pzyj (November 23, 2026)
+tidied: 2026-11-26
 
 **What this batch is.** A pictures run (PROMPTS.md job 8): photographs chosen for places already on the map that had none. No new places, no pins, no text about places. The batch's file is tools/pics_pzyj.py, written by tools/photo_find.py.
 

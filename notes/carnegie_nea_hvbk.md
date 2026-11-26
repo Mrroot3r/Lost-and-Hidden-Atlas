@@ -4,6 +4,7 @@ region: ne
 date: 2026-11-24
 places: 33
 file: data_carnegie_nea_hvbk.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -29,5 +30,4 @@ Carnegie libraries of Nebraska, towns A to L (33 places): 27 standing buildings 
 - Fullerton (1914, other use): the state list gives 402 Fuller Street, the Register inventory 903 Broadway; present use not found.
 
 ## Tips for the next session
-
-- The Register's multiple-property document (npgallery 64500387) has a Section G table of every Nebraska Carnegie library with architect, style and extant or not: the quickest way in.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (1 tip).

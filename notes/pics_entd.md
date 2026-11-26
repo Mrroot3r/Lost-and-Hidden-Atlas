@@ -1,4 +1,5 @@
 # Pictures batch entd (2026-11-22, scheduled pictures run)
+tidied: 2026-11-26
 
 Looked at 11 places from the queue; about 30 was the target, but Wikimedia Commons ran slowly and the 40-minute budget ran out.
 

@@ -4,6 +4,7 @@ region: il
 date: 2026-11-24
 places: 40
 file: data_carnegie_ilb_wtkd.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -38,5 +39,4 @@ St. Charles survives inside the present library. Hours come only from the operat
 - Wilmette: torn down in 1951, and the present library stands on the site. The street address was not read.
 
 ## Tips for the next session
-
-- Shaw Local's 2025 survey of Illinois Carnegie libraries covers many towns in one page.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (1 tip).

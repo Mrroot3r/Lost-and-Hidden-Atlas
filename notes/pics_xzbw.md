@@ -1,4 +1,5 @@
 # Pictures batch xzbw
+tidied: 2026-11-26
 
 30 places looked at in six rounds of `photo_find.py next 5`.
 

@@ -4,6 +4,7 @@ region: oh
 date: 2026-11-24
 places: 38
 file: data_carnegie_ohs_avky.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -39,15 +40,10 @@ Northeast Ohio is in `carnegie_ohne_tjfb` and northwest Ohio in `carnegie_ohnw_w
 - **Pictures:** Commons pictures were chosen for Alumni Hall (Miami) and Gallipolis, the places with no Wikipedia picture; Commons had none of Dayton East. Red brick on Alumni Hall and buff walls at Gallipolis were read off those pictures. The other brick values come from the sources named in each entry.
 
 ## Leads not finished
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (3 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town | What is known | Why it was not added |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Rockford Carnegie library | Rockford | named on Wikipedia's list | grant not confirmed (see `carnegie_ohnw_wjcj`) |
-| Lima Carnegie library | Lima | on Wikipedia's list | status not settled (see `carnegie_ohnw_wjcj`) |
-| East Liverpool Carnegie library | East Liverpool | standing | the state outline puts downtown East Liverpool in West Virginia (see `carnegie_ohne_tjfb`) |
 
 ## Tips for the next session
-
-- **Cincinnati:** Eira Tansey's paper on Cincinnati's Carnegie branches (a University of Cincinnati pre-print) gives exact opening dates and costs for all nine branches. The library's own history pages, chpl.org/about/history/<branch>/, give the rest.
-- **Lookalike sites:** marysville.lib.nckls.org is Marysville, Kansas, and leblib.org is Lebanon, Indiana.
-- **Waymarking** has a page for most Ohio Carnegie buildings, with the architect, but it is a third-party source.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

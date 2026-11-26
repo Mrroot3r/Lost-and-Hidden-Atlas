@@ -1,4 +1,5 @@
 # Pictures batch eznw (scheduled run, November 21, 2026)
+tidied: 2026-11-26
 
 What this batch is: a pictures job (PROMPTS.md job 8). It chose a photograph, or recorded none, for 30 places already on the map that had none. No new places, no pins, no text about places. The file is tools/pics_eznw.py.
 

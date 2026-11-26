@@ -1,4 +1,5 @@
 # Pictures batch vjsy (2026-11-22, scheduled pictures run)
+tidied: 2026-11-26
 
 What this batch is: photographs for places already on the map that had none. No new places, no pins, no text. Only tools/pics_vjsy.py (the tool wrote it) and this note.
 

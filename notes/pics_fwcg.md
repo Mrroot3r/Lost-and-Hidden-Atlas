@@ -1,4 +1,5 @@
 # Pictures batch fwcg (2026-11-21)
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -31,8 +32,4 @@ Brudenell Island cemetery, Edwardsville tannery (Hunter), Cannington Manor, Fort
 - Silver City: the by-name candidates are namesakes in Georgia, Montana and Idaho; none for Utah.
 
 ## Tips for the next session
-
-- `tools/photo_find.py look` for five places took two minutes or more in the foreground and was killed by the shell's time limit twice. Run it with `nohup ... &` and a log file, then read the log and the sheets.
-- On the sheets the small captions carry the file name and the by-name marker; for by-name candidates, read the caption as well as the picture.
-- `tools/check.py` takes the clone path as its argument; run without one it fails, while `publish.sh` passes it.
-- publish.sh stopped once because main had moved (resync needed); the pictures file survived the resync.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

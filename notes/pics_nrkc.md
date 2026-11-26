@@ -1,4 +1,5 @@
 # Pictures batch pics_nrkc
+tidied: 2026-11-26
 
 Photo-finder run (job 8) on 30 places: 11 got a picture, 19 got none (most had nothing on Commons near the pin).
 

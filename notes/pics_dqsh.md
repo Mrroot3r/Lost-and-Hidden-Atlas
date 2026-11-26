@@ -1,4 +1,5 @@
 # Pictures batch pics_dqsh
+tidied: 2026-11-26
 
 Six rounds of `photo_find.py next 5`: 30 places looked at.
 

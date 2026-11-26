@@ -1,4 +1,5 @@
 # Pictures batch zaaj
+tidied: 2026-11-26
 
 Seven rounds of `photo_find.py next 5`: 35 places looked at.
 

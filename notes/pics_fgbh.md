@@ -1,4 +1,5 @@
 # pics_fgbh: pictures batch
+tidied: 2026-11-26
 
 30 places looked at: 12 got a picture, 18 got none.
 

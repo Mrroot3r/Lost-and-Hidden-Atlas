@@ -4,6 +4,7 @@ region: sc
 date: 2026-11-21
 places: 0
 file: hours_tyzw.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The last six New York churches from `tools/hours.py list "New York" --kind worship`, then every church waiting in South Carolina (5), Maryland (4), Arizona (4), Georgia (4), Wisconsin (4) and Maine (4). Ten got service times from the page of whoever runs them, each read in the session (`tools/hours.py page`, or the page's full text where that printed too little) with the address checked against the place; twenty-one are recorded `?`.
@@ -40,5 +41,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 No church was found to be closed or sold.
 
 ## Tips for the next session
-- St. Ignatius (Hickory MD), St. Paul's (Tombstone) and Holy Trinity (Churchville MD) answer 403 to scripts; a session that can approve the web fetch tool can read them.
-- The three Maine meetinghouses are opened in summer by local societies; their hours appear in the Lincoln County News and the Wiscasset Newspaper each June, not on any owner's page found.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

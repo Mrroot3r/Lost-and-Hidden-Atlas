@@ -4,6 +4,7 @@ region: several
 date: 2026-11-22
 places: 0
 file: hours_xrsx.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. Seven churches were still waiting (two in New York, four in Utah, one in South Dakota); none had a page of its own that gave times, so all seven are recorded `?`. After them no church waits anywhere, and the session went on to museums and other places that take visitors (`tools/hours.py list` without `--kind worship`). Twenty-six places were recorded in all: six got hours from the page of whoever runs them, read in the session; twenty (the seven churches and thirteen others) are recorded `?`.
@@ -48,6 +49,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 - Kirby's Mill, Medford NJ: the medfordhistorical.org page a search returned is for Medford, Massachusetts; not used.
 
 ## Tips for the next session
-- No church waits anywhere now; only museums, hotels, theatres, post offices and the like are left.
-- `medfordhistorical.org` is Medford, Massachusetts, not Medford, New Jersey.
-- No church was found to be closed or sold.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

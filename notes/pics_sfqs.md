@@ -1,4 +1,5 @@
 # Pictures batch pics_sfqs
+tidied: 2026-11-26
 
 Photographs chosen from Wikimedia Commons for places that had none. No places, pins or text changed.
 

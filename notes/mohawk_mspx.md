@@ -4,20 +4,16 @@ region: mohawk
 date: 2026-11-20
 places: 12
 file: data_mohawk_mspx.py
+tidied: 2026-11-26
 
 ## What this batch is
 Twelve places round St. Johnsville (region `mohawk`, drawn at random by `choose.py --state ny`), where the Atlas had nothing inside the village. St. Johnsville: the village as a whole (2019 Register district, area pin), Nellis Tavern (Palatine Settlement Society museum, Sundays June to September), the 1835 stone grist mill on Mill Road (private, sold or for sale in 2023), the 1879 Methodist church, the Margaret Reaney library and museum, the Community House (Bates-Englehardt mansion, village offices) and the 1936 post office with its 1940 mural. Round it: the 1853 Crum Creek union church (Oppenheim, Fulton County; closed 2009), the Walrath-Van Horne house at Nelliston, the Fort Plain village district (area pin; the museum and aqueduct were already on the map), the three canals beside the Empire State Trail at Mindenville (marker pin), and the Yanney woolen mill marker at Ephratah (a LEADS.md row, finished as a marker). Wikipedia was read as raw text; HMdb and Pomeroy marker pages, palatinesettlementsociety.org, mohawkvalleymuseums.us, sjvny.org, visitmontgomerycountyny.com, a 2023 sale listing on theoldhouselife.com and the Crum Creek preservation blog through `page.py`. Brick from Wikipedia photographs opened with `brick.py look`: the Methodist church and the post office red brick; the library buff brick; Nellis Tavern clapboard on stone with brick chimneys (`some`); the Community House looks red but may be painted, so left `?` with the village, Fort Plain and Crum Creek (its 1907 brick skin has no picture). Not checked: anything on the ground; service times for the Methodist church (the conference page reset the connection); the library's hours (its own page is gone and the archive copy could not be fetched; the county tourism page gives weekday hours, not used); post office hours and whether the Zorthian mural still hangs; who owns Crum Creek church since 2009; whether the mill's bed and breakfast still runs; the Underground Railroad rooms and tunnel at the mill rest on the county tourism page alone. Crum Creek's dates disagree (last service September 2009 in Wikipedia, December 2007 in the Leader-Herald; brick 1907 in Wikipedia, after a 1906 move in the newspaper): both given, `conf='mixed'`. Area pins: the village, Fort Plain, the mill, Crum Creek (no building could be picked out as the church), Mindenville (marker on the trail), Yanney (marker at the crossroads; no ruin on aerial or LiDAR). Nellis Tavern was moved 40 m onto the house with `pix.py`. National Register forms for these listings are NPGallery placeholders.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (5 rows). New leads for this ground go in the note of the batch that finds them.
+
 | Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Klock's Church site and burying ground | Old Route 5, east of St. Johnsville (HMdb 137555 marker at 42.99640, -74.66245; "500 feet north on hill") | Marker: the 1750 St. John's Reformed Church, school and cemetery, burial place of pioneers and Revolutionary soldiers; an older marker puts the first church about 1720 | No cemetery could be picked out on a 400 m aerial; its position and who owns the hill |
-| Old Lock 33 wall, Mindenville | Empire State Trail (OpenStreetMap ruin at 42.99214, -74.71545) | Mapped as "Old Lock 33 Wall" on the trail; the Enlarged Double Lock 33 already on the map is 4 km east | Any source saying which lock this is (Clinton's Ditch or enlarged) and what stands |
-| Abandoned milk plant, St. Johnsville | North edge of the village (OpenStreetMap ruin at 43.00507, -74.67798) | Mapped as an abandoned milk plant | Any written source, owner |
-| Zimmerman home, mill and fort site | 7 East Main Street, St. Johnsville (HMdb 137532) | Marker: Jacob Zimmerman founded the village in 1725; mill 1757, Revolutionary fort, turnpike tavern of 1800 | Whether anything stands; mentioned in the village entry only |
-| Currytown Reformed Church | Root, NY 162 (HMdb 41375) | State marker only: organized 1790 | Searched again: still no source on whether a building stands |
 
 ## Tips
-- `publish.sh` stopped once because `source/tools/pockets.py` changed on main during the session; `resync.sh` kept the data file but a new batch time was needed. Run `start.py --prs` and publish soon after the build.
-- Montgomery County Register forms are NPGallery placeholders; the Pomeroy Foundation marker pages (`wgpfoundation.org/historic-markers/<slug>`) read well with `page.py` and carry the village historian's research.
-- The Village of St. Johnsville's own site is `sjvny.org`; the Upstate NY Methodist conference pages (`unyumc.org`) reset the connection from `page.py`.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

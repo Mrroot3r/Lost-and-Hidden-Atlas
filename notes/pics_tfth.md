@@ -1,4 +1,5 @@
 # Pictures batch tfth (November 23, 2026)
+tidied: 2026-11-26
 
 A scheduled pictures run: photographs for places on the map that had none, chosen by looking at the candidates on each sheet. No places, pins or text were added. Commons login: logged in.
 

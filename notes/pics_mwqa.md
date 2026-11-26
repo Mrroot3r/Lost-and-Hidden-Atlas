@@ -1,4 +1,5 @@
 # Pictures batch pics_mwqa
+tidied: 2026-11-26
 
 A pictures-only batch (PROMPTS.md job 8). No picture was chosen: none of the places that had candidates showed the place.
 

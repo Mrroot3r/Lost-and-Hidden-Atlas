@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-20
 places: 0
 file: hours_amjw.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. All four New York places of worship still waiting were looked up, then the whole of the Newfoundland and Labrador (15), Texas (9) and New Jersey (8) lists from `tools/hours.py list "<state>" --kind worship`. Five got times from the page of whoever runs them, each read in the session with `hours.py page`; 31 are recorded `?` because no page of their own gave any.
@@ -39,6 +40,4 @@ Closed or changed hands (from the place's own text or a search result, not settl
 None.
 
 ## Tips
-- Newfoundland parishes seldom have pages of their own; the dioceses list churches with a phone number only. Expect `?` there.
-- The Diocese of Victoria (Texas painted churches) answers 403 to the page tool and has no archive copy; try the web fetch tool on its parish finder in an attended session.
-- For Quaker meetings in New Jersey and Pennsylvania, pym.org/meetings/meeting/<name>-friends-meeting/ gives worship times; southjerseyquakers.org has Salem Quarter's meetings.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

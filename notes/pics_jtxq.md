@@ -1,4 +1,5 @@
 # Pictures batch jtxq (2026-11-22, scheduled pictures run)
+tidied: 2026-11-26
 
 Pictures chosen for 26 places that had none: 13 got a picture, 13 got none.
 
