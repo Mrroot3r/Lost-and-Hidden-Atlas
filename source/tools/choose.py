@@ -7,6 +7,15 @@
                                                           or to several: --state qc,nb,ns,pe,nl
    python3 tools/choose.py --claim <clone> --thinnest     no draw: the state or province with the fewest places that nobody has
                                                           taken (for ONE task that runs alone; several would follow each other)
+   python3 tools/choose.py --claim <clone> --state mo,ks --near 39.10,-94.58
+                                                          for a task tied to a city: after the draw it names the counties
+                                                          NEAREST that point that still have enough left, so the task works outward
+   python3 tools/choose.py --dry <clone> "<County>" "<why>"    the county you were sent to has nothing you can use: mark it
+                                                          dry for thirty days (no session is sent there again) and be given
+                                                          the next counties. Twice in one session at most.
+   python3 tools/choose.py --wet <clone> mo:pettis         (owner or maintainer) take a dry mark back
+What is left is counted by tools/gaps.py (National Register listings the Atlas does not have, county by county); a county
+with fewer than eight is never offered. Run nothing in a county the draw did not name unless you hold a source for it.
 Why random: "take the thinnest region" is the same answer for every session, so four sessions started in one hour all
 took the same county. A claim is one line added to claims.txt on the repository's "claims" branch, pushed at once. Git refuses the second of
 two pushes made at the same moment, and that session reads again and picks other ground, so two sessions cannot hold
@@ -120,6 +129,53 @@ def centres(reg,st):
     return random.SystemRandom().sample(out,min(3,len(out)))
 a=sys.argv[1:]
 ONLY=''
+NEAR=None
+if '--near' in a:
+    i=a.index('--near')
+    try: NEAR=tuple(float(x) for x in a[i+1].split(','))
+    except Exception: sys.exit('--near wants a point as  lat,lon  with no space, such as 39.10,-94.58')
+    del a[i:i+2]
+import dry
+def counties(st,lines):
+    """what tools/gaps.py says of this state, as lines to print, and the counties offered"""
+    try:
+        import gaps
+        g,name=gaps.left(st)
+        if g is None: return ['What is left could not be counted for this ground ('+name+') Judge it from start.py and the sources you can open in the first ten minutes.'],None
+        return gaps.table_lines(st,g,dry.dry_regions(lines),NEAR)
+    except Exception as e: return ['(What is left could not be counted: %s.)'%str(e)[:80]],None
+def state_of(reg): return next(k for c,l,sn,k in REG if c==reg)
+if a[:1]==['--wet']:
+    clone,k=a[1],a[2].lower()
+    for i in range(5):
+        lines,par=read_claims(clone)
+        if write_claims(clone,lines+['wet %s %s owner'%(k,datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S'))],par,'wet '+k).returncode==0: print('Taken back: %s is no longer marked dry.'%k); sys.exit(0)
+        time.sleep(1+i)
+    sys.exit('The change could not be pushed.')
+if a[:1]==['--dry']:
+    if len(a)<4: sys.exit('Say which county and why:  python3 tools/choose.py --dry <clone> "<County>" "<what you tried and why nothing came of it>"')
+    clone,county,why=a[1],a[2].replace(' County','').replace(' county',''),a[3]; f=os.path.join(W,'.claim'); rf=os.path.join(W,'.redraws')
+    if not os.path.exists(f): sys.exit('No claim is recorded in this workspace: claim ground first.')
+    if NEAR is None and os.path.exists(os.path.join(W,'.near')): NEAR=tuple(float(x) for x in open(os.path.join(W,'.near')).read().split(','))
+    reg,stamp,tag=open(f).read().split(); st=state_of(reg); done=int(open(rf).read().strip() or 0) if os.path.exists(rf) else 0
+    if not dry.may_redraw(done): sys.exit('This session has already given ground up %d times. Do not draw again: publish what you have if it is one place or more, or stop with nothing, and say in your report that three pieces of ground in a row came up empty and which they were.'%done)
+    import gaps
+    g,name=gaps.left(st); n=None if g is None else sum(1 for r in g if (r.get('county') or '').lower()==county.lower())
+    if n is not None and not dry.can_mark(n): sys.exit('%s County still has %d listings the Atlas does not have: that is not dry ground. The trouble is the sources. Try others before giving it up: the town\'s walking tour, Clio (theclio.com), the county historical society, SAH Archipedia, the web fetch tool for a page page.py cannot open. See them:  python3 tools/gaps.py %s "%s"'%(county,n,st,county))
+    now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S'); k=dry.key(st,county)
+    for i in range(5):
+        lines,par=read_claims(clone)
+        if write_claims(clone,lines+['dry %s %s %s %s %s'%(k,now,tag,'?' if n is None else n,re.sub(r'\s+','_',why)[:120])],par,'dry '+k).returncode==0: break
+        time.sleep(1+i)
+    else: sys.exit('The mark could not be pushed. Leave the county all the same and say so in your note.')
+    open(rf,'w').write(str(done+1))
+    print('Marked dry for %d days: %s County, %s (%s left).'%(dry.DAYS,county,name,'?' if n is None else n))
+    print('Write one line about it in your note under Tips. Throw away nothing you already wrote up: a place with its sources read still goes in your batch.')
+    ls,nx=counties(st,read_claims(clone)[0])
+    for l in ls: print(l)
+    if not nx: print('Nothing is left to offer in this state. Release and draw again:  python3 tools/choose.py --release %s   then   python3 tools/choose.py --claim %s'%(clone,clone))
+    elif not dry.may_redraw(done+1): print('That was this session\'s last change of ground.')
+    sys.exit(0)
 THIN='--thinnest' in a
 if THIN: a.remove('--thinnest')
 if '--state' in a:
@@ -146,9 +202,16 @@ if a[:1]==['--claim']:
         if r.returncode==0: pushed=True; open(os.path.join(W,'.claim'),'w').write('%s %s %s'%(c,stamp,tag)); break
         if 'rejected' in r.stderr or 'fetch first' in r.stderr or 'non-fast-forward' in r.stderr: time.sleep(random.SystemRandom().uniform(0.5,2.5)); continue     # another session wrote first: read again and pick again
         print('The claim could not be pushed (%s). Chosen at random all the same.'%(r.stderr.strip().split('\n')[-1][:90])); break
+    if NEAR: open(os.path.join(W,'.near'),'w').write('%s,%s'%NEAR)      # kept for --dry, which offers the next counties nearest the same point
+    elif os.path.exists(os.path.join(W,'.near')): os.remove(os.path.join(W,'.near'))
     hubs=[h for h in json.load(open('build/hubs.json')) if h.get('st')==k] if os.path.exists('build/hubs.json') else []
     print('CHOSEN: region %s = %s, %s (%d places so far).'%(c,l,sn,cnt.get(c,0)))
     if pushed: print('Claimed on the "claims" branch. Run  python3 tools/choose.py --release %s  once your pull request is open.'%clone)
+    ls,nx=counties(k,read_claims(clone)[0])
+    print('WHAT IS LEFT in %s (National Register listings the Atlas does not have; tools/gaps.py):'%sn)
+    for l in ls: print('  '+l)
+    if nx: print('  A place takes the region code its neighbours already carry (start.py prints it for the town you pick), which may not be the code drawn here: a claim holds a turn in the state, the county is where you work.')
+    if nx: print('  Work in ONE of those counties. See its listings:  python3 tools/gaps.py %s "<County>"   If after the first ten minutes fewer than %d of them have a source you can read, give it up:  python3 tools/choose.py --dry %s "<County>" "<why>"'%(k,dry.LIMIT,clone))
     tc=centres(c,k)
     if tc: print('Old town centres there with no Atlas place yet (drawn at random; take one, or the country round it): '+'; '.join('%s (%.3f, %.3f)'%(r[7],r[0],r[1]) for r in tc))
     print('Wanted: interesting old buildings and what is left of them, of any kind and any age (the 1700s and earlier are welcome), standing as much as ruined. Take what is most worth a visit there, not one kind of thing.')
@@ -158,5 +221,9 @@ if a[:1]==['--claim']:
 tk=taken()
 print('Regions, thinnest first (x2 = twice as likely to be drawn; TAKEN = claimed or in an open pull request):')
 for c,l,sn,k in sorted(REG,key=lambda r:cnt.get(r[0],0))[:45]: print('  %-6s %-34s %-16s %3d %s %s'%(c,l[:34],sn[:16],cnt.get(c,0),'x2' if k in DEEP else '  ','TAKEN: '+', '.join(tk[c])[:60] if c in tk else ''))
+try:
+    import base64; _d=dry.dry_regions(base64.b64decode(api('contents/claims.txt?ref='+BR)['content']).decode().split('\n'))
+    if _d: print('Counties marked dry (passed over for %d days): '%dry.DAYS+'; '.join('%s (%s)'%(k,v) for k,v in sorted(_d.items())))
+except Exception: pass
 if tk: print('Taken now: '+'; '.join('%s (%s)'%(c,', '.join(v)[:50]) for c,v in tk.items()))
 print('To choose and claim one at random:  python3 tools/choose.py --claim <path to the clone>')
