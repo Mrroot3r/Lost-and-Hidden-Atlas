@@ -1,0 +1,7 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'bushnell-building-springfield-oh':('https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/Downtown_Springfield%2C_Ohio_-_1579116927.jpg/960px-Downtown_Springfield%2C_Ohio_-_1579116927.jpg', 900, 675, 'Cindy Funk', 'CC BY 2.0', 'https://commons.wikimedia.org/wiki/File:Downtown_Springfield,_Ohio_-_1579116927.jpg', '2026-11-26', 'name'),
+ 'bushnell-house-springfield-oh':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Richards%2C_Raff%2C_and_Dunbar_Funeral_Home.jpg/960px-Richards%2C_Raff%2C_and_Dunbar_Funeral_Home.jpg', 900, 675, 'Nyttend', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Richards,_Raff,_and_Dunbar_Funeral_Home.jpg', '2026-11-26', 'pin'),
+ 'recitation-hall-wittenberg':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/Wittenberg_College%2C_Carnegie_Hall_of_Science_and_Recreation_Hall%2C_Springfield%2C_Ohio_%281911_Postcard%29.jpg/960px-Wittenberg_College%2C_Carnegie_Hall_of_Science_and_Recreation_Hall%2C_Springfield%2C_Ohio_%281911_Postcard%29.jpg', 900, 581, 'Norwood Souvenir Co., Cincinnati, Ohio', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Wittenberg_College,_Carnegie_Hall_of_Science_and_Recreation_Hall,_Springfield,_Ohio_(1911_Postcard).jpg', '2026-11-26', 'name'),
+}
