@@ -94,6 +94,11 @@ const URL0 = process.argv[2] || 'http://localhost:8772/';
   ok('Near me: switching the alert off reaches the recorder', ((await phone()).targets || {}).r === 0);
   await page.click('#lb-opt'); await page.waitForTimeout(300);
   await page.click('#sheet-x'); await page.click('#tab-log'); await page.waitForTimeout(300);
+  // the photo details (data/photos.json) are not built into the app: they must come from the Atlas address, or pictures found on
+  // Wikimedia Commons never show in the app and every other place asks Wikipedia each time (found November 25, 2026)
+  { const ph = await page.evaluate(async () => { const b0 = window.ATLAS.base; window.ATLAS.setBase('http://localhost:8766/');
+      try { const r = await window.ATLAS.fetch('data/photos.json'); const j = await r.json(); return { ok: r.ok, n: Object.keys(j.p || {}).length }; } catch (e) { return { err: String(e).slice(0, 80) }; } finally { window.ATLAS.setBase(b0); } });
+    ok('the app gets the photo details from the Atlas address', ph.ok === true && ph.n > 100, JSON.stringify(ph)); }
   ok('no script errors', errs.length === 0, errs.join(' | ').slice(0, 300));
   await browser.close(); console.log(fails.length ? fails.length + ' FAILED' : 'app smoke test passed'); process.exit(fails.length ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });
