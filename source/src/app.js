@@ -209,8 +209,14 @@ const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
 const HAY=new Map(), fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+/* What a place says of its brick. bk: red brick y (the main thing), s (some), n (none). bc: the brick's own colour, r red, b buff or
+   yellow, d dark, g glazed, p painted, m red with another, x no brick at all. fb: a source says fire brick is there. Painted brick is
+   never red brick (tools/brickrule.py holds the rules). The Red brick filter still goes by bk alone. */
+function brickWords(s){ const c=s.bc, a=s.bk==='y'?'Red brick':s.bk==='s'?(c==='m'?'Some red brick, with brick of another colour':'Some red brick'):
+    ({b:'Buff or yellow brick',d:'Dark brick',g:'Glazed brick',p:'Painted brick'})[c]||'';
+  return [a,s.fb?'Fire brick':''].filter(Boolean).join(' · '); }
 function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+(s.name2||'')),t:fold(s.town),
-  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,s.bk==='y'?'red brick':s.bk==='s'?'some red brick':'',s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
+  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,brickWords(s).toLowerCase().replace(' · ',' '),s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
 let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
@@ -2572,7 +2578,7 @@ function renderDetail(s){
         map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
     el('h2',{text:s.name})),
     el('div',{class:'dintro pad'},
-    el('p',{class:'sub2',text:[s.name2,s.town,s.years,s.bk==='y'?'Red brick':s.bk==='s'?'Some red brick':''].filter(Boolean).join(' · ')}),
+    el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s)].filter(Boolean).join(' · ')}),
     tags,
     s.mine?sendRow(s):null, twinNote(s),
     photoBox(s),
@@ -3164,7 +3170,7 @@ function goSync(v,auto){ const g=$('#goto'); goSeq++; const c=readCoords(v);
   if(/^https?:\/\//i.test(v)){ g.hidden=false; g.replaceChildren(el('p',{class:'gonote',text:'That link carries no coordinates. In Google Maps, press and hold the spot, copy the two numbers it shows, and paste them here.'})); return true; }
   if(v.length<3){ g.hidden=true; g.replaceChildren(); return false; }
   g.hidden=false; g.replaceChildren(goRow('Find <b>'+esc(v)+'</b> on the map: street, town or address',()=>goLook(v))); return false; }
-try{ window.__atlasGo={read:readCoords}; }catch(e){}
+try{ window.__atlasGo={read:readCoords,brick:brickWords}; }catch(e){}
 try{ window.__atlasSet=(k,v)=>setPref(k,v); }catch(e){}      /* for the tests: a setting changed as the Settings sheet changes it */
 $('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
 $('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });

@@ -10,14 +10,22 @@ yes (mostly brick), some (part brick: a chimney, an arch, brick over stone), no,
                                                 came from: a picture of its Wikipedia article (it lists them all with their captions;
                                                 --pic 2 takes the second), or the address you give.
                                                 Open that file and LOOK at it.
-   python3 tools/brick.py set <id> yes|some|no "<what you saw, and the picture's address or the source's words>"
+   python3 tools/brick.py set <id> yes|some|no "<what you saw, and the picture's address or the source's words>" --colour <colour>
+                                                with the colour of the brick itself: red, buff (yellow, cream, tan), dark, glazed,
+                                                painted, mixed (red with another), or none (no brick at all). For "yes" the colour
+                                                is red and may be left off. Add  --fire "<the source's words>"  ONLY when a source
+                                                says fire brick (refractory brick) is there: a kiln, a furnace, coke ovens.
+   python3 tools/brick.py list --colour [state|region]
+                                                places whose red-brick answer (some or no) was recorded before colours were: look again
                                                 record it in tools/bricks_<four letters>.py (this workspace's own file, so
                                                 sessions working side by side do not collide)
 
 The rule: a value is a fact like any other, so it comes from something you opened in this session: a picture that
 plainly shows this building or ruin, or a source that says what it is built of. A picture of the town, of a sign, or of
 a building you cannot tell is this one settles nothing: leave the place unset. Red or red-brown brick counts; yellow or
-buff brick, painted brick and brick-coloured stone do not ('no', and say so). A place that is gone, a marker or under
+buff brick, painted brick (even painted red: the owner, November 26, 2026) and brick-coloured stone do not ('no', and say so).
+The colour is recorded beside that answer, and fire brick only from a source: a picture cannot tell it from buff face brick
+(tools/brickrule.py holds the rules; test tools/brick_test.py). A place that is gone, a marker or under
 water is not asked."""
 import sys,os,re,json,glob,random,importlib,urllib.request,urllib.parse
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE); os.chdir(W); sys.path.insert(0,HERE); sys.dont_write_bytecode=True
@@ -48,6 +56,7 @@ def raw(t,hop=0):
     m=re.match(r'\s*#REDIRECT\s*\[\[([^\]|#]+)',w,re.I)
     return raw(m.group(1).strip(),hop+1) if m and hop<3 else (w,t)
 def waiting(): return [s for s in S if s['st'] in ASK and 'bk' not in s and not s['id'].startswith('lm-')]
+def colourless(): return [s for s in S if s['st'] in ASK and s.get('bk') in ('s','n') and 'bc' not in s and not s['id'].startswith('lm-')]      # red brick settled before colours were recorded (November 26, 2026): 'some' may be red or mixed, 'no' may be buff, dark, glazed, painted or no brick at all
 def myfile():
     kf=os.path.join(W,'.brickkey')
     if not os.path.exists(kf): open(kf,'w').write(''.join(random.SystemRandom().choice('abcdefghjkmnpqrstvwxyz') for _ in range(4)))
@@ -63,14 +72,16 @@ if not a:
         if sum(by[k])>1: print('  %-22s %3d %3d %3d %4d'%(STNAME.get(k,k),*by[k]))
     print('  (%d states and provinces with one place each are not listed)'%sum(1 for k in by if sum(by[k])==1))
     t=[sum(v[i] for v in by.values()) for i in range(4)]; print('  %-22s %3d %3d %3d %4d'%('all',*t))
+    print('Brick colour: %d places have one; %d with a red-brick answer of some or no still wait for a colour (list them:  python3 tools/brick.py list --colour ).'%(sum(1 for x in S if x.get('bc')),len(colourless())))
     sys.exit(0)
 if a[0]=='list':
-    n=40; rest=[]
+    n=40; rest=[]; COL=False
     i=1
     while i<len(a):
         if a[i]=='--n': n=int(a[i+1]); i+=2
+        elif a[i] in ('--colour','--color'): COL=True; i+=1
         else: rest.append(a[i]); i+=1
-    w=waiting()
+    w=colourless() if COL else waiting()
     if rest:
         q=' '.join(rest).lower(); st=[k for k,v in STNAME.items() if v.lower()==q or k==q]
         w=[s for s in w if (st and REGST.get(s['reg'])==st[0]) or s['reg']==q]
@@ -78,8 +89,9 @@ if a[0]=='list':
     print(len(w),'places wait'+(' there' if rest else '')+'; the first',min(n,len(w)),':')
     for s in w[:n]:
         links=[(l[1] if isinstance(l,(list,tuple)) else str(l)) for l in (s.get('links') or [])][:3]
-        print('  %s | %s, %s | %s | %s'%(s['id'],s['name'],s['town'],s['st'],'  '.join(links) or 'no link'))
-    print('Next:  python3 tools/brick.py look <id>   then open the picture, then   python3 tools/brick.py set <id> yes|some|no "<what you saw; where>"')
+        print('  %s | %s, %s | %s | %s%s'%(s['id'],s['name'],s['town'],s['st'],'  '.join(links) or 'no link',(' | red brick: '+{'s':'some','n':'no'}[s['bk']]) if COL else ''))
+    if COL: print('Each of these has a red-brick answer (the last column) and no colour yet. Look at a picture and record the answer again with its colour; keep the answer unless the picture shows it was wrong.')
+    print('Next:  python3 tools/brick.py look <id>   then open the picture, then   python3 tools/brick.py set <id> yes|some|no "<what you saw; where>" --colour red|buff|dark|glazed|painted|mixed|none')
     sys.exit(0)
 if a[0]=='look':
     s=BY.get(a[1]) or sys.exit('No such place id: '+a[1])
@@ -119,16 +131,26 @@ if a[0]=='look':
     print('Saved %s (%d KB) from %s'%(os.path.join(W,out),len(d)//1024,src))
     if len(a)<=2: print('That is picture %d of the article. The first is often a drawing, a map or an old postcard: only a photograph of the place as it stands settles brick. For another:  python3 tools/brick.py look %s --pic <number>'%(n,s['id']))
     print('Open it and decide:')
-    print('is it plainly %s (%s)? Then:  python3 tools/brick.py set %s yes|some|no "<what you saw>; %s"'%(s['name'],s['town'],s['id'],page))
+    print('is it plainly %s (%s)? Then:  python3 tools/brick.py set %s yes|some|no "<what you saw>; %s" --colour red|buff|dark|glazed|painted|mixed|none'%(s['name'],s['town'],s['id'],page))
+    print('The colour is the brick\'s own: red or red-brown; buff (yellow, cream, tan); dark (brown or black by its own colour, not soot); glazed; painted (its colour cannot be seen: never red brick, even painted red); mixed (red with another); none (no brick). Fire brick is never judged from a picture: add  --fire "<the source\'s words>"  only when a source says so.')
     sys.exit(0)
 if a[0]=='set':
-    if len(a)<4 or a[2] not in ('yes','some','no'): sys.exit('usage: brick.py set <id> yes|some|no "<what you saw, and where>"')
+    import brickrule
+    col=None; fire=''
+    if '--colour' in a or '--color' in a: k=a.index('--colour' if '--colour' in a else '--color'); col=a[k+1].lower(); del a[k:k+2]
+    if '--fire' in a: k=a.index('--fire'); fire=a[k+1].strip(); del a[k:k+2]
+    if len(a)<4 or a[2] not in ('yes','some','no'): sys.exit('usage: brick.py set <id> yes|some|no "<what you saw, and where>" --colour red|buff|dark|glazed|painted|mixed|none [--fire "<the source\'s words>"]')
     if a[1] not in BY: sys.exit('No such place id: '+a[1])
     if len(a[3].strip())<12: sys.exit('Say how it is known: what the picture shows and its address, or the words of the source.')
+    if col is None:
+        if a[2]=='yes': col='red'
+        else: sys.exit('Say the colour of the brick you saw as well:  --colour red|buff|dark|glazed|painted|mixed , or  --colour none  when there is no brick at all (stone, wood, concrete, earth). "some" goes with red or mixed; "no" with buff, dark, glazed, painted or none.')
+    row=(a[2],a[3].strip(),col,fire); why=brickrule.row_problem(row)
+    if why: sys.exit('Not recorded: '+why)
     f=myfile(); cur={}
     if os.path.exists(f): cur=dict(importlib.import_module(os.path.basename(f)[:-3]).BRICK)
-    cur[a[1]]=(a[2],a[3].strip())
-    open(f,'w',encoding='utf-8').write('# Red brick, looked up after the places were written (tools/brick.py set). id: (yes|some|no, how it is known)\nBRICK={\n'+''.join(' %r:(%r,%r),\n'%(k,v[0],v[1]) for k,v in sorted(cur.items()))+'}\n')
-    print('Recorded in %s: %s = %s (%d in this file). It reaches the map at the next build.'%(f,a[1],a[2],len(cur)))
+    cur[a[1]]=row
+    open(f,'w',encoding='utf-8').write('# Brick, looked up after the places were written (tools/brick.py set; the rules are in tools/brickrule.py).\n# id: (red brick yes|some|no, how it is known, the brick\'s colour or \'\', the words of a source that says fire brick or \'\')\nBRICK={\n'+''.join(' %r:%r,\n'%(k,tuple(v)) for k,v in sorted(cur.items()))+'}\n')
+    print('Recorded in %s: %s = %s%s%s (%d in this file). It reaches the map at the next build.'%(f,a[1],a[2],', no brick at all' if col=='none' else ', colour '+col,', fire brick per a source' if fire else '',len(cur)))
     sys.exit(0)
 sys.exit(__doc__)

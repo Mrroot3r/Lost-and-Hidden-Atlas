@@ -1,4 +1,5 @@
 import json,sys,re
+import brickrule
 sys.path.insert(0,'tools')
 # Before a single place list is run: prove that each one is only data (tools/safe_data.py says why this matters).
 import safe_data; safe_data.must('tools')
@@ -51,6 +52,8 @@ for b in B+C:
            story=b['story'],look=b['look'],hook=b['hook'],accn=b['accn'],links=(b['links'] or (e['links'] if e else [])),now='now' in b['tags'].split(','))
     if b.get('th'): s['th']=b['th']; s['thn']=b.get('thn','')
     if b.get('brick') in ('yes','some','no'): s['bk']=b['brick'][0]      # red brick: y, s or n; left out when nobody has looked
+    if brickrule.code(b.get('bcol')): s['bc']=brickrule.code(b['bcol'])   # the brick's colour: r, b(uff), d(ark), g(lazed), p(ainted), m(ixed), x (looked: no brick at all); left out when nobody could tell
+    if (b.get('fireb') or '').strip(): s['fb']=1                          # a source says fire brick is there
     if b.get('tip'): s['tip']=b['tip']                                   # the day a reader sent it in; left out for every other place
     if (b.get('hours') or '').strip() not in ('','?'): s['hrs']=b['hours'].strip()   # when it is open, as a source gave it; '?' means looked for and not found
     sites.append(s)
@@ -87,6 +90,11 @@ for f in sorted(glob.glob('tools/bricks_*.py')):
 for s in sites:
     v=BRICKS.get(s['id'])
     if v and 'bk' not in s and v[0] in ('yes','some','no'): s['bk']=v[0][0]
+    if v and len(v)==4:          # a row may also carry the colour and a fire-brick source (tools/brickrule.py); the place's own values win, field by field
+        if 'bc' not in s and brickrule.code(v[2]): s['bc']=brickrule.code(v[2])
+        if 'fb' not in s and (v[3] or '').strip(): s['fb']=1
+    if s.get('bk')=='y' and 'bc' not in s: s['bc']='r'      # "red brick is the main thing you see" says the colour already
+    if s.get('bk')=='n' and s.get('bc') in ('r','m'): del s['bc']      # a place list and a later look disagree: the red-brick answer stands, the colour is dropped
 # Hours looked up after a place was written: tools/hours_*.py, each HOURS={id:(hours, day read 'YYYY-MM-DD', the page's address, opens)}
 # (tools/hours.py writes them). They win over the place's own hours=, carry their own date, and when 'opens' is true a place
 # that was only 'view' or 'public' becomes 'open'. hours '?' means looked for and not found: nothing is shown.
