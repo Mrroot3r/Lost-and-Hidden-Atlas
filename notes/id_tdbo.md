@@ -15,7 +15,6 @@ Places you read about and could not finish. One row each; delete the example row
 |---|---|---|---|
 | De Lamar ghost town | Owyhee County, ID (43.02444, -116.83139) | Mining camp of 1888, Register district 1976 with four contributing buildings (Wikipedia) | Who owns the land now (mining claims round it) and whether anything can be seen from a public road |
 | Pon Yam House | Idaho City, ID | 1867 store of a Chinese merchant, one of the few survivals of the Chinese town (Wikipedia; HMdb marker 119061 nearby) | Its position, owner and whether it opens |
-| Fort Boise (1863 army post) | Boise, ID (43.61980, -116.19426, HMdb 267460) | HMdb says many original buildings of 1863 on are still in use | Which buildings survive and who lets the public see them |
 | Ada Odd Fellows Temple | Boise, ID (43.616111, -116.204167) | Register list says only parts of the facade still stand | A source on what is left and where |
 | Poison Creek Stage Station | Homedale, ID (43.502201, -116.938278) | Register 78001089 | Form not read; owner and access |
 | Bruneau Episcopal Church | Bruneau, ID (42.880603, -115.800945) | Register 82000356 | Form not read; brick and access |
