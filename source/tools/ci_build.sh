@@ -14,6 +14,14 @@ rm -rf "$W"; bash source/tools/setup.sh "$W" | grep -v "^MISSING Playwright" || 
 export ATLAS="$W"; cd "$W"
 python3 tools/safe_data.py tools > /dev/null || { python3 tools/safe_data.py tools | tail -25; exit 1; }   # before any place list is run: each must be only data
 out=$(python3 tools/build_sites.py) || { echo "$out" | tail -5; exit 1; }; echo "$out" | tail -1 | cut -c1-80
+# The site build (not a pull request's check) looks up the Wikipedia picture of places written since the last build, a few
+# hundred at most, so tools/photos.py no longer waits for somebody to remember it: on November 26, 2026 it had not been run
+# for six days, 3,500 places had never been asked about, and the pictures job, which takes a place only after this has
+# been through it, reported 11 places waiting. What it learns is carried back into the sources and published with the build.
+if [ "${ATLAS_PHOTOS:-}" = "1" ]; then
+  (timeout 300 python3 tools/photos.py --n 300 | tail -1) || echo "WARNING: the article-photo lookup did not finish; the next build carries on"
+  [ -s src/photos.json ] && python3 -c "import json;json.load(open('src/photos.json'))" && cp src/photos.json "$REPO/source/src/photos.json"
+fi
 python3 tools/topo_all.py --missing || echo "WARNING: the old-map step failed; places added now have no old-map crop until the next build"
 # First under the version the repository already has: if nothing comes out different, there is nothing to publish.
 OLD=$(python3 -c "import json;j=json.load(open('$REPO/version.json'));print(j['v']+'|'+str(j.get('built','')))" 2>/dev/null || true)
