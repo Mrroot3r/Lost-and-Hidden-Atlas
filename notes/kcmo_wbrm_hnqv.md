@@ -16,7 +16,6 @@ Facts come from Clio's West Bottoms Walking Tour pages and its Richards and Cono
 | Frank M. Howe Residence, Switzer School Buildings, E. R. Squibb and Sons Building | West Side, Kansas City, MO | Register-listed (85000854, 09001098, 10000985); Squibb was built 1953-54 (probably mid-century modern, not wanted) | A source on what stands; the Squibb style |
 | Montgomery Ward warehouse, Christian Church Hospital, Maj. William Warner House, Columbia Building, Pendergast headquarters | Kansas City, MO | Register-listed | Not looked up |
 | Claybrook House | Kearney, MO (39.388, -94.336) | Register-listed 1981 (81000332) | A source; the nearest Atlas place is the James Farm |
-| Dougherty-Prospect Heights Historic District | Liberty, MO (39.2478, -94.4256) | Register-listed | A source on what survives |
 
 ## Tips
 - Clio's tour pages (theclio.com/tour/3025/<n>, n = 1 to 31) open with tools/page.py --all and give year, builder, later tenants and current use for every West Bottoms building: a fast way to a batch.
