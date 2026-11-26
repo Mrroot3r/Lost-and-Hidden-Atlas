@@ -1112,3 +1112,4 @@ njs 20261126T182842 9f63
 released 20261126T182842 9f63
 mo 20261126T184055 304e
 skip mo:78001651 20261126T185613 304e notwanted International_Style_house
+skip mo:02000886 20261126T185616 304e notwanted International_Style_tower
