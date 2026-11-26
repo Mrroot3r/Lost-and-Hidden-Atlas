@@ -12,12 +12,31 @@ The Register is not the only source (a town's walking tour, Clio, a county surve
 prints): a county with few listings left may still be worth a batch if you have such a source IN HAND, never on the hope
 of finding one. Many listings are plain houses and apartment blocks: take what is worth a visit.
 The Canadian provinces have no such list here, so nothing can be counted for them."""
-import sys,os,json,subprocess
+import sys,os,re,json,subprocess
 HERE=os.path.dirname(os.path.abspath(__file__)); W=os.path.dirname(HERE); os.chdir(W); sys.path.insert(0,HERE)
 import dry
 from states import STATES
-def left(st):
-    """(listings left in the state, or None when it cannot be measured; the state's name or why not)"""
+def claim_lines():
+    """the lines of claims.txt on the repository's "claims" branch (claims, dry counties, listings set aside), or []"""
+    try:
+        import base64,urllib.request
+        j=json.load(urllib.request.urlopen(urllib.request.Request('https://api.github.com/repos/Mrroot3r/Lost-and-Hidden-Atlas/contents/claims.txt?ref=claims',headers={'User-Agent':'lost-hidden-atlas-research/1.0'}),timeout=30))
+        return base64.b64decode(j['content']).decode().split('\n')
+    except Exception: return []
+def state_says_gone(st,reg):
+    """reference numbers the state's own index marks demolished or delisted (Missouri's does, beside each listing)"""
+    if st!='mo': return set()
+    try:
+        import form
+        ix=[e for e in form.mo_index() if re.search(r'demolish|delist|removed|razed|destroyed',e['rest'],re.I)]
+        if not ix: return set()
+        by={}
+        for r in reg: by.setdefault(form._words(r['n']),[]).append(str(r.get('ref','')))
+        return {x for e in ix for x in by.get(form._words(e['name']),[])}
+    except Exception: return set()
+def left(st,lines=None):
+    """(listings left in the state, or None when it cannot be measured; the state's name or why not).
+    Listings a session set aside (choose.py --skip) and those the state's index marks demolished are not counted."""
     S=next((s for s in STATES if s['k']==st),None)
     if S is None: return None,'No state has the key "%s" (two letters, such as mo, ks, ny).'%st
     f='cache/nrhp/%s.json'%st
@@ -26,11 +45,13 @@ def left(st):
         except Exception: pass
     if not os.path.exists(f): return None,'There is no National Register list for %s here (a Canadian province, or the Park Service did not answer).'%S['name']
     if not os.path.exists('build/sites.json'): subprocess.run([sys.executable,'tools/build_sites.py'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-    return dry.gaps(json.load(open(f,encoding='utf-8')),json.load(open('build/sites.json',encoding='utf-8')),None),S['name']
-def table_lines(st,g,dry_now,near=None,n=3):
+    reg=json.load(open(f,encoding='utf-8')); lines=claim_lines() if lines is None else lines
+    skip={k.split(':',1)[1] for k in dry.skipped(lines) if k.startswith(st+':')}|state_says_gone(st,reg)
+    return dry.gaps(reg,json.load(open('build/sites.json',encoding='utf-8')),None,skip=skip),S['name']
+def table_lines(st,g,dry_now,near=None,n=3,passed=()):
     """the lines choose.py and this tool print: where to go, and where not to"""
     t=dry.county_table(g); out=[]
-    nx=dry.next_counties(t,st,dry_now,near=near,n=n)
+    nx=dry.next_counties(t,st,dict(dry_now,**{k:'left by this session' for k in passed}),near=near,n=n)
     if nx: out.append(('Nearest counties with enough left: ' if near else 'Counties to take (drawn by lot among those with enough left): ')+'; '.join('%s (%d left, round %.2f,%.2f)'%(c,v['left'],v['lat'],v['lon']) for c,v in nx))
     else: out.append('NO county of this state has %d or more listings left that is not marked dry. Draw other ground.'%dry.LIMIT)
     thin=sorted(c for c,v in t.items() if v['left']<dry.LIMIT); dd=sorted(c for c in t if dry.key(st,c) in dry_now)
@@ -44,18 +65,13 @@ if __name__=='__main__':
     if not a: sys.exit(__doc__)
     st=a[0].lower(); g,name=left(st)
     if g is None: print(name); print('NOT COUNTED. Judge the ground from what start.py prints and the sources you can open in the first ten minutes.'); sys.exit(0)
-    dn={}
-    try:
-        import base64,urllib.request
-        j=json.load(urllib.request.urlopen(urllib.request.Request('https://api.github.com/repos/Mrroot3r/Lost-and-Hidden-Atlas/contents/claims.txt?ref=claims',headers={'User-Agent':'lost-hidden-atlas-research/1.0'}),timeout=30))
-        dn=dry.dry_regions(base64.b64decode(j['content']).decode().split('\n'))
-    except Exception: pass
+    dn=dry.dry_regions(claim_lines())
     if len(a)>1:
         rows=[r for r in g if (r.get('county') or '').lower()==a[1].lower().replace(' county','')]
         print('%s County, %s: %d National Register listing(s) the Atlas does not have.%s'%(a[1],name,len(rows),'  (marked DRY: '+dn[dry.key(st,a[1])]+')' if dry.key(st,a[1]) in dn else ''))
         for r in rows: print('  %-9s %-48s %-9s %-18s %.5f,%.5f  nearest Atlas place %.1f km'%(r.get('ref',''),r['n'][:48],r['k'],(r.get('town') or '')[:18],r['lat'],r['lon'],r['far']/1000))
         if dry.is_dry(len(rows)): print('Fewer than %d: do not start a batch here on these alone.'%dry.LIMIT)
-        else: print('Check each name against the place lists before writing (grep the id too): a Register point can be 300 m off the pin.')
+        else: print('Read about them with  python3 tools/form.py <number> [<number> ...]  (the record, the form, the state\'s copy). Check each name against the place lists before writing (grep the id too): a Register point can be 300 m off the pin. One that is gone, unreadable, not wanted or already on the Atlas:  python3 tools/choose.py --skip <clone> %s <number> gone|nosource|notwanted|onatlas "<why or the Atlas id>"'%st)
         sys.exit(0)
     t=dry.county_table(g)
     print('%s: %d National Register listing(s) the Atlas does not have, in %d counties.'%(name,len(g),len(t)))

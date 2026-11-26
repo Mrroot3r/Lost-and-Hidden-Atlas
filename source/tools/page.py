@@ -9,7 +9,8 @@ like a page. A PDF that is only scanned pictures has no text layer; the tool say
 read without OCR (say "form is a scan, not read" and use another source).
 A page that will not open (refused, timed out, 403, 404) is looked for in the Internet Archive, and the newest copy kept
 there is read instead, under a line saying ARCHIVED COPY and its date (or, where this machine is not let through to the
-archive, the tool prints the address of that copy to open with the web fetch tool). Hours, fees and rules taken from an archived copy
+archive, the tool says so; the web fetch tool will not open web.archive.org either). Whenever a page will not open the tool
+prints WHAT TO TRY NEXT (tools/form.py --ladder): never stop at the archive. Hours, fees and rules taken from an archived copy
 must be written with that date ("as of an archived copy of March 2024"), because they may have changed.
 A page that is drawn by script comes back nearly empty; the tool says so. Then search the web for the page's own words
 limited to that site: search results often link a plain copy of the same page that this tool can read."""
@@ -22,6 +23,14 @@ while a and a[0] in('-n','-g'):
     else: pat=a[1]
     a=a[2:]
 os.makedirs('research/pages',exist_ok=True)
+def nexts(u):
+    """a page would not open: say what to try next, so nobody stops here (tools/form.py holds the list)"""
+    try:
+        sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import form
+        if form.moved(u): print('   MISSOURI MOVED ITS REGISTER FORMS in 2025; this old address is dead but the form is very likely online. Run  python3 tools/form.py mo "<part of the listing\'s name>"  (or with its reference number).')
+        print('   WHAT TO TRY NEXT, in order:')
+        for i,l in enumerate(form.ladder(u),1): print('   %d. %s'%(i,l))
+    except Exception: pass
 def archived(u,why):
     """The newest copy the Internet Archive holds of a page that would not open, or None."""
     try:
@@ -31,7 +40,7 @@ def archived(u,why):
         try: r=requests.get('https://web.archive.org/web/%sid_/%s'%(ts,u),headers=UA,timeout=90)
         except Exception: pass
         if r is None or r.status_code!=200:          # this machine may not be let through to the archive; the web fetch tool usually is
-            print('##',u,'->',why+'. The Internet Archive holds a copy of '+day+' that this tool could not fetch: open  https://web.archive.org/web/%s/%s  with the web fetch tool, and give that date with any hours, fees or rules you take from it.'%(ts,u)); return ''
+            print('##',u,'->',why+'. The Internet Archive holds a copy of '+day+' that this machine is not let through to (https://web.archive.org/web/%s/%s), and the web fetch tool will not open web.archive.org either: do not spend time on it.'%(ts,u)); nexts(u); return ''
         print('##',u,'->',why+'. Reading the ARCHIVED COPY of %s-%s-%s instead: give that date with any hours, fees or rules you take from it.'%(ts[:4],ts[4:6],ts[6:8]))
         return pdf_text(r.content,u) if r.content[:5]==b'%PDF-' else '<!-- archived copy of %s -->'%ts+r.text
     except Exception: return None
@@ -68,7 +77,7 @@ for u in a:
         except Exception as e: why='ERROR '+str(e)[:90]
         if t is None:
             t=archived(u,why)
-            if t is None: print('##',u,'->',why,'and no archived copy was found\n'); continue
+            if t is None: print('##',u,'->',why,'and no archived copy was found'); nexts(u); print(); continue
             if t=='': print(); continue
         open(p,'w',encoding='utf-8').write(t)
     m=re.match(r'<!-- archived copy of (\d{8})',t); raw=t
@@ -83,4 +92,5 @@ for u in a:
         seen.add(s)
         if used+len(s)>N: break
         out.append(' - '+s); used+=len(s)
-    print('##',u,f'({len(t)} chars of text)\n'+'\n'.join(out)+'\n')
+    cut=used+sum(len(x) for x in sents if x not in seen and 25<=len(x)<=420 and re.search(pat,x,re.I))>N
+    print('##',u,f'({len(t)} chars of text)\n'+'\n'.join(out)+('\n[CUT SHORT at %d characters of matching sentences: more of them follow. Raise -n (for a long form, -n 200000), or read the kept copy in research/pages/.]'%N if cut else '')+'\n')

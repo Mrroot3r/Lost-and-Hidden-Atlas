@@ -10,9 +10,12 @@
    python3 tools/choose.py --claim <clone> --state mo,ks --near 39.10,-94.58
                                                           for a task tied to a city: after the draw it names the counties
                                                           NEAREST that point that still have enough left, so the task works outward
-   python3 tools/choose.py --dry <clone> "<County>" "<why>"    the county you were sent to has nothing you can use: mark it
+   python3 tools/choose.py --dry <clone> mo "<County>" "<why>"   the county you were sent to has nothing you can use: mark it
                                                           dry for thirty days (no session is sent there again) and be given
                                                           the next counties. Twice in one session at most.
+   python3 tools/choose.py --skip <clone> mo <number> gone|nosource|notwanted|onatlas "<why>"
+                                                          set ONE listing aside for a year (pulled down; nothing readable;
+                                                          not what the Atlas is after; already on the Atlas, give its id)
    python3 tools/choose.py --wet <clone> mo:pettis         (owner or maintainer) take a dry mark back
 What is left is counted by tools/gaps.py (National Register listings the Atlas does not have, county by county); a county
 with fewer than eight is never offered. Run nothing in a county the draw did not name unless you hold a source for it.
@@ -140,9 +143,10 @@ def counties(st,lines):
     """what tools/gaps.py says of this state, as lines to print, and the counties offered"""
     try:
         import gaps
-        g,name=gaps.left(st)
+        g,name=gaps.left(st,lines)
         if g is None: return ['What is left could not be counted for this ground ('+name+') Judge it from start.py and the sources you can open in the first ten minutes.'],None
-        return gaps.table_lines(st,g,dry.dry_regions(lines),NEAR)
+        pf=os.path.join(W,'.passed'); passed=open(pf).read().split() if os.path.exists(pf) else []
+        return gaps.table_lines(st,g,dry.dry_regions(lines),NEAR,passed=passed)
     except Exception as e: return ['(What is left could not be counted: %s.)'%str(e)[:80]],None
 def state_of(reg): return next(k for c,l,sn,k in REG if c==reg)
 if a[:1]==['--wet']:
@@ -152,16 +156,35 @@ if a[:1]==['--wet']:
         if write_claims(clone,lines+['wet %s %s owner'%(k,datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S'))],par,'wet '+k).returncode==0: print('Taken back: %s is no longer marked dry.'%k); sys.exit(0)
         time.sleep(1+i)
     sys.exit('The change could not be pushed.')
+if a[:1]==['--skip']:
+    if len(a)<6 or a[4] not in dry.KINDS or not re.fullmatch(r'\d{8,9}',a[3]) or len(a[5].strip())<4: sys.exit('Set one listing aside:  python3 tools/choose.py --skip <clone> <state key> <reference number> gone|nosource|notwanted|onatlas "<why: what says it is gone / what you tried / why not wanted / the Atlas id it already has>"')
+    clone,st,ref,kind,why=a[1],a[2].lower(),a[3],a[4],a[5]; sf=os.path.join(W,'.skips'); done=int(open(sf).read().strip() or 0) if os.path.exists(sf) else 0
+    if not dry.may_skip(done): sys.exit('This session has set %d listings aside, which is the most one session may. Leave the rest for the next.'%done)
+    now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S'); tag=(open(os.path.join(W,'.claim')).read().split()[2] if os.path.exists(os.path.join(W,'.claim')) else 'none')
+    for i in range(5):
+        lines,par=read_claims(clone)
+        if write_claims(clone,lines+['skip %s:%s %s %s %s %s'%(st,ref,now,tag,kind,re.sub(r'\s+','_',why)[:140])],par,'skip %s:%s'%(st,ref)).returncode==0: open(sf,'w').write(str(done+1)); print('Set aside for a year: %s %s (%s). It no longer counts as left.'%(st.upper(),ref,kind)); sys.exit(0)
+        time.sleep(1+i)
+    sys.exit('The record could not be pushed. Say it in your note instead.')
 if a[:1]==['--dry']:
-    if len(a)<4: sys.exit('Say which county and why:  python3 tools/choose.py --dry <clone> "<County>" "<what you tried and why nothing came of it>"')
-    clone,county,why=a[1],a[2].replace(' County','').replace(' county',''),a[3]; f=os.path.join(W,'.claim'); rf=os.path.join(W,'.redraws')
+    LEAVE='--leave' in a
+    if LEAVE: a.remove('--leave')
+    if len(a)<5 or not any(k==a[2].lower() for c,l,sn,k in REG): sys.exit('Say which state, which county and why:  python3 tools/choose.py --dry <clone> <state key> "<County>" "<what you tried and why nothing came of it>"   (the state key is two letters, mo or ks; Jackson County is in both Missouri and Kansas, and a mark once went on the wrong one)')
+    clone,st,county,why=a[1],a[2].lower(),a[3].replace(' County','').replace(' county',''),a[4]; f=os.path.join(W,'.claim'); rf=os.path.join(W,'.redraws')
     if not os.path.exists(f): sys.exit('No claim is recorded in this workspace: claim ground first.')
     if NEAR is None and os.path.exists(os.path.join(W,'.near')): NEAR=tuple(float(x) for x in open(os.path.join(W,'.near')).read().split(','))
-    reg,stamp,tag=open(f).read().split(); st=state_of(reg); done=int(open(rf).read().strip() or 0) if os.path.exists(rf) else 0
+    reg,stamp,tag=open(f).read().split(); done=int(open(rf).read().strip() or 0) if os.path.exists(rf) else 0
     if not dry.may_redraw(done): sys.exit('This session has already given ground up %d times. Do not draw again: publish what you have if it is one place or more, or stop with nothing, and say in your report that three pieces of ground in a row came up empty and which they were.'%done)
     import gaps
-    g,name=gaps.left(st); n=None if g is None else sum(1 for r in g if (r.get('county') or '').lower()==county.lower())
-    if n is not None and not dry.can_mark(n): sys.exit('%s County still has %d listings the Atlas does not have: that is not dry ground. The trouble is the sources. Try others before giving it up: the town\'s walking tour, Clio (theclio.com), the county historical society, SAH Archipedia, the web fetch tool for a page page.py cannot open. See them:  python3 tools/gaps.py %s "%s"'%(county,n,st,county))
+    lines0=read_claims(clone)[0]; g,name=gaps.left(st,lines0); n=None if g is None else sum(1 for r in g if (r.get('county') or '').lower()==county.lower())
+    if n is not None and not dry.can_mark(n):
+        if not LEAVE: sys.exit('%s County, %s still has %d listings the Atlas does not have: that is not dry ground, so it is not marked. Before you leave it, read about them:  python3 tools/gaps.py %s "%s"  then  python3 tools/form.py <number> <number> ...  (the Park Service\'s record always answers, and most of Missouri\'s forms read at the state\'s new address). Set aside each one that is gone, unreadable or not wanted with  --skip , so the count comes down for everyone. If you have done that and still cannot make a batch, leave WITHOUT marking: run this same command again with  --leave  at the end.'%(county,name,n,st,county))
+        open(os.path.join(W,'.passed'),'a').write(dry.key(st,county)+'\n'); open(rf,'w').write(str(done+1))
+        print('Left without a mark: %s County, %s (%d listings still there for a session with better sources). Say in your note what you tried.'%(county,name,n))
+        ls,nx=counties(st,lines0)
+        for l in ls: print(l)
+        if not nx: print('Nothing is left to offer in this state. Release and draw again:  python3 tools/choose.py --release %s   then   python3 tools/choose.py --claim %s'%(clone,clone))
+        sys.exit(0)
     now=datetime.datetime.now(datetime.timezone.utc).strftime('%Y%m%dT%H%M%S'); k=dry.key(st,county)
     for i in range(5):
         lines,par=read_claims(clone)
@@ -211,7 +234,8 @@ if a[:1]==['--claim']:
     print('WHAT IS LEFT in %s (National Register listings the Atlas does not have; tools/gaps.py):'%sn)
     for l in ls: print('  '+l)
     if nx: print('  A place takes the region code its neighbours already carry (start.py prints it for the town you pick), which may not be the code drawn here: a claim holds a turn in the state, the county is where you work.')
-    if nx: print('  Work in ONE of those counties. See its listings:  python3 tools/gaps.py %s "<County>"   If after the first ten minutes fewer than %d of them have a source you can read, give it up:  python3 tools/choose.py --dry %s "<County>" "<why>"'%(k,dry.LIMIT,clone))
+    if nx: print('  Work in ONE of those counties. See its listings:  python3 tools/gaps.py %s "<County>"   If after the first ten minutes fewer than %d of them have a source you can read, give it up:  python3 tools/choose.py --dry %s %s "<County>" "<why>"'%(k,dry.LIMIT,clone,k))
+    if nx: print('  Read about a listing by every road at once:  python3 tools/form.py <number> ...   One that is gone, unreadable, not wanted or already on the Atlas:  python3 tools/choose.py --skip %s %s <number> gone|nosource|notwanted|onatlas "<why>"'%(clone,k))
     tc=centres(c,k)
     if tc: print('Old town centres there with no Atlas place yet (drawn at random; take one, or the country round it): '+'; '.join('%s (%.3f, %.3f)'%(r[7],r[0],r[1]) for r in tc))
     print('Wanted: interesting old buildings and what is left of them, of any kind and any age (the 1700s and earlier are welcome), standing as much as ruined. Take what is most worth a visit there, not one kind of thing.')
