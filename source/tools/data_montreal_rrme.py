@@ -1,0 +1,188 @@
+# November 26, 2026: nineteen standing buildings in Montreal, from the names in one walking-tour video about the city
+# (a tip only: every fact below comes from a source opened while writing). Region qc. Sources: the English Wikipedia
+# articles (raw text), the French Wikipedia article on the Édifice Lucien-Saulnier, McGill University's building-history
+# pages, and the pages of whoever runs each place for hours (the basilica, the Marguerite Bourgeoys Museum, the Archdiocese
+# of Montreal, the City of Montreal, Pointe-à-Callière, the Redpath Museum, St. James United Church, Saint Joseph's
+# Oratory and the Bonsecours Market). Nothing was seen on the ground. Most are in the old town and downtown, reached by
+# metro or on foot; street parking is metered and paid lots are common.
+from data_b import N
+from data_ma import W
+L = lambda t, u: [t, u]
+
+BATCH = {'key': 'montreal_rrme', 'label': 'Montreal: old town and downtown', 'added': '2026-11-26 06:35'}
+
+PLACES = [
+N('notre-dame-basilica-montreal', "Notre-Dame Basilica", 'Montreal (Old Montreal)', 'qc', 'worship', 'standing', 45.50444, -73.55599, 'exact', 'open', 'walk', '', '1824–1829',
+  "The parish church of Montreal, built between 1824 and 1829 to plans by the New York architect James O'Donnell, who designed it in the Gothic Revival style for a congregation of up to 10,000; he became a Catholic on his deathbed and is buried in its crypt. It was made a minor basilica in 1982 and is one of the most visited monuments in North America.",
+  "It faces the Place d'Armes. Inside, the vaults are deep blue with gold stars, there are hundreds of carved wooden figures and statues, stained glass that shows the religious history of Montreal rather than Bible scenes, and a Casavant Frères organ of 1891 with about 7,000 pipes. Visitors go in on a paid sightseeing visit outside services.",
+  "A Gothic Revival interior of blue, gold and carved wood, finished in 1829.",
+  "Run by the Notre-Dame parish (Fabrique), 110 rue Notre-Dame Ouest. Tickets on site during visiting hours or online. The basilica has no parking: metered street parking or paid lots in Old Montreal (basilica's page, read November 2026). Masses are in French.",
+  [W('Notre-Dame Basilica (Montreal)'), L('Notre-Dame Basilica: hours and rates', 'https://www.basiliquenotredame.ca/en/hours-access')],
+  brick='?', hours='Visits Monday to Saturday 9 a.m. to 4 p.m., Sunday 12:30 to 4 p.m.; Sunday Mass 9 a.m., 11 a.m. and 5 p.m., Saturday 5 p.m.'),
+
+N('bon-secours-chapel-montreal', "Notre-Dame-de-Bon-Secours Chapel", 'Montreal (Old Montreal)', 'qc', 'worship', 'standing', 45.50981, -73.55107, 'exact', 'open', 'walk', '', '1771',
+  "One of the oldest churches in Montreal. Marguerite Bourgeoys, the colony's first teacher, rallied the settlers to build a chapel here in 1655; the stone church of 1678 burned in 1754, and the present one was built over its ruins in 1771. In the 19th century it became the sailors' church of the port, and in 1849 a statue of the Virgin as Star of the Sea was set on top, facing the harbour.",
+  "A chapel on rue Saint-Paul Est with the Virgin and angels on its roof facing the river. The Marguerite Bourgeoys Museum shares the building and shows the archaeological site below; going into the chapel itself is free (museum's page). Interior fittings not checked.",
+  "The sailors' chapel of Montreal, rebuilt in 1771 on the ruins of 1678.",
+  "400 rue Saint-Paul Est, run with the Marguerite Bourgeoys Museum; the museum and archaeological site charge admission, the chapel does not (museum's page, read November 2026). Champ-de-Mars metro station is the nearest. Street parking is metered.",
+  [W('Notre-Dame-de-Bon-Secours Chapel'), L('Marguerite Bourgeoys Museum', 'https://margueritebourgeoys.org/en')],
+  brick='?', hours='May 15 to October 15 daily 10 a.m. to 6 p.m.; otherwise Tuesday to Saturday 11 a.m. to 5 p.m., Sunday 10 a.m. to 5 p.m., closed Monday'),
+
+N('bonsecours-market-montreal', "Bonsecours Market", 'Montreal (Old Montreal)', 'qc', 'civic', 'standing', 45.50895, -73.55153, 'exact', 'open', 'walk', '', '1844–1847',
+  "A domed neoclassical market hall built from 1844 to 1847 to designs by William Footner, with changes by George Browne finished in 1860. It was the main public market of the Montreal area for more than a hundred years, held the Legislative Assembly of the Province of Canada for one session in 1849, and housed Montreal's city hall from 1852 to 1878. The market closed in 1963 and the building was slated for demolition, but it was kept and turned into shops, restaurants and halls.",
+  "A two-storey domed hall, between rue Saint-Paul and the Old Port. Shops and cafés on the main and upper floors; the old council chamber and halls are rented for events. Original interior fabric not checked.",
+  "Montreal's market hall of 1847, once its parliament and city hall.",
+  "350 rue Saint-Paul Est. The shops keep the hours below (market's page, read November 2026). Champ-de-Mars metro station; metered street parking and paid lots in the Old Port.",
+  [W('Bonsecours Market'), L('Marché Bonsecours', 'https://www.marchebonsecours.qc.ca/en/')],
+  brick='?', hours='Shops Monday to Wednesday 10 a.m. to 6 p.m., Thursday to Saturday 10 a.m. to 7 p.m., Sunday 10 a.m. to 6 p.m.'),
+
+N('mary-queen-world-cathedral-montreal', "Mary, Queen of the World Cathedral", 'Montreal (downtown)', 'qc', 'worship', 'standing', 45.49926, -73.56835, 'exact', 'open', 'walk', '', '1875–1894',
+  "The cathedral of the Catholic archdiocese of Montreal, begun in 1875 and consecrated in 1894 as Saint James Cathedral, to replace the bishop's church that burned in 1852. Bishop Ignace Bourget had it built as a scale model of St. Peter's in Rome, in rivalry with the Sulpicians and the Anglicans, who favoured Gothic. It is 101 m long, with a dome 77 m high.",
+  "A copy in miniature of St. Peter's: a dome, a canopy over the altar modelled on St. Peter's baldachin, and statues along the front of the patron saints of the thirteen parishes that paid towards it. It faces Dorchester Square on boulevard René-Lévesque.",
+  "St. Peter's of Rome at about a third the size, in downtown Montreal.",
+  "1085 rue de la Cathédrale, at René-Lévesque and Metcalfe; Bonaventure metro station. Run by the archdiocese; its page lists Masses and adoration hours. Paid lots downtown.",
+  [W('Mary, Queen of the World Cathedral'), L('Archdiocese of Montreal: Mary Queen of the World Cathedral', 'https://www.diocesemontreal.org/en/lets-connect/churches-parishes/mary-queen-world-cathedral')],
+  brick='?', hours='Sunday Mass 8 a.m. (English), 9:30 a.m., 11 a.m. and 12:15 p.m.; weekday Mass 12:10 and 5 p.m.; adoration 8 a.m. to 4:15 p.m.'),
+
+N('old-courthouse-montreal', "Old Montreal Courthouse (Édifice Lucien-Saulnier)", 'Montreal (Old Montreal)', 'qc', 'civic', 'standing', 45.50796, -73.55497, 'exact', 'view', 'walk', '', '1856',
+  "The first of three courthouses on rue Notre-Dame, designed by John Ostell with Henri-Maurice Perrault and opened in 1856, in a sober neoclassical style. It was built of cut stone and cost about $400,000. The courts later moved to newer buildings on the same street, and the building now holds City of Montreal offices under the name Édifice Lucien-Saulnier.",
+  "A long cut-stone front on rue Notre-Dame Est, with a portico of six Ionic columns under a pediment, reached by two stone stairways. Interior not checked.",
+  "Montreal's courthouse of 1856, the oldest of three on the same street.",
+  "155 rue Notre-Dame Est, City of Montreal offices: seen from the street. Champ-de-Mars metro station.",
+  [L('Édifice Lucien-Saulnier (Wikipedia, French)', 'https://fr.wikipedia.org/wiki/%C3%89difice_Lucien-Saulnier'), W('Palais de justice (Montreal)')],
+  brick='no', hours=''),
+
+N('montreal-city-hall', "Montreal City Hall", 'Montreal (Old Montreal)', 'qc', 'civic', 'standing', 45.50884, -73.55414, 'exact', 'open', 'walk', '', '1872–1878',
+  "Built from 1872 to 1878 in the Second Empire style to plans by Henri-Maurice Perrault and Alexander Cowper Hutchison, it was the first city hall in Canada built only for a city government. A fire in March 1922 left only the outer walls; Louis Parant built a new steel-framed building inside the shell, modelled on the city hall of Tours, with a copper Beaux-Arts roof, and it opened in 1926. Charles de Gaulle spoke from its balcony in 1967. It is a National Historic Site.",
+  "A five-storey stone building between Place Jacques-Cartier and the Champ de Mars. After a five-year renovation it reopened in 2024 with a permanent exhibition and rooms that had been closed to the public; the museum area can be seen on your own during opening hours, and free guided tours run in summer (City of Montreal).",
+  "The Second Empire city hall rebuilt inside its own burned walls, with de Gaulle's balcony.",
+  "275 rue Notre-Dame Est, City of Montreal. Free; group tours by reservation (city's page, read November 2026). Champ-de-Mars metro station.",
+  [W('Montreal City Hall'), L('City of Montreal: Hôtel de ville', 'https://montreal.ca/en/places/hotel-de-ville')],
+  brick='?', hours='Weekdays 8 a.m. to 5 p.m., closed weekends; free guided tours in summer'),
+
+N('old-custom-house-montreal', "Old Custom House", 'Montreal (Old Montreal)', 'qc', 'civic', 'standing', 45.50335, -73.55461, 'exact', 'open', 'walk', '', '1836',
+  "Montreal's first custom house, designed by John Ostell in the Palladian revival style and finished in 1836 (Wikipedia gives 1838 in its categories). It is a National Historic Site and is now a pavilion of the Pointe-à-Callière museum of archaeology and history.",
+  "On Place Royale. Inside are a museum exhibition and a lunchroom made to look like a New France inn. Original interior fabric not checked.",
+  "",
+  "Pointe-à-Callière museum, entrance at 350 Place Royale; admission charged (museum's page, read November 2026). Place-d'Armes metro station; metered parking in Old Montreal.",
+  [W('Old Custom House (Montreal)'), L('Pointe-à-Callière: hours and rates', 'https://pacmusee.qc.ca/en/plan-your-visit/hours-and-rates/')],
+  conf='mixed', brick='?', hours='Museum Tuesday to Friday 10 a.m. to 5 p.m., Saturday and Sunday 11 a.m. to 5 p.m., closed Monday'),
+
+N('place-viger-montreal', "Place Viger (Viger Station and Hotel)", 'Montreal', 'qc', 'rail', 'standing', 45.51224, -73.55355, 'site', 'view', 'walk', '', '1898',
+  "A grand hotel and railway station in one, built in 1898 by the Canadian Pacific Railway to plans by Bruce Price, the only such combination in Canada. It was the terminus of the CP lines from the north and east and stood by the gardens of Viger Square. The hotel closed in 1935 and the station in 1951, when the city bought it, gutted it and used it as offices. Sold to a developer in 2005, it was redeveloped from 2014 into offices and housing.",
+  "A château-style building with towers and steep roofs on rue Saint-Antoine Est, near Viger Square. The old interiors were gutted in the 1950s. Interior not checked.",
+  "Canada's only railway station and grand hotel under one roof.",
+  "Private offices: seen from the street. Champ-de-Mars metro station is close.",
+  [W('Place Viger')],
+  brick='?', hours=''),
+
+N('windsor-station-montreal', "Windsor Station", 'Montreal (downtown)', 'qc', 'rail', 'standing', 45.49746, -73.56866, 'site', 'view', 'walk', '', '1887–1889',
+  "The Canadian Pacific Railway's Montreal station and its head office from 1889 to 1996, designed by the New York architect Bruce Price in the Romanesque Revival style; the first trains left on February 4, 1889. It was enlarged in 1900–1903 and 1910–1913, and a fifteen-storey tower was added in 1916. In 1970 the railway planned to pull it down for a 60-storey tower, but it was kept; it is a National Historic Site and a provincial historic monument.",
+  "Grey Montreal limestone walls with columns up to 2.1 m wide, between rue Peel and the Bell Centre. It is now an office building. Interior not checked.",
+  "The CPR's Romanesque head office, saved from demolition in the 1970s.",
+  "An office building at rue Peel and avenue des Canadiens-de-Montréal: seen from the street. Bonaventure and Lucien-L'Allier metro stations are close.",
+  [W('Windsor Station (Montreal)')],
+  brick='no', hours=''),
+
+N('sun-life-building-montreal', "Sun Life Building", 'Montreal (downtown)', 'qc', 'civic', 'standing', 45.5002, -73.5702, 'exact', 'view', 'walk', '', '1913–1931',
+  "A 24-storey, 122 m Beaux-Arts office building on Dorchester Square, built for the Sun Life Assurance Company in three stages between 1913 and 1931, and then the largest building by floor area in the British Empire. In 1940 Britain's negotiable securities were shipped here and kept in a vault three storeys underground, guarded by the RCMP, while they were sold to pay for the war.",
+  "On rue Metcalfe, facing Dorchester Square. Interior not checked.",
+  "The vault where Britain's wartime securities were hidden in 1940.",
+  "1155 rue Metcalfe, a private office building: seen from the street and the square. Peel and Bonaventure metro stations are close.",
+  [W('Sun Life Building')],
+  brick='?', hours=''),
+
+N('old-bank-of-commerce-montreal', "Old Canadian Bank of Commerce Building", 'Montreal (Old Montreal)', 'qc', 'civic', 'standing', 45.50335, -73.55945, 'exact', 'view', 'walk', '', '1906–1909',
+  "A five-storey Edwardian Baroque bank on rue Saint-Jacques, built in 1906–1909 to designs by Darling and Pearson. It also held the Montreal offices of the White Star Line from 1909 to 1939. The bank's head office left in 1962 but a branch stayed until the building was sold in 2010.",
+  "A tall portico of six Corinthian columns carved from grey Stanstead granite, on the old banking street. Interior not checked.",
+  "",
+  "265 rue Saint-Jacques, privately owned: seen from the street. Place-d'Armes and Square-Victoria metro stations are close. What the building is used for now was not checked.",
+  [W('Old Canadian Bank of Commerce Building')],
+  brick='no', hours=''),
+
+N('redpath-museum-montreal', "Redpath Museum", 'Montreal (McGill University)', 'qc', 'inst', 'standing', 45.50447, -73.57751, 'exact', 'open', 'walk', '', '1882',
+  "McGill University's natural history museum, built in 1882 as a gift of the sugar baron Peter Redpath and designed by A. C. Hutchison and A. D. Steele; it is the oldest building in Canada built to be a museum. McGill calls it an unusual late example of the Greek Revival in North America.",
+  "On the McGill campus off rue Sherbrooke. Inside, galleries of fossils, minerals, animals and ethnology under Victorian decoration, with a dinosaur skeleton as the centrepiece. No ramps or elevators.",
+  "Canada's oldest purpose-built museum, a Greek Revival hall of dinosaurs.",
+  "McGill University, 859 rue Sherbrooke Ouest; free, donations asked. McGill and Peel metro stations. Closed on statutory holidays (museum's page, read November 2026).",
+  [W('Redpath Museum'), L('Redpath Museum: visit', 'https://www.mcgill.ca/redpath/visit')],
+  brick='?', hours='September to June 24: Tuesday to Friday 9 a.m. to 4:30 p.m., Saturday 10 a.m. to 4 p.m., closed Sunday and Monday'),
+
+N('redpath-hall-mcgill', "Redpath Hall (old Redpath Library)", 'Montreal (McGill University)', 'qc', 'civic', 'standing', 45.50356, -73.57673, 'exact', 'view', 'walk', '', '1893',
+  "McGill's first library building, given by Peter Redpath and designed in the Romanesque style by Andrew Taylor of Edinburgh; it opened in 1893 and was extended to the south several times in the next fifty years. The old reading room, Redpath Hall, is now a concert hall of the Schulich School of Music.",
+  "A Romanesque stone building on rue McTavish with gargoyles and carved figures. Redpath Hall holds a French Classical organ by Hellmuth Wolff (1981) and much of the university's portrait collection. It is entered for concerts; other access not checked.",
+  "",
+  "McGill University, 3461 rue McTavish. McGill metro station.",
+  [W('Redpath Hall')],
+  brick='?', hours=''),
+
+N('macdonald-engineering-mcgill', "Macdonald Engineering Building", 'Montreal (McGill University)', 'qc', 'civic', 'standing', 45.50556, -73.57643, 'exact', 'view', 'walk', '', '1908',
+  "Andrew Taylor's first Macdonald Engineering Building, a gift of Sir William Macdonald, was gutted by fire on April 5, 1907. Macdonald paid for a new one at once; Percy Erskine Nobbs, then head of McGill's School of Architecture, designed it in 1908 to be as fireproof as possible, on the foundations of the old one and with a similar plan.",
+  "A plain stone building with little ornament, except a carving on the south wall of a phoenix rising from the ashes, in memory of the fire. Montreal limestone was the stone of Taylor's building and of most of the campus. Interior not checked.",
+  "The engineering building rebuilt after the 1907 fire, with a phoenix on its wall.",
+  "McGill University, 817 rue Sherbrooke Ouest; the campus grounds are open. McGill metro station.",
+  [L('McGill 200: Macdonald Engineering Building', 'https://200.mcgill.ca/history/macdonald-engineering-building/'), L('The History of McGill University\'s Buildings: Macdonald Engineering', 'https://digital.library.mcgill.ca/campus/items/cb022.html')],
+  brick='no', hours=''),
+
+N('royal-victoria-college-montreal', "Royal Victoria College (Strathcona Music Building)", 'Montreal (McGill University)', 'qc', 'inst', 'standing', 45.50594, -73.57327, 'exact', 'view', 'walk', '', '1899',
+  "The women's college of McGill, built in 1899 by the American architect Bruce Price at the request of Lord Strathcona, who paid for it. Wings were added later, and in 1971 the older wings were given to the Faculty of Music and renamed the Strathcona Music Building.",
+  "On rue Sherbrooke Ouest. A statue of Queen Victoria by Princess Louise, given when the college opened in 1899, still sits on the front steps. Interior not checked.",
+  "",
+  "McGill University, 555 rue Sherbrooke Ouest: seen from the street. McGill metro station.",
+  [L("The History of McGill University's Buildings: Royal Victoria College", 'https://digital.library.mcgill.ca/campus/items/cb041.html')],
+  brick='no', hours=''),
+
+N('royal-victoria-hospital-montreal', "Royal Victoria Hospital (old site)", 'Montreal (Mount Royal)', 'qc', 'inst', 'standing', 45.50801, -73.58128, 'site', 'view', 'walk', '', '1893',
+  "A free hospital founded in 1893 with money from the cousins Lord Strathcona and Lord Mount Stephen, on the old Frothingham estate on the slope of Mount Royal. Three of the site's nine pavilions are from the first hospital, designed by Henry Saxon Snell in the Scottish baronial style. The hospital moved to the Glen site in 2015, and McGill University is turning part of the old site into a new campus, the New Vic.",
+  "Scottish baronial pavilions on avenue des Pins Ouest, against the mountain. The pin is on the administrative pavilion (A). Interior not checked.",
+  "The Scottish baronial hospital on the mountain, empty since 2015.",
+  "Public land owned by the province; the buildings are closed and part of the site is a building site. Seen from avenue des Pins Ouest and rue University.",
+  [W('Royal Victoria Hospital, Montreal')],
+  brick='no', hours=''),
+
+N('st-james-united-montreal', "St. James United Church", 'Montreal (downtown)', 'qc', 'worship', 'standing', 45.50538, -73.56862, 'exact', 'open', 'walk', '', '1889',
+  "A Gothic Revival church designed by Alexander Francis Dunlop and opened in June 1889 as the largest Methodist church in Canada, with 2,000 seats; it was called the cathedral of Methodism. Its congregation founded the first YMCA in North America in 1851. It has belonged to the United Church of Canada since 1925 and is a National Historic Site.",
+  "A stone church on rue Sainte-Catherine Ouest, with a false apse that holds the church offices, a Casavant Frères organ, and a 1924 war memorial window by Charles William Kelsey showing a trench scene.",
+  "",
+  "463 rue Sainte-Catherine Ouest, St. James United Church. McGill metro station.",
+  [W('St. James United Church (Montreal)'), L('St. James United Church', 'https://www.stjamesmontreal.ca/')],
+  brick='?', hours='Sunday service 11 a.m.'),
+
+N('saint-josephs-oratory-montreal', "Saint Joseph's Oratory", 'Montreal (Côte-des-Neiges)', 'qc', 'worship', 'standing', 45.49183, -73.61670, 'exact', 'open', 'walk', '', '1904–1960s',
+  "A Catholic minor basilica and national shrine founded in 1904 by Saint André Bessette in honour of Saint Joseph and built by many architects over six decades. It is Canada's largest church, with one of the largest church domes in the world, and the only building in Montreal allowed to rise higher than Mount Royal. More than two million visitors and pilgrims come each year.",
+  "A Renaissance Revival front and a great dome on Mount Royal's Westmount summit, with an Art Deco interior. The dome and lantern have been under repair since 2018.",
+  "Canada's largest church, finished in the 1960s on the side of Mount Royal.",
+  "3800 chemin Queen-Mary. The shrine has its own paid parking with free time for Sunday Mass; reserved for permit holders in places (Oratory's page, read November 2026). Côte-des-Neiges metro station.",
+  [W("Saint Joseph's Oratory"), L('Saint Joseph\'s Oratory: access and schedule', 'https://saint-joseph.org/en/access-to-the-shrine-and-schedule/')],
+  brick='?', hours='Shrine daily 6:30 a.m. to 9 p.m.'),
+
+N('central-fire-station-montreal', "Old Central Fire Station", 'Montreal (Old Montreal)', 'qc', 'civic', 'standing', 45.50111, -73.55556, 'site', 'view', 'walk', '', '1903–1904',
+  "Montreal's central fire station, built on Place d'Youville in 1903–1904 to plans by Joseph Perrault and Simon Lesage; it had both horses and steam pumps. The station closed in 1972, and from 1983 the building held the Centre d'histoire de Montréal, which closed in 2020 to move to a new building as the MEM.",
+  "On Place d'Youville. Its use since the museum left was not checked; seen from the square.",
+  "",
+  "335 Place d'Youville: seen from the public square. Who owns it now was not checked. Square-Victoria and Place-d'Armes metro stations.",
+  [W("Centre d'histoire de Montréal")],
+  conf='mixed', brick='yes', hours=''),
+]
+
+PIN_NOTES = {
+  'notre-dame-basilica-montreal': 'OpenStreetMap point for the basilica, 110 rue Notre-Dame Ouest.',
+  'bon-secours-chapel-montreal': 'OpenStreetMap point for the chapel on rue Saint-Paul Est.',
+  'bonsecours-market-montreal': 'OpenStreetMap building for the market hall, 350 rue Saint-Paul Est.',
+  'mary-queen-world-cathedral-montreal': 'Moved 43 m from the OpenStreetMap point, which fell on the archdiocese building, onto the green domes of the cathedral seen on the aerial.',
+  'old-courthouse-montreal': 'OpenStreetMap building, 155 rue Notre-Dame Est.',
+  'montreal-city-hall': 'OpenStreetMap point for city hall, 275 rue Notre-Dame Est.',
+  'old-custom-house-montreal': 'OpenStreetMap point for the museum pavilion on Place Royale.',
+  'place-viger-montreal': 'OpenStreetMap building "Ancienne Gare Viger"; on the aerial the pin is at the corner of the block and the building could not be told from its neighbours, so it marks the site.',
+  'windsor-station-montreal': 'Wikipedia point; the station building is large and the pin marks the site.',
+  'sun-life-building-montreal': 'OpenStreetMap building on Dorchester Square.',
+  'old-bank-of-commerce-montreal': 'OpenStreetMap building named for the bank on rue Saint-Jacques; the Wikipedia point was 75 m off.',
+  'redpath-museum-montreal': 'OpenStreetMap point for the museum, 859 rue Sherbrooke Ouest.',
+  'redpath-hall-mcgill': 'OpenStreetMap point for the Redpath Library Building on rue McTavish.',
+  'macdonald-engineering-mcgill': 'OpenStreetMap point for the building, 817 rue Sherbrooke Ouest.',
+  'royal-victoria-college-montreal': 'OpenStreetMap building for the Strathcona Music Building on rue Sherbrooke Ouest.',
+  'royal-victoria-hospital-montreal': "OpenStreetMap building for the administrative pavilion (A); the aerial shows building work around it. Wikipedia's point is the new hospital at the Glen site.",
+  'st-james-united-montreal': 'OpenStreetMap point for the church.',
+  'saint-josephs-oratory-montreal': 'Moved 54 m from the OpenStreetMap point, which fell on trees beside the church, onto the dome seen on the aerial.',
+  'central-fire-station-montreal': "Wikipedia point for the old fire station on Place d'Youville; the street address point is 20 m away.",
+}
