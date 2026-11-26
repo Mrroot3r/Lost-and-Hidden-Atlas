@@ -4,6 +4,7 @@ region: mn
 date: 2026-11-24
 places: 34
 file: data_carnegie_mnz_tqwd.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -28,5 +29,4 @@ It also adds two left out of the A to L batch, on the owner's word: Grand Rapids
 - Worthington (1905 to 1966): the National Register form for the War Memorial Building puts it across 4th Avenue, but the cross street is garbled.
 
 ## Tips for the next session
-
-- Placeography (placeography.net) has a page for nearly every Minnesota Carnegie library, standing or razed, with addresses, architects and wall materials.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (1 tip).

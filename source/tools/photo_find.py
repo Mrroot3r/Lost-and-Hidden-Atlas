@@ -40,6 +40,19 @@ than no picture, because a wrong one is easy for a person to spot and take away 
 stays that way. So choose when a candidate plausibly shows the place, and say `none` only when none plausibly does. Still never:
 an interior, a plaque close-up, a view from the place of something else, a person as the subject, a plainly different building.
 
+Reading the sheets (from the sessions' notes):
+  - Each small caption carries the file name and the by-name marker: for a candidate found by name, read the caption as well as
+    the picture. Candidates are numbered afresh on every run, so `set` from the sheet of the same run. `look <id> ...` draws a
+    sheet again (a long `next` scrolls the first ones away), and runs `look` for a place whatever `new` said about it: `new`
+    passes over a place whose only Wikipedia link is a "List of ..." page. A place with nothing prints one long "Nothing on
+    Commons" line; do not filter long lines out of the output.
+  - A name shared with another town or thing brings that one's pictures: Sheffield, Woonsocket, Fort Totten, Fort Brown (Texas),
+    Livingston Manor (the Sullivan County hamlet), Oak Ridge (Tennessee), Thistle (flowers). Check the town line; those are
+    usually none. Two places in one town (a society and its railroad in Belton) share candidates: read each description, not
+    the distance; "names it" candidates can be other houses with like file names (other Hook houses): check the house's name.
+  - Near a downtown pin most candidates are the neighbours; a museum's pin brings the art inside; a place in the news brings
+    the event. For lighthouses and churches the wide view from the road is nearly always the best candidate.
+
 Choices go in tools/pics_<four letters>.py (PICS = {place id: (address, width, height, photographer, licence, the file's page,
 day chosen, how it was found)} or ('', day, why, which search) for "none fits"), which tools/make.py folds into
 data/photos.json. A "none" recorded under an earlier, narrower search is asked again (SEARCH). A picture from a place's own
@@ -526,7 +539,8 @@ def main(a):
     if a[0]=='look':
         for i in a[1:]:
             if i not in BY: print(i,'is not a place id'); continue
-            look(BY[i],_myfile())
+            try: look(BY[i],_myfile())
+            except Exception as e: print('%s: the look failed (%s); the others go on. Run  look %s  again by itself.'%(i,str(e)[:100],i))      # one place's error used to stop the whole batch
         return
     if a[0]=='next':
         # the next places that have something to look at: python3 tools/photo_find.py next 5 ["<state>"]. A place Commons has nothing for is

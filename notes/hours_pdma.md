@@ -4,6 +4,7 @@ region: several
 date: 2026-11-22
 places: 0
 file: hours_pdma.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. New York had one place of worship left waiting (Temple of Israel, Amsterdam) and no other state had any, so the rest came from `tools/hours.py list "<state>"` without `--kind worship`: museums, courthouses, historic sites and a library. Thirty-two were settled: nineteen got days and times from the page of whoever runs them, one was found closed, twelve are recorded `?`.
@@ -42,7 +43,4 @@ Not recorded and still waiting: Boulton Historic Site (jacobsburghistory.com say
 No church was found to be closed or sold.
 
 ## Tips for the next session
-- Illinois DNR historic sites: the list page is drawn by script, but each site page at `dnrhistoric.illinois.gov/experience/sites/site.<slug>.html` gives an "Open:" line under its address. Ignore the JSON block on the page (it holds every site).
-- outdoornebraska.gov blocks plain fetches; the web page tool reads it.
-- jacobsburg.org is not the Jacobsburg Historical Society; its site is jacobsburghistory.com.
-- New York's remaining "open" places without hours are mostly post offices; USPS pages give nothing the tools can read.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

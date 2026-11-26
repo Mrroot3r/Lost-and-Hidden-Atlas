@@ -1,4 +1,5 @@
 # Pictures batch yphg (22 November 2026)
+tidied: 2026-11-26
 
 What this batch is: a pictures job. No new places and no pins. It looked for a photograph for places already on the map that had none, using tools/photo_find.py next 5 and choosing by looking at each sheet. The pictures file is source/tools/pics_yphg.py.
 

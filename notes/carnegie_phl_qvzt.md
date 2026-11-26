@@ -4,6 +4,7 @@ region: pae
 date: 2026-11-24
 places: 23
 file: data_carnegie_phl_qvzt.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -19,15 +20,10 @@ Not checked: the use of the old South Philadelphia branch (only the 2020 nominat
 Pictures: twenty places have a Commons picture chosen by looking at the finder's sheet (Richmond's is a Historic American Buildings Survey photograph). The three sites of torn-down branches have none.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (3 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Nicetown Carnegie branch (1917) | Philadelphia, Pennsylvania | Gone; the list gives 1715 Hunting Park Avenue with ZIP 19124, which the geocoder puts in Juniata, far from Nicetown; the Free Library says near Wayne Avenue. Place it from an old map or atlas | Free Library digital item 48845; PhillyHistory census (2019) |
-| Wissahickon Carnegie branch (1909) | Philadelphia, Pennsylvania | Burned before 1970; at Manayunk Avenue and Osborn Street (PhillyHistory) or Kalos Street (Free Library) | PhillyHistory census (2019); Free Library Roxborough branch page |
-| Rest of Pennsylvania's Carnegie libraries | Pennsylvania | Researched in the next batches | Wikipedia, List of Carnegie libraries in Pennsylvania |
 
 ## Tips
-
-- The city's nomination PDF (phila.gov/media/20200109130220/Historic-District-Carnegie-Libraries.pdf) gives architect, builder, style, wall material and Register date for every surviving branch; it is the best single source.
-- The Free Library's current pages are at libwww.freelibrary.org/locations/<branch>; the older branches/branch.cfm pages carry stale hours.
-- The geocoder's points for Lehigh Avenue, Wyoming and Holmesburg missed the buildings; OpenStreetMap's library points were right.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

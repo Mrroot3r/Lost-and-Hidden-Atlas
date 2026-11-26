@@ -15,6 +15,10 @@ one row per name with what came of it, so that no name is researched twice.
                                                             start the record: research/video_<id>.md, a table to fill in
   python3 tools/videos.py check <record.md>                 is the record complete? (every row an outcome, every place real)
 
+`list` cannot tell from the index a video that walks through named buildings from a montage with music and no names
+(a running time far shorter than the channel's usual 20 to 60 minutes is a hint), and a title beginning "Demolished"
+names mostly buildings that are gone (49 of 53 in one Detroit video): look at the title and length before claiming.
+
 A video is a stranger's tip: never a source for a fact. Names in captions are often misspelled, and "still stands" is
 what the narrator thought. Every place added needs sources opened in the session, like any other."""
 import sys,os,re,csv,json,time,random,subprocess,datetime
@@ -83,7 +87,7 @@ def problems(md,ids):
         k=next((x for x in OUTCOMES if o==x or (o.startswith(x) and o[len(x)] in ' :,;(.')),None)          # a remark may follow: "gone: razed 1942"
         if not k: out.append('"%s": the outcome must begin with one of: %s'%(c[0],', '.join(OUTCOMES))); continue
         if k in ('added','on the atlas'):
-            pid=(c[4][len(k):].strip(' :').split() or [''])[0].strip('`.,;')          # the id is the first word; a remark after it is not part of it
+            pid=(c[4][len(k):].strip(' :').split() or [''])[0].strip('`.,;:()')          # the id is the first word; a remark after it is not part of it ("added <id>: remark" too)
             if not pid: out.append('"%s": say which place: %s <place id>'%(c[0],k))
             elif pid not in ids: out.append('"%s": no such place id on the Atlas: %s'%(c[0],pid))
     return out
@@ -168,7 +172,9 @@ def main(a):
         open(p,'w',encoding='utf-8').write(skeleton(r,a[3],a[4],'Old World Exploration' if 'oldworldex' in a[1].replace('\\','/').lower() else 'the channel in '+os.path.basename(os.path.dirname(a[1])),a[5]))
         print('Wrote %s. Add one row for every building the video names. When the work is done, copy it into the clone as source/videos/%s.md'%(p,r['file'][:-4] if r['file'].endswith('.txt') else r['date'].replace('-','')+'_'+a[2])); return
     if len(a)>=2 and a[0]=='check':
-        ids={s['id'] for s in json.load(open('build/sites.json'))} if os.path.exists('build/sites.json') else set()
+        sj=next((x for x in ('build/sites.json',os.path.join(os.path.dirname(HERE),'build','sites.json')) if os.path.exists(x)),None)   # the working folder's built list, wherever this is run from
+        if not sj: sys.exit('No build/sites.json: run  python3 tools/build_sites.py  in the working folder first (the clone has no built place list).')
+        ids={s['id'] for s in json.load(open(sj))}
         P=problems(open(a[1],encoding='utf-8').read(),ids)
         for p in P: print('PROBLEM: '+p)
         R=rows_of(open(a[1],encoding='utf-8').read()); n=lambda k:sum(1 for c in R if c[4].lower().startswith(k))

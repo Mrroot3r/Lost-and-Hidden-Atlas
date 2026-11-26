@@ -1,4 +1,5 @@
 # Pictures batch pics_ndng (2026-11-22)
+tidied: 2026-11-26
 
 What this batch is: a pictures job (job 8). No new places, no pins, no text. It chose photographs for places already on the map that had none, using `tools/photo_find.py next 5` and looking at each sheet. The pictures file is `tools/pics_ndng.py`.
 

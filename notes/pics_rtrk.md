@@ -1,4 +1,5 @@
 # Pictures batch pics_rtrk
+tidied: 2026-11-26
 
 Six rounds of `photo_find.py next 5`; 35 places looked at.
 

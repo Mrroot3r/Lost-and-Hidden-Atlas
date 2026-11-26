@@ -1,4 +1,5 @@
 # Pictures batch xnht
+tidied: 2026-11-26
 
 Photographs chosen from Wikimedia Commons for places that had none (tools/pics_xnht.py). Six rounds of `photo_find.py next 5`.
 

@@ -1,4 +1,5 @@
 # pics_kjzq: pictures job
+tidied: 2026-11-26
 
 Pictures only: no places, pins or text changed. About 40 places were looked at in five rounds of `photo_find.py next 5` (Commons logged in for most rounds; one round ran without the login and was slow).
 

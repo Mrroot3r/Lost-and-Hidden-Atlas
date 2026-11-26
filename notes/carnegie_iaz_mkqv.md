@@ -4,6 +4,7 @@ region: ia
 date: 2026-11-24
 places: 44
 file: data_carnegie_iaz_mkqv.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -26,7 +27,4 @@ The Carnegie libraries of Iowa in towns M to Z: 44 places, from Wikipedia's stat
 - Spencer: razed 1970; the site was not found.
 
 ## Tips for the next session
-
-- carnegielibrariesiowa.org has a page for almost every town, at /library/<town>/, with architect, contractor and dates. It does not give wall material.
-- Look-alike Wikipedia articles: Monticello Carnegie Library and Spencer Public Library are both in Indiana.
-- The Monticello sale of 2008 and the Spencer window name private people; they are left out.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

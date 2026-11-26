@@ -1,4 +1,5 @@
 # pics_gyjk: pictures job
+tidied: 2026-11-26
 
 17 places got a picture, 13 got "none" from me, and the tool recorded 22 more as none by itself (nothing on Commons, or nothing new since an earlier look). Six rounds of `next 5`.
 

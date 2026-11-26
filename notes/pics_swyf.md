@@ -1,4 +1,5 @@
 # Pictures batch pics_swyf (2026-11-24)
+tidied: 2026-11-26
 
 - Places given a picture: 0.
 - Places I said none for: 1 (ossining-carnegie-library-site: the library is demolished; the candidates showed other downtown Ossining buildings and the Croton Aqueduct).

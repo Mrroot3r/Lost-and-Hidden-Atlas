@@ -1,4 +1,5 @@
 # Pictures batch ddzw (2026-11-21, scheduled pictures run)
+tidied: 2026-11-26
 
 Thirty waiting places were looked at (tools/photo_find.py look, sheets read). 11 got a picture, 19 got none.
 

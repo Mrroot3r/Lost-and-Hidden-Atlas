@@ -4,6 +4,7 @@ region: il
 date: 2026-11-24
 places: 38
 file: data_carnegie_ila_qmzr.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -51,6 +52,4 @@ Hours come only from the operator's own page. Where none was read, the place say
 - Ewing College: the college's buildings were all razed, and no Carnegie library is mentioned.
 
 ## Tips for the next session
-
-- Shaw Local's 2025 survey of Illinois Carnegie libraries covers many towns in one page.
-- Watch for same-named towns in other states (Belleville, Lewistown, Chillicothe).
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

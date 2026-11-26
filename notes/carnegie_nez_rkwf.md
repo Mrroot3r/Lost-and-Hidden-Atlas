@@ -4,6 +4,7 @@ region: ne
 date: 2026-11-24
 places: 28
 file: data_carnegie_nez_rkwf.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -25,5 +26,4 @@ Carnegie libraries of Nebraska, towns M to Z (28 places): 25 standing buildings 
 - Sutton (1910 or 1911, condemned 1969, torn down): it stood on Saunders Avenue north of today's library at 201 South Saunders; the exact site was not found.
 
 ## Tips for the next session
-
-- Madison's Wikipedia infobox picture shows the Carnegie building at left of the newer city building; worth a look on the aerial with a street-level picture.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (1 tip).

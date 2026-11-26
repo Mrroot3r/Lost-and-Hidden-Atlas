@@ -1,4 +1,5 @@
 # Pictures batch krem (2026-11-21)
+tidied: 2026-11-26
 
 Job 8, "pictures", run as a scheduled session. No new places and no pins: only photographs chosen for 30 places already on the map that had none.
 

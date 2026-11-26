@@ -4,6 +4,7 @@ region: several
 date: 2026-11-22
 places: 0
 file: hours_qnbg.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py` showed only four places of worship waiting anywhere, all in New York, and all four had already been tried by earlier sessions; they were tried again and recorded `?`. The rest of the session took museums, capitols and house museums from the states with the most waiting. 33 places were recorded: 9 with hours from the page of whoever runs them, read in the session, and 24 as `?`.
@@ -59,5 +60,4 @@ No church in this batch was found to be closed or sold.
 None.
 
 ## Tips
-- Most of what still waits outside New York are sites whose pages answer 403 or draw their hours by script (NPS, state historical societies). `hours.py page` prints nothing for them; a plain fetch of the page and a search for "Hours" around the text sometimes finds a schedule it missed (Hotel de Paris, Brushy Mountain's seasonal table).
-- New York's remaining 32 non-church places are mostly working post offices; the Postal Service's pages give the tools nothing.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

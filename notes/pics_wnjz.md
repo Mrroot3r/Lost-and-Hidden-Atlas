@@ -1,4 +1,5 @@
 # Pictures batch wnjz
+tidied: 2026-11-26
 
 30 places looked at: 7 got a picture, 23 got none. Scheduled run; Wikimedia answered 429 at first and 200 on retry. Done in five-place looks, with each sheet read before choosing.
 

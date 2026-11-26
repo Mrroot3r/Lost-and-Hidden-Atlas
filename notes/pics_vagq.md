@@ -1,4 +1,5 @@
 # Pictures batch pics_vagq (2026-11-23)
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -48,6 +49,4 @@ Each is a picture chosen, unless marked "none".
 - eglise-sainte-famille-io: interiors, altars, statues, paintings and graveyard views only; no view of the outside.
 
 ## Tips
-
-- The first publish stopped because two photo-finder files (`source/tools/photo_find.py` and `source/tools/photo_find_test.py`) changed on `main` after the workspace was set up. The resync ran cleanly, the rebuild passed and the second publish went through. A pictures session started from fresh `main` should not hit this.
-- The smoke test (`tools/app_smoke.js`) was not run: it tests the Android app's page at `localhost:8772`, not the built site, and the job says it is not needed for a pictures-only change.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

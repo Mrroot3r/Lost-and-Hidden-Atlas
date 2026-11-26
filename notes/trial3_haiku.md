@@ -1,4 +1,5 @@
 # Trial of brick, hours and pins: claude-haiku-5-5, 2026-11-20
+tidied: 2026-11-26
 A | simons-general-store-ancram | no | green-grey clapboard with white trim, no brick visible
 A | majors-inn-gilbert-block | ? | stone and half-timbered Tudor-style mansion, only a small red chimney top; no sign or caption tying it to this name, so not plainly this building
 A | mayer-red-brick-schoolhouse | yes | two-storey red brick schoolhouse with red trim, plainly the place

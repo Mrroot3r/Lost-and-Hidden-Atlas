@@ -1,4 +1,5 @@
 # pics_eaxt: pictures batch
+tidied: 2026-11-26
 
 Pictures job, 30 places looked at in six rounds of `photo_find.py next 5` (logged in to Commons).
 

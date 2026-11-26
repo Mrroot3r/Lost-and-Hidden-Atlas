@@ -1,4 +1,5 @@
 # Pictures batch pics_hawk
+tidied: 2026-11-26
 
 Photographs chosen for places already on the map that had none (job 8, "pictures"). Seven rounds of `photo_find.py next 5`: 35 places looked at.
 

@@ -4,6 +4,7 @@ region: oh
 date: 2026-11-24
 places: 35
 file: data_carnegie_ohne_tjfb.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -25,15 +26,10 @@ Not checked:
 - Pictures: Akron and Kent show their Wikipedia articles' pictures. Wikimedia Commons photographs were chosen for Youngstown and Cleveland's Broadway, Brooklyn and Carnegie West branches; the finder's sheets for the rest of the batch were still being gathered when this was published (Commons is slow without a login) and come with a later batch.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (3 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Carnegie Public Library, East Liverpool | East Liverpool, Ohio | Written up but left out: the state outlines put all of downtown East Liverpool inside West Virginia, so check.py refuses the pin (the outline needs mending near the Ohio, West Virginia and Pennsylvania corner). The entry is ready to add once it is | Wikipedia: Carnegie Public Library (East Liverpool, Ohio); the library's history page |
-| Ohio's other Carnegie libraries, northwest | Toledo branches, Bellevue, Bryan, Bucyrus, Carey, Celina, Clyde, Defiance, Delphos, Fostoria, Galion, Kenton, Lima, Maumee, Napoleon, Paulding, Tiffin, Upper Sandusky, Wauseon, Marion, Bellefontaine, Norwalk, Milan, Sandusky, Mansfield and others, Ohio | Not yet written up | Wikipedia: List of Carnegie libraries in Ohio |
-| Ohio's other Carnegie libraries, central and south | Cincinnati and Dayton branches, Athens, Cambridge, Chillicothe, Coshocton, Delaware, Gallipolis, Marietta, Middletown, Portsmouth, Xenia and others, and the college buildings (Cedarville, Miami, Otterbein, Wilberforce, Marietta), Ohio | Not yet written up | Wikipedia: List of Carnegie libraries in Ohio |
 
 ## Tips
-
-- `photo_find.py new` passes over a place whose only Wikipedia link is the state list (it counts the list as the place's article), so for a batch like this one run `look` on the ids yourself.
-- cpl.org (Cleveland Public Library) shows a bot check to the cloud browser; the Encyclopedia of Cleveland History (case.edu/ech) and Cleveland Historical cover the branches well.
-- Waymarking has a page for most Ohio Carnegie libraries with architect, cost and present use, usually from about 2008 to 2010; check present use elsewhere.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

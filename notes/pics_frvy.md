@@ -1,4 +1,5 @@
 # Pictures batch pics_frvy
+tidied: 2026-11-26
 
 - Places given a picture by a session: 0
 - Places a session said none for: 0

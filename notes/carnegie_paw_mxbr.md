@@ -4,6 +4,7 @@ region: pac, paw
 date: 2026-11-24
 places: 23
 file: data_carnegie_paw_mxbr.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -19,14 +20,10 @@ Red brick: "yes" for Duquesne, South Side, Carnegie borough and Corry from sourc
 Pictures: twenty places have a Commons picture chosen by looking at the finder's sheet. Duquesne (torn down), Wylie Avenue (nothing on Commons) and Butler (the named pictures are of Butler, Indiana) have none.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (2 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| North Bessemer Carnegie library | Penn Hills, Pennsylvania | Torn down in the 1950s; no address found. Grant $20,600, May 1, 1901 | Wikipedia, List of Carnegie libraries in Pennsylvania |
-| Rest of Pennsylvania's Carnegie libraries | Pennsylvania | Eastern and central towns and college buildings in the next batch | Wikipedia, List of Carnegie libraries in Pennsylvania |
 
 ## Tips
-
-- historicpittsburgh.org shows a human check to this browser; skip it.
-- The Carnegie Library of Pittsburgh's branch pages hold their hours in a script; a session with a full browser could read them.
-- For Butler, butlerpubliclibrary.org is a different library (founded 1926); the Carnegie building's library is at butlerlibrary.com.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

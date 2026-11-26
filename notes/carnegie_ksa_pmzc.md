@@ -4,6 +4,7 @@ region: ks
 date: 2026-11-24
 places: 30
 file: data_carnegie_ksa_pmzc.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -27,6 +28,4 @@ Carnegie libraries of Kansas, towns A to L (30 places): 27 standing buildings an
 - Kansas City, Kansas, main library (razed 1958, Huron Place): exact plot not found.
 
 ## Tips for the next session
-
-- The Kansas group nomination of Carnegie libraries (npgallery 64000195) lists the listed buildings with architects; npgallery PDFs read well with curl.
-- Already on the map before this batch: Argentine (Kansas City), Lawrence (Ninth and Vermont), Leavenworth, Wichita, Baker University's Case Library and the Paola Free Library.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

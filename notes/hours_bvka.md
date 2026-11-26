@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-21
 places: 0
 file: hours_bvka.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The last five New York places of worship, then most of those waiting in Vermont, Mississippi, Connecticut, Hawaii, Massachusetts, Maine and Pennsylvania, were looked up. Seven got service times from the page of whoever runs them, each read in the session with `tools/hours.py page` (or `tools/page.py`) and its address checked against the place; twenty-four are recorded `?`.
@@ -44,6 +45,4 @@ Closed or sold: First Baptist Church of Troy is a fraternity house (the place al
 None.
 
 ## Tips for the next session
-- Still waiting and not tried here: Fletcher Union Church VT; Temple Gemiluth Chessed, Oakland Memorial Chapel and Bethel Presbyterian MS; Ahuʻena Heiau and Hale Hālāwai O Hōlualoa HI; Unitarian Meetinghouse, Brooklyn CT; Pembroke Friends, Old Parish Sheffield, Old Stone Church West Boylston MA; Maine's four meetinghouses; Uwchlan Meetinghouse PA.
-- Small rural meetinghouses and historic churches in these states rarely have a page of their own; the yield was under one in four. A session after more hours would do better on museums or on states with active parish sites.
-- A search for a church's name often returns a same-named church elsewhere (a Messiah Episcopal in St. Paul MN, a St. John's in Warren OH): check the address on every page.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

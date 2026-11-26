@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-22
 places: 0
 file: hours_xqvd.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The last seven churches waiting anywhere (five in New York, two in Delaware), then nine New York museums and houses and ten museums elsewhere, from `tools/hours.py list`. Seven got opening or service times from the page of whoever runs them, read in the session with `tools/hours.py page` and the address checked; nineteen are recorded `?`. No church now waits in any state.
@@ -51,5 +52,4 @@ No church was found closed or sold, apart from Old St. Luke's, Mechanicville, wh
 |---|---|---|---|
 
 ## Tips
-- For Episcopal churches whose own site will not open, the Episcopal Asset Map (episcopalassetmap.org/node/<n>) is the denomination's own listing and reads cleanly; check how old its text looks.
-- Several historical-society domains belong to a same-named town in another state (Milford CT for Milford DE, Lodi OH for Lodi NY, Waterloo IA for Waterloo NY): check the street address every time.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

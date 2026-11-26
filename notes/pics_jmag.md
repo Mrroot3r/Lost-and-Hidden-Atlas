@@ -1,4 +1,5 @@
 # Pictures batch pics_jmag (2026-11-22)
+tidied: 2026-11-26
 
 What this batch is: a pictures job (PROMPTS.md job 8). It only chose photographs for places already on the map that had none. No new places, no pins, no text.
 

@@ -4,6 +4,7 @@ region: nyc
 date: 2026-11-24
 places: 39
 file: data_carnegie_nyc_fxbk.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -19,14 +20,10 @@ Not checked: opening hours for most branches. The library's branch pages read in
 Pictures: 115th Street, Fort Washington, Hamilton Grange and Yorkville show their own Wikipedia article's picture; 27 more were chosen on Wikimedia Commons. None fitted Kingsbridge (only the newer library and nearby churches came up); the old 135th Street branch was not looked for (its link is kept off the Schomburg Center's article on purpose), and the sites of torn-down branches have none.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (1 row). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| The 28 Carnegie branches of Brooklyn and Queens | New York, New York | The next batch | Wikipedia, List of Carnegie libraries in New York City |
 
 ## Tips
-
-- The library's branch pages (nypl.org/locations/...) often show a dated week from a past year; check the date on the hours table before using it.
-- The Historic Districts Council's survey pages are from about 2009, so their "not designated" and "closed" notes can be out of date (Harlem was designated in 2021).
-- `photo_find.py new` skips places whose only Wikipedia link is a "List of" article; run `photo_find.py look <id>` on them by id.
-- The Schomburg Center's Wikipedia link is written as an index.php link so that the center's main-building picture is not shown for the old Carnegie branch.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

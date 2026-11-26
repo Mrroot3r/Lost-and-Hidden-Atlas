@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-21
 places: 0
 file: hours_vahd.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py` showed only two places of worship still waiting anywhere (both in New York), so they were taken first, then New York's museums, house museums, theatres and other places that take visitors, from `tools/hours.py list "New York"`. 23 places recorded: 14 with times from the page of whoever runs them, read in the session with `hours.py page` or `page.py --all` (two, Arkell and Whiteface, read with the web fetch tool because the page reader was refused), and 9 recorded `?`.
@@ -47,7 +48,4 @@ Closed or sold: none found in this batch.
 None.
 
 ## Tips
-- No places of worship are waiting any more (November 21, 2026); the hours job is now museums and the like.
-- `hours.py page` sometimes prints a day row that `page.py --all` does not show (City Winery's hours sit in a block the text reader drops); trust only what was printed and leave out what was not.
-- Many small-museum and library sites in the North Country answer 403 to the page reader, and the web fetch tool's request for approval goes unanswered in unattended runs. A session someone is watching could finish Chapman, Northport, Yaddo and Wells Memorial quickly.
-- Post offices: USPS location pages give the tools nothing usable (an earlier note says the same); skip them.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

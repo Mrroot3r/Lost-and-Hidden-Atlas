@@ -1,4 +1,5 @@
 # Pictures batch nbgm (11 pictures, 19 none)
+tidied: 2026-11-26
 
 Job 8, "pictures", run as a scheduled session on 2026-11-21. The 30 places were the first 30 that `photo_find.py list --n 30` printed. No new places, pins or text about places. Every choice was made by looking at the candidate sheet; the address, credit and licence come from Wikimedia Commons through the tool.
 

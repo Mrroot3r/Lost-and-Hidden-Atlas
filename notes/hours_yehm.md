@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-22
 places: 0
 file: hours_yehm.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. It took every place of worship still waiting anywhere (four in New York, two in Alabama, one each in Louisiana and Maryland), so after this batch no church waits, then 18 museums, capitols, inns and the like from `tools/hours.py list`. Thirteen got hours from the page of whoever runs them, each read in the session with `tools/hours.py page` and its address checked against the place; thirteen are recorded `?`.
@@ -43,5 +44,4 @@ Closed or sold: none found. The Strand Center for the Arts, Plattsburgh, was rep
 None.
 
 ## Tips for the next session
-- No place of worship waits anywhere now; `tools/hours.py list --kind worship` will be empty until new churches are added.
-- The Episcopal Asset Map (episcopalassetmap.org/node/<n>) gives worship times for many Episcopal churches and is the denomination's own listing; its "hours of operation" lines are usually a food pantry's, not the church's.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

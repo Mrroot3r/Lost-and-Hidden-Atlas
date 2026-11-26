@@ -1,4 +1,5 @@
 # Sample check, November 23, 2026
+tidied: 2026-11-26
 
 A review, not a research batch: the daily sample check (GUIDE.md section 14). No place was added; no pin, text, id, source or hours row was changed.
 

@@ -4,6 +4,7 @@ region: cthv, ctsw, mec, men, mes, nhl, nhs, nhw, vt, vtc, vtn
 date: 2026-11-24
 places: 46
 file: data_carnegie_ne_rkvd.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -26,13 +27,10 @@ Not checked:
 - Pictures: 26 places have a Wikimedia Commons photograph chosen from the finder's sheets. None was found that plainly shows the building for Caribou, Fort Fairfield, Houlton, Presque Isle, Waterville, the University of Maine's Carnegie Hall, Berlin, Dover, Rochester, the University of New Hampshire's Hamilton Smith Hall, Morristown, Norwich's Chaplin Hall, Bridgeport's two branches, Derby Neck, New Haven's Fair Haven and Dixwell branches, South Norwalk, Unionville and West Haven.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (2 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Rhode Island's Carnegie libraries | Rhode Island | Wikipedia has no state list; New England Carnegies has Rhode Island pages (ri<town>.htm) | necarnegies.com |
-| Bridgeport East and North branches | Bridgeport, Connecticut | Present use of both Carnegie buildings | New England Carnegies |
 
 ## Tips
-
-- New England Carnegies links presqueislelibrary.org for Presque Isle, Maine; that address is now a Wisconsin library. carylibrary.org is Lexington, Massachusetts, not Houlton's Cary Library.
-- The Maine Historic Preservation Commission's architect biographies (maine.gov/mhpc, documents) list each architect's buildings with their state; good for who designed what in Maine.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

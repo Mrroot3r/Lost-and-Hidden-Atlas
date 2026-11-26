@@ -1,4 +1,5 @@
 # Pictures batch pics_nsqz
+tidied: 2026-11-26
 
 Pictures only: no new places, pins or text. Every picture was chosen by looking at the sheet; the tool took address, credit and licence from Wikimedia Commons.
 
@@ -16,4 +17,4 @@ Pictures only: no new places, pins or text. Every picture was chosen by looking 
 - winchester-carnegie-library-il, geneva-carnegie-library-il: candidates were of another state's Winchester or of neighbouring Geneva buildings, so none.
 
 ## Tips
-- `next 15` prints a long list; the first sheets scroll away, so `look <ids>` was used to see them again.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (1 tip).

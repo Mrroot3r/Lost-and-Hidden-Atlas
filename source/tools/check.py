@@ -8,6 +8,7 @@ import sys,os,re,json,glob,importlib
 SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
 REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
+if not os.path.isdir(T): sys.exit('check.py checks a clone of the repository: give its path, e.g.  python3 tools/check.py /home/claude/<clone> --sources  (%s has no source/tools)'%REPO)
 # Before a single place list is run: prove that each one is only data. A list that holds anything else stops the check here.
 import safe_data; safe_data.must(T)
 err=[]; warn=[]

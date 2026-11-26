@@ -4,6 +4,7 @@ region: ny, nh
 date: 2026-11-20
 places: 0
 file: hours_rswp.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The last 20 New York places of worship waiting in `tools/hours.py list "New York" --kind worship`, then all 12 waiting in New Hampshire. Four got times from a page of whoever runs them, read in the session; 28 are recorded `?` after two searches turned up no page of their own with times. New York now has no church waiting; New Hampshire has none either.
@@ -31,6 +32,4 @@ Not checked: nothing was seen on the ground and no call was made. No church was 
 | The rest (Log Cabin Church, Hartford Baptist, Lordville, Camroden, Taylor Center, Richville Welsh, Mount Moriah, Hartwick Seminary, Reformed Church on Staten Island, St. Andrew's Walden, Calvary McDonough, First Baptist Carthage, Sand Beach, St. Peter's Spencertown, Centre Village Enfield, Danville, Rindge, Stark Union Church) | searches | No page of their own found; only directories, Wikipedia and markers |
 
 ## Tips for the next session
-- `tools/hours.py page` uses its own fetcher; plain Python `urllib` in this container needs `SSL_CERT_FILE=/root/.ccr/ca-bundle.crt`.
-- New England Yearly Meeting's yearly listings PDF gives address and worship time for every Quaker meeting in New England.
-- The OCA parish pages (oca.org/parishes/...) read cleanly and give address and service times.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

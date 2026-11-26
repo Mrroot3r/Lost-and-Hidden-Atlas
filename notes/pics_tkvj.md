@@ -1,4 +1,5 @@
 # Pictures batch pics_tkvj
+tidied: 2026-11-26
 
 **What this batch is.** Photographs chosen from Wikimedia Commons for places already on the map that had none (job 8). No places, pins or place text were changed. Only `tools/pics_tkvj.py` and this note are in the pull request.
 

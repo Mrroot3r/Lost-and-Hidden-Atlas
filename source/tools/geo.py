@@ -4,7 +4,8 @@
        prints lat, lon, the kind of match (PointAddress lands on the building; StreetAddress is interpolated along the
        street; POI is a named place) and the score. A two-letter state or province at the end of the address keeps the
        search inside that state's box, so "Pine Street, Manchester, CT" is not taken for Manchester, England.
-   python3 tools/geo.py queries.json results.json      the older batch form: {"id": "address", ...}, New York's box
+   python3 tools/geo.py queries.json [results.json]    the older batch form: {"id": "address", ...} or a plain list of
+       addresses; each is kept inside the state named at its end, and an address with no state is searched in New York
 Give a house number and a ZIP where you have them; nom.py (OpenStreetMap) is the other route, and often has the
 building's own mapped name."""
 import json,urllib.request,urllib.parse,time,sys,os,re
@@ -30,10 +31,12 @@ if __name__=='__main__':
     if not a: sys.exit(__doc__)
     if a[0].endswith('.json'):
         qs=json.load(open(a[0]))
+        if isinstance(qs,list): qs={str(i):q for i,q in enumerate(qs)}          # a plain list of addresses is taken too
         res=json.load(open(a[1])) if len(a)>1 and os.path.exists(a[1]) else {}
+        ny=box('x, NY') or NYBOX                                               # the whole state: the old box stopped at 41.6 N and missed Westchester, the city and Long Island
         for k,q in qs.items():
             if k in res: continue
-            try: res[k]=arc(q)
+            try: res[k]=arc(q,box(q) or ny)                                     # an address ending in another state is no longer searched in New York
             except Exception as e: res[k]=['ERR',str(e)]
             print(k,'|',q,'->',res[k]); time.sleep(0.15)
         if len(a)>1: json.dump(res,open(a[1],'w'),indent=0)          # without a second argument the answers are only printed (it used to crash here)

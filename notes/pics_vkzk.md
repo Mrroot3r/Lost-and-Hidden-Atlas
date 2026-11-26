@@ -1,4 +1,5 @@
 # Pictures batch pics_vkzk (2026-11-21)
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -34,7 +35,4 @@ The rate of "none" is higher than the one-third to one-half the job expected, be
 - publish.sh stopped once because main had moved. resync.sh was run as it said, the site was rebuilt, and publish was run again.
 
 ## Tips for the next pictures session
-
-- Run each `look` with a generous timeout, or in the background. Each look fetches its candidates one at a time.
-- Places whose only candidates are "by name" for a namesake town (Sheffield, Woonsocket, Fort Totten) are usually none. Check the town line first.
-- For lighthouses and churches, the wide view from the road is almost always the best candidate.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

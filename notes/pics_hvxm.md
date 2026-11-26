@@ -1,4 +1,5 @@
 # Pictures batch pics_hvxm (2026-11-22)
+tidied: 2026-11-26
 
 What this batch is: a pictures run (job 8). No new places, no pins, no text. It chooses freely licensed Wikimedia Commons photographs for places already on the map that had none, one answer per place by looking at its candidate sheet.
 

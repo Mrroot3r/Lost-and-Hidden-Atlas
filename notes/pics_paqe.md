@@ -1,4 +1,5 @@
 # Pictures batch paqe (pictures job, 2026-11-25)
+tidied: 2026-11-26
 
 - 22 places got a picture chosen from Wikimedia Commons by looking at the sheets.
 - 8 places I answered "none": albia, boonville, clinton (IN), colfax (IA), jerseyville, logan (IA), mott-branch-toledo, mount-ayr. Candidates showed other buildings, other towns, a courthouse or a street view.

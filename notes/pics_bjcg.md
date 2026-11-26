@@ -1,4 +1,5 @@
 # pics_bjcg: pictures for places that had none
+tidied: 2026-11-26
 
 35 places were looked at over seven rounds.
 

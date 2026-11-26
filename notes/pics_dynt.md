@@ -1,4 +1,5 @@
 # Pictures batch dynt (2026-11-20)
+tidied: 2026-11-26
 
 Job 8, "pictures": 30 places already on the map with no picture, taken in the order `photo_find.py list --n 30` gave them. No new places, no pins, no text about places.
 

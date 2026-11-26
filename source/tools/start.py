@@ -52,6 +52,9 @@ try:
             j2=i
         return ins
     st=next((k for k,rs in O.items() if any(inr(r,lo,la) for r in rs)),None)
+    if not st:      # a point on a river border (Cincinnati) can fall just outside every coarse outline: take the nearest outline, and say so
+        st=min(O,key=lambda k:min(math.hypot(r[i]-lo,r[i+1]-la) for r in O[k] for i in range(0,len(r),2)))
+        print(f'== (the point is just outside every state\'s coarse outline; the nearest outline is {st})')
 except Exception: pass
 S=json.load(open('build/sites.json')); sname=''
 try:

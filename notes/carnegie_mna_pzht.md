@@ -4,6 +4,7 @@ region: mn
 date: 2026-11-24
 places: 26
 file: data_carnegie_mna_pzht.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -24,7 +25,4 @@ The Carnegie libraries of Minnesota in towns A to L: 26 places, from Wikipedia's
 - Lake City (Carnegie-Tryon library, razed 1966 or 1967): exact site not settled.
 
 ## Tips for the next session
-
-- placeography.net has a page for nearly every Minnesota Carnegie library, gone ones included ("(Razed)" in the title), with wall materials and colours.
-- Look-alike sites: alexlibrary.net is Indiana, hutchpl.org is Kansas, glenwood.lib.ia.us is Iowa.
-- Dawson's present occupant is a law office named after a family; it is left out.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

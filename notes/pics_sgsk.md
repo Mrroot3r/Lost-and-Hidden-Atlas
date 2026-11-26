@@ -1,4 +1,5 @@
 # Pictures batch sgsk (2026-11-22)
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -27,5 +28,4 @@ Three rounds of `photo_find.py next 5` were run, and each sheet was looked at be
 - The app smoke test (`tools/app_smoke.js`) was run against a local server of the build and failed at a field-log button; this pull request changes only `tools/pics_sgsk.py`, and the failure was not investigated further.
 
 ## Tips for the next session
-
-- A `next 5` call that Commons answers slowly can run past ten minutes in the foreground and be cut off; the sheets and the record still get written. Run it with its output in a file and check the file afterwards.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (1 tip).

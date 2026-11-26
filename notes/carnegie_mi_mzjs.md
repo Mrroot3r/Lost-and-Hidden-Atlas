@@ -4,6 +4,7 @@ region: mi
 date: 2026-11-24
 places: 54
 file: data_carnegie_mi_mzjs.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -34,8 +35,4 @@ Michigan's Carnegie libraries, part of the owner's pass to put every Carnegie- a
 - Academic Carnegie buildings in Michigan (if any on the list) were not taken.
 
 ## Tips for the next session
-
-- northernmichiganhistory.com has a page for nearly every northern Michigan Carnegie library, with dates and present use.
-- The Michigan historical marker texts are PDFs on the state DNR site (www and www2 hosts both used), named by marker number.
-- The 1914 Detroit Public Library report on archive.org describes every early branch: architect, materials, cost.
-- Pictures: Wikimedia Commons answered "too busy" partway through. Allegan was chosen (its red brick is from that picture); Cassopolis, the Utley branch, Ludington and Mount Clemens still wait for a look (`photo_find.py look` on those ids).
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

@@ -1,4 +1,5 @@
 # Pictures batch ckqt (2026-11-22, scheduled run)
+tidied: 2026-11-26
 
 What this batch is: a pictures job (PROMPTS.md job 8). No new places, no pins, no text. It chose photographs for 30 places already on the map that had none, by looking at the candidate sheets from tools/photo_find.py. Only source/tools/pics_ckqt.py and this note are new.
 

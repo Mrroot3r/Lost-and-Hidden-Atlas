@@ -1,4 +1,5 @@
 # Pictures batch gtsd (22 November 2026, scheduled run)
+tidied: 2026-11-26
 
 What this batch is: pictures only, for places already on the map that had none. No new places, no pins, no text. Pictures chosen by looking at Commons candidate sheets from `tools/photo_find.py next 5`.
 

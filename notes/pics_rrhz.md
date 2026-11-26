@@ -1,4 +1,5 @@
 # Pictures batch rrhz
+tidied: 2026-11-26
 
 30 places looked at: 10 got a picture, 20 got none.
 

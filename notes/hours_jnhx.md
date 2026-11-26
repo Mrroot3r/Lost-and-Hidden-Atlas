@@ -4,6 +4,7 @@ region: several
 date: 2026-11-22
 places: 0
 file: hours_jnhx.py
+tidied: 2026-11-26
 
 ## What this batch is
 A review, not research: the daily sample check (GUIDE.md section 14). No new places, no pins moved, no place text or sources changed. It carries two files: `hours_jnhx.py` (one corrected hours row) and `checked_ok.json` (ten warnings looked at and recorded as standing).
@@ -32,5 +33,4 @@ A review, not research: the daily sample check (GUIDE.md section 14). No new pla
 - `amsterdam-post-office-murals` passed, but its pin sits on the pavement about 5 m off the west wall of the building rather than on the roof.
 
 ## Tips for the next session
-- `tools/hours.py page` prints only lines with clock times. For a row with no clock time ("tours in summer", "closed for the season") read the same page with `tools/page.py --all` and search it.
-- Running `tools/pincheck.py <id> --lidar` after the main run overwrites `research/pincheck_picked_1.jpg`; look at the sheets first.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

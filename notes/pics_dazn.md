@@ -1,4 +1,5 @@
 # Pictures batch pics_dazn (2026-11-22)
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -23,6 +24,4 @@ Counts:
 - Left as none, though a picture might have been wanted: kaena-point-railroad (only coast and highway shown), beaver-kill (park lawn, not the ravine), cataract-firehouse-cohoes (no picture of the 1848 firehouse among the candidates).
 
 ## Tips for the next session
-
-- The first run of "next 5" went past the two-minute limit of the shell here. Run it with a longer timeout (up to ten minutes) and do not interrupt it.
-- Sheets of five places take a few minutes to produce; the tool's own wait is the cause, not a fault.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

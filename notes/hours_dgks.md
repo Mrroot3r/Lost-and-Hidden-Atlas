@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_dgks.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. New York had three churches left waiting; none of them has a page of its own, and after them no place of worship waits in any state, so the rest came from `tools/hours.py list "New York"` (museums, house museums and public buildings). Twenty-nine were looked up: fourteen got hours from the page of whoever runs them, read in the session; fifteen are recorded `?`.
@@ -42,6 +43,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 No church or museum was found to be closed for good or sold.
 
 ## Tips for the next session
-- No place of worship waits anywhere now (`tools/hours.py` showed only three, all in New York, all now tried). Museums are next; New York still has the most.
-- Batcheller Mansion (an inn) was not tried: its page refused the web fetch tool.
-- Oyster Bay Railroad Museum, Montauk Point Light and Opus 40 are worth another try by a session whose web fetch tool can open web.archive.org.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

@@ -1,4 +1,5 @@
 # Pictures batch tkkr (scheduled pictures run, 2026-11-22)
+tidied: 2026-11-26
 
 30 places already on the map that had no picture were looked at (job 8). No new places, pins or text.
 

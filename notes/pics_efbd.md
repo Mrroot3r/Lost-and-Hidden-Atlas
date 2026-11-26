@@ -1,4 +1,5 @@
 # Pictures batch efbd (2026-11-22, scheduled pictures run)
+tidied: 2026-11-26
 
 What the batch is: 35 places already on the map with no picture were taken in turn by `tools/photo_find.py next 5`. 24 of them had candidates and were looked at by eye; 11 had nothing on Wikimedia Commons and were recorded as none by the tool. No place, pin or text was added. The pictures file is `tools/pics_efbd.py`.
 

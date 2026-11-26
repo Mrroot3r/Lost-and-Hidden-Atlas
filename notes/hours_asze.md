@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-22
 places: 0
 file: hours_asze.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. All seven places of worship still waiting anywhere (three in New York, two in Iowa, one each in Kansas and Tennessee) were looked up; with no church left, 18 others from `tools/hours.py list` (museums, house museums, historic sites, a capitol, theatres) followed. Nine got hours from the page of whoever runs them, read in the session; sixteen are recorded `?`.
@@ -38,6 +39,4 @@ Not checked: nothing was seen on the ground and no telephone call was made. No c
 | Barter Theatre VA | bartertheatre.com visit and FAQ | Box office phone only, no hours in the text |
 
 ## Tips for the next session
-- No place of worship waits anywhere now; `tools/hours.py list` without `--kind worship` gives the museums.
-- nps.gov hours pages draw their tables by script; `tools/page.py --all` shows only the surrounding text. A park's "Basic Information" or a site's own page sometimes has the times in plain text.
-- `hours.py set` refuses a row with no digit and none of "appointment", "service", "closed", "noon" or "no regular", so "daily" or "summer weekends" alone are refused.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).

@@ -4,6 +4,7 @@ region: ns
 date: 2026-11-20
 places: 0
 file: hours_yytg.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. The last five New York churches from `tools/hours.py list "New York" --kind worship`, all thirteen waiting in Nova Scotia, and six of Vermont's thirteen were looked up. Fourteen got service times or opening hours from the page of whoever runs them, each read in the session with `tools/hours.py page` and its address checked against the place; ten are recorded `?`.
@@ -36,5 +37,4 @@ Closed or sold: none found closed. Goat Island Baptist and St. John Evangelist, 
 None.
 
 ## Tips for the next session
-- Vermont still has seven churches waiting: Old West Church (Calais), Isle La Motte United Methodist, Union Meetinghouse (Ferrisburgh), Brownington Congregational, Cambridge Meetinghouse, Leicester Meeting House and Fletcher Union Church. Each had at most one search here and was left unrecorded, not `?`.
-- The Anglican Diocese of NS and PEI keeps one page per parish under nspeidiocese.ca/<region>/parish-of-…; some give service times, all give the parish's own site if it has one. `curl` the region page to list them.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

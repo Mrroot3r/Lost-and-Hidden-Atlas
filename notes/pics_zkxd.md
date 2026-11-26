@@ -1,4 +1,5 @@
 # Pictures batch zkxd (scheduled run, November 22-23, 2026)
+tidied: 2026-11-26
 
 Job 8, pictures. No new places, no pins, no text about places.
 

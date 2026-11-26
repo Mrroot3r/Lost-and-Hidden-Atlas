@@ -1,4 +1,5 @@
 # Pictures batch pics_qhzg (2026-11-22)
+tidied: 2026-11-26
 
 What this batch is: pictures for 12 places already on the map that had none. No new places, no pins, no text.
 

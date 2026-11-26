@@ -1,4 +1,5 @@
 # Pictures run, November 23, 2026 (pics_yhnx)
+tidied: 2026-11-26
 
 Scheduled pictures job (job 8). About 30 places were meant to get a look. The run reached 40 minutes after 20 places had been looked at by eye, and the last round was cut short by a background timeout, so it stopped there.
 

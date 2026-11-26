@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_eqdb.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py list --kind worship` showed only 17 churches waiting in all (5 in New York); every one was looked up, so after this batch no church waits anywhere and the next session goes straight to museums. Then 8 museums and public buildings from `tools/hours.py list` without `--kind`. 25 places recorded: 9 with times or a visiting arrangement from the page of whoever runs the place, read in this session with `tools/hours.py page`; 16 recorded `?`.
@@ -50,7 +51,4 @@ No church was found closed or sold in this batch.
 |---|---|---|---|
 
 ## Tips
-- No church waits anywhere after this batch: `hours.py list` without `--kind worship` gives museums.
-- `hours.py list` offers `lm-` landmark pins that `check.py` will not take in an hours file; skip them (or fix the tool).
-- `hours.py set` refuses text with no digit and none of the words "services", "closed", "appointment", "no regular"; work a number from the page into the row.
-- Unattended, the web fetch tool cannot open Internet Archive copies (approval goes unanswered), so a site that answers 403 to `page.py` ends as `?`.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

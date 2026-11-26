@@ -4,6 +4,7 @@ region: several
 date: 2026-11-21
 places: 0
 file: hours_dtpx.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. `tools/hours.py` showed only six churches still waiting anywhere, all in New York; after them came New York's other open-to-visitors places from `tools/hours.py list "New York"`. Thirty-eight were looked up: seven got hours from the page of whoever runs them, read in the session; thirty-one are recorded `?` after two tries (a search, then the place's own site or the best candidate).
@@ -60,5 +61,4 @@ No church was found closed or sold in this batch (Wells Baptist was already know
 - Several "?" places have sites that are drawn by script or refuse plain fetches; a session with a browser could fill them.
 
 ## Tips for the next session
-- Only New York had churches waiting; every other state's churches are done. Museums and others wait in most states (Massachusetts 17, New Hampshire 12).
-- Many small historical societies' sites would not connect at all from here; do not spend more than two tries on each.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

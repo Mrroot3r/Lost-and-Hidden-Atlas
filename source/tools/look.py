@@ -13,7 +13,10 @@ def merc(la,lo): return lo*20037508.34/180, math.log(math.tan((90+la)*math.pi/36
 if len(sys.argv)<3 or sys.argv[1] in('-h','--help'): sys.exit(__doc__)
 tiles=[]; FAILED=[]
 import time
+_opt=[a for a in sys.argv[1:] if a.startswith('--')]
+if _opt: sys.exit('look.py takes no %s: it draws the aerial only. For bare-ground shading use  python3 tools/pincheck.py <id> ... --lidar  (or lidar_dem.dem() and shade() for a wider view).'%_opt[0])
 for a in sys.argv[2:]:
+    if a.count(',')!=3: sys.exit('Each square is label,lat,lon,half_m (four parts, no spaces): %s'%a)
     lab,la,lo,h=a.split(','); la=float(la); lo=float(lo); h=float(h)
     x,y=merc(la,lo); hh=h/math.cos(math.radians(la))
     im=None; src=''

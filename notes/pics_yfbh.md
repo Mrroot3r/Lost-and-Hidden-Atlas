@@ -1,4 +1,5 @@
 # Pictures batch yfbh (2026-11-22, scheduled run)
+tidied: 2026-11-26
 
 ## What this batch is
 

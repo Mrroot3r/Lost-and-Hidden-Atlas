@@ -4,6 +4,7 @@ region: cny, scho, wny
 date: 2026-11-24
 places: 20
 file: data_carnegie_ny_tpsk.py
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -20,16 +21,10 @@ Not checked: whether The Old Library restaurant in Olean has reopened after its 
 Pictures: found on Wikimedia Commons for Andover, Bolivar, Salamanca, Warsaw, Penn Yan, Lackawanna, Binghamton and both Syracuse buildings; none fitted Franklinville, Elmira, Perry (the one "Perry Carnegie Library" picture may be Perry, Oklahoma's), Dunkirk or Fulton. The finder ran without the Commons login, at the slow pace.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (3 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Hamburg Carnegie library (1915–1966) | Hamburg, New York | The Carnegie building was on Center Street, not at the present library at 102 Buffalo Street; whether it stands, its number and its use today were not found | buffalolib.org/hamburg-public-library/legacy-nineteenth-century-club |
-| Wells College Carnegie library (Cleveland Hall) | Aurora, New York | Not researched yet; a library 1911–1968 | Wikipedia, List of Carnegie libraries in New York |
-| The 66 Carnegie branch libraries of New York City | New York, New York | A batch or two of their own; about a dozen were torn down | Wikipedia, List of Carnegie libraries in New York City |
 
 ## Tips
-
-- The Wikipedia list's addresses gave PointAddress geocoder hits that landed on the building in 18 of 20 cases; Salamanca's was only interpolated along the street and North Tonawanda's fell under trees on Goundry Street.
-- The list can be wrong about which building was Carnegie's: Hamburg's 102 Buffalo Street is the 1966 library, not the Carnegie one. Check the library's own history page.
-- Lookalike library sites: perrypubliclibrary.org is Perry, Ohio, and warsawlibrary.org is Warsaw, Indiana.
-- A place's own Wikipedia link must come first among its links for the photo; a "List of ..." link is skipped by the photo finder, so it is safe as the only Wikipedia link.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (4 tips).

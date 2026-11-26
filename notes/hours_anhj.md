@@ -4,6 +4,7 @@ region: ny
 date: 2026-11-21
 places: 0
 file: hours_anhj.py
+tidied: 2026-11-26
 
 ## What this batch is
 An "hours" session (PROMPTS.md type 7): no new places and no pins. Every church still waiting in New York (11), then Prince Edward Island (8), Saskatchewan (5) and Manitoba (5), from `tools/hours.py list "<state>" --kind worship`. Seven got service times from the page of whoever runs them, read in the session; 22 are recorded `?` because no page of their own could be found after two searches.
@@ -32,5 +33,4 @@ Not checked: nothing was seen on the ground and no telephone call was made.
 No church was found to be closed or sold, apart from Old St. James, Port Hill, which the diocese calls deconsecrated (the place text already treats it as the old church).
 
 ## Tips for the next session
-- No church now waits in New York, Prince Edward Island, Saskatchewan or Manitoba. Next by count: British Columbia (5), Oklahoma (4), then several states with 3.
-- Diocesan PDF tables with columns: read word positions with pdfplumber rather than pdftotext.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

@@ -4,6 +4,7 @@ region: midh, nyc
 date: 2026-11-24
 places: 10
 file: data_rockefeller_ny_sypl.py
+tidied: 2026-11-26
 
 ## What this batch is
 
@@ -22,12 +23,10 @@ Red brick is "yes" for Vassar's Rockefeller Hall (from its Commons picture) and 
 Pictures: pictures from Wikimedia Commons were chosen for International House, Rockefeller Center and Vassar's Rockefeller Hall. None fitted the Thomas Garden Apartments. The other six take their picture from their own Wikipedia article.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (1 row). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Rockefeller Hall, Cornell University | Ithaca, New York | The sources read only say it is named for Rockefeller and show no gift, so the funding is unconfirmed | historicithaca.org; tompkins.historyforge.net |
 
 ## Tips
-
-- A building "named for" a Rockefeller is not always one the family paid for. Find the gift in a source before adding it.
-- Rockefeller Jr. gave housing as well as institutions. The Dunbar and Thomas Garden apartments were cooperatives he financed in 1926 to 1928.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

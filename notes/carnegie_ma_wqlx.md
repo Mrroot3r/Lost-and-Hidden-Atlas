@@ -4,6 +4,7 @@ region: berk, bos, cmass, nshore, pv, south, worc
 date: 2026-11-24
 places: 47
 file: data_carnegie_ma_wqlx.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -26,14 +27,10 @@ Not checked:
 - Pictures: 33 places have a Wikimedia Commons photograph chosen from the finder's sheets. None was found that plainly shows the building for Rockport, Saugus, Sharon, Somerville Central, Williston (Mount Holyoke), Ashland, Chelsea, Granby, Hudson, Needham, New Marlborough, Reading and the two Lynn branches.
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (3 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Needham Carnegie library site | Needham, Massachusetts | Exact year torn down and what stands at 968 Highland Avenue; Digital Commonwealth's photographs were behind a bot check | New England Carnegies |
-| Massachusetts Cultural Resource Information System (MACRIS) | Massachusetts | The state inventory and its National Register forms would settle walls, architects and dates; mhc-macris.net was refused and is JavaScript only | mhc-macris.net |
-| Rest of New England's Carnegie libraries | Connecticut, Rhode Island, Vermont, New Hampshire, Maine | Researched in the next batches | Wikipedia's state lists |
 
 ## Tips
-
-- New England Carnegies (necarnegies.com) has a page for every Carnegie library in New England (ma<town>.htm, ct<town>.htm, and so on): grant, architect, style, dates. Its notes on present use are often about 2005, so check use elsewhere.
-- Buildings of New England (buildingsofnewengland.com) has dated posts with good photographs and present use.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

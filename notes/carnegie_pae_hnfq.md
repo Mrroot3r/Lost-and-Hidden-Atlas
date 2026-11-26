@@ -4,6 +4,7 @@ region: pac, pae, pane, paw
 date: 2026-11-24
 places: 15
 file: data_carnegie_pae_hnfq.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -22,13 +23,10 @@ Not checked:
 Pictures: chosen from Wikimedia Commons by looking at the finder's sheet where one plainly shows the building; Penn State's is a 1904 engraving from the student paper. Bucknell, Cheyney, Lebanon Valley, Mansfield, Phoenixville, Reading and Swarthmore have none that fits (Swarthmore's "Tarble" picture on Commons shows the newer Tarble-in-Clothier, not Old Tarble).
 
 ## Leads
+Moved to `LEADS.md` on 2026-11-26 by the tidy job (2 rows). New leads for this ground go in the note of the batch that finds them.
 
-| Place | Town, state | What is missing | Source |
+| Place | Where | What is known | What is missing |
 |---|---|---|---|
-| Carnegie gifts to the Institute for Colored Youth (Cheyney) | Cheyney, Pennsylvania | A Columbia University record of the grants was behind a bot check and not read; it may place the hall and give its architect | Columbia University Libraries, Carnegie Corporation records |
-| Rest of the country's Carnegie libraries | New England first | Researched in the next batches | Wikipedia's state lists of Carnegie libraries |
 
 ## Tips
-
-- Swarthmore's own pages contradict each other on Old Tarble; the engineering report (swarthmore.edu, engineering, ke_sh_final.pdf) is the most detailed.
-- Joyce Tice's Tioga County site (joycetice.com) quotes old Wellsboro Gazette articles in full; good for Tioga County buildings.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

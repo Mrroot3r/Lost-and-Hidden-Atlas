@@ -48,7 +48,8 @@ def check_file(path,cache=None):
     cache={} if cache is None else cache; name=os.path.basename(path); folder=os.path.dirname(path); bad=[]
     def no(node,why): bad.append('%s line %d: %s'%(name,getattr(node,'lineno',0),why))
     try: tree=ast.parse(open(path,encoding='utf-8').read(),name)
-    except SyntaxError as e: return ['%s line %s: not Python that can be read (%s)'%(name,e.lineno,e.msg)]
+    except SyntaxError as e: return ['%s line %s: not Python that can be read (%s)%s'%(name,e.lineno,e.msg,
+        '. The usual cause is an apostrophe inside a \'...\' string that is not escaped (write doctor\\\'s), on this line or one above it; the error Python names can be a later character' if re.search(r'invalid character|unterminated string|invalid syntax|was never closed',str(e.msg)) else '')]
     def exports(mod):
         if mod not in cache:
             f=os.path.join(folder,mod+'.py')

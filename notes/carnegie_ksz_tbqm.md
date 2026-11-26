@@ -4,6 +4,7 @@ region: ks
 date: 2026-11-24
 places: 16
 file: data_carnegie_ksz_tbqm.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -29,6 +30,4 @@ Carnegie libraries of Kansas, towns M to Z and the college libraries (16 places)
 - McPherson, Olathe, Osawatomie, Plainville, Russell and Washington (all torn down): sites not found. Olathe's opened in 1914 and was torn down in the mid-1960s.
 
 ## Tips for the next session
-
-- The group nomination (npgallery 64000195) names the 13 torn-down Kansas Carnegie libraries and those altered too much to be listed.
-- The archived "Carnegie Legacy in Kansas" site could not be read here (web.archive.org was refused).
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

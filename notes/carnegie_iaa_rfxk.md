@@ -4,6 +4,7 @@ region: ia
 date: 2026-11-24
 places: 54
 file: data_carnegie_iaa_rfxk.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -27,6 +28,4 @@ file: data_carnegie_iaa_rfxk.py
 - Ellsworth College, Iowa Falls: said to stand as Bullock-Jones Hall on the college campus (Lost Colleges); the building's place was not settled.
 
 ## Tips for the next session
-
-- The Carnegie Libraries in Iowa Project has a page for every library at carnegielibrariesiowa.org/library/<town>/; WebFetch reads it, curl does not. Its weekday-dated openings often differ from Wikipedia's list by a year.
-- Most Iowa libraries have a site at http://www.<town>.lib.ia.us/ with hours on the home page.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (2 tips).

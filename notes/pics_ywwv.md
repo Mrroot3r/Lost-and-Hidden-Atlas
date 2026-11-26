@@ -1,4 +1,5 @@
 # Pictures batch ywwv
+tidied: 2026-11-26
 
 Pictures job: 35 places that had candidates were looked at; 22 got a picture, 13 got "none". The tool itself recorded 46 more places as none (nothing on Commons, or nothing new since an earlier look).
 

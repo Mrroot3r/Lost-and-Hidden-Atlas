@@ -4,6 +4,7 @@ region: in
 date: 2026-11-24
 places: 57
 file: data_carnegie_ina_rbqw.py
+tidied: 2026-11-26
 
 
 ## What this batch is
@@ -38,7 +39,4 @@ Indiana's Carnegie libraries for towns A to K, part of the owner's pass to put e
 - Earlham College (Richmond) and the rest of the list after K: see the L to P note and later batches.
 
 ## Tips for the next session
-
-- The Indiana State Library blog post on Indiana's Carnegie libraries and the state historical marker pages (in.gov/history/state-historical-markers) give dates for many towns.
-- Several small libraries keep their history on in.gov pages (in.gov/<library>/about).
-- Fetch budget: two researchers working at once ran out of web fetches; one at a time goes further.
+Folded into `GUIDE.md` and the tools on 2026-11-26 by the tidy job (3 tips).
