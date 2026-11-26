@@ -85,4 +85,17 @@ ok('a county key is the state and the county, lower case, no spaces',dry.key('mo
 ok('a county with plenty left cannot be called dry (25 or more)',dry.can_mark(24) and not dry.can_mark(25))
 ks2=[c for c,v in dry.next_counties(tb,'zz',{},near=None,rnd=__import__('random').Random(1))]
 ok('with no city named the counties are drawn by lot among those with enough',set(ks2)<={'Near','Far','Marked'} and len(ks2)==3,ks2)
-print(f'{len(fails)} FAILED' if fails else 'choose test: 31 checks passed'); sys.exit(1 if fails else 0)
+# ---- one listing set aside (November 26, 2026): Jackson County had 65 listings "left", several of them pulled down years ago
+# (the Blackstone Hotel, Holy Name Church), and every session found that out afresh. A listing found gone, without a source,
+# not wanted or already on the Atlas under another name is recorded once and leaves the count.
+L2=['skip mo:85000942 20261126T140000 ab12 gone demolished_2000_per_Missouri_index','skip mo:1 20251001T000000 cd34 nosource old','skip mo:3 20261126T140500 ab12 onatlas smith-house-b','skip mo:2 20261126T141000 ab12 bogus x','dry mo:cass 20261126T013000 ab12 2']
+sk=dry.skipped(L2,now)
+ok('a listing set aside today is known, with its reason',sk.get('mo:85000942','').startswith('gone') and 'mo:3' in sk,sk)
+ok('one set aside over a year ago is looked at again',('mo:1' not in sk),sk)
+ok('a reason that is not one of the four is not taken',('mo:2' not in sk),sk)
+ok('a dry mark is not a skipped listing and a skipped listing is not a dry mark',('mo:cass' not in sk) and ('mo:85000942' not in dry.dry_regions(L2,now)))
+g=dry.gaps(NR,AT,None,skip={'3'})
+ok('a listing set aside leaves the count',sorted(x['n'] for x in g)==['Depot','First Church'],[x['n'] for x in g])
+ok('a session may set aside forty listings and no more',dry.may_skip(39) and not dry.may_skip(40))
+ok('the four reasons',dry.KINDS==('gone','nosource','notwanted','onatlas'))
+print(f'{len(fails)} FAILED' if fails else 'choose test: 38 checks passed'); sys.exit(1 if fails else 0)

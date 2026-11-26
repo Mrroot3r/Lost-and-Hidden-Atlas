@@ -30,7 +30,7 @@ def dry_regions(lines,now=None):
     now=now or datetime.datetime.now(datetime.timezone.utc); out={}; when={}
     for l in lines:
         p=l.split()
-        if len(p)<3 or p[0] not in ('dry','wet'): continue
+        if len(p)<3 or p[0] not in ('dry','wet'): continue      # (a 'skip' line is one listing set aside: skipped(), below)
         t=_t(p[2])
         if t is None: continue
         if p[0]=='wet':
@@ -54,12 +54,12 @@ def _words(name):
 
 def _m(a,b,c,d): return math.hypot((a-c)*111200,(b-d)*111200*math.cos(math.radians(a)))
 
-def gaps(register,atlas,region):
+def gaps(register,atlas,region,skip=()):
     """Register listings (dicts with n, k, lat, lon, town, county) that fall in `region` and that the Atlas does not have.
     A listing falls in the region of the nearest Atlas place; with no Atlas place within 150 km it is in none."""
     out=[]
     for r in register:
-        if r.get('k')=='site' or r.get('lat') is None: continue
+        if r.get('k')=='site' or r.get('lat') is None or str(r.get('ref','')) in skip: continue
         best=None; bd=1e12; near=[]
         for s in atlas:
             if abs(s['lat']-r['lat'])>1.4: continue
@@ -96,4 +96,24 @@ def next_counties(table,st,dry_now,near=None,rnd=None,n=3):
     rnd=rnd or random.SystemRandom(); out=[]
     while c and len(out)<n:
         i=rnd.choices(range(len(c)),weights=[v['left']**0.5 for k,v in c],k=1)[0]; out.append(c.pop(i))
+    return out
+
+KINDS=('gone','nosource','notwanted','onatlas')      # why one listing is set aside: pulled down; nothing readable about it;
+                                                      # not what the Atlas is after (a plain apartment block, a modernist
+                                                      # building); already on the Atlas under another name (give its id)
+SKIP_DAYS=365
+SKIPS=40         # how many listings one session may set aside
+
+def may_skip(done): return done<SKIPS
+
+def skipped(lines,now=None):
+    """'<state>:<reference number>' -> 'kind why', for listings set aside in the last SKIP_DAYS days. A line is
+       skip <state>:<number> <UTC time> <tag> <kind> <why_with_underscores>"""
+    now=now or datetime.datetime.now(datetime.timezone.utc); out={}
+    for l in lines:
+        p=l.split()
+        if len(p)<5 or p[0]!='skip' or p[4] not in KINDS: continue
+        t=_t(p[2])
+        if t is None or (now-t).total_seconds()>=SKIP_DAYS*86400: continue
+        out[p[1]]=p[4]+' '+(p[5] if len(p)>5 else '')
     return out
