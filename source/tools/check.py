@@ -5,6 +5,7 @@
 That is for a branch that carries sources alone; GitHub builds the site and runs the full check (tools/ci_build.sh).
 Exit code 1 on any error. Warnings are for a person to read."""
 import sys,os,re,json,glob,importlib
+import brickrule
 SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
 REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
@@ -108,6 +109,8 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if _tip and not(re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',_tip) and _tip<=_ad[:10]): err.append(f"{w}: tip='{_tip}' must be the day the reader sent it, as YYYY-MM-DD, and not after the batch's own date")
         _bk=p.get('brick') or ''
         if _bk not in ('','yes','some','no','?'): err.append(f"{w}: brick='{_bk}' must be yes, some, no or ? (not checked)")
+        _bp=brickrule.place_problem(p)      # the brick's colour and a fire-brick source, where given (tools/brickrule.py)
+        if _bp: err.append(f"{w}: {_bp}")
         if not _bk and _ad[:10]>='2026-11-19': err.append(f"{w}: no brick=. Say whether red brick can be seen there: brick='yes' (mostly brick), 'some' (part brick), 'no', or '?' if no source or picture settles it")
         for fld,ok in(('cat',CAT),('st',ST),('prec',PREC),('acc',ACC),('eff',EFF)):
             if p[fld] not in ok: err.append(f"{w}: {fld}='{p[fld]}' is not one of {' '.join(ok)}")
@@ -207,7 +210,7 @@ for f in sorted(glob.glob(os.path.join(T,'bricks_*.py'))):
     except Exception as ex: err.append(f'{nm}: cannot be read ({str(ex)[:60]})'); continue
     for i,v in BR.items():
         if i not in ids: err.append(f'{nm}: {i} is not a place id')
-        elif not(isinstance(v,(list,tuple)) and len(v)==2 and v[0] in ('yes','some','no') and len(str(v[1]).strip())>=12): err.append(f"{nm}: {i} must be ('yes'|'some'|'no', 'how it is known: the picture's address, or the words of the source')")
+        elif brickrule.row_problem(v): err.append(f"{nm}: {i}: {brickrule.row_problem(v)}")
 # ---- the old lines: every feature says which state it is in, or the hosted copy cannot fetch them a state at a time ----
 _lp=os.path.join(REPO,'data','lines.json')
 if os.path.exists(_lp):

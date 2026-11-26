@@ -474,6 +474,13 @@ const { chromium } = require('playwright');
     ok('go to: choosing an answer takes the map there with a mark',Math.abs(g.lat-39.6321)<0.003&&Math.abs(g.lon+94.9441)<0.003&&g.z>=14&&g.mark===1,JSON.stringify([g.lat.toFixed(4),g.lon.toFixed(4),g.z,g.mark]));
     await p.fill('#q','nowhere at all'); await p.waitForTimeout(400); await p.press('#q','Enter'); await p.waitForTimeout(700); g=await cen();
     ok('go to: Enter looks it up too, and nothing found is said plainly',asked.length===2&&/Nothing found/.test(g.note),g.note);
+    // ---- what a place page says of its brick (November 26, 2026): the colour beside the red-brick answer, and fire brick when a source says so
+    { const W=o=>p.evaluate(o=>window.__atlasGo.brick(o),o);
+      ok('brick: red brick as before',await W({bk:'y',bc:'r'})==='Red brick'&&await W({bk:'y'})==='Red brick'&&await W({bk:'s',bc:'r'})==='Some red brick');
+      ok('brick: red with another colour',await W({bk:'s',bc:'m'})==='Some red brick, with brick of another colour',await W({bk:'s',bc:'m'}));
+      ok('brick: buff, dark, glazed and painted brick are named, and are not red brick',await W({bk:'n',bc:'b'})==='Buff or yellow brick'&&await W({bk:'n',bc:'d'})==='Dark brick'&&await W({bk:'n',bc:'g'})==='Glazed brick'&&await W({bk:'n',bc:'p'})==='Painted brick',await W({bk:'n',bc:'b'}));
+      ok('brick: no brick at all, or not looked at, says nothing',await W({bk:'n',bc:'x'})===''&&await W({bk:'n'})===''&&await W({})==='');
+      ok('brick: fire brick is added when a source says so',await W({bk:'n',bc:'b',fb:1})==='Buff or yellow brick · Fire brick'&&await W({bk:'n',fb:1})==='Fire brick',await W({bk:'n',bc:'b',fb:1})); }
     ok('go to: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();
