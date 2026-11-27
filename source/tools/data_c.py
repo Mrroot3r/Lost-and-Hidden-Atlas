@@ -7,10 +7,6 @@ OSM='Pin is the feature as mapped on OpenStreetMap; not checked on the ground.'
 GEO='Pin is from an address lookup of the named place; treat it as the front door, not the ruin.'
 C=[
 # ---- Upper Hudson and Washington County ----
-N('feeder-five-combines','Five Combines, Glens Falls Feeder Canal','Hudson Falls','wash','canal','ruins',43.2967,-73.5687,'site','public','walk','canal','c.1822; rebuilt 1832',
-  'The feeder canal was dug around 1822 to carry Hudson River water to the summit level of the Champlain Canal and widened for boats in 1832. Thirteen masonry locks took it down a 130-foot drop; the "Five Combines" are five locks stacked back to back that lower the water 55 feet.',
-  'The stone lock chambers stepping down the hill at Pine Street and Burgoyne Avenue, and the towpath, now the 7-mile Feeder Canal Heritage Trail.','A stone staircase for boats.',
-  'Public park and trail.',[W('Glens Falls Feeder Canal')]),
 N('rogers-island','Rogers Island','Fort Edward','wash','fort','traces',43.26554,-73.58721,'site','public','drive','forts','1750s',
   'In the French and Indian War the island and Fort Edward held one of the largest British encampments in North America, described as the third largest "city" in the colonies. It was the base of Rogers\' Rangers and the site of a smallpox hospital. Listed on the National Register in 1973; the visitors center opened in 2001.',
   'The visitors center exhibits and the open ground of the excavated camp. Nothing stands above ground.','',
@@ -191,7 +187,7 @@ N('kingston-point','Kingston Point Park','Kingston','hud','amuse','traces',41.92
   'A trolley-and-steamboat park at the mouth of the Rondout where Hudson River Day Line boats landed. The details here were not checked against a source this round.',
   'The lagoon, landing and trolley line; the Trolley Museum of New York still runs cars out to the point.','','City park.',[],conf='lead'),
 ]
-PNC={'feeder-five-combines':GEO,'rogers-island':GEO+' (visitors center)','dionondahowa-falls':'Pin is the falls as listed by Northern New York Waterfalls (43°6\'8"N 73°32\'18"W); the dam is at the falls.','schaghticoke-powder':WK,'vischer-ferry-lock19':OSM+' (Lock 19)','mechanicville-hydro':WK,'hudson-river-mill':WK,'wood-mower-works':WK+' It marks the village, not the works.',
+PNC={'rogers-island':GEO+' (visitors center)','dionondahowa-falls':'Pin is the falls as listed by Northern New York Waterfalls (43°6\'8"N 73°32\'18"W); the dam is at the falls.','schaghticoke-powder':WK,'vischer-ferry-lock19':OSM+' (Lock 19)','mechanicville-hydro':WK,'hudson-river-mill':WK,'wood-mower-works':WK+' It marks the village, not the works.',
  'frontier-town':OSM,'scaroon-manor':GEO,'hooper-mine':GEO,'north-creek-station':WK,'shermans':WK,'caughnawaga':WK,'lock-33':OSM,'little-falls-canal':WK,'fort-klock':WK,'herkimer-home':WK,'remington-ilion':GEO,
  'sharon-springs':WK+' It marks the village centre.','howes-cave':GEO,'blenheim-bridge':GEO,'oneonta-roundhouse':GEO,'huyck-felt-mill':OSM,'widow-jane-mine':GEO,'rosendale-trestle':WK,'high-falls-dh':WK,'minnewaska-hotels':WK,'wyndcliffe':WK,'bennett-college':WK,'hudson-river-state-hospital':WK,'harlem-valley':WK,
  'bannerman':WK,'mount-beacon-incline':OSM+' (incline powerhouse)','nevele':WK,'catskill-game-farm':WK,'copake-iron-works':OSM+' (furnace)','mount-lebanon-shakers':WK,'hoosac-tunnel':GEO+' (west portal)','keystone-arches':WK,'richmond-furnace':WK,'becket-quarry':'Pin is the guy derrick at the pit, from a published trail log (MyHikes).','aspinwall-hotel':'Pin is Kennedy Park; the hotel footprint was not located.',

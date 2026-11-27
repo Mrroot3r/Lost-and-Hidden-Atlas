@@ -3,7 +3,7 @@
 # otherwise (Cranston Street Armory is yellow brick and is left out; Barree's brick mansion is painted white and is left out).
 # 'yes' = brick is the main thing to see; 'some' = part of it (a chimney, an arch, brick with stone).
 _T='its own Atlas text says so; no picture was looked at'
-BRICK={k:('yes',_T) for k in '''scott-ice-house empire-stove-works shultz-brickyard valley-paper-mill-chimney troy-gasholder mohasco-power-house
+BRICK={k:('yes',_T) for k in '''scott-ice-house-nutten-hook empire-stove-works shultz-brickyard valley-paper-mill-chimney troy-gasholder mohasco-power-house
  buffalo-smelting-works mechanicville-hydro herkimer-home remington-ilion wyndcliffe harlem-valley laugh-o-gram-studio wornall-house
  baldwin-city-santa-fe-depot washburn-moen monson-developmental medfield-state-hospital fort-andrews cocheco-mills-dover
  salmon-falls-mill-rollinsford woonsocket-rubber-mill new-manchester-mill fort-pike susan-b-anthony-childhood-house crompton-loom-works

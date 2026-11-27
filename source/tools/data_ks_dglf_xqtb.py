@@ -59,13 +59,6 @@ N('mount-washington-school-independence-mo','Mount Washington School, Independen
   'The form gives the address as 570 S. Evanston Avenue; the building sits on the north side of Independence Avenue between Evanston and Arlington Avenues, with public sidewalks round the lot. Look from the public sidewalks. The owner and whether anyone may go in were not checked.',
   [['National Register form, 2013 (NPGallery)','https://npgallery.nps.gov/NRHP/GetAsset/NRHP/13000192_text']],
   brick='yes'),
-N('merritt-insley-house-leavenworth-ks','Merritt Insley House and outbuildings, Leavenworth','Leavenworth, Kansas','ks','landmark','standing',39.31971,-94.91759,'area','view','drive','','1860–1883',
-  'A two-storey brick Italianate house at 602 Seneca Street with a Carpenter Gothic carriage house, a brick outhouse and a cast-iron fence. The 1986 National Register form says the rear wing was built about 1860, the Italianate front added in 1865 and 1866 by banker John Kerr, and a five-sided bay in 1883. Merritt Insley, a hotelkeeper, army quartermaster, newspaper editor and banker, bought it in 1866 and lived there until money troubles forced a sale in 1894.',
-  'Large wooden brackets under wide eaves, a limestone foundation, and the cast-iron fence and brick sidewalks along Fifth and Seneca Streets (about 1865 to the 1880s). The 1986 form said old photographs show the brick painted light grey and that the house was then white; photographs on Wikimedia Commons from about 2012 show the brick now red. The 1986 form listed it as a private residence; its present use was not checked.',
-  'A banker\'s Italianate house with its original cast-iron fence still along the street.',
-  'Private property. Look from the public sidewalks of Fifth and Seneca Streets, two blocks north of Leavenworth\'s downtown. Whether it is lived in or open was not checked.',
-  [['National Register form, 1986 (NPGallery)','https://npgallery.nps.gov/NRHP/GetAsset/NRHP/86002801_text']],
-  brick='yes'),
 N('clinton-school-district-25-ks','Clinton School, District 25 (Clinton Township Hall)','Clinton, Kansas','ks','civic','standing',38.9117,-95.3906,'area','view','drive','','1866',
   'A small limestone schoolhouse on the old town square of Clinton, a prairie village about nine miles southwest of Lawrence settled in 1854. A stone circle high on the north gable reads "No. 25 erected 1866". The National Register form (1996) says it served as a school until 1884, and that the building has since been the township hall and a community centre, with a fire-truck garage added on the south end. The Kansas state staff did not support listing it because later changes had hurt its original look, but it was listed.',
   'Walls of rough, irregularly coursed limestone about a foot and a half thick, 39 by 27 feet, with smoother stone at the corners and wood lintels. The form says brick chimneys were taken off and the inside has been altered with panelling and a dropped ceiling. Not checked on the ground.',
@@ -83,7 +76,6 @@ N('first-umc-trail-swales-lawrence-ks','Oregon and California trail swales, Firs
 ]
 PIN_NOTES={
  'mount-washington-school-independence-mo':'Pin is the Esri address point for 570 S Evanston Avenue; on the aerial it falls on the large school building.',
- 'merritt-insley-house-leavenworth-ks':'Pin is the Esri address point for 602 Seneca Street; the Register list coordinate was about 700 m away. On the aerial the point falls on a grassy tree lot beside houses, and the house could not be picked out, so the pin marks the block.',
  'clinton-school-district-25-ks':"Pin marks the village of Clinton only. The Register's point and list coordinate fall in or beside Clinton Lake, and the township hall could not be picked out among the buildings of the village on the aerial.",
  'first-umc-trail-swales-lawrence-ks':"Pin is the Register list point, on the lawn east of the church's Celebration Center building; the swales are too faint to see on the aerial.",
  'east-lawrence-industrial-district-ks':"Pin is the address point for 808 Pennsylvania Street, one of the district's buildings, from the Esri address lookup; the 2005 Register form names the street addresses.",

@@ -68,7 +68,7 @@ N('john-kelly-stone-building-lawrence-ks', 'John Kelly Stone Building and farmst
   links=[KS_LIST], conf='mixed', brick='no', hours=''),
 
 N('barnes-hoskinson-farmstead-vinland-ks', 'Barnes-Hoskinson Farmstead (William Barnes farm), Vinland', 'Vinland', 'ks', 'landmark', 'standing',
-  38.84031, -95.18214, 'site', 'view', 'drive', '', '1885–1891',
+  38.84293, -95.18253, 'site', 'view', 'drive', '', '1885–1891',
   'A farm that William Elliot Barnes bought in 1856 and lived on until 1920. A businessman and horticulturalist, he began what is believed to be the first vineyard in Kansas. He had the Queen Anne farmhouse built in 1885 and a vernacular bank barn in 1891. '
   'The farm was listed on the National Register in 2023 as the Barnes-Hoskinson Farmstead. Only the Kansas Historical Society\'s summary was read, so what else stands on it is not confirmed. The nearby Barnes Apple Barn is a separate listing.',
   look='A Queen Anne farmhouse and a bank barn on a rural road near Vinland. Which other farm buildings survive was not read. Interior not checked.',
@@ -99,7 +99,7 @@ PIN_NOTES = {
   'benedict-house-lawrence-ks': 'Register list coordinate for 923 Tennessee Street.',
   'griffin-house-645-connecticut-lawrence-ks': 'Address lookup in OpenStreetMap for 645 Connecticut Street.',
   'john-kelly-stone-building-lawrence-ks': 'Address lookup in OpenStreetMap for 777 North 1750 Road; the pin marks the farm address, not the stone building itself.',
-  'barnes-hoskinson-farmstead-vinland-ks': 'Address lookup in OpenStreetMap for 715 East 1728 Road fell in a field north of the road; the pin was moved about 70 m to the farmhouse seen on the 2024 aerial just south of it. Which building is which was not confirmed.',
+  'barnes-hoskinson-farmstead-vinland-ks': "Moved on November 27, 2026: the pin had been on the building at Vinland's crossroads, where the Presbyterian church's pin also sits. It is now on the farmstead (a house, outbuildings and a red barn) that the address point for 715 East 1728 Road falls on, up a lane about 290 m north of the crossroads, on the 2024 state aerial.",
   'chi-omega-house-ku-lawrence-ks': 'OpenStreetMap map point for the Chi Omega house at 1345 West Campus Road.',
   'breezedale-historic-district-lawrence-ks': 'Register list coordinate for the middle of the district.',
 }

@@ -5,7 +5,6 @@ PICS={
  'carbon-ghost-town-wy':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/Carbon_Cemetery%2C_Carbon%2C_WY.jpg/960px-Carbon_Cemetery%2C_Carbon%2C_WY.jpg', 900, 675, '25or6to4', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Carbon_Cemetery,_Carbon,_WY.jpg', '2026-11-20'),
  'christ-church-lancaster-va':('https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Christ_Church%2C_Lancaster_County.jpg/960px-Christ_Church%2C_Lancaster_County.jpg', 900, 675, 'Michael Kotrady', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Christ_Church,_Lancaster_County.jpg', '2026-11-20'),
  'east-point-lighthouse':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/East_Point_Lighthouse_%2822261562436%29.jpg/960px-East_Point_Lighthouse_%2822261562436%29.jpg', 900, 604, 'Dennis G. Jarvis', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:East_Point_Lighthouse_(22261562436).jpg', '2026-11-20'),
- 'feeder-five-combines':('', '2026-11-20', 'nothing on Commons within 250 m'),
  'glastenbury':('', '2026-11-20', 'nothing on Commons within 400 m'),
  'grafton-inn-ny':('', '2026-11-20', 'candidates are pubs in England named Grafton Inn / Punch Bowl Inn'),
  'haywardville':('', '2026-11-20', 'nothing on Commons within 400 m'),

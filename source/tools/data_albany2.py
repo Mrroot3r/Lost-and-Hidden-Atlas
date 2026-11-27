@@ -33,7 +33,7 @@ N('five-combines-locks','Five Combines locks','Hudson Falls','wash','canal','sta
   'The stepped flight of five lock chambers at Pine Street and Burgoyne Avenue, and the towpath trail. The article does not describe their condition.',
   'A staircase of five locks on a canal built to feed another canal.',
   'State canal land, open to the public. The Feeder Canal Heritage Trail follows the towpath; the Feeder Canal Alliance, formed in 1987, looks after the canal.',
-  [W('Glens Falls Feeder Canal')]),
+  [W('Glens Falls Feeder Canal')],was='feeder-five-combines'),
 N('peebles-island-earthworks','Peebles Island earthworks','Waterford','conf','fort','traces',42.782,-73.686,'area','public','walk','forts','1777',
   'In 1777, with a British army coming down from Canada, General Philip Schuyler chose Peebles Island for his last stand in front of Albany: the islands at the mouth of the Mohawk commanded the fords and suited cannon. General John Glover was put in charge of the island and its guns. The defenses were never tested. Horatio Gates replaced Schuyler and marched the army north to fight at Saratoga.',
   'Earthworks dating from the Revolutionary War; the sources read do not say where on the island they are. A converted factory complex on the island houses the state\'s historic preservation offices, and a visitors\' center tells the island\'s industrial history.',

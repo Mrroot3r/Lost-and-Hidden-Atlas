@@ -51,12 +51,6 @@ N('headquarters-house-fayetteville','Headquarters House','Fayetteville','ar','la
   [W('Headquarters House (Fayetteville, Arkansas)'),['Washington County Historical Society: tours','https://washcohistoricalsociety.org/individual_tours']],conf='mixed',brick='?',
   hours='Tours Tue–Thu noon–3 p.m.; Sat by appointment; book by phone 479-521-2970 (not confirmed on the page)'),
 
-N('rush-historic-district-buffalo-river','Rush zinc-mining ghost town, Buffalo National River','Yellville','ar','town','ruins',36.1325,-92.57111,'area','public','walk','','1880–1931',
-  'Zinc was found on Rush Mountain in 1880 and the Morning Star mine, the largest in the district, opened in 1885. Ten companies worked fourteen mines here, most busily in the boom of 1911 to 1918; a fall in zinc prices after the First World War closed most of them. The Park Service dates the district\'s importance 1885 to 1931. Wikipedia calls it the only place left in Arkansas\'s zinc country with mines, buildings and ruins together. It is listed on the National Register (1987).',
-  'The Park Service lists the Taylor-Medley General Store, the Rush blacksmith shop (1925, stabilized in 1989), the Rush smelter, and several mines, tunnels and houses, many in poor repair and overgrown. A short Morning Star loop and the longer Rush Mine Level Trail go past mine entrances. Mine entrances such as the McIntosh mine are closed: stay out of any mine or tunnel and off unstable walls.',
-  '',
-  'National Park Service, Buffalo National River (Lower District). A small gravel lot serves the Morning Star trail (search result quoting the Park Service). The pin is the Register coordinate and was checked on the aerial; the buildings are spread along the valley.',
-  [W('Rush Historic District'),['NPS: Rush Historic District','https://www.nps.gov/articles/rush-historic-district-500856.htm']],conf='mixed',brick='?'),
 
 N('parkin-archeological-state-park','Parkin Archeological State Park','Parkin','ar','curio','standing',35.27714,-90.55741,'area','open','drive','','AD 1000–1550',
   'A 17-acre palisaded village of the Mississippian period at the meeting of the St. Francis and Tyronza rivers, a National Historic Landmark. Archeologists think it may be the Casqui of Hernando de Soto\'s 1541 march (the state parks page says "may have visited"). The ground later held a 1920s lumber and cooperage works, and a one-room school for Black children, the Northern Ohio School, still stands there.',
@@ -95,7 +89,6 @@ PIN_NOTES={
  'plum-bayou-mounds-scott':'Wikipedia coordinate for the site; checked on the aerial.',
  'elkhorn-tavern-pea-ridge':'Wikipedia article coordinate for the tavern; checked on the aerial.',
  'headquarters-house-fayetteville':'Address lookup (118 East Dickson Street); the Wikipedia coordinate lay about 140 m east in trees. Checked on the aerial.',
- 'rush-historic-district-buffalo-river':'Wikipedia coordinate for the district; checked on the aerial. The pin marks the district, not one building.',
  'parkin-archeological-state-park':'Wikipedia coordinate for the park; checked on the aerial.',
  'drennen-scott-house-van-buren':'Address lookup (221 North 3rd Street); the Wikipedia coordinate was about 400 m east on a street by the tracks. Checked on the aerial.',
  'texarkana-union-station':'Wikipedia coordinate (a rounded figure); checked on the aerial.',
