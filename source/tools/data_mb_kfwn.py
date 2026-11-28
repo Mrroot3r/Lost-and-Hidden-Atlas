@@ -1,0 +1,90 @@
+# November 28, 2026: a fifth scatter of places across Manitoba (9 added), the thinnest state or province on the map,
+# claimed with tools/choose.py --claim --thinnest. Sources opened in this session: the Province's Provincial Heritage Site
+# pages (gov.mb.ca/chc/hrb/prov, and its list of all designated sites) and the Manitoba Historical Society's "Historic Sites of
+# Manitoba" page for each place (mhs.mb.ca, read with tools/page.py; each gives a site coordinate). Galloway Bros store at
+# Gladstone (demolished 2024) and the Glenboro water tower (burned 2008) were left out on the Society's word.
+from data_b import N
+from data_ma import W
+def L(t,u): return [t,u]
+def MHS(t,s): return ['Manitoba Historical Society: '+t,'https://mhs.mb.ca/docs/sites/'+s+'.shtml']
+def PHS(n): return ['Province of Manitoba: Provincial Heritage Site No. '+str(int(n)),'https://www.gov.mb.ca/chc/hrb/prov/p'+n+'.html']
+
+BATCH={'key':'mb_kfwn','label':'Manitoba: fifth scatter','added':'2026-11-28 12:28'}
+
+PLACES=[
+N('virden-cpr-station','Virden Canadian Pacific Railway Station','Virden','mb','rail','standing',49.85069,-100.92931,'site','view','drive','stations','1900 or 1906',
+  'The Canadian Pacific main line reached Virden in the summer of 1883, and by 1899 the town had outgrown its first small station. The replacement was designed by R. B. Pratt, a station designer who worked first for the CPR and later for its rival Canadian Northern, from a standard set of plans used for several Manitoba stations. It is the only station in Manitoba built of fieldstone. The sources disagree on the date: the Province says 1906 and the Manitoba Historical Society says 1900.',
+  'A fieldstone station with a complicated roof of dormers and beak-like canopies, beside the tracks on Sixth Avenue South. A railway underpass of 1917 nearby lets people cross the tracks. Whether the inside can be seen was not checked.',
+  'Manitoba\'s only fieldstone railway station.',
+  'Owned by the Town of Virden (Province\'s record), at 425 Sixth Avenue South. Look from the street and the platform side without crossing the tracks. Parking, and whether it is open to visitors, not checked.',
+  [PHS('079'),MHS('Canadian Pacific Railway Station, Virden','virdentrainstation')],
+  conf='mixed',brick='no',arch='R. B. Pratt',archw='Province of Manitoba and Manitoba Historical Society pages name him as the designer',hours=''),
+N('pipestone-municipal-building-reston','Pipestone Municipal Building','Reston (RM of Pipestone)','mb','civic','standing',49.55869,-101.09411,'site','view','drive','','1917',
+  'The Rural Municipality of Pipestone was incorporated in 1893 but had no formal civic building until 1917. The Brandon architect William A. Elliott designed it and the builder Arthur Henry Bushby put it up. The Province calls it an unusual town hall: not the usual Classical Revival with columns but an informal Italianate villa style, with broad roof overhang and a corner tower. It also housed telephone circuitry for the government telephone service. Plaques by the door list the municipal councils of 1884 and 1984.',
+  'A two-storey brick building with a corner tower and wide eaves at 401 Third Avenue. The brick\'s colour was not described in the sources read. Interior not checked.',
+  'A prairie town hall in the style of an Italian villa.',
+  'Owned by the RM of Pipestone (Province\'s record). Municipal office hours were not checked; look from the street. Parking not checked.',
+  [PHS('106'),MHS('Pipestone Municipal Building','pipestonemunicipal')],
+  brick='?',arch='William A. Elliott',builder='Arthur Henry Bushby',archw='Province of Manitoba page names Elliott as architect and Bushby as builder; the Historical Society gives the builder\'s full name',hours=''),
+N('griswold-united-church','Griswold United Church (former Presbyterian church)','Griswold (RM of Sifton)','mb','worship','standing',49.77708,-100.47089,'site','view','drive','','1896–1898',
+  'The stonemason Henry Winter built this stone Presbyterian church between 1896 and 1898 to a design by the Brandon architect Walter Henderson Shillinglaw (the Historical Society names him; the Province\'s page names only Winter). The Province calls its rugged stonework, pointed Gothic windows and restrained woodwork one of the fullest Manitoba expressions of the small British parish church. Methodists and Presbyterians worshipped together here from 1925, when both joined the United Church of Canada. The two sources give different designation dates, 1989 (Province) and 1998 (Historical Society).',
+  'A small rough-stone church with pointed windows, with a commemorative plaque beside it. Interior photographs from 2017 exist; whether visitors can go in was not checked.',
+  'A Scottish-style stone kirk on the prairie.',
+  'Owned by the United Church of Canada (Province\'s record), on Patterson Street. Service times and parking not checked; look from the street.',
+  [PHS('045'),MHS('Griswold Presbyterian Church / Griswold United Church','griswoldunited')],
+  conf='mixed',brick='no',arch='Walter Henderson Shillinglaw',builder='Henry Winter',archw='Manitoba Historical Society page names Shillinglaw as the designer and Winter as the builder',hours=''),
+N('st-elijah-romanian-church-lennard','St. Elijah Romanian Orthodox Church and Pioneer Museum','Lennard (RM of Riding Mountain West, near Inglis)','mb','worship','standing',50.99262,-101.26976,'site','open','drive','','1908',
+  'Romanian settlers from Bukovina (then part of Austria-Hungary) began farming in this district in 1900 and founded the St. Elijah parish in 1903, building a first church of logs and sod, now gone. A second church of 1908, designed by the farmer Alexie Slusarchuk on land given by Elie Burla, is called the oldest standing Romanian church in Manitoba; it was used for worship until 1952 and restored in 1979. The two sources disagree on which building the Province designated: the Province\'s page describes the 1908 church, while the Historical Society says the designated church is a later one built in 1952, with the 1908 church beside it restored in 1983. The grounds also hold the Paulencu House of 1906, the last known traditional Romanian-style farmhouse, moved here in 1992, and the Bucovinian Pioneer Cemetery.',
+  'A plain rectangular church with rounded ends in the Bukovinian manner. The Province lists sculptured rafters, processional crosses and icons inside. A pioneer cemetery with many rotted wooden grave markers lies near, and the Paulencu House stands on the grounds.',
+  'Manitoba\'s oldest Romanian church, with a pioneer farmhouse.',
+  'Owned by the St. Elijah Pioneer Church Museum (Province\'s record). Guided tours are by appointment, as the Historical Society says; the museum\'s own page was not opened, so days and times are not known. Respect the cemetery. Parking not checked.',
+  [PHS('020'),MHS('St. Elijah Romanian Orthodox Church / Pioneer Museum and Paulencu House','stelijahmuseum')],
+  conf='mixed',brick='no',arch='Alexie Slusarchuk',archw='Province of Manitoba page names him as the designer',hours='By appointment (Historical Society page); days and times not checked'),
+N('st-michaels-ukrainian-catholic-trembowla','St. Michael\'s Ukrainian Catholic Church (Trembowla Cross of Freedom)','Trembowla (RM of Dauphin)','mb','worship','standing',51.27306,-100.25052,'area','view','drive','','1898',
+  'The Province calls this the oldest remaining Ukrainian Catholic church in Canada. Ukrainians settled the Drifting River district in 1896, and Father Nestor Dmytriw celebrated the first Ukrainian Catholic liturgy in Canada here in 1897. The settlers built a small log church in 1898 (about 4 by 5 metres, covered with wooden siding), which the Historical Society says was consecrated in 1902. It was moved to the Cross of Freedom site in 1967 (the Province says it was moved twice). The Province praises its Byzantine-style icon painting inside.',
+  'A tiny log church sided with boards, among other buildings of the Cross of Freedom museum: a pioneer home, Riverbend School, a log granary and the Ksionzyk house. A fieldstone monument of 1981 names the 1896 settlers.',
+  'The first Ukrainian Catholic church in Canada, only 4 by 5 metres.',
+  'Owned by Cross of Freedom Inc., Trembowla Historical Site and Museum (Province\'s record). The museum\'s opening days and hours were not found. Look from the road unless a visit is arranged. Parking not checked.',
+  [PHS('108'),MHS('Trembowla Cross of Freedom Museum','trembowlacrossoffreedom')],
+  conf='mixed',brick='no',hours=''),
+N('old-st-james-church-winnipeg','Old St. James Anglican Church','Winnipeg (St. James)','mb','worship','standing',49.87928,-97.19912,'site','view','drive','','1853–1855',
+  'The Reverend W. H. Taylor was told in 1850 to start a church for settlers moving west along the Assiniboine River. The cornerstone was laid on June 8, 1853, and the big building of logs in the Red River frame manner was done by the end of that year. It stands on high ground chosen because settlers thought of it as shelter from the floods of 1826 and 1853. It was consecrated on May 29, 1855 and gave its name to the district. The Province calls it the oldest surviving wooden church in Western Canada, and one of the oldest buildings in Winnipeg. A larger church of 1922 was built nearby; the old church is still used for summer services and weddings.',
+  'A long, plain wooden church in a cemetery, with a plaque of 1998 west of it. Interior photographs from 2016 exist; when the public may go in was not checked.',
+  'Western Canada\'s oldest surviving wooden church.',
+  'Owned by the Anglican Diocese of Rupert\'s Land (Province\'s record), at 525 Tylehurst Street (the Province gives 540). Look from the street and keep to the cemetery paths. Service times and parking not checked.',
+  [PHS('101'),MHS('St. James Anglican Church and Cemetery','stjamescemetery')],
+  conf='mixed',brick='no',hours=''),
+N('st-annes-church-poplar-point','St. Anne\'s Anglican Church','Poplar Point (RM of Portage la Prairie)','mb','worship','standing',50.04392,-98.02364,'site','view','drive','','1859 or 1864',
+  'Archdeacon William Cockran founded the Church of England missions along the Assiniboine, and this log church was built through his efforts. The Province says it was completed in 1864; the Manitoba Historical Society says Cockran built it in 1859 and calls it the oldest log church on the prairies. It is one of a handful of buildings left that were put up in the Red River frame way, with a frame of upright logs and short horizontal logs filling the gaps. It is still used on special occasions.',
+  'A small log church with a cemetery and a commemorative plaque (and a plaque for West Poplar Point School in the cemetery). Interior photographs from 2016 and 2022 exist; when it opens was not checked.',
+  'One of the oldest log churches on the prairies.',
+  'Owned by the Anglican Diocese of Rupert\'s Land (Province\'s record). It is a municipally designated site (1996, Historical Society) and a Provincial Heritage Site (1997). Service times and parking not checked; respect the cemetery.',
+  [PHS('099'),MHS('St. Anne\'s Anglican Church and Cemetery','stannes')],
+  conf='mixed',brick='no',hours=''),
+N('st-pauls-anglican-churchill','St. Paul\'s Anglican Church (iron church)','Churchill','mb','worship','standing',58.77234,-94.17339,'site','view','drive','','1890–1892',
+  'In 1890 the Reverend Joseph Lofthouse bought prefabricated parts in England for a new church, and the structural frame was iron, one of only three such buildings that came to Canada. It rose over two years and opened in 1892. It was moved by sledge across the Churchill River in the winter of 1933, set on Franklin Street three years later, and moved to its present site in 1973. The Historical Society calls it the oldest church building in northern Manitoba still in use. Inside are old furnishings and a stained-glass window given by the widow of Sir John Franklin.',
+  'A small church at 67 Bernier Street. Interior photographs (including the Franklin window) are on the Historical Society\'s page from 2018 to 2026, so it survives inside; when visitors may go in was not checked.',
+  'A church with an iron frame, shipped from England in pieces.',
+  'Owned by the Anglican Church of Canada, Diocese of Keewatin (Province\'s record). Churchill can be reached by rail or air only; services and opening times not checked. Look from the street.',
+  [PHS('095'),MHS('St. Paul\'s Anglican Church, Churchill','stpaulschurchill')],
+  brick='?',hours=''),
+N('st-john-the-divine-church-wawanesa','St. John the Divine Anglican Church','Wawanesa (Municipality of Oakland-Wawanesa)','mb','worship','standing',49.59330,-99.68377,'site','view','drive','','1882',
+  'English settlers who arrived in 1881 built this church in 1882 from pre-cut lumber brought from Winnipeg by steamboat and then by ox cart. It was moved to Rounthwaite in 1892 (the Province says 2 km west to the new railway), closed in 1982 after a hundred years of use, and moved in 2002 to its present site beside the Sipiweske Museum. The Province says its interior is almost unchanged since the 1880s, with a barrel-vaulted ceiling, an ornate wood-burning stove and many original furnishings, while the outside was altered in the 1930s (new siding, and the clerestory dormers removed). Plaque of 2007.',
+  'A small wooden High Victorian church with tall pointed windows, beside the museum. Interior seen only in photographs of 2003; whether visitors may go in was not checked.',
+  'A prairie church of 1882 with its stove and furnishings.',
+  'Owned by Sipiweske Museum Inc. (Province\'s record), on Cliff Street at 102 Fourth Street. The museum\'s days and hours were not read; look from the street. Parking not checked.',
+  [PHS('063'),MHS('St. John the Divine Anglican Church','stjohndivine')],
+  conf='mixed',brick='no',hours=''),
+]
+
+PIN_NOTES={
+ 'virden-cpr-station':'Manitoba Historical Society site coordinate.',
+ 'pipestone-municipal-building-reston':'Manitoba Historical Society site coordinate.',
+ 'griswold-united-church':'Manitoba Historical Society site coordinate.',
+ 'st-elijah-romanian-church-lennard':'Manitoba Historical Society site coordinate.',
+ 'st-michaels-ukrainian-catholic-trembowla':'Manitoba Historical Society site coordinate.',
+ 'old-st-james-church-winnipeg':'Manitoba Historical Society site coordinate.',
+ 'st-annes-church-poplar-point':'Manitoba Historical Society site coordinate.',
+ 'st-pauls-anglican-churchill':'Manitoba Historical Society site coordinate.',
+ 'st-john-the-divine-church-wawanesa':'Manitoba Historical Society site coordinate.',
+}
