@@ -26,7 +26,7 @@ N('michigan-trust-building-grand-rapids','Michigan Trust Company Building','Gran
   '',
   'A private office building at 40 Pearl Street NW, on the corner of Ottawa Avenue; seen from the streets.'+DT,
   [W('Michigan Trust Company Building'),['SAH Archipedia: Trust Building',SAH+'KT9']],
-  brick='yes'),
+  brick='yes',apart="grand-rapids-trust-building: a different trust company's tower of 1926 on Monroe Center; this is the 1892 building on Pearl Street"),
 
 N('grand-rapids-trust-building','Grand Rapids Trust Building (77 Monroe Center)','Grand Rapids','mi','civic','standing',42.96447,-85.66966,'exact','view','walk','','1926',
   'A bank and office tower of 1926 by Wirt C. Rowland of Smith, Hinchman and Grylls, built for the Grand Rapids Trust Company. Its strong piers rise to pinnacles above great three-storey arches; the architectural historian Kathryn Bishop Eckert likens it to H. H. Richardson\'s Marshall Field store in Chicago turned on end.',

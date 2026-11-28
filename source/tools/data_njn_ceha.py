@@ -36,7 +36,7 @@ N('boonton-ironworks-arch-bridge','Boonton Ironworks stone arch bridge','Boonton
   '',
   'In Grace Lord Park (Town of Boonton), open as a footbridge since 2024. Park on Liberty Street or at the Upper Plane Street lot. Hours not checked.',
   [BOONTON_BRIDGE,BOONTON_NOM,SKYLANDS_BOONTON,NRHP_LIST],conf='mixed',
-  th=[40.90633,-74.41429],thn='Liberty Street parking, Grace Lord Park',brick='no'),
+  th=[40.90633,-74.41429],thn='Liberty Street parking, Grace Lord Park',brick='no',apart='boonton-ironworks-ruins: the ruins of the works in the park; this is the stone arch bridge below the falls'),
 N('split-rock-furnace','Split Rock Furnace','Rockaway Township','njn','industry','ruins',40.959167,-74.461944,'site','view','walk','','1862',
   'A forge stood here by about 1793 (Ebenezer Ferrand), and Andrew Bell Cobb built a second forge in 1837 and a furnace about a year later. Cobb rebuilt the furnace in 1862, and that is the stack that stands. The Register form (1974) counted at least fourteen buildings in the ironmaking settlement on an 1868 map; none of the others is described as surviving. The land became Jersey City\'s water supply and is now owned by the State of New Jersey.',
   'A truncated pyramid of stone and brick about 22 feet square at the base, at the foot of a hillside beside the outlet from Split Rock Pond. The inner wall is lined with brick, about three feet of the top stone is gone, and frost has pushed the walls outward. The kiosk at the reservoir parking area has a panel on the furnace.',

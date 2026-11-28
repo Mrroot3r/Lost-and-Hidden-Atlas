@@ -5,7 +5,7 @@
 That is for a branch that carries sources alone; GitHub builds the site and runs the full check (tools/ci_build.sh).
 Exit code 1 on any error. Warnings are for a person to read."""
 import sys,os,re,json,glob,importlib,math
-import brickrule
+import brickrule, dupes
 SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
 REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
@@ -71,9 +71,10 @@ def seen(i,where):
     if i in ids: err.append(f"duplicate id '{i}' in {where} and {ids[i]}: add a town or state suffix to the new one")
     ids[i]=where
 from data_a import A
-for r in A: seen(r[1],'data_a')
+ALLP=[]      # every entry with the list it is in, for the guard against one place entered twice (tools/dupes.py)
+for r in A: seen(r[1],'data_a'); ALLP.append(('data_a',dict(id=r[1],name=r[2],town=r[3],lat=r[7],lon=r[8],apart=r[13].get('apart',''))))
 from data_b import B
-for b in B: seen(b['id'],'data_b')
+for b in B: seen(b['id'],'data_b'); ALLP.append(('data_b',b))
 keys=set(); stamps=[]
 for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
     name=os.path.basename(f)[:-3]
@@ -97,6 +98,7 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
     keys.add(k)
     for p in m.PLACES:
         i=p['id']; w=f'{name}:{i}'; seen(i,name)
+        ALLP.append((name,p))
         if not re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+)*',i): err.append(f'{w}: id must be lowercase words joined by hyphens')
         # red brick (GUIDE.md section 4): every place written since November 19, 2026 says yes, some, no, or ? for not checked
         for _o in ([p['was']] if isinstance(p.get('was'),str) and p.get('was') else list(p.get('was') or [])):      # this entry replaces an older, thinner one for the same place
@@ -261,6 +263,31 @@ for st_,nm in stamps:
     if 'Delete this bracketed text' in t_ or '| Example mill |' in t_: _nl.append(f'notes/{k_}.md still holds the template text: fill in "What this batch is", the leads and the tips, and delete the bracketed lines and the example row')
     for h_ in('## What this batch is','## Leads','## Tips'):
         if h_ not in t_: _nl.append(f'notes/{k_}.md: the heading "{h_}" is missing')
+# ---- one place entered twice (tools/dupes.py has the rule and why). Two entries on one spot, or with the same name close by,
+# are one place until an entry says otherwise with apart='<other id>: <why>'. A pair that involves the newest batch, the one
+# being published, is an error; a pair between older entries is a warning, so that one which slipped in (two sessions adding
+# the same building in the same hour) cannot stop every other session from publishing. The thin landmark pins (lm-...) are
+# compared too: build_sites.py makes them from src/landmarks.json, and a full entry replaces one with was='lm-...'.
+try:
+    _bs=open(os.path.join(T,'build_sites.py'),encoding='utf-8').read(); import ast as _ast
+    _FIX=_ast.literal_eval(re.search(r'^FIX=(\{.*\})\s*$',_bs,re.M).group(1)); _SKIP=_ast.literal_eval(re.search(r'^SKIP=(\{.*\})\s*$',_bs,re.M).group(1))
+    _L=json.load(open(os.path.join(REPO,'source','src','landmarks.json'),encoding='utf-8')); _G2=json.load(open(os.path.join(REPO,'source','src','g2.json'),encoding='utf-8'))
+    for _i,_r in enumerate(_L):
+        if _i in _SKIP: continue
+        _id='lm-'+re.sub(r'[^a-z0-9]+','-',_r['name'].lower()).strip('-')[:40]
+        if _id in WAS: continue          # already replaced by a full entry
+        _la,_lo=_FIX[_i] if _i in _FIX else _G2[f'L{_i}'][:2]
+        ALLP.append(('the landmark list',dict(id=_id,name=_r['name'],town=_r['town'],lat=_la,lon=_lo)))
+except Exception as _e: err.append(f'check.py could not read the landmark pins (src/landmarks.json, src/g2.json, FIX and SKIP in build_sites.py): {_e}')
+_byid={p['id']:p for _,p in ALLP}; _file={p['id']:f for f,p in ALLP}
+for _f,_p in ALLP:
+    _ap=dupes.apart_problem(_p,_byid)
+    if _ap: err.append(f"{_f}:{_p['id']}: {_ap}")
+_newest=sorted(stamps)[-1][1] if stamps else None
+for _x in dupes.find([p for _,p in ALLP]):
+    _new=[i for i in (_x['b'],_x['a']) if _file[i]==_newest]      # the entry the sentence is written about: the one in the batch being published
+    _n=_new[0] if _new else (_x['a'] if _x['b'].startswith('lm-') else _x['b'])
+    (err if _new else warn).append(f"{_file[_n]}:{dupes.line(_x,_byid,_n)}")
 # Warnings a session has looked at and accepted (tools/checked_ok.json: place id -> what was looked at and why it stands) are
 # not printed again: the same seventeen warnings every day taught everyone to stop reading them. Only the two kinds of
 # warning that are judgement calls can be accepted this way: the kind of place, and a pin just outside a coarse state outline.

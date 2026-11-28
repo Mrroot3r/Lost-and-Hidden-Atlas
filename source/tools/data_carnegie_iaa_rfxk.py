@@ -275,7 +275,7 @@ N('simpson-college-carnegie-library-site-ia','Site of the Simpson College Carneg
   "A Jacobean Revival library by Proudfoot, Bird and Rawson, opened on June 8, 1907. It stopped being the library in 1964, was renamed Heckert Hall in 1975, later held the art centre, and was torn down in 2014.",
   'On North C Street.',
   '','508 North C Street, on the campus. Look from the street.',
-  [P('simpson-college','Simpson College'),L],brick='?'),
+  [P('simpson-college','Simpson College'),L],brick='?',apart="indianola-carnegie-library-ia: the town's own Carnegie library on Boston Avenue; this was the college's, on the campus"),
 N('upper-iowa-henderson-carnegie-library-ia','Henderson Carnegie Library, Upper Iowa University','Fayette','ia','civic','standing',42.83906,-91.8001,'exact','view','walk','','1901–',
   "The first college Carnegie library granted in Iowa, opened on November 11, 1902 and named for David B. Henderson, Speaker of the House and a friend of Carnegie; a statue of Henderson stands in front. The Iowa Carnegie project says it is still a library.",
   'With a statue of Henderson in front.',

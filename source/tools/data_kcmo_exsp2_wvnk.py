@@ -42,7 +42,7 @@ N('elms-pump-house-well-carriage-house-excelsior-springs-mo', 'Elms Hotel pump h
   'Behind the Elms Hotel stand the plain buildings that served it. A small brick building of about 1912 was a carpenter\'s shop in 1913 and a pump house by 1926; local people told the Register nomination writers that mineral water was served from it. In the guest lot is the hotel\'s own sulpho-saline well, a long slot in the ground under metal plates, whose water was used only for hotel guests and never sold from a pavilion. A one-story limestone carriage house or garage of about 1920 completes the group.',
   look='The brick pump house with a gable roof and a porch on its south end (now a meeting space), the metal-plated well opening in the east service lot south of the east wing, and the limestone carriage house with two cross-braced board doors. All three are inside the hotel\'s grounds; the pump house and carriage house are by the western guest lot. Interior not checked.',
   accn='Private grounds of the Elms Hotel, 401 Regent Avenue. These are service buildings: ask at the hotel before walking the grounds; the pin marks the general area behind the hotel.',
-  links=[W('The Elms Historic District'), W('Elms Hotel (Excelsior Springs, Missouri)')], conf='mixed', brick='some'),
+  links=[W('The Elms Historic District'), W('Elms Hotel (Excelsior Springs, Missouri)')], conf='mixed', brick='some',apart=['elms-hotel-excelsior-springs-mo: these are the service buildings behind the hotel, listed separately from it', 'elms-historic-district-excelsior-springs-mo: the service buildings behind the hotel; the district is the streets around it']),
 
 N('barbee-memorial-church-excelsior-springs-mo', 'Barbee Memorial Presbyterian Church (Siloam Spring Baptist Church), Excelsior Springs', 'Excelsior Springs', 'kcmo', 'worship', 'standing',
   39.34129, -94.21881, 'site', 'view', 'drive', '', 'about 1902',
@@ -77,14 +77,14 @@ N('hall-of-waters-west-district-excelsior-springs-mo', 'Hall of Waters Commercia
   'Twenty buildings on the west side of downtown, listed in 1999, built between about 1894 and 1948: Victorian, Classical Revival and Art Deco. Wikipedia names the Post Office (1914), the McCleary Thornton-Minor Hospital (about 1910), the Montgomery Ward Building (1929), J. J. Newberry and J. C. Penney (both about 1929), the Elks Lodge (1913-1926), the Washington Hotel and Orpheus Theatre, the I.O.O.F. Building (1913-1917), the Arlington Hotel (1899-1900) and the Ideal Hotel (about 1900-1905). Several of those are separate entries on the Atlas; the Ideal Hotel, the hospital, Newberry, Penney and I.O.O.F. buildings are only named here.',
   look='A walk along West Broadway and the streets off it, past two- and three-story brick fronts. The district\'s 1999 form could not be read, so which buildings keep their original fronts is not checked.',
   accn='Public sidewalks downtown; the buildings are shops and offices (private). Free street parking nearby; not checked.',
-  links=[W('Excelsior Springs Hall of Waters Commercial West Historic District')], brick='?'),
+  links=[W('Excelsior Springs Hall of Waters Commercial West Historic District')], brick='?',apart='hall-of-waters-excelsior-springs-mo: the Hall of Waters itself; this is the commercial district west of it, named for it'),
 
 N('hall-of-waters-east-district-excelsior-springs-mo', 'Hall of Waters Commercial East Historic District, Excelsior Springs', 'Excelsior Springs', 'kcmo', 'town', 'standing',
   39.34220, -94.22080, 'area', 'view', 'walk', 'hotels', '1894–1948',
   'Twenty-four buildings and two structures round the Hall of Waters, listed in 1999, built between about 1894 and 1948. Wikipedia names the Flanders Dry Goods Store (about 1900-05), the A. M. Howard Drug Store (1905-09), the Clay County State Bank (1906), the Huey Building (1908), the Oriental Bazaar (1908), the Excelsior Baths and Broadway Rooms, the Eagles Lodge Hall (about 1905-09) and the Kennedy Building (1902).',
   look='Victorian commercial fronts along East Broadway either side of the 1936-38 Hall of Waters (its own entry). The 1999 form could not be read, so which fronts remain unaltered is not checked.',
   accn='Public sidewalks downtown; shops and offices are private. Park by the Hall of Waters; hours of individual businesses not checked.',
-  links=[W('Excelsior Springs Hall of Waters Commercial East Historic District')], brick='?'),
+  links=[W('Excelsior Springs Hall of Waters Commercial East Historic District')], brick='?',apart='hall-of-waters-excelsior-springs-mo: the Hall of Waters itself; this is the commercial district east of it, named for it'),
 
 N('royal-hotel-excelsior-springs-mo', 'Royal Hotel (Wholf\'s Tavern), 201 South Street, Excelsior Springs', 'Excelsior Springs', 'kcmo', 'hotel', 'standing',
   39.34116, -94.22419, 'exact', 'view', 'drive', 'hotels', '1898–1998',

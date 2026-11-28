@@ -12,16 +12,6 @@ BATCH = {'key': 'ks_lawh_dwpt', 'label': 'Lawrence and Douglas County, Kansas (s
 
 PLACES = [
 
-N('castle-tea-room-roberts-house-lawrence-ks', 'The Castle (John N. Roberts House, Castle Tea Room), 1307 Massachusetts Street', 'Lawrence', 'ks', 'landmark', 'standing',
-  38.95967, -95.23633, 'exact', 'view', 'walk', '', '1893–1894',
-  'A fifteen-room Romanesque mansion of ashlar limestone with a three-storey corner tower, built for Lawrence manufacturer John N. Roberts during the financial panic of 1893 to 1894 and finished in the autumn of 1894. Roberts made much of his money from patents on wooden butter and lard containers and served as Kansas adjutant general in 1889. '
-  'The nomination says the seventeen-year-old English visitor Sidney Endacott carved the mantels, newel posts and other interior woodwork over three months. The Roberts family left in 1919; from 1947 the house was the home of Libuse Kriz, who ran a restaurant in it, the Castle Tea Room. '
-  'The Lawrence Journal-World reported in 2019 that the nonprofit that owns it would lease it out, and in 2020 that an agency would put its offices in part of it; who owns it and what it is used for now were not checked.',
-  look='A towering stone house with carved porches and entries, a slate-and-lead hipped roof and several tall stone chimneys; the 1974 nomination says the outside looked unchanged from an 1898 photograph. '
-  'Inside it describes five first-floor fireplaces, a third-floor ballroom with stained glass and a hidden staircase, and each room finished in a different wood. Interior not checked now. The neighbouring house at 1313 Massachusetts, also listed (Roberts-Luther-Mitchell House), was Roberts\'s as well.',
-  accn='Owned by a nonprofit foundation per 2019 and 2020 press reports; present use and any opening hours not checked. Look from the sidewalk on Massachusetts Street at 13th; park on the street. Do not assume the interior is open.',
-  links=[['National Register nomination (1974), read in full', NPG + '74000831_text'], ['Lawrence Journal-World, local history: the Castle Tea Room (2020)', 'https://www2.ljworld.com/living/2020/aug/12/local-history-a-few-stories-of-the-castle-tea-room-and-its-number-loving-parrot'], KS_LIST],
-  conf='mixed', brick='no', hours=''),
 
 N('morse-house-lawrence-ks', 'Dr. Frederic D. Morse House, 1041 Tennessee Street', 'Lawrence', 'ks', 'landmark', 'standing',
   38.96444, -95.23889, 'exact', 'view', 'walk', '', '1888–1889',
@@ -34,7 +24,7 @@ N('morse-house-lawrence-ks', 'Dr. Frederic D. Morse House, 1041 Tennessee Street
   conf='mixed', brick='some', hours=''),
 
 N('benedict-house-lawrence-ks', 'Benedict House, 923 Tennessee Street', 'Lawrence', 'ks', 'landmark', 'standing',
-  38.9664, -95.2397, 'exact', 'view', 'walk', '', 'about 1869–1890',
+  38.96663, -95.23977, 'exact', 'view', 'walk', '', 'about 1869–1890',
   'A small frame cottage built about 1869 as a four-room house, enlarged in seven stages up to 1927, and given its Stick-style look by the addition of 1882 and the foyer of 1890. The 1991 nomination was written to certify a rehabilitation that took off the later rear additions, '
   'put a metal-clad addition behind the old house and built two cottages on the lot to the south; the work was finished in August 1990. The Kansas Historical Society lists the builder as James Bell.',
   look='A cross-gabled, shingled and weatherboarded cottage with decorated gable trusses, overhanging eaves, varied wood siding and a one-storey porch. The metal-clad addition of 1989 to 1990 behind it echoes the old form but is plainly modern. Interior not checked.',
@@ -84,9 +74,8 @@ N('breezedale-historic-district-lawrence-ks', 'Breezedale Historic District (230
 ]
 
 PIN_NOTES = {
-  'castle-tea-room-roberts-house-lawrence-ks': 'OpenStreetMap building named for General John Roberts Castle at 1307 Massachusetts.',
   'morse-house-lawrence-ks': 'Register list coordinate for 1041 Tennessee Street.',
-  'benedict-house-lawrence-ks': 'Register list coordinate for 923 Tennessee Street.',
+  'benedict-house-lawrence-ks': "On OpenStreetMap's house at 923 Tennessee Street; a house in the row on the aerial. (Until November 27, 2026 the pin sat between this house and 933.)",
   'griffin-house-645-connecticut-lawrence-ks': 'Address lookup in OpenStreetMap for 645 Connecticut Street.',
   'john-kelly-stone-building-lawrence-ks': 'Address lookup in OpenStreetMap for 777 North 1750 Road; the pin marks the farm address, not the stone building itself.',
   'barnes-hoskinson-farmstead-vinland-ks': "Moved on November 27, 2026: the pin had been on the building at Vinland's crossroads, where the Presbyterian church's pin also sits. It is now on the farmstead (a house, outbuildings and a red barn) that the address point for 715 East 1728 Road falls on, up a lane about 290 m north of the crossroads, on the 2024 state aerial.",

@@ -104,7 +104,7 @@ N('old-city-hall-davenport','Old City Hall (Oxford Flats)','Davenport','ia','civ
   '',
   'Private apartments, 514 Brady Street, just north of downtown. Seen from the street only. Parking not checked.',
   [W('Old City Hall (Davenport, Iowa)')],
-  brick='?'),
+  brick='?',apart='davenport-city-hall: the 1895 city hall on West Fourth Street; this is the 1857 engine house that served before it'),
 N('central-high-school-davenport','Central High School (Davenport High School)','Davenport','ia','civic','standing',41.53000,-90.57578,'site','view','walk','','1905–1907',
   'Opened in January 1907 as Davenport High School on the old Griswold College grounds, which the school board bought from the Episcopal Diocese of Iowa for $53,000. Clausen & Burrows designed it; building began in 1905 and it cost $347,000, with room for 1,600 pupils, a 1,300-seat auditorium and a gymnasium. It is still one of the city\'s three public high schools and stands in the College Square Historic District.',
   'Four storeys (three above a tall basement) faced in Marquette "rain-drop" sandstone under a red tile roof; the original floors were terrazzo mosaic and maple.',

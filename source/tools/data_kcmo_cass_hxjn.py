@@ -13,7 +13,7 @@ N('howard-schoolhouse-independence-mo', 'William Bullitt Howard Schoolhouse, Ind
   accn='Owned by the Jackson County Historical Society, which also owns the 1859 jail beside it. It is on the jail museum grounds at 217 N. Main Street. The society says there is free parking across the street and parking along the street. Admission is paid at the door of the museum; the museum says its site is a historic building and is not ADA compliant. The hours given are the museum\'s, from its visit page; the schoolhouse has no separate times on that page.',
   hours='April to October: Tuesday to Saturday 10 a.m. to 4 p.m.; also weekends in December (museum hours; closed Sunday and Monday)',
   links=[['Jackson County Historical Society: Howard Schoolhouse', 'https://www.jchs.org/howardschoolhouse'], ['Jackson County Historical Society: plan your visit', 'https://www.jchs.org/plan-your-visit'], ['Jackson County Historical Society: Saving the Howard Schoolhouse', 'https://www.jchs.org/jchs-e-journal/2025/2/14/saving-the-howard-schoolhouse']],
-  conf='mixed', brick='no', th=[39.09343, -94.41457], thn='Parking lot on North Lynn Street (the society names a free lot across the street, not which one)'),
+  conf='mixed', brick='no', th=[39.09343, -94.41457], thn='Parking lot on North Lynn Street (the society names a free lot across the street, not which one)',apart='jackson-county-1859-jail-independence-mo: a one-room school moved onto the jail museum grounds; the jail is its own building'),
 
 N('sharp-hopper-log-cabin-harrisonville-mo', 'Sharp-Hopper Log Cabin (1835), Harrisonville', 'Harrisonville', 'kcmo', 'landmark', 'standing',
   38.65329, -94.34605, 'area', 'ask', 'drive', '', '1835',

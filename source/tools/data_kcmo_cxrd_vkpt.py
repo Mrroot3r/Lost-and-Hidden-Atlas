@@ -36,11 +36,11 @@ N('dierks-building-kc', 'Dierks Building (Grand Boulevard Lofts), Grand Boulevar
   hours='', brick='?'),
 
 N('insurance-building-spalding-college-kc', 'Kansas City Insurance Building (Spalding\'s Commercial College)', 'Kansas City', 'kcmo', 'civic', 'standing',
-  39.102392, -94.579256, 'site', 'view', 'drive', '', '1905',
+  39.10237, -94.57871, 'exact', 'view', 'drive', '', '1905',
   'Built in 1905 for Spalding\'s Commercial College, which James F. Spalding had founded in 1865 and which moved here to be near the city\'s leading businesses. Clio says more than 1,200 students attended and that Harry Truman studied there in 1901. Insurance companies took the building later, and in 1944 the Consumers Cooperative Association moved in and rebuilt the interior. Union and public-service offices followed. It is on the National Register of Historic Places.',
-  look='A Chicago-style front with multi-sash windows, vertical piers and terra-cotta trim (Clio). The pin is the Register list\'s point; the exact street address was not read.',
+  look='A Chicago-style front with multi-sash windows, vertical piers and terra-cotta trim (Clio). The Register form places it at the northwest corner of East 10th and Oak Streets, 318-320 East 10th Street, five storeys with its seven-bay front on 10th.',
   accn='Private; current use not checked. Look from the street. Downtown street and garage parking.',
-  links=[['Kansas City Insurance Building (Clio downtown walking tour, stop 7)', 'https://theclio.com/tour/251']],
+  links=[['Kansas City Insurance Building (Clio downtown walking tour, stop 7)', 'https://theclio.com/tour/251'],['National Register form, 2005 (Missouri state copy)','https://mostateparks.com/sites/g/files/zuston361/files/media/pdf/2025/02/insurance-building-consumers-cooperative-association-building.pdf']],
   hours='', brick='?'),
 
 N('firestone-building-kc', 'Firestone Building (Abdiana Building), Grand Boulevard', 'Kansas City', 'kcmo', 'industry', 'standing',
@@ -120,7 +120,7 @@ PIN_NOTES = {
   'gumbel-building-kc': 'Register list coordinate for the building at 801 Walnut Street (the address Clio gives).'+' On the aerial the pin sits on a building of the right size in the right block.',
   'baker-vawter-building-kc': 'Register list coordinate; Clio gives the address as 915 to 917 Wyandotte Street.'+' On the aerial the pin sits on a building of the right size in the right block.',
   'dierks-building-kc': 'Register list coordinate.'+' On the aerial the pin sits on a building of the right size in the right block.',
-  'insurance-building-spalding-college-kc': 'Register list coordinate.'+' On the aerial the pin sits on a building of the right size in the right block.',
+  'insurance-building-spalding-college-kc': "On the long white-roofed building on East 10th Street at the Oak Street corner: about 38 m long on the aerial, as the Register form's 126 by 48 feet says, at 318-320 East 10th Street. The pin was 60 m west, on the Pickwick block's hotel, until November 27, 2026."+' On the aerial the pin sits on a building of the right size in the right block.',
   'firestone-building-kc': 'Register list coordinate; the Janssen Place article places the building at 2001 Grand.'+' On the aerial the pin sits on a building of the right size in the right block.',
   'twenty-twenty-grand-building-kc': 'Register list coordinate; the address is 2020 Grand Boulevard by its name.'+' On the aerial the pin sits on a building of the right size in the right block.',
   'land-bank-building-kc': 'OpenStreetMap and the Register list agree within about 20 metres.'+' On the aerial the pin sits on a building of the right size in the right block.',

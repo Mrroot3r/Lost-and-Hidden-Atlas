@@ -106,7 +106,7 @@ N('union-station-albany','Union Station (Kiernan Plaza)','Albany','alb','rail','
   '',
   'Credit union offices; view from Broadway. Street parking downtown.',
   [W('Union Station (Albany, New York)')],
-  brick='?',was='lm-kiernan-plaza-union-station'),
+  brick='?',was='lm-kiernan-plaza-union-station',apart='delavan-house: the hotel that burned in 1894 stood on this spot before the station was built'),
 ]
 PIN_NOTES={
  'albany-city-hall':'Wikipedia coordinate (42.65167, -73.75444). On the building on the aerial.',

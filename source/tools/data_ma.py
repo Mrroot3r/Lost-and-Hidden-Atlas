@@ -57,7 +57,7 @@ N('tantiusques','Tantiusques graphite mine','Sturbridge','worc','industry','ruin
 N('sne-railway','Southern New England Railway, the "Titanic Railroad"','Palmer','worc','rail','traces',42.17781,-72.36887,'area','view','drive','','1910–1912',
   'The Grand Trunk\'s president Charles Hays planned a line from Palmer to Providence to break the New Haven\'s monopoly. He went down with the Titanic in April 1912. Much grading and many large concrete supports were built, but the line was never finished.',
   'Concrete piers and abutments and unused grade between Palmer and the Rhode Island line. Turn on Old rails to trace it; the pin only marks the Palmer end.','A railroad that sank with the Titanic.',
-  'Remains are scattered over many owners; check each spot with Owner?.',[W('Southern New England Railway')],conf='mixed'),
+  'Remains are scattered over many owners; check each spot with Owner?.',[W('Southern New England Railway')],conf='mixed',apart='hampden-railroad: a different unfinished railway of the same years; both met at Palmer and both pins mark the town, not one spot'),
 N('westborough-state-hospital','Westborough State Hospital site','Westborough','worc','inst','gone',42.30111,-71.61028,'site','view','drive','','closed 2010',
   'A state hospital on more than 600 acres beside Chauncy Lake. It closed in 2010 and, despite being on the National Register, the whole complex was demolished in the summer of 2019.',
   'The cleared campus between Lyman Street and the lake.','','Redevelopment site; view from public roads.',[W('Westborough State Hospital')]),
