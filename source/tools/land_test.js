@@ -11,6 +11,13 @@ const { chromium } = require('playwright');
   const c=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,hasTouch:true,isMobile:true,userAgent:'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Mobile Safari/537.36'});
   const p=await c.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
   await p.goto(process.argv[2]||'http://localhost:8766/index.html'); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(600);
+  // ---- a first visit on a slow connection: the page is some megabytes, and until it has all come the reader used to see an empty map and an
+  // empty list with no word that anything was happening (found November 28, 2026). The page itself now says it is loading, in words that
+  // are there before any script runs, and they go when the map is up.
+  { const c2=await b.newContext({viewport:{width:390,height:844},javaScriptEnabled:false}); const q=await c2.newPage(); await q.goto(process.argv[2]||'http://localhost:8766/index.html'); await q.waitForTimeout(300);
+    const w=await q.evaluate(()=>{ const n=document.querySelector('#loadnote'), l=document.querySelector('#list'), st=document.querySelector('#stage').getBoundingClientRect(); if(!n) return null; const r=n.getBoundingClientRect(); return {note:n.textContent.trim(),seen:r.width>0&&r.height>0&&r.left>=st.left&&r.right<=st.right&&r.top>=st.top&&r.bottom<=st.bottom,list:l.textContent.trim()}; });
+    ok('before the page has finished coming, the map and the list each say they are loading',!!w&&/Loading/.test(w.note)&&w.seen&&/Loading/.test(w.list),JSON.stringify(w)); await c2.close();
+    ok('once the map is up, those words are gone',await p.evaluate(()=>!document.querySelector('#loadnote')&&!/Loading the places/.test(document.querySelector('#list').textContent))); }
   const R=sel=>p.evaluate(sel=>{ const n=document.querySelector(sel); if(!n||n.offsetParent===null&&getComputedStyle(n).position!=='fixed') return null; const r=n.getBoundingClientRect(); return {l:r.left,t:r.top,r:r.right,b:r.bottom,w:r.width,h:r.height}; },sel);
   const mapSize=()=>p.evaluate(()=>{ const s=window.__atlasMap.getSize(); return [s.x,s.y]; });
   // ---- upright: as it was
@@ -27,6 +34,12 @@ const { chromium } = require('playwright');
     const NP=n=>p.evaluate(n=>window.__atlasGo.nameParts(n),n);
     ok('a name in two parts: what is in brackets or after a comma goes underneath, smaller',JSON.stringify(await NP('Staten Island Light (Ambrose Channel Range Light)'))==='["Staten Island Light","Ambrose Channel Range Light"]'&&JSON.stringify(await NP('First Presbyterian Church, Cherry Valley'))==='["First Presbyterian Church","Cherry Valley"]'&&JSON.stringify(await NP('The Castle (John N. Roberts House, Castle Tea Room), 1307 Massachusetts Street'))==='["The Castle","John N. Roberts House, Castle Tea Room, 1307 Massachusetts Street"]',JSON.stringify(await NP('The Castle (John N. Roberts House, Castle Tea Room), 1307 Massachusetts Street')));
     ok('a name in one part, or with brackets in its middle, is left whole',JSON.stringify(await NP('Joliet Iron Works'))==='["Joliet Iron Works",""]'&&JSON.stringify(await NP('La Grange M-K-T (Katy) Depot'))==='["La Grange M-K-T (Katy) Depot",""]',JSON.stringify(await NP('La Grange M-K-T (Katy) Depot')));
+    // A name that is a list ("A, B and C") or a railroad's name is not cut at its first comma: "Delaware" in big letters over "Lackawanna &
+    // Western station" was wrong (found November 28, 2026). The cut moves to after the list, and a list with nothing after it stays whole.
+    { const J=async n=>JSON.stringify(await NP(n));
+      ok('a name that begins with a list is cut after the list, not inside it',await J('Delaware, Lackawanna & Western station, Binghamton')==='["Delaware, Lackawanna & Western station","Binghamton"]'&&await J('Chicago, Burlington & Quincy Railroad Freight Depot, Atchison, Kansas')==='["Chicago, Burlington & Quincy Railroad Freight Depot","Atchison, Kansas"]'&&await J('Old Champlain Canal locks 16, 17 and 18, Fort Ann')==='["Old Champlain Canal locks 16, 17 and 18","Fort Ann"]'&&await J('Cluett, Peabody bleachery, Peebles Island')==='["Cluett, Peabody bleachery","Peebles Island"]',await J('Delaware, Lackawanna & Western station, Binghamton')+' '+await J('Cluett, Peabody bleachery, Peebles Island'));
+      ok('a name that is only a list stays whole',await J('Water, Wall and Pine Street lenticular truss bridges')==='["Water, Wall and Pine Street lenticular truss bridges",""]'&&await J('Mary, Queen of the World Cathedral')==='["Mary, Queen of the World Cathedral",""]'&&await J('U.S. Post Office, Courthouse, and Custom House')==='["U.S. Post Office, Courthouse, and Custom House",""]'&&await J('Odd Fellows\' Home for Orphans, Indigent and Aged')==='["Odd Fellows\' Home for Orphans, Indigent and Aged",""]',await J('Water, Wall and Pine Street lenticular truss bridges')+' '+await J('U.S. Post Office, Courthouse, and Custom House'));
+      ok('a street corner, "now …" or "the …" after the comma is still the second part',await J('Gem Theater, 18th and Vine, Kansas City')==='["Gem Theater","18th and Vine, Kansas City"]'&&await J('U.S. Post Office and City Hall, Broadway and Church Street')==='["U.S. Post Office and City Hall","Broadway and Church Street"]'&&await J('Ladysmith Carnegie Library, now Carnegie Hall Bed and Breakfast')==='["Ladysmith Carnegie Library","now Carnegie Hall Bed and Breakfast"]'&&await J('Gilboa, under the Schoharie Reservoir')==='["Gilboa","under the Schoharie Reservoir"]'&&await J('Galena: Main Street and the old town')==='["Galena","Main Street and the old town"]',await J('Gem Theater, 18th and Vine, Kansas City')+' '+await J('U.S. Post Office and City Hall, Broadway and Church Street')); }
     ok('upright: Compare, More and Me are always in reach, in that order, and there is no Full button',m.fix.join()==='lb-cmp,lb-opt,lb-loc'&&!m.inScroll,m.fix.join()); }
   // The compare divider pushed to the right edge: its right-hand label used to stick out past the screen, which made the page itself
   // wider than the phone. In the Android app the whole page could then be dragged about by the layer bar, with blank beside and below it.
@@ -56,6 +69,16 @@ const { chromium } = require('playwright');
   await p.evaluate(()=>document.getElementById('lb-opt').click()); await p.waitForTimeout(400);
   ok('upright: a plain tap on the bar still works',await p.evaluate(()=>!!document.querySelector('#lb-opt')&&[...document.querySelectorAll('button')].some(b=>b.textContent.trim()==='Done'&&b.offsetParent!==null)));
   await p.evaluate(()=>{ const d=[...document.querySelectorAll('button')].find(b=>b.textContent.trim()==='Done'&&b.offsetParent!==null); d&&d.click(); }); await p.waitForTimeout(300);
+  // ---- a place open, and the bar dragged up to read its page: the place's pin must not slide out under the bar (found November 28, 2026:
+  // on the shortest map it sat on the bottom edge, behind the scale)
+  { const id=await p.evaluate(()=>{ const S=window.__atlasNM.sites(); return S.find(s=>s.id==='state-education-building-albany')?'state-education-building-albany':S[40].id; });
+    await p.evaluate(id=>{ location.hash='#'+id; },id); await p.waitForTimeout(1600); await dragBar(0,900); await dragBar(0,-900); await p.waitForTimeout(900);
+    const at=()=>p.evaluate(id=>{ const m=window.__atlasMap, s=window.__atlasNM.sites().find(x=>x.id===id), pt=m.latLngToContainerPoint([s.lat,s.lon]), z=m.getSize(); return {x:Math.round(pt.x),y:Math.round(pt.y),w:z.x,h:z.y}; },id);
+    const pin=await at();
+    ok('upright, a place open and the bar dragged to the top: its pin stays in view, clear of the edges',pin.y>=45&&pin.y<=pin.h-45&&pin.x>=30&&pin.x<=pin.w-30,JSON.stringify(pin));
+    await p.evaluate(()=>window.__atlasMap.panBy([0,-60],{animate:false})); const moved=await at(); await dragBar(0,60); await p.waitForTimeout(700); const kept=await at();
+    ok('upright: a pin still well inside the map after a drag is left where the reader put it',Math.abs(kept.y-moved.y)<=2&&Math.abs(kept.x-moved.x)<=2,JSON.stringify([moved,kept]));
+    await p.evaluate(()=>document.querySelector('#mapback').click()); await p.waitForTimeout(300); await dragBar(0,-900); await dragBar(0,200); await p.waitForTimeout(300); }
   // ---- the page itself is never zoomed (the owner, November 25, 2026: while he tapped through places the whole screen "zoomed in a hair
   // and cut off the edges", and he could not undo it). Two guards: nothing outside the map may pinch or double-tap the page bigger,
   // and if the page is magnified all the same, the Atlas draws itself inside the part of the page that shows, so nothing is cut off.
