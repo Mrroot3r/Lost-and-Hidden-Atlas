@@ -34,7 +34,7 @@ N('carnegie-library-ninth-vermont-lawrence-ks','Carnegie Library at Ninth and Ve
   '',
   'Owned by the City of Lawrence as of its 2005 call for proposals for the building\'s use; who uses it now was not checked. Look from the sidewalk. Metered street parking.',
   [W('Lawrence Public Library'),['The Carnegie Library, 1904 to 1937 (Lawrence Public Library history)','https://history.lplks.org/exhibits/show/library-history/carnegie'],['Kansas Historical Society register summary',KSNR%8]],
-  conf='mixed',brick='?'),
+  conf='mixed',brick='no',was='old-lawrence-library-ks'),
 N('plymouth-congregational-church-lawrence-ks','Plymouth Congregational Church','Lawrence, Kansas','ks','worship','standing',38.96658,-95.23731,'exact','view','drive','','1868–1870',
   'The congregation was founded in 1854, months after Kansas Territory opened, and held its first service on October 1, 1854 in a mudbrick boarding house. Its first permanent building, the "Stone Church", was in use from 1857 and finished in 1862. The present church, also called the Brick Church, was designed by John G. Haskell, begun in 1868 and finished in May 1870 at a cost of $45,000. Services have been held in it regularly since 1870. The Lawrence massacre of 1863 killed several members.',
   'The 1870 church on Vermont Street. Wikipedia says its sanctuary windows were made in England. The inside was not checked, and the church\'s own pages could not be read for service times.',

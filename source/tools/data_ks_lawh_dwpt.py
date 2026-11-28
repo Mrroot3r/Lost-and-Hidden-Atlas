@@ -11,15 +11,6 @@ NPG = 'https://npgallery.nps.gov/NRHP/GetAsset/NRHP/'
 BATCH = {'key': 'ks_lawh_dwpt', 'label': 'Lawrence and Douglas County, Kansas (second pass)', 'added': '2026-11-24 23:54'}
 
 PLACES = [
-N('old-lawrence-library-ks', 'Old Lawrence City Library (1904 Carnegie library)', 'Lawrence', 'ks', 'civic', 'standing',
-  38.96778, -95.2375, 'exact', 'view', 'walk', '', '1903–1904',
-  'Lawrence\'s public library from its opening on December 26, 1904 until a new library opened in 1972. Congressman J. D. Bowersock obtained $25,000 of Carnegie money for it, and the building and its fittings cost $27,412. '
-  'The 1975 nomination says contemporary newspapers reported it as the first building in Kansas faced with grey terra cotta, made by the Northwestern Terra Cotta Company of Chicago. A buff-brick addition was built in 1937.',
-  look='A one-storey Neo-Classical building of pressed buff brick on a Warrensburg stone foundation, set back from the corner of Ninth and Vermont. A portico with two Corinthian columns on each side shelters a round-arched entrance, and a terra-cotta pediment above it carries the date 1904 and the words "Lawrence City Library". '
-  'The 1975 nomination says the front is nearly unaltered except for the replaced doors. Interior not checked, and what the building is used for now was not found.',
-  accn='Present owner and use not checked: the 1975 nomination says the city was then planning to use it for the arts. Look from the sidewalk at the corner of Ninth and Vermont; there is parking on the downtown streets and in the lots nearby (West 9th Street lot, about 60 m).',
-  links=[['National Register nomination (1975), read in full', NPG + '75000709_text'], KS_LIST],
-  conf='mixed', brick='no', hours=''),
 
 N('castle-tea-room-roberts-house-lawrence-ks', 'The Castle (John N. Roberts House, Castle Tea Room), 1307 Massachusetts Street', 'Lawrence', 'ks', 'landmark', 'standing',
   38.95967, -95.23633, 'exact', 'view', 'walk', '', '1893–1894',
@@ -93,7 +84,6 @@ N('breezedale-historic-district-lawrence-ks', 'Breezedale Historic District (230
 ]
 
 PIN_NOTES = {
-  'old-lawrence-library-ks': 'Register list coordinate for the old library at Ninth and Vermont.',
   'castle-tea-room-roberts-house-lawrence-ks': 'OpenStreetMap building named for General John Roberts Castle at 1307 Massachusetts.',
   'morse-house-lawrence-ks': 'Register list coordinate for 1041 Tennessee Street.',
   'benedict-house-lawrence-ks': 'Register list coordinate for 923 Tennessee Street.',
