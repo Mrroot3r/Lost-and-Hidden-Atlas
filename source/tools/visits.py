@@ -38,6 +38,14 @@ if lg:
     for x in lg:
         if x.get('lego') in ('pegs','holes','no'): print('  '+legorule.report_cmd(x.get('id'),x['lego'],x.get('trig') or '',str(x.get('note') or '').strip(),"the Atlas's keeper",x.get('t') or 'date not given')+'      # '+str(x.get('place') or ''))
     print()
+# The words cut on a building, as the owner read them ("What does the building say?" on a place page; tools/stonerule.py).
+st=(j.get('stones') if isinstance(j,dict) else None) or []
+if st:
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import stonerule
+    print('WORDS ON THE BUILDING: %d place(s) the owner read. Run each line from the workspace after build_sites.py; the stones file goes out with the pull request.'%len(st))
+    for x in st:
+        if str(x.get('says') or '').strip(): print('  '+stonerule.report_cmd(x.get('id'),str(x['says']).strip(),str(x.get('where') or '').strip(),str(x.get('note') or '').strip(),"the Atlas's keeper",x.get('t') or 'date not given')+'      # '+str(x.get('place') or ''))
+    print()
 if not vs: print('No visit reports in that file.'); sys.exit(0)
 ledger='--ledger' in sys.argv; L=None
 if ledger:

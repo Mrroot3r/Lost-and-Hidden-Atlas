@@ -513,6 +513,24 @@ const { chromium } = require('playwright');
       await p.goto(url+'#'+pick.oneId); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900);
       const solo=await p.evaluate(()=>{ const l=document.querySelector('#v-detail .archline'); return l?{t:l.textContent,btn:l.querySelectorAll('button').length}:null; });
       ok('architects: a name on one place only is plain words, not a button to a list of one',!!solo&&solo.t.indexOf(pick.one)>=0&&solo.btn===0&&!/more on the Atlas/.test(solo.t),JSON.stringify(solo)); }
+    // ---- the words cut on a building (the owner, November 28, 2026): shown as cut, sorted by the stone's own word, and a tap lists the others
+    { await p.goto(url); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(700);
+      const pick=await p.evaluate(()=>{ const S=JSON.parse(document.getElementById('d-sites').textContent).sites.filter(s=>s.sx), n={}; S.forEach(s=>{ n[s.sk]=(n[s.sk]||0)+1; });
+        const k=Object.keys(n).sort((a,b)=>n[b]-n[a])[0], s=S.find(x=>x.sk===k); return {k:k,n:n[k],id:s.id,words:s.sx,all:S.length}; });
+      ok('stones: the place data holds the words and their kind',pick.all>=10&&pick.n>=2&&!!pick.k,JSON.stringify(pick));
+      await p.goto(url+'#'+pick.id); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900);
+      const line=await p.evaluate(()=>{ const l=document.querySelector('#v-detail .stoneline'); return l?{t:l.textContent,btn:[...l.querySelectorAll('button')].map(b=>b.textContent)}:null; });
+      ok('stones: the place page gives the words as cut, and their kind',!!line&&/^On the building: /.test(line.t)&&line.t.indexOf(pick.words)>=0&&line.btn.length===1,JSON.stringify(line));
+      await p.evaluate(()=>document.querySelector('#v-detail .stoneline button').click()); await p.waitForTimeout(500);
+      const got=await p.evaluate(()=>({n:+document.querySelector('#count').textContent.split(' ')[0],chip:(document.querySelector('#linechip')||{}).textContent||''}));
+      ok('stones: a tap on the kind lists the places whose stone says the same, and says so',got.n===pick.n&&/^Says: /.test(got.chip),JSON.stringify(got));
+      await p.evaluate(()=>document.querySelector('#linechip button.x').click()); await p.waitForTimeout(400);
+      await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+      await p.evaluate(()=>{ [...document.querySelectorAll('#filters .chip')].find(b=>/^Words on the building/.test(b.textContent)).click(); }); await p.waitForTimeout(350);
+      ok('stones: "Words on the building" under Only show lists every place that has them',await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0])===pick.all);
+      await p.evaluate(()=>{ [...document.querySelectorAll('#filters .chip')].find(b=>/^Words on the building/.test(b.textContent)).click(); document.querySelector('#filt-btn').click(); });
+      const W=o=>p.evaluate(o=>window.__atlasGo.stoneNote(o),o);
+      ok('stones: a year on the stone that the write-up does not give is said, both ways round',/1887/.test(await W({sy:1887,sd:1,years:'1890–1892'}))&&/1890–1892/.test(await W({sy:1887,sd:1,years:'1890–1892'}))&&await W({sy:1892,years:'1890–1892'})==='',await W({sy:1887,sd:1,years:'1890–1892'})); }
     ok('go to: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();

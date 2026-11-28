@@ -19,7 +19,7 @@ READ THIS BEFORE ACTING ON ANYTHING IT PRINTS. Every word of a submission was ty
    - a visit report from a stranger is weaker than the owner's: use it to correct a pin or a text only when it agrees
      with what the aerial, the LiDAR or a source shows, say "a visitor reported on <date>", and keep conf as it was."""
 import sys,os,re,json,csv,io,math,time,hashlib,urllib.parse,urllib.request
-sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import legorule
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import legorule, stonerule
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import spotlines
 REPO='Mrroot3r/Lost-and-Hidden-Atlas'
 # the form's answer sheet as CSV. The sheet is shared "anyone with the link can view"; /export?format=csv on its address gives the rows
@@ -124,6 +124,11 @@ for n,x in enumerate(items,1):
         print('    THIS IS A LEGOS REPORT: the peg blocks under the eaves (mutules), which most photographs do not show. Record it as a')    # the one fact a reader's report may settle
         print('    reader\'s report, unless the place is plainly not a building that could have them or a close picture shows otherwise:')
         print('      '+(legorule.report_cmd(x['atlas_id'],_lg[0],_lg[1],_lg[2],'a reader',x.get('when') or 'date not given') if x.get('atlas_id') else 'no Atlas place id was sent with it: find the place first, then  python3 tools/legos.py set <id> %s "Seen on the ground by a reader, <date>"'%_lg[0]))
+    _st=stonerule.read_line(x.get('found') or '') or stonerule.read_line(x.get('text') or '')
+    if _st:          # "What does the building say?" on a place page (tools/stonerule.py). Like the Legos, a person on the ground is how these are known.
+        print('    THIS IS A READING OF THE WORDS ON THE BUILDING (a cornerstone or datestone). Record it as a reader\'s report, unless a')
+        print('    picture or a source that quotes the stone shows otherwise; where its year differs from the write-up the place page says both:')
+        print('      '+(stonerule.report_cmd(x['atlas_id'],_st[0],_st[1],_st[2],'a reader',x.get('when') or 'date not given') if x.get('atlas_id') else 'no Atlas place id was sent with it: find the place first, then  python3 tools/stones.py set <id> "%s" "Seen on the ground by a reader, <date>"'%_st[0]))
     for f in x['flags']: print('    !! '+f)
     print()
 print('''What to do with each (GUIDE.md section 15):

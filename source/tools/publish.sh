@@ -41,7 +41,7 @@ if [ -n "$SC" ] && git cat-file -e "$SC^{commit}" 2>/dev/null && git rev-parse -
     # and stopping for each one cost a session about four minutes a time (the sessions' notes, November 2026). The site this
     # workspace built does not show those places, which does not matter: the branch carries sources, GitHub builds the site,
     # and check.py below reads all of them together. Anything else that changed (the app, a tool) still stops.
-    if echo "$f" | grep -q -E '^source/tools/((data|pics|hours|bricks|legos|archs)_[a-z0-9_]+\.py|checked_ok\.json)$' && { [ ! -e "$w" ] || { git cat-file -e "$SC:$f" 2>/dev/null && git show "$SC:$f" | cmp -s - "$w"; }; }; then
+    if echo "$f" | grep -q -E '^source/tools/((data|pics|hours|bricks|legos|archs|stones)_[a-z0-9_]+\.py|checked_ok\.json)$' && { [ ! -e "$w" ] || { git cat-file -e "$SC:$f" 2>/dev/null && git show "$SC:$f" | cmp -s - "$w"; }; }; then
       git show "$BASE:$f" > "$w"; CAUGHT=$((CAUGHT+1)); continue
     fi
     STALE="$STALE $f"
@@ -84,7 +84,7 @@ git add -A
 # workspace lacks one that the base has (it was set up, or marked as caught up, without it), the file is put back, in the
 # branch and in the workspace, and the publish goes on (the maintainer lost two files this way on November 21, 2026,
 # before anything merged, by marking a workspace as caught up by hand).
-for f in $(git diff --cached --name-only --diff-filter=D -- source/tools | grep -E '^source/tools/((data|pics|hours|bricks|legos|archs)_[a-z0-9_]+\.py|checked_ok\.json)$' || true); do
+for f in $(git diff --cached --name-only --diff-filter=D -- source/tools | grep -E '^source/tools/((data|pics|hours|bricks|legos|archs|stones)_[a-z0-9_]+\.py|checked_ok\.json)$' || true); do
   if git cat-file -e "$BASE:$f" 2>/dev/null; then git checkout -q "$BASE" -- "$f"; cp "$f" "$W/${f#source/}"; echo "Put back $f: the workspace did not have it, and publishing would have deleted it."; fi
 done
 git add -A
