@@ -457,7 +457,6 @@ Places someone read about while researching but did not add, with what is missin
 | Point Barrow Refuge Station | Utqiagvik, AK | 1889 Revenue Cutter Service building, oldest wooden building on the Arctic coast (Wikipedia; no coordinates in article) | Coordinates (Register 71.29839, -156.77305), owner, access |
 | Fort Mears and Dutch Harbor Naval Operating Base | Unalaska, AK (53.888, -166.542) | WWII bases bombed June 1942 (Wikipedia) | Which ruins can be visited, owners |
 | Alaska Nellie's Homestead, Brown & Hawkins Store, Seward Depot | Seward area, AK | On the Register list for Kenai Peninsula | Articles not read |
-| Cathedral-Basilica of the Immaculate Conception | Mobile, AL | Wikipedia article title did not resolve; no official page with Mass times turned up in search | A source for its history and its own hours page |
 | Burritt on the Mountain | Huntsville, AL (34.71583, -86.53944) | Open-air museum of 19th-century buildings moved to a 1930s mansion; hours on its own page (Tuesday to Saturday, Sunday afternoon, seasonal times) | Which pieces are original 19th-century fabric; left out as the mansion dates from 1935-38 |
 | Alabama Theatre | Birmingham, AL (33.51491, -86.80918) | Built 1927 by Publix, original Wurlitzer organ (Wikipedia) | A hours or tour page that was read |
 | Rock Run Furnace and town | Rock Run, Cherokee County, AL (34.02778, -85.49528) | HAER photographs show furnace foundations (Wikipedia) | A source for what is left, the exact spot and the owner |
