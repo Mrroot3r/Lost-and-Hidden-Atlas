@@ -905,8 +905,10 @@ function setAsking(on){ asking=on; adding=false; spotting=false; pickingHome=fal
 function buildBar(){
   const sc=$('#lscroll'), fx=$('#lfix'); sc.textContent=''; fx.textContent='';
   BAR.forEach((b,i)=>{ if(schematic&&(LD[b[0]]||b[0]==='cmp'||b[0]==='lots'||b[0]==='land'||b[0]==='who')) return;
+    if(b[0]==='cmp') return;      /* Compare is fixed at the right with More and Me, always in reach (below) */
     if((i===6||i===12)&&sc.childNodes.length) sc.append(el('span',{class:'lsep'}));
     sc.append(el('button',{class:'lb',type:'button',id:'lb-'+b[0],title:b[2],'aria-label':b[2],'aria-pressed':'false',onclick:()=>barTap(b[0])},ico(b[0]),el('span',{class:'lt',text:b[1]}))); });
+  { const b=BAR.find(x=>x[0]==='cmp'); if(!schematic) fx.append(el('button',{class:'lb',type:'button',id:'lb-cmp',title:b[2],'aria-label':b[2],'aria-pressed':'false',onclick:()=>barTap('cmp')},ico('cmp'),el('span',{class:'lt',text:b[1]}))); }
   fx.append(el('button',{class:'lb',type:'button',id:'lb-opt',title:'Flight year, light direction, compare and line options','aria-label':'More map options',onclick:openSheet},ico('opt'),el('span',{class:'lt',text:'More'})));
   fx.append(el('button',{class:'lb',type:'button',id:'lb-loc',title:'Show where I am','aria-label':'Show where I am','aria-pressed':String(geo.id!==null),onclick:()=>{ if(map) locate(); }},ico('loc'),el('span',{class:'lt',text:'Me'})));
   const big=$('#app').classList.contains('mapbig');

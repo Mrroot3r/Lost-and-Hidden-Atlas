@@ -16,6 +16,15 @@ const { chromium } = require('playwright');
   // ---- upright: as it was
   let side=await R('#side'), stage=await R('#stage');
   ok('upright: the map is above the menu',stage.b<=side.t+1&&stage.w>380,[stage.b,side.t].join(' '));
+  // ---- upright: slimmer bars (the owner, November 28, 2026: "cut that bar by like 1/3", tabs "way smaller" with lines between them so
+  // the wrong one is not hit; Full dropped where the bar can be dragged; Compare always in reach, then More, then Me at the far right)
+  { const m=await p.evaluate(()=>{ const r=q=>{ const e=document.querySelector(q); return e?e.getBoundingClientRect():null; }, t=[...document.querySelectorAll('.tabs button')];
+      return {bar:r('#lbar').height,tabs:r('.tabs').height,tabW:Math.min(...t.map(x=>x.getBoundingClientRect().width)),lines:t.slice(1).every(x=>parseFloat(getComputedStyle(x).borderLeftWidth)>=1),
+        fix:[...document.querySelectorAll('#lfix .lb')].filter(x=>x.offsetParent!==null).map(x=>x.id),inScroll:!!document.querySelector('#lscroll #lb-cmp'),ic:r('#lb-streets svg').height,txt:parseFloat(getComputedStyle(document.querySelector('#lb-streets')).fontSize)}; });
+    ok('upright: the layer bar is a third shorter than its old 54',m.bar<=39&&m.bar>=34,m.bar);
+    ok('upright: its icons and words are smaller, and still readable',m.ic<=18&&m.ic>=15&&m.txt>=10&&m.txt<11,[m.ic,m.txt].join(' '));
+    ok('upright: the tabs are much shorter than their old 45, with a line between each and room for a thumb across',m.tabs<=34&&m.tabs>=28&&m.lines&&m.tabW>=60,[m.tabs,m.lines,m.tabW].join(' '));
+    ok('upright: Compare, More and Me are always in reach, in that order, and there is no Full button',m.fix.join()==='lb-cmp,lb-opt,lb-loc'&&!m.inScroll,m.fix.join()); }
   // The compare divider pushed to the right edge: its right-hand label used to stick out past the screen, which made the page itself
   // wider than the phone. In the Android app the whole page could then be dragged about by the layer bar, with blank beside and below it.
   await p.evaluate(()=>{ document.getElementById('lb-cmp').click(); }); await p.waitForTimeout(500);
@@ -74,6 +83,7 @@ const { chromium } = require('playwright');
     ok(name+': the list is tall enough to scroll with a thumb',view&&view.h>=H-80,view&&view.h);
     ok(name+': the layer bar is at the top of the map, not along the bottom edge',bar&&bar.b<=H-120&&ls.b<=H-120&&bar.l>=stage.l-1,bar&&[bar.t,bar.b].join(' '));
     ok(name+': the Full button is there',(await R('#lb-big'))!==null);
+    ok(name+': Compare, More, Me and Full are fixed at the right of the bar',await p.evaluate(()=>[...document.querySelectorAll('#lfix .lb')].filter(x=>x.offsetParent!==null).map(x=>x.id).join())==='lb-cmp,lb-opt,lb-loc,lb-big');
     ok(name+': tabs fit in the column',await p.evaluate(()=>{ const t=document.querySelector('.tabs'); return t.scrollWidth<=t.clientWidth+1; }));
     // a finger drag on the map moves the map
     const c0=await p.evaluate(()=>{ const c=window.__atlasMap.getCenter(); return [c.lat,c.lng]; });
