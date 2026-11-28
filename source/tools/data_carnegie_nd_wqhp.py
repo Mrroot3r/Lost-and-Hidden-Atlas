@@ -1,0 +1,85 @@
+# November 24, 2026: Carnegie libraries of North Dakota, town and college: a batch of the pass the owner asked for to put
+# the buildings Andrew Carnegie paid for on the map.
+# Sources opened in this session: Wikipedia's state list and articles; the National Register survey "Philanthropically
+# Established Libraries in North Dakota" and single nominations; Prairie Public's Dakota Datebook; the libraries',
+# cities' and universities' own pages.
+# Pins: ArcGIS geocoder points for street addresses and corners and the list's own coordinates, looked at on the aerial.
+from data_b import N
+from data_ma import W
+BATCH={'key':'carnegie_nd_wqhp','label':'Carnegie libraries, North Dakota','added':'2026-11-28 01:34'}
+L=W('List of Carnegie libraries in North Dakota')
+MPS=['National Register: Philanthropically Established Libraries in North Dakota','https://npgallery.nps.gov/pdfhost/docs/NRHP/Text/64500383.pdf']
+def NR(ref,label): return ['National Register nomination: '+label,'https://npgallery.nps.gov/pdfhost/docs/NRHP/Text/'+ref+'.pdf']
+LIB='Still the public library.'
+PLACES=[
+N('bismarck-carnegie-library-site-nd','Site of the Bismarck Carnegie Library','Bismarck','nd','civic','gone',46.80749,-100.78306,'area','view','walk','','1916–1980',
+  "A colonial-style library by Frederick W. Keith of Grand Forks, built with $25,000 from the Carnegie Corporation; the books moved in on January 5, 1918, and wartime delays to the furniture put off the dedication (Wikipedia's list says it opened in July 1918). It was faced in dark red Hebron brick with Bedford stone trim. The library left in 1963, the city court used the building, and it was torn down on March 18, 1980.",
+  'What stands on the corner now was not found.',
+  '','Southwest corner of 6th Street and Thayer Avenue. Nothing of the library is left.',
+  [['Bismarck Public Library: history (PDF)','https://bismarcklibrary.org/DocumentCenter/View/45724/Frontier-Days-to-the-21st-Century---A-History-of-the-Bismarck-Public-Library-PDF'],['Dakota Datebook: Carnegie Library in Bismarck','https://news.prairiepublic.org/show/dakota-datebook-archive/2022-05-31/carnegie-library-in-bismarck'],L],brick='?'),
+N('devils-lake-carnegie-library-nd','Devils Lake Carnegie Library','Devils Lake','nd','civic','standing',48.11452,-98.86067,'exact','view','walk','','1908–2003',
+  "A one-storey, cross-shaped library by Joseph A. Shannon with a front portico, opened in January 1910 with no ceremony. It was the library until November 26, 2003, when the books moved to a new building on 7th Street. In 2015 it became furnished lofts; Wikipedia's list says it houses private businesses.",
+  'Cream brick from the Grand Forks Brick and Tile Company over a darker rough brick basement.',
+  '','623 4th Avenue NE. Private: look from the street.',
+  [W('Devils Lake Carnegie Library'),NR('02000132','Devils Lake Carnegie Library'),L],brick='no'),
+N('dickinson-carnegie-library-nd','Dickinson Carnegie Library','Dickinson','nd','civic','standing',46.88183,-102.78761,'exact','open','walk','','1908–',
+  "Designed by Joseph Bell DeRemer of Grand Forks, after Grafton's library in Prairie Public's account, and opened on January 3, 1910 with about 1,000 books; $10,600 of the $12,500 grant went into the building. A WPA wing was added in 1938 and another addition in 1975, and it is still the library.",
+  'White mottled brick with Bedford stone trim, all the brick from the Dickinson Fire and Pressed Brick Company.',
+  '','139 3rd Street West. '+LIB,
+  [W('Dickinson Area Public Library'),NR('08000735','Dickinson Carnegie Library'),['Dakota Datebook: Dickinson\'s Carnegie Library','https://news.prairiepublic.org/main-street/2019-06-13/dickinsons-carnegie-library'],L],
+  brick='no',hours='?'),
+N('fargo-carnegie-library-site-nd','Site of the Fargo Carnegie Library','Fargo','nd','civic','gone',46.87981,-96.78862,'area','view','walk','','1901–1970',
+  "Opened on January 26, 1903, when about 2,500 people came to see it; a semicircular bay stood on one side of its corner lot. A children's room went into the basement in 1936 and a new wing doubled it in 1939. The library moved to a new building in 1968 and the old one was torn down in 1970. Its site is given as the northeast corner of Roberts Street and First Avenue North (Prairie Public), at Roberts Street and Second Avenue North (the city), or 625 Second Avenue North (Wikipedia's list).",
+  'What stands there now was not found.',
+  '','Near Roberts Street and Second Avenue North; the three sources disagree on the corner. Nothing of the library is left.',
+  [['City of Fargo: library history','https://fargond.gov/city-government/departments/library/library-history'],['Dakota Datebook: Fargo\'s Carnegie Library','https://news.prairiepublic.org/show/dakota-datebook-archive/2022-05-22/fargos-carnegie-library'],MPS,L],brick='?'),
+N('grafton-carnegie-library-nd','Grafton Carnegie Library','Grafton','nd','civic','standing',48.41783,-97.41234,'exact','open','walk','','1902–',
+  "Opened on January 28, 1904, after a local drive raised $1,240 toward the $10,000 grant; the library calls Grafton the first city in North Dakota with a Carnegie library. An addition was begun in 1970, and the state survey says the building has lost its cornice and portico and had its walls lowered. Now the Carnegie Regional Library.",
+  'Much altered: the old cornice and portico are gone.',
+  '','49 West 7th Street. '+LIB,
+  [['Carnegie Regional Library: our history','https://graftonndlibrary.com/our-history/'],MPS,L],brick='?',hours='?'),
+N('grand-forks-carnegie-library-site-nd','Site of the Grand Forks Carnegie Library','Grand Forks','nd','civic','gone',47.92437,-97.03372,'area','view','walk','','1901–1972',
+  "Opened in 1903 to plans by Warren H. Milner of Chicago, with Joseph Bell DeRemer of Grand Forks in charge of the work; its basement hall sat 250, and the state survey says it looked almost the same as Minot's. The grant is given as $22,700 (Wikipedia's list) or $22,000 (the state survey). It closed in 1972 and was torn down when the new library was built.",
+  'What stands on the corner now was not found.',
+  '','Corner of North 5th Street and Alpha (1st) Avenue North. Nothing of the library is left.',
+  [['UND Scholarly Commons: Carnegie Library photo','https://commons.und.edu/gf-city-photos/150'],MPS,L],brick='?'),
+N('minot-carnegie-library-nd','Minot Carnegie Library','Minot','nd','civic','standing',48.23465,-101.29116,'exact','view','walk','','1908–1965',
+  "Built in 1911 by Woodruff and McGulpin of Minot, with Ionic sandstone columns and a frieze reading Carnegie Library. It was the library until 1965, then a senior centre, then stood empty until it was listed in 1980. In 2021 the city leased it to the Minot Area Council of the Arts.",
+  'Sandstone trim on buff and brown brick, washed over with white paint in the late 1970s.',
+  '','105 2nd Avenue SE. City-owned; look from the street.',
+  [W('Minot Carnegie Library'),NR('80002929','Carnegie Library, Minot'),['Minot Daily News, 2021','https://www.minotdailynews.com/life/arts-entertainment/2021/07/minot-area-council-of-the-arts-gains-future-lease-on-carnegie'],L],brick='no'),
+N('valley-city-carnegie-library-nd','Valley City Carnegie Library','Valley City','nd','civic','standing',46.92656,-98.00270,'exact','open','walk','','1901–',
+  "Built in 1903 to plans by William C. Albrant of Fargo, with four pink sandstone Tuscan columns, a cupola, a Tiffany window and most of its first oak furniture. A dome covered over in the 1960s or 1970s has been opened up and restored, helped by a 2024 drive. Still the Valley City Barnes County Public Library.",
+  'Pink sandstone columns under a white pediment and a cupola.',
+  '','410 Central Avenue North. '+LIB,
+  [NR('79003724','Carnegie Library, Valley City'),['Carnegie Corporation: Valley City restoration','https://www.carnegie.org/our-work/article/north-dakota-valley-city-carnegie-library-restoration/'],['Valley City Barnes County Public Library','https://vcbclibrary.org'],L],
+  brick='?',hours='?'),
+N('fargo-college-carnegie-library-site-nd','Site of the Fargo College Carnegie Library','Fargo','nd','civic','gone',46.87436,-96.78798,'area','view','walk','','1905–1964',
+  "Theodore Roosevelt laid its cornerstone on September 5, 1910, on the college's hilltop in Island Park beside Jones Hall. After Fargo College closed in 1922 it was the home office of Western Life until it was torn down in 1964.",
+  'What stands there now was not found.',
+  '','In Island Park, from the coordinate in Wikipedia\'s list. Nothing of the library is left.',
+  [['Lost Colleges: Fargo College','https://www.lostcolleges.com/fargo-college'],L],brick='?'),
+N('putnam-hall-ndsu-fargo-nd','Putnam Hall, the old Carnegie Library of North Dakota Agricultural College','Fargo','nd','civic','standing',46.89095,-96.80051,'exact','view','walk','','1905–',
+  "A Classical Revival library on a Greek cross plan by W. C. Albrant, begun in 1905 and dedicated on January 18, 1906; Carnegie gave $15,000 and $3,400 more, and President Worst raised $4,500. Later the music department's, it now holds university departments and the graduate school.",
+  'Yellow brick with brick corner quoins, sandstone trim and a small cupola.',
+  '','1349 12th Avenue North, on the NDSU campus. Look from outside.',
+  [['NDSU: Putnam Hall','https://www.ndsu.edu/alphaindex/buildings/Building::391'],['NDSU Archives: the library','https://library.ndsu.edu/fargo-history/index3714.html?q=content/library'],NR('86003261','North Dakota State University District'),L],brick='no'),
+N('carnegie-hall-und-grand-forks-nd','Carnegie Hall, University of North Dakota','Grand Forks','nd','civic','standing',47.91932,-97.07177,'exact','view','walk','','1906–',
+  "Built in 1907 and 1908 to plans by Patton and Miller of Chicago; the legislature would not add to the $30,000 grant, so President Merrifield lent $6,000 of his own. It stopped being the library in 1927, 1928 or 1929 (sources differ), then served as the dining hall and the home economics building, and now holds university offices.",
+  'The 1929 addition is red brick matched to the first building.',
+  '','250 Centennial Drive, on the UND campus. Look from outside.',
+  [['Clio: Carnegie Hall','https://theclio.com/tour/847/4'],NR('08001233','University of North Dakota Historic District'),L],brick='?'),
+]
+PIN_NOTES={
+  'bismarck-carnegie-library-site-nd':"Gone; at the street corner the library's history names (the southwest corner).",
+  'devils-lake-carnegie-library-nd':'On the building, from the address, checked on the aerial.',
+  'dickinson-carnegie-library-nd':'On the building, from the address, checked on the aerial.',
+  'fargo-carnegie-library-site-nd':"Gone; from the coordinate in Wikipedia's state list. Sources give three different corners, so the pin is near.",
+  'grafton-carnegie-library-nd':'On the building, from the address, checked on the aerial.',
+  'grand-forks-carnegie-library-site-nd':'Gone; at the street corner a university archive caption names.',
+  'minot-carnegie-library-nd':'On the building, from the address, checked on the aerial.',
+  'valley-city-carnegie-library-nd':'On the building, from the address, checked on the aerial.',
+  'fargo-college-carnegie-library-site-nd':"Gone; from the coordinate in Wikipedia's state list.",
+  'putnam-hall-ndsu-fargo-nd':'On the building, from the address, checked on the aerial.',
+  'carnegie-hall-und-grand-forks-nd':'On the building, from the address, checked on the aerial.',
+}
