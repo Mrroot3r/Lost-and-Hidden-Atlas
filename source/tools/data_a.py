@@ -67,7 +67,7 @@ A=[
 (66,'east-albany-yards','East Albany freight yards','Rensselaer','renss','rail','gone',42.6415,-73.7455,'area','public','drive','',{'years':'burned 1861'}),
 (67,'albany-hudson-trolley','Albany & Hudson third-rail trolley','Nassau','renss','rail','traces',42.53541,-73.60864,'exact','public','walk','',{'years':'1899–1929','accn':'The pin is one trail marker near Nassau; the whole 36-mile bed is the public Albany–Hudson Electric Trail.'}),
 (68,'vale-burial-ground','African American burial ground, Vale Cemetery','Schenectady','sch','burial','marker',42.80406,-73.92240,'site','public','walk','now,cemeteries',{'years':'moved 1863; survey 2026'}),
-(69,'stockade-churchyard','Stockade\'s lost churchyard','Schenectady','sch','burial','gone',42.81825,-73.94569,'area','public','walk','cemeteries',{'years':'moved 1859–1879'}),
+(69,'stockade-churchyard','Stockade\'s lost churchyard','Schenectady','sch','burial','gone',42.81825,-73.94569,'area','public','walk','cemeteries',{'years':'moved 1859–1879','apart':'queens-fort: the fort of about 1705 stood by the churchyard; a fort and a burial ground'}),
 (70,'queens-fort','Queen\'s Fort site','Schenectady','sch','fort','marker',42.8183,-73.945772,'exact','public','drive','forts',{'years':'c.1705–1780s'}),
 (71,'burr-bridge','Burr\'s Mohawk bridge abutment','Schenectady','sch','landmark','traces',42.8186,-73.9495,'site','public','walk','',{'years':'1808–1926'}),
 (72,'erie-boulevard','Erie Boulevard, the filled canal','Schenectady','sch','canal','gone',42.81422,-73.9441,'site','public','drive','canal',{'years':'1825–1917'}),

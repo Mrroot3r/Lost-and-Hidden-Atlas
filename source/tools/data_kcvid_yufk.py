@@ -107,7 +107,7 @@ N('mark-twain-tower-kc', 'Kansas City Athletic Club building (Mark Twain Tower, 
   look='A 22-storey tower at Eleventh and Baltimore. What is left of the club and hotel inside was not checked.',
   accn='Private building at Eleventh Street and Baltimore Avenue. Seen from the street. ' + DTKC,
   links=[W('Kansas City Athletic Club')],
-  hours='', brick='?'),
+  hours='', brick='?',apart="kansas-city-club-building-mo: a different club's building two blocks away; this was the Kansas City Athletic Club"),
 
 N('aladdin-hotel-kc', 'Aladdin Hotel', 'Kansas City', 'kcmo', 'hotel', 'standing',
   39.09948, -94.58526, 'exact', 'view', 'drive', 'hotels', '1925',

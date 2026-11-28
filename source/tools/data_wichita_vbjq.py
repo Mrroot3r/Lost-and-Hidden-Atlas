@@ -38,7 +38,7 @@ N('soldiers-sailors-monument-wichita','Sedgwick County Memorial Hall and Soldier
   'A domed granite Civil War memorial with its own small locked hall, beside the 1888 courthouse.',
   '510 North Main Street, on the lawn of the old courthouse, downtown Wichita; street parking. Seen from the courthouse grounds.',
   [W('Sedgwick County Memorial Hall and Soldiers and Sailors Monument'),['Kansas Historical Society: Sedgwick County register listings (page 12)',KSR%'12']],
-  brick='no'),
+  brick='no',apart='old-sedgwick-county-courthouse-wichita: the monument stands on the lawn of the old courthouse, which has its own entry'),
 N('carnegie-library-wichita','Wichita City Carnegie Library Building','Wichita, Kansas','ks','civic','standing',37.684338,-97.337842,'exact','view','drive','','1915',
   'Wichita\'s Carnegie library, built in 1915 and listed on the National Register in 1987; the register names Anthony Allaire Crowell as architect. After the new central library opened in 1966 it held city offices and the municipal court, then from 1976 the Wichita Omnisphere and Science Center, followed by other tenants.',
   'A two-storey Beaux Arts building of cut limestone on a raised foundation, with an entry pavilion in the middle of its west front and a short square tower with a tiled hipped roof and windows of translucent glass (Wikipedia). It stands just south of the old City Hall. Interior not checked.',

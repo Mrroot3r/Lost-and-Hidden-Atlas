@@ -84,7 +84,7 @@ N('westport-junior-high-school-kc', 'Westport Junior High School (Westport Middl
   look='Red brick walls with limestone and terra cotta ornament that mixes Jacobethan strapwork, Italian arcaded windows and Beaux-Arts festoons and shields. Inside, the form lists plasterwork at the entrance and auditorium, marble floors on the first floor, built-in lockers and a three-storey auditorium. The form gives the use as education in 2014; present use not checked.',
   accn=STREET + 'East 39th Street, three blocks east of 39th and Main.',
   links=[['National Register registration form, Westport Junior High School (2014)', NPS % '14000162']],
-  brick='yes'),
+  brick='yes',apart='westport-high-school-kc: the 1908 high school across East 39th Street; this is the 1924 junior high'),
 
 N('agee-apartments-historic-district-linwood-kc', 'Agee Apartments Historic District, 3200-3218 Linwood Boulevard', 'Kansas City', 'kcmo', 'landmark', 'standing',
   39.06817, -94.54587, 'site', 'view', 'drive', '', '1925',
