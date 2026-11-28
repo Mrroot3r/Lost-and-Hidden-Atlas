@@ -64,7 +64,7 @@ REGION={'ny':{'Albany':'albco','Rensselaer':'renss','Schenectady':'sch','Saratog
  'Worcester':'TODO: region: cmass (Quabbin and central) or worc (Worcester and Blackstone Valley)','Middlesex':'TODO: region: bos (Greater Boston and MetroWest) or nshore (Merrimack Valley)'}}
 for _c in ('Warren','Essex','Hamilton','Franklin','Clinton','Fulton','Herkimer'): REGION['ny'][_c]='adk'
 # Missouri has two Atlas regions: the Kansas City country (kcmo) and the rest of the state (mo, '*': every other county). Kansas is one region.
-REGION['mo']={c:'kcmo' for c in ('Jackson','Clay','Platte','Cass','Ray','Lafayette','Johnson','Clinton','Buchanan','Caldwell','Bates','Henry','Carroll','Saline','Pettis','DeKalb','Andrew')}
+REGION['mo']={c:'kcmo' for c in ('Jackson','Clay','Platte','Cass')}      # Kansas City and the country within about 60 km of it (tools/check.py, CITY_REG); every other county, St. Joseph's and Lexington's among them, is 'mo'
 REGION['mo']['*']='mo'
 REGION['ks']={'*':'ks'}
 def region_of(st,county):

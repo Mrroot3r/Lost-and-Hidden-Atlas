@@ -10,7 +10,7 @@ from data_ma import W
 LNR = ['Missouri State Parks: Lafayette County National Register listings', 'https://mostateparks.com/basic-page/missouri-national-register-listings/Lafayette']
 
 PLACES = [
-N('machpelah-cemetery-lexington-mo', 'Machpelah Cemetery', 'Lexington', 'kcmo', 'burial', 'standing',
+N('machpelah-cemetery-lexington-mo', 'Machpelah Cemetery', 'Lexington', 'mo', 'burial', 'standing',
   39.17871, -93.87286, 'site', 'view', 'drive', 'cemeteries', '1839–',
   'The first burial here, in 1839, was in the Waddell family cemetery. In 1849 William Bradford Waddell gave it and nearby land to form Machpelah, which the city says an act of the Missouri General Assembly set up that year. '
   'Soldiers from both sides of the 1861 Battle of Lexington are buried here, and so are victims of the 1852 Saluda steamboat explosion, in a mass grave with a memorial. It was added to the National Register in 2022.',
@@ -19,7 +19,7 @@ N('machpelah-cemetery-lexington-mo', 'Machpelah Cemetery', 'Lexington', 'kcmo', 
   links=[['City of Lexington: Machpelah Cemetery', 'https://lexingtonmo.gov/machpelahcemetery'], ['Lexington Area Chamber of Commerce: Machpelah Cemetery', 'https://historiclexington.com/?p=5822'], LNR],
   conf='mixed', brick='?'),
 
-N('forest-grove-cemetery-lexington-mo', 'Forest Grove Cemetery', 'Lexington', 'kcmo', 'burial', 'standing',
+N('forest-grove-cemetery-lexington-mo', 'Forest Grove Cemetery', 'Lexington', 'mo', 'burial', 'standing',
   39.20109, -93.86408, 'area', 'view', 'drive', 'cemeteries', '1854–',
   'The town of Lexington held this ground by 1854. It may have been a burying place for enslaved people and a pauper\'s field; on October 28, 1890 the city deeded it to "trustees for the colored people of Lexington, Missouri". '
   'George H. Green, who was principal of the Douglass School from 1886 to 1936, is buried here, and so is the Black baseball pitcher William Lindsay. It was added to the National Register in 2022.',
@@ -28,7 +28,7 @@ N('forest-grove-cemetery-lexington-mo', 'Forest Grove Cemetery', 'Lexington', 'k
   links=[['Lexington Area Chamber of Commerce: Forest Grove Cemetery', 'https://historiclexington.com/?p=5895'], LNR],
   conf='mixed', brick='?'),
 
-N('madonna-of-the-trail-lexington-mo', 'Madonna of the Trail, Lexington', 'Lexington', 'kcmo', 'curio', 'marker',
+N('madonna-of-the-trail-lexington-mo', 'Madonna of the Trail, Lexington', 'Lexington', 'mo', 'curio', 'marker',
   39.18662, -93.88628, 'exact', 'view', 'drive', '', '1928',
   'A statue of a pioneer mother with a baby and a boy, unveiled on September 17, 1928 by the Missouri Daughters of the American Revolution. August Leimbach of St. Louis made it. It is one of 12 along the National Old Trails Road, and Jackson County judge Harry Truman gave the main speech. A Potawatomi "Trail of Death" marker of 1838 shares the spot.',
   look='A ten-foot statue of Missouri granite on a square base, with the DAR\'s inscription on the front and the names of Lexington traders such as the Aull brothers and Russell, Majors and Waddell on one side. Views over the Missouri valley.',
@@ -36,7 +36,7 @@ N('madonna-of-the-trail-lexington-mo', 'Madonna of the Trail, Lexington', 'Lexin
   links=[['Waymarking: Madonna of the Trail, Lexington', 'https://www.waymarking.com/waymarks/WMBK33_Madonna_of_the_Trail_Lexington_Missouri'], W('Madonna of the Trail'), ['Lexington Area Chamber of Commerce: Must See', 'https://historiclexington.com/visit-lexington/must-see/']],
   conf='mixed', brick='no'),
 
-N('christ-episcopal-church-lexington-mo', 'Christ Episcopal Church', 'Lexington', 'kcmo', 'worship', 'standing',
+N('christ-episcopal-church-lexington-mo', 'Christ Episcopal Church', 'Lexington', 'mo', 'worship', 'standing',
   39.18470, -93.87975, 'exact', 'open', 'drive', '', '1848',
   'The parish was founded in 1844 by Bishop Jackson Kemper, and the Gothic Revival church was built in 1848 of pink brick. Cannon fire hit it in the 1861 Battle of Lexington. The bell tower was added in 1890. One source attributes the design to the Rev. J. W. Dunn; another page names a different person, so the designer is not settled.',
   look='Gothic Revival brick church with an open-truss roof, lancet windows with some fine painted glass (the Register form, as a marker quotes it, says glass by Booth of New York in the chancel in 1884), walnut furnishings, original pews and a small tracker organ brought by steamboat in 1870. The 1890 tower has battlements. Inside not seen.',
@@ -44,7 +44,7 @@ N('christ-episcopal-church-lexington-mo', 'Christ Episcopal Church', 'Lexington'
   links=[['Christ Church, Lexington (parish page)', 'https://christchurchlexington.diowestmo.org/'], ['Waymarking: Christ Episcopal Church (copies the marker and Register text)', 'https://www.waymarking.com/waymarks/WM11846_Christ_Episcopal_Church_Lexington_MO']],
   conf='mixed', brick='yes', hours='Sunday service 10 a.m. (parish page); other times not listed'),
 
-N('zion-ame-church-lexington-mo', 'Zion African Methodist Episcopal Church', 'Lexington', 'kcmo', 'worship', 'standing',
+N('zion-ame-church-lexington-mo', 'Zion African Methodist Episcopal Church', 'Lexington', 'mo', 'worship', 'standing',
   39.18711, -93.87613, 'area', 'view', 'drive', '', '1870',
   'Built in 1870 in the Romanesque style, this was once the largest Black congregation in Lafayette County. The AME church closed it in 2006 after the congregation shrank, and it was damaged by vandals. Missouri Preservation put it on its endangered list in 2010 and 2011. It was bought and restored in 2017 as an event space, and a comment on the Preservation page says it was bought again in 2023 for a house, so its present use is not settled.',
   look='A Romanesque church with its tower and the look of the 1870s. Look from the street at the walls and windows. Whether the interior survives was not found.',
@@ -52,7 +52,7 @@ N('zion-ame-church-lexington-mo', 'Zion African Methodist Episcopal Church', 'Le
   links=[['Missouri Preservation: Zion AME Church', 'https://preservemo.org/zion-african-methodist-episcopal-church/']],
   conf='mixed', brick='?'),
 
-N('saluda-memorial-heritage-park-lexington-mo', 'Saluda Memorial, Heritage Park', 'Lexington', 'kcmo', 'curio', 'marker',
+N('saluda-memorial-heritage-park-lexington-mo', 'Saluda Memorial, Heritage Park', 'Lexington', 'mo', 'curio', 'marker',
   39.18455, -93.88002, 'area', 'view', 'drive', '', '1852; memorial 2002',
   'On April 9, 1852 the steamboat Saluda blew up just above Lexington on the Missouri River, killing most of the people on board, many of them Latter-day Saint emigrants from Britain bound for Utah. The count differs: Wikipedia says over 100, a Lexington tourism page says about 75. Townspeople rescued survivors and took in orphans. The town put up this memorial in 2002 for the 150th year.',
   look='A small park memorial with information panels, a bell and a plaque of victims\' names, across from the Lexington Historical Museum. Many of the dead lie in Machpelah Cemetery, which has its own memorial.',
@@ -60,7 +60,7 @@ N('saluda-memorial-heritage-park-lexington-mo', 'Saluda Memorial, Heritage Park'
   links=[['VisitMO: Saluda Memorial at Heritage Park', 'https://visitmo.com/things-to-do/saluda-memorial-at-heritage-park'], W('Saluda (steamship)'), ['City of Lexington: Machpelah Cemetery', 'https://lexingtonmo.gov/machpelahcemetery']],
   conf='mixed', brick='?'),
 
-N('houx-hoefer-rehkop-house-higginsville-mo', 'Houx-Hoefer-Rehkop House', 'Higginsville', 'kcmo', 'landmark', 'standing',
+N('houx-hoefer-rehkop-house-higginsville-mo', 'Houx-Hoefer-Rehkop House', 'Higginsville', 'mo', 'landmark', 'standing',
   39.07583, -93.71861, 'site', 'view', 'drive', '', 'about 1882',
   'A two-story Italianate brick house in a T plan with a hipped roof, built about 1882. The front porch has four round columns and two pilasters with Corinthian capitals. It was added to the National Register in 1983, under the Houx, Hoefer and Rehkop family names. The land was first taken from the government in 1843 by the Speers, according to the search listing of the Register record; the form itself was not read.',
   look='Look for the Corinthian porch and the hipped roof from the road. A web search listing for the form says five brick chimneys painted white; not checked.',
@@ -68,7 +68,7 @@ N('houx-hoefer-rehkop-house-higginsville-mo', 'Houx-Hoefer-Rehkop House', 'Higgi
   links=[W('Houx-Hoefer-Rehkop House'), LNR],
   conf='mixed', brick='?'),
 
-N('dinwiddie-house-dover-mo', 'James M. Dinwiddie House (Maple Grove Stock Farm)', 'Dover', 'kcmo', 'landmark', 'standing',
+N('dinwiddie-house-dover-mo', 'James M. Dinwiddie House (Maple Grove Stock Farm)', 'Dover', 'mo', 'landmark', 'standing',
   39.19222, -93.70167, 'area', 'view', 'drive', '', 'about 1840',
   'A two-story brick house of about 1840 in vernacular Greek Revival style, with a central passage, a one-story portico on the front and a one-story rear ell. Also known as Maple Grove Stock Farm, it is one of the antebellum houses of Lafayette and nearby counties listed on the National Register together in 1997.',
   look='A brick house of the I-house plan. A web search listing places it about a quarter mile east of the US 24 and Missouri 184 junction near Dover.',
@@ -76,7 +76,7 @@ N('dinwiddie-house-dover-mo', 'James M. Dinwiddie House (Maple Grove Stock Farm)
   links=[W('James M. Dinwiddie House'), LNR],
   conf='mixed', brick='?'),
 
-N('george-johnson-house-lexington-mo', 'George Johnson House', 'Lexington', 'kcmo', 'landmark', 'standing',
+N('george-johnson-house-lexington-mo', 'George Johnson House', 'Lexington', 'mo', 'landmark', 'standing',
   39.18528, -93.85444, 'area', 'view', 'drive', '', 'about 1894',
   'A frame house of about 1894 in the Queen Anne style, with a contributing two-story building behind that served as a summer kitchen and servants\' quarters. It was added to the National Register in 1993.',
   look='A Queen Anne frame house; look from the street for its porch and trim. The rear outbuilding is the unusual survivor. Not seen from inside.',

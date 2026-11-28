@@ -86,7 +86,7 @@ N('robert-a-brown-house-harrisonville-mo', 'Robert A. Brown House', 'Harrisonvil
   links=[W('Robert A. Brown House')],
   conf='mixed', brick='yes', hours=''),
 
-N('obannon-homestead-garden-city-mo', 'O\'Bannon Homestead (Schuyler Stock Farm)', 'Garden City', 'kcmo', 'landmark', 'standing',
+N('obannon-homestead-garden-city-mo', 'O\'Bannon Homestead (Schuyler Stock Farm)', 'Garden City', 'mo', 'landmark', 'standing',
   38.57333, -94.15694, 'site', 'view', 'drive', '', '1893',
   'Wikipedia describes a farm complex near Garden City, also known as Schuyler Stock Farm, Steeple House and Four Leaf Clover Farm. The 1893 two-storey frame farmhouse has Queen Anne decoration. '
   'Six outbuildings also count: a wash house and smokehouse, work house, pump house, chicken house, outhouse and barn. It was listed on the National Register in 1979.',

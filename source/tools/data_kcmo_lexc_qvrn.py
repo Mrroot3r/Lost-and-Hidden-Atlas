@@ -5,7 +5,7 @@ from data_b import N
 from data_ma import W
 
 PLACES = [
-N('commercial-community-district-lexington-mo', 'Commercial Community Historic District, Lexington', 'Lexington', 'kcmo', 'town', 'standing',
+N('commercial-community-district-lexington-mo', 'Commercial Community Historic District, Lexington', 'Lexington', 'mo', 'town', 'standing',
   39.18583, -93.88111, 'area', 'view', 'drive', '', '1830–1930',
   'This is the business centre of Lexington and the streets round it, built up between about 1830 and 1930. The National Register lists 106 buildings and one structure in it, in Late Victorian and Gothic Revival styles. The Lafayette County Courthouse stands inside it and is listed on its own.',
   look='Wikipedia names a former German Methodist Episcopal church (about 1878, rebuilt 1910, now a racquetball club), the Wright House (about 1840), Goehner\'s Marbleworks (about 1857), the First Presbyterian Church and a former beer cellar of about 1871 once run by Baehr, now a storage building. Walk the streets round the courthouse square. Interiors were not checked.',

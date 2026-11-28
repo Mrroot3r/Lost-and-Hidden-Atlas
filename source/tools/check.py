@@ -4,7 +4,7 @@
 --sources: check the place lists, the ledger and the privacy rule only, and skip "the built site matches the sources".
 That is for a branch that carries sources alone; GitHub builds the site and runs the full check (tools/ci_build.sh).
 Exit code 1 on any error. Warnings are for a person to read."""
-import sys,os,re,json,glob,importlib
+import sys,os,re,json,glob,importlib,math
 import brickrule
 SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
 REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
@@ -38,6 +38,7 @@ def state_of(lat,lon):
 # again (Ohio is 98 points), and along a big river they wander: downtown East Liverpool, Ohio is 1.1 km inside "West Virginia" and
 # downtown Steubenville 0.8 km. At 1 km a researched place was refused (November 24, 2026); 3 km clears every river town tried.
 EDGE=3000
+CITY_REG={'kcmo':(39.10,-94.58,60,'Kansas City, Missouri','mo')}      # region: (lat, lon, km, what it is, the region for everything further out)
 def near_state(lat,lon,k,m=1000):
     """is the point within m metres of state k's outline? The outlines are simplified to about a kilometre and run a few
     hundred metres off border rivers (the Salmon Falls at South Berwick, the Connecticut), so a pin on the right bank can
@@ -109,6 +110,10 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         if _tip and not(re.fullmatch(r'20\d\d-[01]\d-[0-3]\d',_tip) and _tip<=_ad[:10]): err.append(f"{w}: tip='{_tip}' must be the day the reader sent it, as YYYY-MM-DD, and not after the batch's own date")
         _bk=p.get('brick') or ''
         if _bk not in ('','yes','some','no','?'): err.append(f"{w}: brick='{_bk}' must be yes, some, no or ? (not checked)")
+        # A region named for one city is for that city and the country close round it. Missouri began as Kansas City alone (region
+        # kcmo), so sessions filed St. Louis, Hannibal and the capitol under it; 66 places were refiled on November 27, 2026.
+        if p.get('reg') in CITY_REG and math.hypot((p['lat']-CITY_REG[p['reg']][0])*111.2,(p['lon']-CITY_REG[p['reg']][1])*111.2*math.cos(math.radians(p['lat'])))>CITY_REG[p['reg']][2]:
+            err.append(f"{w}: reg='{p['reg']}' is the region for {CITY_REG[p['reg']][3]} and the country within {CITY_REG[p['reg']][2]} km of it, and this pin is further off: use reg='{CITY_REG[p['reg']][4]}'")
         _bp=brickrule.place_problem(p)      # the brick's colour and a fire-brick source, where given (tools/brickrule.py)
         if _bp: err.append(f"{w}: {_bp}")
         if not _bk and _ad[:10]>='2026-11-19': err.append(f"{w}: no brick=. Say whether red brick can be seen there: brick='yes' (mostly brick), 'some' (part brick), 'no', or '?' if no source or picture settles it")
