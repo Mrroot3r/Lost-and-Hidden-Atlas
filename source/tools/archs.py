@@ -5,6 +5,8 @@ tools/archrule.py holds the rules and the list of spellings.
                                       record it (give "" for the architect when only the builder is known). A place that
                                       already has a row keeps it in the same file; a new one goes in this workspace's own
                                       tools/archs_<four letters>.py, which goes out with tools/publish.sh
+   python3 tools/archs.py rows <file.json>   many at once: {"<id>": ["<architects>", "<builder>", "<how it is known>"]}; a place that
+                                      names somebody already is left alone
    python3 tools/archs.py list [name]  everything recorded in the archs files, or the rows that name somebody
    python3 tools/archs.py count        how many places each name is on, most first (from build/sites.json)
    python3 tools/archs.py wikidata     fill in from Wikidata, in one question: every National Register listing's
@@ -49,6 +51,18 @@ if a[:1]==['set']:
     p=A.row_problem((a[2],b,a[3]))
     if p: sys.exit('Not recorded: '+p)
     by=put({pid:row}); print('Recorded in %s: %s  %s%s. It goes out with your pull request (tools/publish.sh).'%(list(by)[0],pid,row[0] or '(no architect)',', built by '+row[1] if row[1] else '')); sys.exit(0)
+if a[:1]==['rows']:      # many at once, from a file: {"<id>": ["<architects>", "<builder>", "<how it is known>"]}. A place that names somebody already is left alone.
+    if len(a)!=2: sys.exit('python3 tools/archs.py rows <file.json>')
+    S={s['id']:s for s in sites()}; have=allrows(); rows={}; bad=[]
+    for pid,v in json.load(open(a[1],encoding='utf-8')).items():
+        if pid not in S: bad.append('%s: not a place id'%pid); continue
+        if S[pid].get('ar') or S[pid].get('bb') or pid in have: continue
+        p=A.row_problem(tuple(v))
+        if p: bad.append('%s: %s'%(pid,p)); continue
+        rows[pid]=('; '.join(A.names(v[0])),'; '.join(A.names(v[1])),str(v[2]).strip())
+    by=put(rows) if rows else {}
+    for b in bad[:40]: print('  refused  '+b)
+    print('%d row(s) recorded in %s; %d refused.'%(len(rows),', '.join(by) or 'no file',len(bad))); sys.exit(0)
 if a[:1]==['list']:
     d=allrows(); q=A.key(a[1]) if len(a)>1 else ''; n=0
     for k in sorted(d):

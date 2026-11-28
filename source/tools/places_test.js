@@ -502,7 +502,7 @@ const { chromium } = require('playwright');
       ok('architects: the place data names them, and some are on several places',!!pick.name&&pick.n>=5,JSON.stringify(pick));
       await p.goto(url+'#'+pick.id); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900);
       const line=await p.evaluate(()=>{ const l=document.querySelector('#v-detail .archline'); return l?{t:l.textContent,btn:[...l.querySelectorAll('button')].map(b=>b.textContent)}:null; });
-      ok('architects: the place page says who, and how many more of theirs are on the Atlas',!!line&&/^Architect/.test(line.t)&&line.btn.includes(pick.name)&&new RegExp((pick.n-1)+' more on the Atlas').test(line.t),JSON.stringify(line));
+      ok('architects: the place page says who, and how many more of theirs are on the Atlas',!!line&&/^Designed by: /.test(line.t)&&line.btn.includes(pick.name)&&new RegExp((pick.n-1)+' more on the Atlas').test(line.t),JSON.stringify(line));
       await p.evaluate(n=>{ [...document.querySelectorAll('#v-detail .archline button')].find(b=>b.textContent===n).click(); },pick.name); await p.waitForTimeout(500);
       const got=await p.evaluate(()=>({n:+document.querySelector('#count').textContent.split(' ')[0],chip:(document.querySelector('#linechip')||{}).textContent||'',list:!!document.querySelector('#list li'),detail:(document.querySelector('#v-detail')||{}).hidden}));
       ok('architects: a tap lists that name\'s places, all of them and only them, and says whose they are',got.n===pick.n&&got.chip.indexOf('By '+pick.name)>=0&&got.list,JSON.stringify(got));

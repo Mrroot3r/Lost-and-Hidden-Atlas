@@ -117,6 +117,10 @@ for s in sites:
     v=ARCHS.get(s['id'])
     if v and 'ar' not in s and archrule.names(v[0]): s['ar']=archrule.names(v[0])
     if v and 'bb' not in s and archrule.names(v[1]): s['bb']=archrule.names(v[1])
+_one=archrule.unify([s.get('ar',[])+s.get('bb',[]) for s in sites])      # one spelling for one name across the whole map, so a tap on it finds every place
+for s in sites:
+    for _k in ('ar','bb'):
+        if _k in s: s[_k]=_one(s[_k])
 # Hours looked up after a place was written: tools/hours_*.py, each HOURS={id:(hours, day read 'YYYY-MM-DD', the page's address, opens)}
 # (tools/hours.py writes them). They win over the place's own hours=, carry their own date, and when 'opens' is true a place
 # that was only 'view' or 'public' becomes 'open'. hours '?' means looked for and not found: nothing is shown.
