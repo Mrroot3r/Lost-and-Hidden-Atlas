@@ -1,0 +1,25 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'bristol-wells-nv':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Bristol_Wells_Townsite_%2854105626709%29.jpg/960px-Bristol_Wells_Townsite_%2854105626709%29.jpg', 900, 675, 'BLM Nevada', 'Public domain', 'https://commons.wikimedia.org/wiki/File:Bristol_Wells_Townsite_(54105626709).jpg', '2026-11-28', 'far'),
+ 'cleveland-museum-of-art':('', '2026-11-22', 'artworks inside the museum and close views of The Thinker statue; none shows the building from outside', 3),
+ 'cuthbert-carnegie-library-ga':('https://thumb.wikimedia.org/wikipedia/commons/thumb/6/60/Randolph_County_Chamber_of_Commerce%2C_Old_Carnegie_Library.JPG/960px-Randolph_County_Chamber_of_Commerce%2C_Old_Carnegie_Library.JPG', 900, 675, 'Michael Rivera', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Randolph_County_Chamber_of_Commerce,_Old_Carnegie_Library.JPG', '2026-11-28', 'pin+name'),
+ 'district-school-4-coventry':('', '2026-11-22', 'a church 390 m away, not the school', 3),
+ 'elsah-ice-house-ruin':('', '2026-11-23', 'only a painted frame house on Mill and Selma; the place is a limestone building', 3),
+ 'fort-branch-hamilton':('', '2026-11-22', 'Brooklyn libraries, a Bay Ridge railway and brush fires elsewhere', 3),
+ 'fort-pemberton-greenwood':('', '2026-11-23', 'only a battle map and Vicksburg prints, no photograph of the site', 3),
+ 'hayes-memorial-library-millbrook':('', '2026-11-23', 'street scenes, a shop, the town hall and a fungus; not the library', 3),
+ 'iron-hill-ore-pits':('', '2026-11-23', 'plants and fungi only', 3),
+ 'irondale-schoolhouse-millerton':('', '2026-11-23', "Candidates were night views of Millerton's Main Street and shops; none showed the schoolhouse.", 3),
+ 'knox-hamlet':('', '2026-11-22', "bird's-eye maps of Knoxville, Tennessee", 3),
+ 'lehigh-gap-toll-house':('', '2026-11-23', 'road and hillside views only; no candidate shows the toll house', 3),
+ 'millbrook-village-centre':('', '2026-11-23', 'a fungus and a convenience store', 3),
+ 'pleasant-valley-mill-site-park':('', '2026-11-23', 'places named Pleasant Valley in Georgia, New Jersey and Massachusetts', 3),
+ 'prudhomme-rouquier-house':('', '2026-11-23', 'Candidates were Natchitoches street views and Christmas lights; none clearly showed this house.', 3),
+ 'roanoke-canal-trail':('', '2026-11-22', 'only a Greetings from Roanoke Rapids postcard of the town', 3),
+ 'sitka-pioneer-home':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Alaska_Pioneers_Home_-_panoramio.jpg/960px-Alaska_Pioneers_Home_-_panoramio.jpg', 900, 600, 'Federico Pizano', 'CC BY 3.0', 'https://commons.wikimedia.org/wiki/File:Alaska_Pioneers_Home_-_panoramio.jpg', '2026-11-28', 'pin+name'),
+ 'st-charles-hall-carroll-college':('', '2026-11-22', "O'Connell Hall with a person as subject, a nearby house and unrelated artwork", 3),
+ 'stone-grist-mill-st-johnsville':('', '2026-11-23', 'only a Michigan mill (Fleming Creek, Ann Arbor) and a different building', 3),
+ 'wildwood-cemetery-fisher-chapel-lyons-falls':('', '2026-11-23', 'chapels and cemeteries in Williamsport PA, Florida and Massachusetts, not this Lyons Falls cemetery', 3),
+ 'ywca-building-helena':('', '2026-11-22', 'the Olsen House next door', 3),
+}
