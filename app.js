@@ -283,7 +283,7 @@ function archShow(n){ clearF(); F.arch=n; const q=$('#q'); if(q) q.value=''; des
 function archLine(s){ const part=(label,list)=>{ if(!list||!list.length) return []; const out=[el('span',{class:'lbl2',text:label+': '})];
     list.forEach((n,i)=>{ const c=archCount(n); if(i) out.push(', ');
       if(c>1){ out.push(el('button',{class:'linkbtn archbtn',type:'button',title:'Show every place on the Atlas by '+n,onclick:()=>archShow(n)},n)); out.push(el('span',{class:'more',text:' · '+(c-1)+' more on the Atlas'})); } else out.push(n); }); return out; };
-  const a=part('Designed by',s.ar), b=part('Built by',s.bb);      /* "Designed by", not "Architect": some are engineers of a bridge or an incline, and the Army's engineers */ if(!a.length&&!b.length) return null;
+  const a=part('Architect',s.ar), b=part('Built by',s.bb);      /* "Architect" though a few are engineers of a bridge or an incline: everybody knows the word and it is short (the owner, November 28, 2026) */ if(!a.length&&!b.length) return null;
   return el('p',{class:'archline'},...a,(a.length&&b.length)?el('br'):null,...b); }
 const BATCHES=D.batches||[];
 /* Five shortcuts (the owner, November 24, 2026: the row had become clutter). Gone: ruins you can walk to and within 30 minutes (the Near
