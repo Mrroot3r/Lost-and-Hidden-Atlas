@@ -23,3 +23,7 @@ Carnegie libraries of Alabama (14 places): 9 standing buildings, among them thre
 - Avondale in Birmingham (demolished 1961): the lot was not settled.
 - Talladega College (burned 1963; Sumner Hall of 1965 is on the site): no address found.
 - Pictures: Commons is slow without a login, so picture choices for this batch are left for a later pictures pass.
+
+## Tips for the next session
+
+- Wikipedia's state list and the Encyclopedia of Alabama gave most of the towns; the leads above need a local source, such as the town's own library or county historical society, to settle.
