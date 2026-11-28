@@ -143,7 +143,9 @@ def must(folder):
 
 if __name__=='__main__':
     folder=sys.argv[1] if len(sys.argv)>1 else os.path.dirname(os.path.abspath(__file__))
-    files,bad=check_folder(folder)
+    if os.path.isfile(folder): files,bad=[folder],check_file(folder,{})      # one list by name: until November 28, 2026 this said "0 place lists read", which read as a pass
+    elif not os.path.isdir(folder): sys.exit('%s is neither a folder nor a file'%folder)
+    else: files,bad=check_folder(folder)
     for b in bad: print(b)
-    print('%d place lists read, %s'%(len(files),'all of them only data' if not bad else '%d problem(s)'%len(bad)))
+    print('%d place list%s read, %s'%(len(files),'' if len(files)==1 else 's','all of them only data' if not bad else '%d problem(s)'%len(bad)))
     sys.exit(1 if bad else 0)

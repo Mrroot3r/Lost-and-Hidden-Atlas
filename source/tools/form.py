@@ -76,9 +76,15 @@ def moved(u):
     """an address of Missouri's that died when the state moved its forms"""
     return bool(re.search(r'mostateparks\.com/sites/mostateparks/files/|dnr\.mo\.gov/shpo/',u or ''))
 
-def ladder(u):
+def unreachable(why):
+    """the shell could not connect to the site at all (the network here lets few sites through), as against a page that answered 404 or 403"""
+    return bool(re.search(r'ProxyError|Tunnel connection failed|Name or service not known|NameResolution|Temporary failure in name resolution|Max retries exceeded|Connection refused|ConnectionError|Connection reset|Network is unreachable|timed out|SSLError',str(why or ''),re.I))
+def ladder(u,why=''):
     """what to try when a page will not open, in order. Never the Internet Archive through the web fetch tool: it is refused."""
     L=[]
+    if unreachable(why):
+        host=re.sub(r'^https?://([^/]+).*$',r'\1',u or '')
+        L.append('The web fetch tool, first, with this same address: the shell here could not connect to %s at all, which says nothing about the page. The web fetch tool takes another road and reads most such sites (it did for ohio.edu, sah-archipedia.org, in.gov and others on November 28, 2026). Do not retry page.py for this site in this session.'%host)
     if re.search(r'npgallery\.nps\.gov|mostateparks\.com|dnr\.mo\.gov|nps-nr|national.register|/NRHP/',u or '',re.I) or moved(u):
         L.append('python3 tools/form.py <the listing\'s reference number>   (or: form.py <state> "<part of the name>"): the Park Service\'s record, its form, and the state\'s copy at its present address')
     L+=['The site\'s own search or front page: a 404 often means the page moved, not that it is gone. Fetch the front page with page.py --all and look for the section.',

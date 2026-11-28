@@ -3,6 +3,7 @@
 historic-pockets layer (tools/pockets.py).
 
    python3 tools/nrhp_state.py "NEW YORK" ny        writes cache/nrhp/ny.json
+   python3 tools/nrhp_state.py ny                   the same: the name is looked up from the key
 
 The Park Service publishes two layers: points, and polygons for listings that have a mapped boundary (most historic
 districts). Each listing is kept once, with its name, kind (building, district, site, structure, object), town,
@@ -10,6 +11,11 @@ the number of contributing buildings it counts, a centre point, and for district
 The data is a work of the US government and in the public domain. The Park Service warns that positions are
 approximate (many are a single coordinate from the nomination form) and that a listing may no longer stand."""
 import sys,os,json,time,urllib.request,urllib.parse
+if len(sys.argv)==2 and len(sys.argv[1])==2:      # the key alone: the name comes from tools/states.py
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); from states import STATES as _ST
+    _s=next((s for s in _ST if s['k']==sys.argv[1].lower()),None)
+    if not _s: sys.exit('No state has the key "%s".'%sys.argv[1])
+    sys.argv=[sys.argv[0],_s['name'],_s['k']]
 if len(sys.argv)<3: sys.exit(__doc__)
 STATE,KEY=sys.argv[1].upper(),sys.argv[2]
 B='https://mapservices.nps.gov/arcgis/rest/services/cultural_resources/nrhp_locations/MapServer/'; UA={'User-Agent':'lost-hidden-atlas-research/1.0'}
@@ -50,6 +56,7 @@ for f in pull(1):
     e['w']=round(max(max(xs)-min(xs),(max(ys)-min(ys))*1.35)*82000)        # widest extent in metres, roughly
     if e['k']=='district' and len(ring)>3: e['poly']=simp(ring)
     L[a['NRIS_Refnum']]=e
+if not L: sys.exit('The Park Service returned no listings for %s: nothing was written. Check the state\'s name (as the Register writes it, e.g. "NEW YORK") or try again later.'%STATE)
 os.makedirs('cache/nrhp',exist_ok=True)
 json.dump(list(L.values()),open(f'cache/nrhp/{KEY}.json','w'),separators=(',',':'),ensure_ascii=False)
 from collections import Counter

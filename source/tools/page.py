@@ -37,13 +37,13 @@ def sentences(t):
         else: out.append(piece)
     return out
 os.makedirs('research/pages',exist_ok=True)
-def nexts(u):
+def nexts(u,why=''):
     """a page would not open: say what to try next, so nobody stops here (tools/form.py holds the list)"""
     try:
         sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import form
         if form.moved(u): print('   MISSOURI MOVED ITS REGISTER FORMS in 2025; this old address is dead but the form is very likely online. Run  python3 tools/form.py mo "<part of the listing\'s name>"  (or with its reference number).')
         print('   WHAT TO TRY NEXT, in order:')
-        for i,l in enumerate(form.ladder(u),1): print('   %d. %s'%(i,l))
+        for i,l in enumerate(form.ladder(u,why),1): print('   %d. %s'%(i,l))
     except Exception: pass
 def archived(u,why):
     """The newest copy the Internet Archive holds of a page that would not open, or None."""
@@ -94,7 +94,7 @@ for u in a:
         except Exception as e: why='ERROR '+str(e)[:90]
         if t is None:
             t=archived(u,why)
-            if t is None: print('##',u,'->',why,'and no archived copy was found'); nexts(u); print(); continue
+            if t is None: print('##',u,'->',why,'and no archived copy was found'); nexts(u,why); print(); continue
             if t=='': print(); continue
         open(p,'w',encoding='utf-8').write(t)
     m=re.match(r'<!-- archived copy of (\d{8})',t); raw=t
