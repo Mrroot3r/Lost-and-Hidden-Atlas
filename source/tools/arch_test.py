@@ -12,7 +12,7 @@ def ok(name,cond,extra=''):
     n[0]+=1; print(('ok   ' if cond else 'FAIL ')+name+(('  ['+str(extra)[:200]+']') if extra!='' else ''))
     if not cond: fails.append(name)
 HOW="Wikidata's entry for National Register listing 78001234"
-ok('names are split on semicolons, in order, without repeats',A.names('Wight and Wight; Louis Curtiss; Wight and Wight')==['Wight and Wight','Louis Curtiss'] and A.names(['A. B. Cross',' Louis Curtiss '])==['A. B. Cross','Louis Curtiss'] and A.names('')==[])
+ok('names are split on semicolons, in order, without repeats',A.names('Wight and Wight; Louis Curtiss; Wight and Wight')==['Wight and Wight','Louis Curtiss'] and A.names(['Philip Hooker',' Louis Curtiss '])==['Philip Hooker','Louis Curtiss'] and A.names('')==[])
 ok('"&" and "and", stops and spacing do not make two firms',A.key('McKim, Mead & White')==A.key('McKim, Mead and White')==A.key('McKim Mead  and White.') and A.key('H.H. Richardson')==A.key('H. H. Richardson'))
 ok('a spelling in the list is the same person',A.canon('Frank Packard')==A.canon('Frank L. Packard')=='Frank L. Packard',A.canon('Frank Packard'))
 ok('a name not in the list stays as written',A.canon('Louis Curtiss')=='Louis Curtiss')
@@ -22,6 +22,9 @@ ok('"unknown", a question mark or a sentence is not a name',all(A.place_problem(
 ok('a guess is not how it is known',bool(A.place_problem(dict(arch='Louis Curtiss',archw='Probably his, from the look of it'))))
 ok('a row in an archs file is (architects, builder, how)',A.row_problem(('Wight and Wight','',HOW)) is None and A.row_problem(('','W. H. Sternberg',HOW)) is None)
 ok('a row says something and says how',bool(A.row_problem(('','',HOW))) and bool(A.row_problem(('Louis Curtiss','',''))) and bool(A.row_problem(('Louis Curtiss',HOW))))
+ok('the list of spellings does not chain: what a spelling leads to is not itself led elsewhere',all(A.key(v) not in A._SAME or A._SAME[A.key(v)]==v for v in A.SAME.values()),[v for v in A.SAME.values() if A.key(v) in A._SAME and A._SAME[A.key(v)]!=v][:3])
+u=A.unify([['Holabird & Roche'],['Holabird and Roche','Louis Curtiss'],['Holabird and Roche'],['Wight & Wight']])
+ok('across the map one firm has one spelling: the commoner, or the one in the list',u(['Holabird & Roche','Louis Curtiss'])==['Holabird and Roche','Louis Curtiss'] and u(['Wight & Wight'])==['Wight and Wight'],u(['Holabird & Roche','Louis Curtiss']))
 # ---- the tool, in a scratch copy
 d=tempfile.mkdtemp(); T=os.path.join(d,'tools'); os.makedirs(T); os.makedirs(os.path.join(d,'build'))
 for f in('archs.py','archrule.py'): shutil.copy(os.path.join(W,'tools',f),T)
@@ -38,6 +41,9 @@ if fs:
     ok('a second answer for the same place replaces the row, in the same file',len([f for f in os.listdir(T) if f.startswith('archs_')])==1 and ns['ARCH']['a-bank'][0]=='Louis Curtiss',ns.get('ARCH'))
 r=run('set','no-such-place','Louis Curtiss',HOW); ok('set refuses an id that is not a place',r.returncode!=0)
 r=run('set','b-house','Unknown',HOW); ok('set refuses "Unknown"',r.returncode!=0,(r.stdout+r.stderr)[-120:])
+json.dump({'b-house':['Philip Hooker','',HOW],'c-hall':['Somebody Else','',HOW],'zz-nowhere':['Philip Hooker','',HOW],'a-bank':['Unknown','',HOW]},open(os.path.join(d,'rows.json'),'w'))
+r=run('rows',os.path.join(d,'rows.json')); ns={}; exec(open(os.path.join(T,fs[0])).read(),ns)
+ok('rows takes many at once: good ones in, a place that names somebody already left alone, bad ones refused and said',r.returncode==0 and ns['ARCH'].get('b-house',('',))[0]=='Philip Hooker' and 'c-hall' not in ns['ARCH'] and ns['ARCH']['a-bank'][0]=='Louis Curtiss' and 'zz-nowhere' in r.stdout,(r.stdout+r.stderr)[-300:])
 r=run('list'); ok('list shows what is recorded',r.returncode==0 and 'a-bank' in r.stdout and 'Louis Curtiss' in r.stdout,r.stdout[-200:])
 shutil.rmtree(d)
 print(f'{len(fails)} FAILED' if fails else f'arch test: {n[0]} checks passed'); sys.exit(1 if fails else 0)
