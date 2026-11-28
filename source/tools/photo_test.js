@@ -144,7 +144,7 @@ const { chromium } = require('playwright');
       await tap(); await p.waitForTimeout(400); const bk=await p.evaluate(()=>window.atlasBack()); await p.waitForTimeout(150);
       ok('the phone\'s Back button puts the large picture away and leaves the place page open',bk===true&&(await st())===null&&await p.evaluate(()=>!!document.querySelector('#v-detail .dphoto img'))); }
     const more=await p.evaluate(()=>{ const a=document.querySelector('#v-detail #d-morephotos'); return a?{href:a.getAttribute('href'),t:a.textContent,target:a.getAttribute('target')}:null; });
-    const nm=await p.evaluate(()=>document.querySelector('#v-detail h2').textContent);
+    const nm=await p.evaluate(()=>{ const h=document.querySelector('#v-detail h2'); return h.dataset.full||h.textContent; });
     ok('the place page has a "More photos" link that searches for pictures of it by name, outside the Atlas',!!more&&/^https:\/\/www\.google\.com\/search\?/.test(more.href)&&/udm=2|tbm=isch/.test(more.href)&&decodeURIComponent(more.href.replace(/\+/g,' ')).indexOf(nm)>=0&&more.target==='_blank',more?more.href.slice(0,120):'no link'); }
   await c.close(); await b.close();
   ok('no page errors',!errs.length,errs.slice(0,3).join(' | '));
