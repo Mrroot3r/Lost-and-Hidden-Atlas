@@ -1,0 +1,10 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'architecture-hall-unl-lincoln':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e4/UNL_Architecture_Hall_from_E_1.JPG/960px-UNL_Architecture_Hall_from_E_1.JPG', 900, 860, 'Ammodramus', 'CC0', 'https://commons.wikimedia.org/wiki/File:UNL_Architecture_Hall_from_E_1.JPG', '2026-11-28', 'pin+name'),
+ 'first-plymouth-church-lincoln':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/First_Plymouth_Church_%28Lincoln%2C_Nebraska%29.JPG/960px-First_Plymouth_Church_%28Lincoln%2C_Nebraska%29.JPG', 900, 614, 'Ammodramus', 'CC0', 'https://commons.wikimedia.org/wiki/File:First_Plymouth_Church_(Lincoln,_Nebraska).JPG', '2026-11-28', 'name'),
+ 'grand-manse-lincoln-ne':('https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Old_Federal_Bldg_%28Lincoln%2C_NE%29_from_NE_1.JPG/960px-Old_Federal_Bldg_%28Lincoln%2C_NE%29_from_NE_1.JPG', 900, 456, 'Ammodramus', 'CC0', 'https://commons.wikimedia.org/wiki/File:Old_Federal_Bldg_(Lincoln,_NE)_from_NE_1.JPG', '2026-11-28', 'pin+name'),
+ 'lincoln-va-hospital-historic-district':('https://thumb.wikimedia.org/wikipedia/commons/thumb/9/93/VA_Nebraska-Western_Iowa_Health_Care_System_Lincoln%2C_Lincoln%2C_Nebraska%2C_USA.jpg/960px-VA_Nebraska-Western_Iowa_Health_Care_System_Lincoln%2C_Lincoln%2C_Nebraska%2C_USA.jpg', 900, 506, 'Hanyou23', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:VA_Nebraska-Western_Iowa_Health_Care_System_Lincoln,_Lincoln,_Nebraska,_USA.jpg', '2026-11-28', 'name'),
+ 'pioneers-park-treasury-columns-lincoln':('', '2026-11-28', 'Commons offered no photograph of the columns near the pin or under their name', 3),
+ 'temple-building-unl-lincoln':('', '2026-11-28', 'neighbouring Lied Center, Hixson-Lied, buses and towers; none shows the Temple Building', 3),
+}
