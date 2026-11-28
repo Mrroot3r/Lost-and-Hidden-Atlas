@@ -80,7 +80,7 @@ N('new-hope-primitive-baptist-church-richmond-mo', 'New Hope Primitive Baptist C
   accn='A country church on Old Orrick Road off Highway EE, south-west of Richmond. Owned by the congregation. Look from the road; services and visiting times were not found.',
   links=[W('New Hope Primitive Baptist Church'), ['Ray County Genealogy: New Hope Church', 'https://ray.mogenweb.org/histsites/newhope/newhope.htm']], brick='no'),
 
-N('mansur-farmstead-rock-hall-richmond-mo', 'Isiah Mansur Farmstead (Rock Hall)', 'Richmond', 'kcmo', 'landmark', 'standing',
+N('mansur-farmstead-rock-hall-richmond-mo', 'Isiah Mansur Farmstead (Rock Hall)', 'Richmond', 'mo', 'landmark', 'standing',
   39.41278, -93.88639, 'area', 'view', 'drive', '', '1842–1945',
   'Rock Hall is a farm near Richmond that grew from the middle of the 1800s into the 1900s. The Wikipedia summary of its 1998 National Register listing names a two-storey, five-bay frame I-house (1842, with an addition of 1858), a buggy house (about 1905), a large barn (about 1909), an engine house (about 1900), and smaller farm buildings, wells and a smokehouse from about 1840 to 1945.',
   look='A working-farm group: the I-house, a big barn and a string of small outbuildings. The pin is the Register\'s point for the farm and was not checked on the aerial. Interior and condition not checked.',

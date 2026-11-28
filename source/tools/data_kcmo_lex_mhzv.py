@@ -10,7 +10,7 @@ VMO = ['VisitMO (Missouri tourism): Lexington Historical Museum', 'https://www.v
 LNR = ['Missouri State Parks: Lafayette County National Register listings', 'https://mostateparks.com/basic-page/missouri-national-register-listings/Lafayette']
 
 PLACES = [
-N('lafayette-county-courthouse-lexington-mo', 'Lafayette County Courthouse', 'Lexington', 'kcmo', 'civic', 'standing',
+N('lafayette-county-courthouse-lexington-mo', 'Lafayette County Courthouse', 'Lexington', 'mo', 'civic', 'standing',
   39.18548, -93.88317, 'site', 'public', 'drive', '', '1847–1849',
   'The county planned this Greek Revival courthouse in 1847, on the new Main Street, to replace the one in the old town. The accepted plans set aside $12,000 and the finished cost was $14,382. '
   'Wikipedia calls it the oldest courthouse in continuous use west of the Mississippi River. One of the sources gives the finishing year as 1849, so the completion date is not settled. '
@@ -21,7 +21,7 @@ N('lafayette-county-courthouse-lexington-mo', 'Lafayette County Courthouse', 'Le
   links=[W('Lafayette County Courthouse (Missouri)'), ['VisitMO: Lafayette County Courthouse', 'https://www.visitmo.com/things-to-do/lafayette-county-courthouse'], LNR],
   conf='mixed', brick='?', hours='?'),
 
-N('lexington-historical-museum-mo', 'Lexington Historical Museum (Cumberland Presbyterian Church)', 'Lexington', 'kcmo', 'worship', 'standing',
+N('lexington-historical-museum-mo', 'Lexington Historical Museum (Cumberland Presbyterian Church)', 'Lexington', 'mo', 'worship', 'standing',
   39.18515, -93.87974, 'exact', 'open', 'drive', '', '1846',
   'The Greek Revival building went up in 1846 as the Cumberland Presbyterian Church and was later the town library. A local gardening club helped restore it, and it opened as a museum in 1976. '
   'It stands in the Old Neighborhoods Historic District and was listed on the National Register in 1978.',
@@ -30,7 +30,7 @@ N('lexington-historical-museum-mo', 'Lexington Historical Museum (Cumberland Pre
   links=[W('Lexington Historical Museum'), VMO, LNR],
   brick='?', hours='?'),
 
-N('wentworth-military-academy-lexington-mo', 'Wentworth Military Academy campus', 'Lexington', 'kcmo', 'inst', 'standing',
+N('wentworth-military-academy-lexington-mo', 'Wentworth Military Academy campus', 'Lexington', 'mo', 'inst', 'standing',
   39.18662, -93.87288, 'site', 'view', 'drive', '', 'buildings from 1838; school 1880–2017',
   'Stephen Wentworth founded the military school in 1880, and it grew into one of six military junior colleges in the country. It closed in May 2017 and was sold in 2020 to a Christian arts organisation, Jubilee University. '
   'Wikipedia says the buildings have stood vacant since the closure and have fallen into disrepair. The 1980 National Register district names seven buildings from about 1830 to 1920: Hickman Hall (1907), "D" Company (1884), the Administration Building (1865, with later additions), the Student Union, the Marine Barracks, the Superintendent\'s Residence (1838 and 1848) and the Junior Barracks (1920).',
@@ -39,7 +39,7 @@ N('wentworth-military-academy-lexington-mo', 'Wentworth Military Academy campus'
   links=[W('Wentworth Military Academy and College'), LNR],
   conf='mixed', brick='?', hours=''),
 
-N('linwood-lawn-lexington-mo', 'Linwood Lawn', 'Lexington', 'kcmo', 'landmark', 'standing',
+N('linwood-lawn-lexington-mo', 'Linwood Lawn', 'Lexington', 'mo', 'landmark', 'standing',
   39.16523, -93.84745, 'exact', 'view', 'drive', '', '1850–1854',
   'Linwood Lawn is an Italianate brick house built between 1850 and 1854, 71 feet by 110 feet, with a heavy cornice, balustrades, bay windows and columns. A brick octagonal ice house stands on the grounds. It was listed on the National Register in 1973.',
   look='The house and the octagonal ice house are what the Register listing names. An older web listing describes the house as a bed and breakfast; whether it takes guests or visitors now was not checked.',
@@ -47,7 +47,7 @@ N('linwood-lawn-lexington-mo', 'Linwood Lawn', 'Lexington', 'kcmo', 'landmark', 
   links=[W('Linwood Lawn'), LNR],
   conf='mixed', brick='?'),
 
-N('confederate-memorial-chapel-higginsville-mo', 'Confederate Memorial State Historic Site: chapel, cottage and cemetery', 'Higginsville', 'kcmo', 'inst', 'standing',
+N('confederate-memorial-chapel-higginsville-mo', 'Confederate Memorial State Historic Site: chapel, cottage and cemetery', 'Higginsville', 'mo', 'inst', 'standing',
   39.09826, -93.72910, 'site', 'open', 'drive', 'cemeteries', '1891–1950',
   'From 1891 to 1950 these grounds were a home for old Confederate soldiers. The state took the site over after the last veteran died in 1950. '
   'Three things are on the National Register: a weatherboard chapel of 1892 with a tower and a stained glass window, moved in 1913 and returned in 1978; a small wooden cottage on a brick foundation; and a cemetery of 723 graves with a 1906 monument modelled on the Lion of Lucerne. '
@@ -58,7 +58,7 @@ N('confederate-memorial-chapel-higginsville-mo', 'Confederate Memorial State His
   th=[39.09858, -93.72894], thn='Parking by West 1st Street',
   brick='some', hours='Grounds sunrise to sunset daily; chapel and cemetery tours by appointment'),
 
-N('waddell-house-lexington-mo', 'Waddell House (Van Amburg House)', 'Lexington', 'kcmo', 'landmark', 'standing',
+N('waddell-house-lexington-mo', 'Waddell House (Van Amburg House)', 'Lexington', 'mo', 'landmark', 'standing',
   39.18389, -93.87472, 'exact', 'view', 'drive', '', 'about 1840',
   'A two-storey red brick house of about 1840 on a partial basement, with clustered chimney pots, scalloped bargeboards and a Victorian stickwork porch with a mansard roof. '
   'William Bradford Waddell took it in 1869 in trade for stock in the local Baptist Female College. It was listed on the National Register in 1979 and stands in the Old Neighborhoods Historic District.',
@@ -67,7 +67,7 @@ N('waddell-house-lexington-mo', 'Waddell House (Van Amburg House)', 'Lexington',
   links=[W('Waddell House (Lexington, Missouri)'), LNR],
   brick='yes'),
 
-N('hicklin-hearthstone-lexington-mo', 'Hicklin Hearthstone', 'Lexington', 'kcmo', 'landmark', 'standing',
+N('hicklin-hearthstone-lexington-mo', 'Hicklin Hearthstone', 'Lexington', 'mo', 'landmark', 'standing',
   39.18611, -93.82889, 'site', 'view', 'drive', '', 'about 1838',
   'A two-storey Greek Revival brick house with a pedimented portico, built about 1838 by James Hicklin, one of Lexington\'s earliest settlers. Wikipedia says its group of outbuildings is the most extensive of its kind in Missouri: a store house, carpenter\'s quarters, wash house, servants\' quarters and a large summer kitchen, with an overseer\'s cabin and smokehouse. '
   'Other farm buildings are gone, including the large barn, the root cellar and the slave cabins. A domed limestone mausoleum stands in the fields to the west. A descendant has restored the outbuildings since 2018.',
@@ -76,7 +76,7 @@ N('hicklin-hearthstone-lexington-mo', 'Hicklin Hearthstone', 'Lexington', 'kcmo'
   links=[W('Hicklin Hearthstone'), LNR],
   conf='mixed', brick='?'),
 
-N('hicklin-school-lexington-mo', 'Hicklin School', 'Lexington', 'kcmo', 'civic', 'standing',
+N('hicklin-school-lexington-mo', 'Hicklin School', 'Lexington', 'mo', 'civic', 'standing',
   39.18472, -93.82472, 'site', 'view', 'drive', '', '1914–1957',
   'A one-room school built in 1914 to a standard plan drawn by J. H. Felt and Company, with a cross-gabled frame building and a two-hole privy. It closed about 1957 and was listed on the National Register in 2004. '
   'The Hicklin family\'s farmhouse is a few hundred yards to the west.',
@@ -85,7 +85,7 @@ N('hicklin-school-lexington-mo', 'Hicklin School', 'Lexington', 'kcmo', 'civic',
   links=[W('Hicklin School'), LNR],
   conf='mixed', brick='no'),
 
-N('higginsville-depot-mo', 'Chicago and Alton Railroad depot, Higginsville', 'Higginsville', 'kcmo', 'rail', 'standing',
+N('higginsville-depot-mo', 'Chicago and Alton Railroad depot, Higginsville', 'Higginsville', 'mo', 'rail', 'standing',
   39.07352, -93.71678, 'exact', 'open', 'drive', 'stations', '1888–1889',
   'The Chicago and Alton Railroad built this one-and-a-half-storey Stick style frame depot in 1888 to 1889. It has projecting eaves on large brackets and walls faced in vertical boards and battens with horizontal clapboards. It was listed on the National Register in 1987.',
   look='The brackets under the eaves and the mixed board-and-batten and clapboard walls. A listing says the Harvey J. Higgins Historical Society runs a museum in the old depot on South Main Street; what is shown inside was not checked.',
@@ -93,7 +93,7 @@ N('higginsville-depot-mo', 'Chicago and Alton Railroad depot, Higginsville', 'Hi
   links=[W('Higginsville station'), ['Waymarking: Harvey J. Higgins Historical Society Museum', 'https://waymarking.com/waymarks/WMNQ47_Harvey_J_Higgins_Historical_Society_Museum_Higginsville_MO'], LNR],
   conf='mixed', brick='no', hours='?'),
 
-N('douglass-school-higginsville-mo', 'Douglass School, Higginsville', 'Higginsville', 'kcmo', 'civic', 'standing',
+N('douglass-school-higginsville-mo', 'Douglass School, Higginsville', 'Higginsville', 'mo', 'civic', 'standing',
   39.07892, -93.72116, 'exact', 'view', 'drive', '', '1925–1955',
   'This was the school for Black students in Higginsville and Lafayette County for nearly 70 years after the Civil War, until the Brown v. Board of Education decision integrated classrooms and it closed in 1955. '
   'A former student\'s family bought the building in 1990, and former students have since worked to turn it into a museum, the Douglass School Project. It is on the National Register; Wikipedia gives the reference number 100008715 and the state list the date March 10, 2023.',
@@ -110,7 +110,7 @@ N('odessa-ice-cream-company-odessa-mo', 'Odessa Ice Cream Company building', 'Od
   links=[W('Odessa Ice Cream Company Building'), LNR],
   conf='mixed', brick='?'),
 
-N('highland-avenue-historic-district-lexington-mo', 'Highland Avenue Historic District, Lexington', 'Lexington', 'kcmo', 'town', 'standing',
+N('highland-avenue-historic-district-lexington-mo', 'Highland Avenue Historic District, Lexington', 'Lexington', 'mo', 'town', 'standing',
   39.18444, -93.87500, 'area', 'public', 'walk', '', 'about 1830–1930',
   'A residential district of 64 contributing buildings that grew between about 1830 and 1930, with Greek Revival and late Victorian houses. The Register listing names the William H. Russell houses (about 1840 and 1845), the Frick House, Arnold House, Hinesley House, O\'Malley-Kelly House and Old Winkler House, and the 1928 Madonna of the Trail statue. '
   'Sources disagree on which corner the statue stands on: web listings give Highland Avenue and Broadway, Highland and Cliff Drive, or Commerce Street, so its exact spot was not settled.',
