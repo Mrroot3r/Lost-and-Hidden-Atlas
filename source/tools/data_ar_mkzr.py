@@ -1,0 +1,103 @@
+# November 28, 2026: a second scatter across Arkansas, the state with the fewest places on the map when this session began.
+# Claimed with tools/choose.py --thinnest (ar). Twelve places spread over the state: the Ozarks (Carroll, Johnson, Stone
+# country), the White River, the Black River at Pocahontas, the Delta (Burdette), and the south (Gurdon).
+# Sources read in this session: the National Register nomination forms (tools/form.py: the Park Service's record and form
+# for each) and the Wikipedia article for Spring Mill (tools/wiki_raw.py). Searches for visiting hours turned up no page of
+# whoever runs a place, so hours are marked not checked. Nothing was seen on the ground.
+from data_b import N
+from data_ma import W
+BATCH={'key':'ar_mkzr','label':'Arkansas: a second scatter across the state','added':'2026-11-28 17:42'}
+
+def NR(ref,label):
+    return [label+' (National Register nomination)','https://npgallery.nps.gov/NRHP/GetAsset/NRHP/%s_text'%ref]
+NP='Parking not checked.'
+
+PLACES=[
+N('spring-mill-batesville','Spring Mill','Batesville','ar','industry','standing',35.82855,-91.72362,'site','view','drive','','1867–1869',
+  'A water-powered grist mill on Arkansas Highway 69, six miles northwest of Batesville. The stone dam was built in 1867 for Anthony N. Simmons by the millwright Col. J. A. Schnabel, whose name and the date are noted on a stone in the dam; the mill building is believed to date from two years later. A mill of about 1853 stood about two hundred yards downstream, fed from the same spring. The mill ran into the 1960s. The nomination (1974) calls it the state\'s only known operable grist mill of its period.',
+  'A wood-frame mill with a gambrel roof on a rock foundation, at the end of its mill pond. Its timbers are hewn, mortised and pegged. Inside, on three levels, are a 40-horsepower Leffel water turbine, a 1,500-pound buhr stone and gears with wooden teeth. A large spring feeds the pond (three to five million gallons a day, per the nomination). A porch was added in 1918. All of this is from the 1974 nomination; its present state was not checked.',
+  '',
+  'Was in private hands when listed (the Lytle family; the nomination says the owner then opened it daily, free). Current owner, opening and whether it can be entered were not checked: look from the road unless a sign says otherwise. '+NP,
+  [NR('74000477','Spring Mill'),W('Spring Mill (Batesville, Arkansas)')],brick='no',bcol='none',arch='Col. J. A. Schnabel',archw='National Register nomination: millwright of the 1867 dam'),
+N('quigleys-castle-eureka-springs','Quigley\'s Castle','Eureka Springs','ar','landmark','standing',36.34611,-93.75591,'site','open','drive','','1943',
+  'A two-storey house built in 1943 by Elise Quigley and her husband Albert from lumber cut on their own farm. She faced all four outer walls with rocks, fossils and minerals she had collected since childhood and set the house in a garden of more than 400 kinds of perennials and over 100 rock sculptures. Its outer walls enclose a four-foot-wide, two-storey indoor atrium she planned as a place to bring nature inside, with tropical plants and birds. Her heirs still live there.',
+  'Rock-covered walls with 24 windows and 8 French doors opening on the atrium, a rock-edged garden, and eleven kinds of native lumber inside (a black walnut living room, cherry kitchen cabinets, pine and oak rooms). The nomination (2003) calls it unaltered and in excellent condition, and says it is both the family home and a tour home open to the public.',
+  '',
+  'A private family home shown as a paid tour, down a quarter-mile lane off Scenic Highway 23, four miles south of Eureka Springs; a circular drive at the end of the lane is the parking lot (nomination). Visiting days and times were not found on a page of the owners: web listings disagree, so call ahead.',
+  [NR('03000467','Quigley\'s Castle'),['Quigley\'s Castle website','https://quigleyscastle.com/']],brick='no',bcol='none',hours='?',arch='Elise Quigley; Albert Webster Quigley',archw='National Register record lists both as the designers'),
+N('three-states-lumber-powerhouse-burdette','Three States Lumber Company powerhouse, Burdette','Burdette','ar','industry','standing',35.81675,-89.93997,'area','view','drive','','1909',
+  'The one building left of a big timber mill. The Three States Lumber Company built it in 1909 as the mill\'s power house; it also lit the whole company town. Fires broke out at the mill several times between 1905 and 1922, which is why this part was made of brick with a poured-concrete roof. The rest of the mill was taken down in 1922. The building later served as the Burdette Plantation Company store.',
+  'A brick building in two parts, a two-storey north part under a gable roof and a one-storey south part with a shed roof, both roofed in poured concrete and lit by seven concrete-framed skylights. Concrete foundations of the mill lie nearby (nomination, 2001).',
+  '',
+  'On Old Mill Road in Burdette. Current owner and whether the grounds can be entered were not checked: look from the road. '+NP,
+  [NR('01001175','Three States Lumber Company Mill Powerhouse')],brick='?',builder='Three States Lumber Company',archw='National Register record'),
+N('old-randolph-county-courthouse-pocahontas','Old Randolph County Courthouse','Pocahontas','ar','civic','standing',36.26062,-90.96957,'area','view','walk','','1875',
+  'The county\'s courthouse of 1875, on the site of the first one, at Broadway and Vance streets in Pocahontas. The nomination (1972) calls it a rare Victorian example for this part of the state and says it was structurally sound with its interior woodwork largely original.',
+  'A big brick building, 60 by 48 feet, in a bright salmon colour, with quoins at the corners, pedimented breaks on every side, tall arched and stilted windows and a delicate wooden cupola. A later addition was taken off, and two side windows were bricked in where it was removed. Present use and whether it can be entered were not checked.',
+  '',
+  'Stands on the square in town, seen from the street. Owner and any opening hours were not checked. A newer Randolph County Courthouse is a block away and is a separate entry on the Register. '+NP,
+  [NR('73000390','Old Randolph County Courthouse')],brick='?'),
+N('mckennon-house-clarksville','Capt. Archibald S. McKennon House','Clarksville','ar','landmark','standing',35.47291,-93.46543,'site','view','walk','','1868',
+  'A two-storey red brick house of 1868 built by a Clarksville merchant who became a lawyer and Confederate veteran. It was built as a twin of a house for his business partner, Major Lorenzo N. Swaggerty; the Swaggerty house was torn down in 1970 for a parking lot, and this one survives. The bricks came from a brick plant one block north.',
+  'Light, Adam-style detail: a two-storey flat-roofed portico with wide-spaced tapered square pine columns, each cut from a single log; double doors with half-round fanlights and sidelights on both floors under a balcony; round-arched windows with brick hood moulds and quarried-stone sills; a stone foundation. Inside, a large foyer with a two-flight staircase and hand-made pine floors (nomination, 1976).',
+  '',
+  'Seen from the street in Clarksville. Whether it is a private house or open, and who owns it now, were not checked. '+NP,
+  [NR('76000424','Capt. Archibald S. McKennon House')],brick='yes',bcol='red'),
+N('oark-school-methodist-church','Oark School–Methodist Church','Oark','ar','worship','standing',35.69120,-93.57114,'area','view','drive','','c. 1923',
+  'A one-storey frame building put up about 1923 by the Oark school district together with the Methodist church. Half of it was curtained off as a Methodist high-school academy, which closed after one year with three students. The district taught grades one to eight here until about 1938, when it merged with two others and moved to a new school built by the Works Progress Administration. The building then became the Methodist church.',
+  'A plain Craftsman frame building on a fieldstone foundation with novelty siding, triangular knee braces in both gables and a small hip-roofed belfry. The nomination (1995) says the interior is virtually unaltered, with flush-board walls and a beaded-board ceiling.',
+  '',
+  'In the Ozark village of Oark. Whether the church holds services or opens to visitors was not checked. '+NP,
+  [NR('95001142','Oark School–Methodist Church')],brick='no',bcol='none'),
+N('cotter-bridge','Cotter Bridge (Marsh rainbow arch)','Cotter','ar','landmark','standing',36.26676,-92.54127,'site','view','walk','','1930',
+  'A 1,850-foot bridge that carries U.S. 62 over the White River at Cotter, built in 1930 on the Marsh rainbow-arch design, by Marsh Engineering Company with the Bateman Construction Company.',
+  'Five concrete arches of 216 feet, one smaller arch viaduct and 638 feet of girder approaches, with a two-foot concrete balustrade; the concrete is poured over a steel frame that keeps the shape of the steel members, so the hangers and columns look like I-beams. The nomination (1990) calls the spans unaltered and in good condition. Best seen from the river bank; where the public can stand was not checked.',
+  '',
+  'A public highway bridge on U.S. 62 immediately west of Cotter, maintained by the state highway department. Parking and viewing spots were not checked. Do not stop on the bridge.',
+  [NR('90000518','Cotter Bridge')],brick='no',bcol='none',builder='Marsh Engineering Company; Bateman Construction Company',archw='National Register record'),
+N('taylor-hill-hotel-coal-hill','Taylor Hill Hotel','Coal Hill','ar','hotel','standing',35.43818,-93.67114,'site','view','drive','hotels','c. 1890',
+  'A two-storey railroad-town hotel built about 1890 across the street from the depot, in a coal-mining town; the nomination (2008) calls it the centre of a thriving business community. Its builder is not known.',
+  'A big folk "I-house" with a rear wing and a central hall running through to the back, a three-quarter-width two-storey porch with turned columns and mass-produced decoration. Two blocks south of U.S. 64 on Alabama Street. Whether it still takes guests, and what is inside, were not checked.',
+  '',
+  'Two blocks south of U.S. 64 on Alabama Street in Coal Hill. Ownership and use were not checked: look from the street. '+NP,
+  [NR('08001007','Taylor Hill Hotel')],brick='?'),
+N('mo-ark-baptist-academy-blue-eye','Mo-Ark Baptist Academy','Blue Eye','ar','civic','standing',36.49772,-93.39925,'site','view','drive','','1918',
+  'A Baptist mission school of 1918 in Blue Eye, a town split by the Missouri line (the post office is on the Missouri side), run by the Baptist mission boards for children of both states. When it was listed in 1996 the town of Blue Eye owned it and meant to restore it as a community center.',
+  'A T-shaped, two-storey brick building with a full basement and a hipped roof, four brick chimneys and concrete lintels and sills. The original windows were gone and the doors had been replaced after vandalism (nomination, 1996). Its present state was not checked.',
+  '',
+  'South of Park Street in Blue Eye. The town owned it in 1996; current owner, repair and use were not checked: look from the street. '+NP,
+  [NR('96001030','Mo-Ark Baptist Academy')],brick='?'),
+N('winona-church-and-school','Winona Church and School','Winona Springs','ar','worship','standing',36.33282,-93.68197,'area','view','drive','','1893',
+  'A one-room frame building of 1893 in the Ozark hamlet of Winona Springs, built by George Pinkley and Joe Clark and used as both church and school.',
+  'A plain Greek Revival meetinghouse of weatherboard on stone piers, with two doors in the gable end under a wide central stair, four-over-four windows along each side, and a wood stove under a brick flue in the middle of the one room. The nomination (1991) says the interior is much as it was.',
+  '',
+  'In the community of Winona Springs, Carroll County. Whether it is used or opened was not checked. '+NP,
+  [NR('91000688','Winona Church and School')],brick='no',bcol='none',builder='George Pinkley; Joe Clark',archw='National Register record'),
+N('harmony-presbyterian-church-johnson','Harmony Presbyterian Church','Harmony','ar','worship','standing',35.55063,-93.57058,'area','view','drive','','1915–1917',
+  'A stone church built about 1915 to 1917 by the Chandler family (Tip, Ed and Joe Chandler) about eight miles north of Clarksville, in a plain Gothic Revival style.',
+  'Rough-cut stone walls, a tall hipped belfry over the front door, triangular-headed stained-glass windows in purple and light green, a stone chimney finished in brick, and a full basement. The nomination (1994) notes a ramp and a small bathroom wing added later. Whether services are held was not checked.',
+  '',
+  'On the north side of State Highway 103, about eight miles north of Clarksville. Hours not checked. '+NP,
+  [NR('94001411','Harmony Presbyterian Church')],brick='?',builder='Tip, Ed and Joe Chandler',archw='National Register record'),
+N('gurdon-jail','Gurdon Jail','Gurdon','ar','civic','standing',33.91990,-93.15401,'site','view','walk','','1907',
+  'A one-storey red brick jail of 1907, designed by M. D. Lowe, co-owner of the Gurdon Brick Company, to replace an older jail on the same site. Gurdon grew up where several logging railroads met, and the nomination (1989) says this is the only jail left in the town. The jail itself is a rectangle divided into two cells.',
+  'A small gable-roofed red brick block. A concrete floor was added later to keep out standing water, and the metal roof copies the shape of the original.',
+  '',
+  'Stands in the town of Gurdon, seen from the street. Ownership and opening were not checked. '+NP,
+  [NR('89001959','Gurdon Jail')],brick='yes',bcol='red',arch='M. D. Lowe',archw='National Register record'),
+]
+
+PIN_NOTES={
+ 'spring-mill-batesville':'National Register list point; the aerial shows a gabled building at the end of a pond with a dam beside the road, as the nomination describes.',
+ 'quigleys-castle-eureka-springs':'National Register list point; the aerial shows a house and outbuildings in a clearing at the end of a lane, matching the nomination.',
+ 'three-states-lumber-powerhouse-burdette':'National Register list point. The aerial shows trees and a pond near the pin and the powerhouse could not be picked out, so the pin marks the area.',
+ 'old-randolph-county-courthouse-pocahontas':'National Register list point, which falls on the edge of a street in the town centre; the courthouse itself was not picked out on the aerial, so the pin marks the area.',
+ 'mckennon-house-clarksville':'National Register list point; a house stands under trees at the pin on the aerial.',
+ 'oark-school-methodist-church':'National Register list point. The aerial shows only trees and a clearing at the pin, so the pin marks the area, not the building.',
+ 'cotter-bridge':'National Register list point at the east end of the bridge; the aerial shows the highway crossing the river there.',
+ 'taylor-hill-hotel-coal-hill':'National Register list point; a building stands at the pin on the aerial, two blocks south of the highway as the nomination says.',
+ 'mo-ark-baptist-academy-blue-eye':'National Register list point; a red-roofed building stands at the pin on the aerial.',
+ 'winona-church-and-school':'National Register list point. The aerial shows only woods at the pin, so the pin marks the area, not the church.',
+ 'harmony-presbyterian-church-johnson':'National Register list point. The aerial shows only woods at the pin, so the pin marks the area, not the church.',
+ 'gurdon-jail':'National Register list point; a small grey-roofed building stands at the pin on the aerial.',
+}
