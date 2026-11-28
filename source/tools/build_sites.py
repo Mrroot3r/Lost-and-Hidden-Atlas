@@ -1,5 +1,5 @@
 import json,sys,re
-import brickrule, legorule, archrule
+import brickrule, legorule, archrule, stonerule
 sys.path.insert(0,'tools')
 # Before a single place list is run: prove that each one is only data (tools/safe_data.py says why this matters).
 import safe_data; safe_data.must('tools')
@@ -56,6 +56,7 @@ for b in B+C:
     if legorule.code(b.get('lego')): s['lg']=legorule.code(b['lego'])        # "Legos" (mutules): p pegs, h holes, y yes of a kind not seen, n none; left out when nobody has looked (tools/legorule.py)
     if archrule.names(b.get('arch')): s['ar']=archrule.names(b['arch'])        # the architect or architects, one spelling each (tools/archrule.py)
     if archrule.names(b.get('builder')): s['bb']=archrule.names(b['builder'])  # who built it, when a source says so and it is not the architect
+    if (b.get('stone') or '').strip(): s['sx']=b['stone'].strip()            # the words cut on the building, as cut (tools/stonerule.py)
     if b.get('trig')=='yes': s['tg']=1                                     # the grooved blocks that go with them (triglyphs)
     if (b.get('fireb') or '').strip(): s['fb']=1                          # a source says fire brick is there
     if b.get('tip'): s['tip']=b['tip']                                   # the day a reader sent it in; left out for every other place
@@ -117,6 +118,19 @@ for s in sites:
     v=ARCHS.get(s['id'])
     if v and 'ar' not in s and archrule.names(v[0]): s['ar']=archrule.names(v[0])
     if v and 'bb' not in s and archrule.names(v[1]): s['bb']=archrule.names(v[1])
+# The words cut on a building, found out after the place was written: tools/stones_*.py, each STONE={id:(words, how they are known)}
+# (tools/stones.py writes them). A place's own stone= wins. The kind (sk) and the year (sy) are read from the words, and sd says
+# the stone's year is outside the years the write-up gives, so the page can say both.
+STONES={}
+for f in sorted(glob.glob('tools/stones_*.py')):
+    STONES.update(importlib.import_module(os.path.basename(f)[:-3]).STONE)
+for s in sites:
+    v=STONES.get(s['id'])
+    if v and 'sx' not in s and str(v[0]).strip(): s['sx']=str(v[0]).strip()
+    if 'sx' in s:
+        s['sk']=stonerule.kind(s['sx']); _y=stonerule.year(s['sx'])
+        if _y: s['sy']=_y
+        if stonerule.differs(_y,s.get('years')): s['sd']=1
 _one=archrule.unify([s.get('ar',[])+s.get('bb',[]) for s in sites])      # one spelling for one name across the whole map, so a tap on it finds every place
 for s in sites:
     for _k in ('ar','bb'):

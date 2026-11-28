@@ -74,6 +74,15 @@ const { chromium, devices } = require('playwright'); const fs=require('fs'), pat
     ok('legos: "Copy my additions" carries them',Array.isArray(ex)&&ex.length===1&&ex[0].id==='joliet-iron-works'&&ex[0].lego==='holes'&&ex[0].trig==='yes'&&ex[0].note==='Under the tower cornice',JSON.stringify(ex));
     await p.click('#lego-clear'); await p.waitForTimeout(250);
     ok('legos: the mark can be taken back',await p.evaluate(()=>!/Legos/.test((document.querySelector('#v-detail .sub2')||{}).textContent||'')&&window.__atlasLegoExport().length===0)); }
+  // ---- "What does the building say?" (the owner, November 28, 2026): the words on a cornerstone or datestone, read on the ground
+  { const sg=await p.evaluate(()=>{ const d=document.querySelector('#stone'); if(!d) return null; return {open:d.open,sum:d.querySelector('summary').textContent.trim(),links:d.querySelectorAll('a').length}; });
+    ok('stone: every place page offers it, folded away, with nothing to send until words are written',!!sg&&!sg.open&&/What does the building say/.test(sg.sum)&&sg.links===0,JSON.stringify(sg));
+    await p.click('#stone summary'); await p.waitForTimeout(150); await p.fill('#stone-x','ERECTED A.D. 1892'); await p.selectOption('#stone-w','cornerstone'); await p.waitForTimeout(450);
+    const st=await p.evaluate(()=>{ const a=document.querySelector('#stone a.share-gh'), g=a?new URL(a.href):null; return {ex:window.__atlasStoneExport(),line:(document.querySelector('#v-detail .stoneline')||{}).textContent||'',found:g&&g.searchParams.get('found'),place:g&&g.searchParams.get('place')}; });
+    ok('stone: the words are kept on this device and the page shows them at once',st.ex.length===1&&st.ex[0].id==='joliet-iron-works'&&st.ex[0].says==='ERECTED A.D. 1892'&&st.ex[0].where==='cornerstone'&&st.line.indexOf('ERECTED A.D. 1892')>=0,JSON.stringify(st));
+    ok('stone: and can be sent, quoted exactly, with where they are and the place\'s id',st.found==='Building says: "ERECTED A.D. 1892" (cornerstone)'&&/\(joliet-iron-works\)/.test(st.place||''),JSON.stringify(st));
+    await p.click('#stone-clear'); await p.waitForTimeout(250);
+    ok('stone: the reading can be taken back',await p.evaluate(()=>window.__atlasStoneExport().length===0&&!document.querySelector('#v-detail .stoneline'))); }
   await p.click('#tab-guide'); await p.waitForTimeout(300);
   ok('the Guide offers a way to send a place without a pin',await p.evaluate(()=>{ const a=document.querySelector('#share-blank a.share-gh'); return !!a&&/template=lead\.yml/.test(a.href); }));
   await p.goto(url+'#joliet-iron-works'); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(800);
