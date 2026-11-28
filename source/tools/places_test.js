@@ -495,6 +495,24 @@ const { chromium } = require('playwright');
       ok('legos: it is not one more shortcut in the row of five',await p.evaluate(()=>document.querySelectorAll('#presets .chip').length)===5);
       await p.fill('#q','mutules'); await p.waitForTimeout(400);
       ok('legos: the proper name finds them in the search box too',await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0])>=1); await p.fill('#q',''); }
+    // ---- architects (the owner, November 27, 2026): tap a building's architect and see the others by the same hand
+    { await p.fill('#q',''); await p.evaluate(()=>{ const c=[...document.querySelectorAll('#filters .chip')].find(b=>/^Legos/.test(b.textContent)); if(c&&c.getAttribute('aria-pressed')==='true') c.click(); const f=document.querySelector('#filters'); if(f&&f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(300);
+      const pick=await p.evaluate(()=>{ const S=JSON.parse(document.getElementById('d-sites').textContent).sites, n={}; S.forEach(s=>(s.ar||[]).concat(s.bb||[]).forEach(x=>{ n[x]=(n[x]||0)+1; }));
+        const name=Object.keys(n).sort((a,b)=>n[b]-n[a])[0], one=Object.keys(n).find(k=>n[k]===1); return {name:name,n:n[name],id:S.find(s=>(s.ar||[]).includes(name)).id,one:one,oneId:S.find(s=>(s.ar||[]).includes(one)).id,total:S.length}; });
+      ok('architects: the place data names them, and some are on several places',!!pick.name&&pick.n>=5,JSON.stringify(pick));
+      await p.goto(url+'#'+pick.id); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900);
+      const line=await p.evaluate(()=>{ const l=document.querySelector('#v-detail .archline'); return l?{t:l.textContent,btn:[...l.querySelectorAll('button')].map(b=>b.textContent)}:null; });
+      ok('architects: the place page says who, and how many more of theirs are on the Atlas',!!line&&/^Architect/.test(line.t)&&line.btn.includes(pick.name)&&new RegExp((pick.n-1)+' more on the Atlas').test(line.t),JSON.stringify(line));
+      await p.evaluate(n=>{ [...document.querySelectorAll('#v-detail .archline button')].find(b=>b.textContent===n).click(); },pick.name); await p.waitForTimeout(500);
+      const got=await p.evaluate(()=>({n:+document.querySelector('#count').textContent.split(' ')[0],chip:(document.querySelector('#linechip')||{}).textContent||'',list:!!document.querySelector('#list li'),detail:(document.querySelector('#v-detail')||{}).hidden}));
+      ok('architects: a tap lists that name\'s places, all of them and only them, and says whose they are',got.n===pick.n&&got.chip.indexOf('By '+pick.name)>=0&&got.list,JSON.stringify(got));
+      await p.evaluate(()=>document.querySelector('#linechip button.x').click()); await p.waitForTimeout(400);
+      ok('architects: the ✕ beside the name brings every place back',await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0])===pick.total||await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0])>pick.n*50);
+      await p.fill('#q',pick.name); await p.waitForTimeout(450);
+      ok('architects: the name finds them in the search box too',await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0])>=pick.n); await p.fill('#q','');
+      await p.goto(url+'#'+pick.oneId); await p.reload(); await p.waitForFunction(()=>window.__atlasMap); await p.waitForTimeout(900);
+      const solo=await p.evaluate(()=>{ const l=document.querySelector('#v-detail .archline'); return l?{t:l.textContent,btn:l.querySelectorAll('button').length}:null; });
+      ok('architects: a name on one place only is plain words, not a button to a list of one',!!solo&&solo.t.indexOf(pick.one)>=0&&solo.btn===0&&!/more on the Atlas/.test(solo.t),JSON.stringify(solo)); }
     ok('go to: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();

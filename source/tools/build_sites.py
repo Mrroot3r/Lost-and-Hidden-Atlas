@@ -1,5 +1,5 @@
 import json,sys,re
-import brickrule, legorule
+import brickrule, legorule, archrule
 sys.path.insert(0,'tools')
 # Before a single place list is run: prove that each one is only data (tools/safe_data.py says why this matters).
 import safe_data; safe_data.must('tools')
@@ -54,6 +54,8 @@ for b in B+C:
     if b.get('brick') in ('yes','some','no'): s['bk']=b['brick'][0]      # red brick: y, s or n; left out when nobody has looked
     if brickrule.code(b.get('bcol')): s['bc']=brickrule.code(b['bcol'])   # the brick's colour: r, b(uff), d(ark), g(lazed), p(ainted), m(ixed), x (looked: no brick at all); left out when nobody could tell
     if legorule.code(b.get('lego')): s['lg']=legorule.code(b['lego'])        # "Legos" (mutules): p pegs, h holes, y yes of a kind not seen, n none; left out when nobody has looked (tools/legorule.py)
+    if archrule.names(b.get('arch')): s['ar']=archrule.names(b['arch'])        # the architect or architects, one spelling each (tools/archrule.py)
+    if archrule.names(b.get('builder')): s['bb']=archrule.names(b['builder'])  # who built it, when a source says so and it is not the architect
     if b.get('trig')=='yes': s['tg']=1                                     # the grooved blocks that go with them (triglyphs)
     if (b.get('fireb') or '').strip(): s['fb']=1                          # a source says fire brick is there
     if b.get('tip'): s['tip']=b['tip']                                   # the day a reader sent it in; left out for every other place
@@ -106,6 +108,15 @@ for s in sites:
     v=LEGOS.get(s['id'])
     if v and 'lg' not in s and legorule.code(v[0]): s['lg']=legorule.code(v[0])
     if v and 'tg' not in s and v[1]=='yes': s['tg']=1
+# Who designed or built a place, found out after it was written: tools/archs_*.py, each ARCH={id:(architects, builder, how it is known)}
+# (tools/archs.py writes them). A place's own arch= and builder= win, field by field; among these files the later name wins.
+ARCHS={}
+for f in sorted(glob.glob('tools/archs_*.py')):
+    ARCHS.update(importlib.import_module(os.path.basename(f)[:-3]).ARCH)
+for s in sites:
+    v=ARCHS.get(s['id'])
+    if v and 'ar' not in s and archrule.names(v[0]): s['ar']=archrule.names(v[0])
+    if v and 'bb' not in s and archrule.names(v[1]): s['bb']=archrule.names(v[1])
 # Hours looked up after a place was written: tools/hours_*.py, each HOURS={id:(hours, day read 'YYYY-MM-DD', the page's address, opens)}
 # (tools/hours.py writes them). They win over the place's own hours=, carry their own date, and when 'opens' is true a place
 # that was only 'view' or 'public' becomes 'open'. hours '?' means looked for and not found: nothing is shown.

@@ -204,7 +204,7 @@ async function fetchDT(){
    map is, and is never hidden as "nothing to see". Filters has "My favourites" to list them. */
 const isFav=id=>Array.isArray(U.fav)&&U.fav.indexOf(id)>=0;
 function favToggle(s){ if(!Array.isArray(U.fav)) U.fav=[]; const i=U.fav.indexOf(s.id); if(i>=0) U.fav.splice(i,1); else U.fav.push(s.id); save(); refresh(); return i<0; }
-const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,lego:false,tip:false,y0:0,y1:0,fresh:'',my:'any',hideDone:false};
+const F={fav:false,line:null,arch:'',q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,lego:false,tip:false,y0:0,y1:0,fresh:'',my:'any',hideDone:false};
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
@@ -216,7 +216,7 @@ function brickWords(s){ const c=s.bc, a=s.bk==='y'?'Red brick':s.bk==='s'?(c==='
     ({b:'Buff or yellow brick',d:'Dark brick',g:'Glazed brick',p:'Painted brick'})[c]||'';
   return [a,s.fb?'Fire brick':''].filter(Boolean).join(' · '); }
 function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+(s.name2||'')),t:fold(s.town),
-  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,brickWords(s).toLowerCase().replace(' · ',' '),legoWords(s).toLowerCase().replace(' · ',' '),s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
+  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,brickWords(s).toLowerCase().replace(' · ',' '),legoWords(s).toLowerCase().replace(' · ',' '),(s.ar||[]).concat(s.bb||[]).join(' '),s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
 let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
@@ -225,6 +225,7 @@ const goneHid=s=>pref('hideGone')&&nothingToSee(s)&&!F.st.has(s.st)&&!(sel&&sel.
 function match(s){ return !goneHid(s)&&match0(s); }
 function match0(s){
   if(F.line&&!F.line.ids.has(s.id)) return false;
+  if(F.arch&&!((s.ar||[]).includes(F.arch)||(s.bb||[]).includes(F.arch))) return false;      /* one architect's or builder's places */
   if(F.q){ const h=hay(s); if(!qWords().every(w=>h.n.indexOf(w)>=0||h.t.indexOf(w)>=0||h.x.indexOf(w)>=0)) return false; }
   if(F.cat.size&&!F.cat.has(s.cat)) return false;
   if(F.st.size&&!F.st.has(s.st)) return false;
@@ -259,9 +260,9 @@ function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.y
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
   YEAR.set(s.id,y); return y; }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.lego?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.y0||F.y1?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function activeCount(){ return (F.line?1:0)+(F.arch?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.lego?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.y0||F.y1?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); { const fc=$('#fclear'), ct=$('#f-clear-top'); if(fc) fc.hidden=!activeCount(); if(ct) ct.hidden=!activeCount(); } $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.lego=false;F.tip=false;F.fav=false;F.y0=0;F.y1=0;F.fresh='';F.my='any';F.hideDone=false; }
+function clearF(){ setLine(null,true); F.arch=''; F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.lego=false;F.tip=false;F.fav=false;F.y0=0;F.y1=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
 /* "Legos" (the owner's word, November 27, 2026): the flat blocks studded with pegs under the eaves of a building in the Doric order,
    properly mutules with their guttae, and the grooved blocks in the frieze below them, triglyphs. lg: p pegs, h holes where the pegs
@@ -273,6 +274,17 @@ function legoWords(s){ const g=legoOf(s), a=g.k==='p'?'Legos (mutules with pegs)
   return [a,g.t?'Triglyphs':''].filter(Boolean).join(' · '); }
 function hasLego(s){ const g=legoOf(s); return g.k==='p'||g.k==='h'||g.k==='y'||!!g.t; }
 function legoExport(){ return Object.keys(U.lego||{}).map(id=>{ const m=U.lego[id], s=byId(id); return {id:id,place:s?s.name+(s.town?', '+s.town:''):'',lego:{p:'pegs',h:'holes',n:'no'}[m.k]||'',trig:m.t?'yes':'',note:m.x||'',t:m.d||''}; }); }
+/* Who designed or built a place (the owner, November 27, 2026: "tap on a building and see all buildings made by this architect").
+   ar: the architects, bb: the builders, each name in one spelling (tools/archrule.py). A name that is on more than one place is a
+   button on the place page: it clears the filters, lists that name's places and says so in a chip above the list (F.arch). */
+let ARCHN=null;
+function archCount(n){ if(!ARCHN){ ARCHN=new Map(); sites().forEach(s=>(s.ar||[]).concat(s.bb||[]).forEach(x=>ARCHN.set(x,(ARCHN.get(x)||0)+1))); } return ARCHN.get(n)||0; }
+function archShow(n){ clearF(); F.arch=n; const q=$('#q'); if(q) q.value=''; deselect(); refresh(); }
+function archLine(s){ const part=(label,list)=>{ if(!list||!list.length) return []; const out=[el('span',{class:'lbl2',text:label+(list.length>1&&label==='Architect'?'s':'')+': '})];
+    list.forEach((n,i)=>{ const c=archCount(n); if(i) out.push(', ');
+      if(c>1){ out.push(el('button',{class:'linkbtn archbtn',type:'button',title:'Show every place on the Atlas by '+n,onclick:()=>archShow(n)},n)); out.push(el('span',{class:'more',text:' · '+(c-1)+' more on the Atlas'})); } else out.push(n); }); return out; };
+  const a=part('Architect',s.ar), b=part('Built by',s.bb); if(!a.length&&!b.length) return null;
+  return el('p',{class:'archline'},...a,(a.length&&b.length)?el('br'):null,...b); }
 const BATCHES=D.batches||[];
 /* Five shortcuts (the owner, November 24, 2026: the row had become clutter). Gone: ruins you can walk to and within 30 minutes (the Near
    tab does that), standing from before 1800 (the year range does), and the two that only repeated a chip under Kind of place. */
@@ -386,6 +398,7 @@ function renderList(){
   { const fd=$('#f-done'); if(fd) fd.textContent='Show '+visible.length+(visible.length===1?' place':' places'); }
   yearsBar();
   const lc=$('#linechip'); lc.textContent=''; lc.hidden=!F.line; if(F.line){ lc.append(el('span',{class:'chip','aria-pressed':'true'},el('span',{class:'sw',style:'--c:'+LK[F.line.k][1]}),'Along '+F.line.label,el('button',{type:'button',class:'x','aria-label':'Stop following this line',onclick:()=>{setLine(null);refresh();}},'✕'))); }
+  if(F.arch){ lc.hidden=false; lc.append(el('span',{class:'chip','aria-pressed':'true'},'By '+F.arch,el('button',{type:'button',class:'x','aria-label':'Stop showing only this name',onclick:()=>{F.arch='';refresh();}},'✕'))); }
   /* places that fit the search and the filters but are kept off by the setting: say so, or a search for one looks like a gap in the Atlas */
   const hid=pref('hideGone')?sites().filter(s=>goneHid(s)&&match0(s)).length:0;
   const hidRow=()=>el('li',{class:'pad hidnote'},el('span',{text:hid+(hid===1?' place':' places')+' with nothing to see '+(hid===1?'is':'are')+' hidden by your setting.'}),el('button',{class:'btn sm',type:'button',id:'hid-show',onclick:()=>{ setPref('hideGone',false); banner('Showing them again. Settings has the switch.',false,5000); }},'Show them'));
@@ -2589,7 +2602,7 @@ function renderDetail(s){
         map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
     el('h2',{text:s.name})),
     el('div',{class:'dintro pad'},
-    el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s),legoWords(s)].filter(Boolean).join(' · ')}),
+    el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s),legoWords(s)].filter(Boolean).join(' · ')}),archLine(s),
     tags,
     s.mine?sendRow(s):null, twinNote(s),
     photoBox(s),

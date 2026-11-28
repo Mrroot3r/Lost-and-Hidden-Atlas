@@ -1,12 +1,13 @@
 # Split pins and new entries. p = parent catalogue entry index (links and confidence are inherited when given)
-def N(id,name,town,reg,cat,st,lat,lon,prec,acc,eff,tags,years,story,look='',hook='',accn='',links=None,p=None,conf=None,th=None,thn=None,name2='',brick='',tip='',was='',hours='',bcol='',fireb='',apart='',lego='',trig='',legow=''):
+def N(id,name,town,reg,cat,st,lat,lon,prec,acc,eff,tags,years,story,look='',hook='',accn='',links=None,p=None,conf=None,th=None,thn=None,name2='',brick='',tip='',was='',hours='',bcol='',fireb='',apart='',lego='',trig='',legow='',arch='',builder='',archw=''):
+    # arch: the architect or firm, several separated by '; '; builder: who built it, when it is not the architect; archw: how it is known (tools/archrule.py)
     # lego: 'pegs'|'holes'|'yes'|'no'|'?' the peg blocks under the eaves (mutules, guttae); trig: 'yes'|'no' the grooved blocks (triglyphs); legow: how it is known (tools/legorule.py)
     # apart: this entry is close to another, or shares its name, and they are two places: '<the other id>: <why>' (tools/dupes.py)
     # bcol: the colour of the brick you can see ('red','buff','dark','glazed','painted','mixed'); fireb: the words of a source that says fire brick is there (tools/brickrule.py)
     # brick: 'yes' red brick is the main thing you see, 'some' part brick (a chimney, an arch, brick over stone), 'no' none or not red, '?' not checked (GUIDE.md section 4)
     # tip: the day a reader sent this place to the Atlas ('2026-11-18'); empty for a place a session found. The app shows "Sent in by a reader" (GUIDE.md sections 4 and 15)
     # was: the id of an older, thinner entry for the same place that this one replaces, 'lm-mabee-farm' (GUIDE.md section 4). The old pin is dropped and a reader's notes move to this one
-    return dict(id=id,name=name,town=town,reg=reg,cat=cat,st=st,lat=lat,lon=lon,prec=prec,acc=acc,eff=eff,tags=tags,years=years,story=story,look=look,hook=hook,accn=accn,links=links or [],p=p,conf=conf,th=th,thn=thn,name2=name2,brick=brick,tip=tip,was=was,hours=hours,bcol=bcol,fireb=fireb,apart=apart,lego=lego,trig=trig,legow=legow)
+    return dict(id=id,name=name,town=town,reg=reg,cat=cat,st=st,lat=lat,lon=lon,prec=prec,acc=acc,eff=eff,tags=tags,years=years,story=story,look=look,hook=hook,accn=accn,links=links or [],p=p,conf=conf,th=th,thn=thn,name2=name2,brick=brick,tip=tip,was=was,hours=hours,bcol=bcol,fireb=fireb,apart=apart,lego=lego,trig=trig,legow=legow,arch=arch,builder=builder,archw=archw)
 B=[
 N('dudley-observatory-1','First Dudley Observatory site','Albany','alb','inst','gone',42.66471,-73.74935,'site','public','drive','','1856–1893',
   'The first observatory (1856) stood on "Goat Hill," now Dudley Heights in Arbor Hill, until vibration from the railroad below ruined its readings.',

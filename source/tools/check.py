@@ -5,7 +5,7 @@
 That is for a branch that carries sources alone; GitHub builds the site and runs the full check (tools/ci_build.sh).
 Exit code 1 on any error. Warnings are for a person to read."""
 import sys,os,re,json,glob,importlib,math
-import brickrule, dupes, legorule
+import brickrule, dupes, legorule, archrule
 SRC_ONLY='--sources' in sys.argv; _args=[a for a in sys.argv[1:] if not a.startswith('--')]
 REPO=os.path.abspath(_args[0] if _args else os.path.join(os.path.dirname(__file__),'..','..'))
 T=os.path.join(REPO,'source','tools'); sys.path.insert(0,T); sys.dont_write_bytecode=True
@@ -116,6 +116,8 @@ for f in sorted(glob.glob(os.path.join(T,'data_*.py'))):
         # kcmo), so sessions filed St. Louis, Hannibal and the capitol under it; 66 places were refiled on November 27, 2026.
         if p.get('reg') in CITY_REG and math.hypot((p['lat']-CITY_REG[p['reg']][0])*111.2,(p['lon']-CITY_REG[p['reg']][1])*111.2*math.cos(math.radians(p['lat'])))>CITY_REG[p['reg']][2]:
             err.append(f"{w}: reg='{p['reg']}' is the region for {CITY_REG[p['reg']][3]} and the country within {CITY_REG[p['reg']][2]} km of it, and this pin is further off: use reg='{CITY_REG[p['reg']][4]}'")
+        _ap2=archrule.place_problem(p)      # who designed or built it, where given (tools/archrule.py)
+        if _ap2: err.append(f"{w}: {_ap2}")
         _lp2=legorule.place_problem(p)      # "Legos" and triglyphs, where given (tools/legorule.py)
         if _lp2: err.append(f"{w}: {_lp2}")
         _bp=brickrule.place_problem(p)      # the brick's colour and a fire-brick source, where given (tools/brickrule.py)
@@ -220,6 +222,14 @@ for f in sorted(glob.glob(os.path.join(T,'bricks_*.py'))):
     for i,v in BR.items():
         if i not in ids: err.append(f'{nm}: {i} is not a place id')
         elif brickrule.row_problem(v): err.append(f"{nm}: {i}: {brickrule.row_problem(v)}")
+# ---- who designed or built a place, found out later (tools/archs_*.py, written by tools/archs.py) ----
+for f in sorted(glob.glob(os.path.join(T,'archs_*.py'))):
+    nm=os.path.basename(f)[:-3]
+    try: AC=importlib.import_module(nm).ARCH
+    except Exception as ex: err.append(f'{nm}: cannot be read ({str(ex)[:60]})'); continue
+    for i,v in AC.items():
+        if i not in ids: err.append(f'{nm}: {i} is not a place id')
+        elif archrule.row_problem(v): err.append(f"{nm}: {i}: {archrule.row_problem(v)}")
 # ---- "Legos" found out later (tools/legos_*.py, written by tools/legos.py) ----
 for f in sorted(glob.glob(os.path.join(T,'legos_*.py'))):
     nm=os.path.basename(f)[:-3]
