@@ -119,11 +119,11 @@ const { chromium } = require('playwright');
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); let v=await seen();
     ok('zoomed out, neither has a pin of its own: both are inside a group disc',!v.a&&!v.b&&v.discs>0,JSON.stringify(v));
     await p.evaluate(id=>{ location.hash='#'+id; },two[0].id); await p.waitForTimeout(600);
-    const btn=()=>p.evaluate(()=>{ const n=document.querySelector('#d-fav'); return n?{t:n.textContent,p:n.getAttribute('aria-pressed'),l:n.getAttribute('aria-label'),row:Math.abs(n.getBoundingClientRect().top-document.querySelector('.dtop .btn').getBoundingClientRect().top)<6,fits:n.getBoundingClientRect().right<=innerWidth&&document.querySelector('.dtop').scrollWidth<=document.querySelector('.dtop').clientWidth+1}:null; });
-    let bt=await btn(); ok('a place page has a favourite button in its top row, empty heart, and the row still fits a phone',!!bt&&bt.t==='♡'&&bt.p==='false'&&bt.l==='Add to my favourites'&&bt.row&&bt.fits,JSON.stringify(bt));
+    const btn=()=>p.evaluate(()=>{ const n=document.querySelector('#d-fav'); return n?{t:n.textContent,p:n.getAttribute('aria-pressed'),l:n.getAttribute('aria-label'),row:(()=>{ const h=document.querySelector('#v-detail .dhead h2').getBoundingClientRect(), r=n.getBoundingClientRect(); return Math.abs(r.top-h.top)<8&&r.left>=h.right-1; })(),fits:n.getBoundingClientRect().right<=innerWidth&&!document.querySelector('#v-detail .dtop')}:null; });
+    let bt=await btn(); ok('a place page has a favourite button at the right of its name, empty heart, with no row of buttons above',!!bt&&bt.t==='♡'&&bt.p==='false'&&bt.l==='Add to my favourites'&&bt.row&&bt.fits,JSON.stringify(bt));
     await p.click('#d-fav'); await p.waitForTimeout(500); bt=await btn();
     ok('tapped, it is a full heart and says how to undo it',!!bt&&bt.t==='♥'&&bt.p==='true'&&bt.l==='Remove from my favourites',JSON.stringify(bt));
-    await p.click('.dtop .btn'); await p.waitForTimeout(400);     // Back
+    await p.click('#mapback'); await p.waitForTimeout(400);     // Back, which floats on the map
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
     ok('zoomed out again, the favourite has its own pin, ringed; its neighbour is still in the disc',!!v.a&&v.a.fav&&!v.b&&v.discs>0&&v.favs===1,JSON.stringify(v));
     // while the numbered discs are showing, a favourite is a small mark beside a disc, never on top of its number (the owner, November 21, 2026)
@@ -145,7 +145,7 @@ const { chromium } = require('playwright');
     await p.reload(); await p.waitForFunction(()=>window.__atlasNM); await p.waitForTimeout(600);
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
     ok('the page opened again: it is still a favourite, still on the map zoomed out',!!v.a&&v.a.fav&&await p.evaluate(id=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).fav.join()===id,two[0].id));
-    await p.evaluate(id=>{ location.hash='#'+id; },two[0].id); await p.waitForTimeout(600); await p.click('#d-fav'); await p.waitForTimeout(500); await p.click('.dtop .btn'); await p.waitForTimeout(300);
+    await p.evaluate(id=>{ location.hash='#'+id; },two[0].id); await p.waitForTimeout(600); await p.click('#d-fav'); await p.waitForTimeout(500); await p.click('#mapback'); await p.waitForTimeout(300);
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
     ok('taken off the list, it goes back into the disc',(!v.a||!v.a.fav)&&v.favs===0&&await p.evaluate(()=>JSON.parse(localStorage.getItem('lost-hidden-atlas-v1')).fav.length===0),JSON.stringify(v));
     ok('favourites: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
@@ -341,7 +341,7 @@ const { chromium } = require('playwright');
     ok('heat: at zoom 10 the pins are there and the heat is gone, the same step as after the discs',b9.img===0&&b9.clus===0&&b9.pins>20,JSON.stringify({img:b9.img,clus:b9.clus,pins:b9.pins}));
     // a favourite keeps a pin at every zoom, and with no number to hide it is full size
     await p.evaluate(()=>{ location.hash='#harmony-mills-cohoes'; }); await p.waitForTimeout(900); await p.evaluate(()=>{ const x=[...document.querySelectorAll('#v-detail button')].find(e=>/favourite/i.test(e.getAttribute('aria-label')||e.title||'')||e.textContent.trim()==='♡'); if(x) x.click(); }); await p.waitForTimeout(300);
-    await p.evaluate(()=>{ const x=[...document.querySelectorAll('#v-detail button')].find(e=>/Back/.test(e.textContent)); if(x) x.click(); }); await p.waitForTimeout(300);
+    await p.evaluate(()=>{ const x=document.querySelector('#mapback'); if(x&&!x.hidden) x.click(); }); await p.waitForTimeout(300);
     await p.evaluate(()=>window.__atlasMap.setView([41,-78],5,{animate:false})); await p.waitForTimeout(900);
     const fv=await p.evaluate(()=>{ const P=[...document.querySelectorAll('.leaflet-marker-pane .pin')]; return {n:P.length,far:P.filter(x=>x.classList.contains('far')).length,fav:P.filter(x=>x.classList.contains('fav')).length}; });
     ok('heat: zoomed far out a favourite still has its pin, at full size',fv.fav>=1&&fv.far===0,JSON.stringify(fv));

@@ -443,6 +443,7 @@ function renderList(){
 let clusLayer=null;
 let map=null, sel=null, markers=new Map(), baseLayer=null, cmpLayer=null, histLayer=null, selShapes=[], homeMarker=null, schematic=false, adding=false, pickingHome=false;
 const stage=$('#stage');
+{ const mb=$('#mapback'); if(mb) mb.addEventListener('click',()=>deselect()); }      /* Back, floating on the map while a place is open */
 const W=20037508.342789244;
 let FnLayer=null;
 const YEARS=['Latest','2025','2024','2023','2022','2021','2020','2018','2017','2016','2015','2014','2013','2012','2011','2010','2009','2008','2007','2006','2005','2004','2003','2002','2001','2000','napp'];
@@ -905,8 +906,10 @@ function setAsking(on){ asking=on; adding=false; spotting=false; pickingHome=fal
 function buildBar(){
   const sc=$('#lscroll'), fx=$('#lfix'); sc.textContent=''; fx.textContent='';
   BAR.forEach((b,i)=>{ if(schematic&&(LD[b[0]]||b[0]==='cmp'||b[0]==='lots'||b[0]==='land'||b[0]==='who')) return;
+    if(b[0]==='cmp') return;      /* Compare is fixed at the right with More and Me, always in reach (below) */
     if((i===6||i===12)&&sc.childNodes.length) sc.append(el('span',{class:'lsep'}));
     sc.append(el('button',{class:'lb',type:'button',id:'lb-'+b[0],title:b[2],'aria-label':b[2],'aria-pressed':'false',onclick:()=>barTap(b[0])},ico(b[0]),el('span',{class:'lt',text:b[1]}))); });
+  { const b=BAR.find(x=>x[0]==='cmp'); if(!schematic) fx.append(el('button',{class:'lb',type:'button',id:'lb-cmp',title:b[2],'aria-label':b[2],'aria-pressed':'false',onclick:()=>barTap('cmp')},ico('cmp'),el('span',{class:'lt',text:b[1]}))); }
   fx.append(el('button',{class:'lb',type:'button',id:'lb-opt',title:'Flight year, light direction, compare and line options','aria-label':'More map options',onclick:openSheet},ico('opt'),el('span',{class:'lt',text:'More'})));
   fx.append(el('button',{class:'lb',type:'button',id:'lb-loc',title:'Show where I am','aria-label':'Show where I am','aria-pressed':String(geo.id!==null),onclick:()=>{ if(map) locate(); }},ico('loc'),el('span',{class:'lt',text:'Me'})));
   const big=$('#app').classList.contains('mapbig');
@@ -2444,7 +2447,7 @@ function onContext(e){
 
 /* ---------- views ---------- */
 let view='list';
-function showView(v){ view=v; if(v!=='detail') dropFormPin(); if(v==='list'&&listFrom!==nearFrom()){ if(F.max) refresh(); else renderList(); }      /* the position changed while another tab was open */
+function showView(v){ view=v; { const mb=$('#mapback'); if(mb) mb.hidden=v!=='detail'; } if(v!=='detail') dropFormPin(); if(v==='list'&&listFrom!==nearFrom()){ if(F.max) refresh(); else renderList(); }      /* the position changed while another tab was open */
   ['list','detail','trip','log','guide','near'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
   $('#tab-list').setAttribute('aria-selected',String(v==='list'||v==='detail')); $('#tab-trip').setAttribute('aria-selected',String(v==='trip')); $('#tab-guide').setAttribute('aria-selected',String(v==='guide')); $('#tab-log').setAttribute('aria-selected',String(v==='log')); $('#tab-near').setAttribute('aria-selected',String(v==='near'));
   nmCompass(v==='near'); if(v==='near'){ nmEnsure(true); renderNear(); if(NM.org==='me'&&geo.id===null&&U.last&&map) locate(); }
@@ -2565,9 +2568,15 @@ function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false) 
   return box; }
 /* The head of a place page cuts a long name to two lines when the phone is on its side. When that happens the whole name
    is written at the top of the part that scrolls, so nothing is lost. Asked again when the window changes shape. */
-function nameFit(){ const v=$('#v-detail'), h=v&&v.querySelector('.dhead h2'), intro=v&&v.querySelector('.dintro'); if(!h||!intro) return;
-  const cut=h.scrollHeight>h.clientHeight+2, old=intro.querySelector('.fullname');
-  if(cut&&!old) intro.prepend(el('p',{class:'fullname',text:h.textContent})); else if(!cut&&old) old.remove(); }
+/* A name in two parts (the owner, November 28, 2026: "so many of these entries have the name and then stuff in parentheses or a comma ...
+   the main name, and then the rest smaller, slightly less bright, under it"). "Staten Island Light (Ambrose Channel Range Light)" is
+   Staten Island Light with Ambrose Channel Range Light beneath; "First Presbyterian Church, Cherry Valley" likewise; brackets in the
+   middle of a name ("La Grange M-K-T (Katy) Depot") are left alone. Only how the head is drawn: the name itself is not changed. */
+function nameParts(n){ n=String(n||''); let m=n.match(/^(.{3,}?)\s*\(([^()]+)\)\s*(?:,\s*(.+))?$/); if(m) return [m[1].trim(),m[2].trim()+(m[3]?', '+m[3].trim():'')];
+  m=n.match(/^([^(),:]{3,}?)\s*[:,]\s+(.+)$/); return m?[m[1].trim(),m[2].trim()]:[n,'']; }
+function nameFit(){ const v=$('#v-detail'), h=v&&v.querySelector('.dhead h2'), d=v&&v.querySelector('.dhead .dsub'), intro=v&&v.querySelector('.dintro'); if(!h||!intro) return;
+  const cut=h.scrollHeight>h.clientHeight+2||(!!d&&d.scrollHeight>d.clientHeight+2), old=intro.querySelector('.fullname');
+  if(cut&&!old) intro.prepend(el('p',{class:'fullname',text:h.dataset.full||h.textContent})); else if(!cut&&old) old.remove(); }
 window.addEventListener('resize',debounce(()=>{ if(view==='detail') nameFit(); },150));
 /* "on November 18, 2026" for a place that began as a reader's tip (s.tip is that day), or nothing */
 /* When it is open. s.hrs is what a source said when the place was written up, so the row says which month that was (the batch's own date):
@@ -2613,15 +2622,14 @@ function renderDetail(s){
   /* the head that stays put while the page scrolls is one row of buttons and the name, nothing more: on a phone on its
      side the column is short, and the photo, the line under the name and the badges scroll away with the rest */
   v.append(el('div',{class:'dhead pad'},
-    el('div',{class:'dtop'},
-      el('button',{class:'btn sm',type:'button',onclick:deselect,'aria-label':'Back to all places',title:'All places'},'← Back'),
-      el('div',{class:'dtop-r'},
-        el('button',{class:'btn sm favb'+(isFav(s.id)?' on':''),type:'button',id:'d-fav','aria-pressed':String(isFav(s.id)),'aria-label':isFav(s.id)?'Remove from my favourites':'Add to my favourites',title:isFav(s.id)?'In my favourites: tap to remove':'Add to my favourites: its pin stays on the map at every zoom',onclick:()=>{ const on=favToggle(s); banner(on?'Added to your favourites. Its pin now shows at every zoom; Filters has "My favourites".':'Removed from your favourites.',false,on?5000:2500); renderDetail(s); }},isFav(s.id)?'\u2665':'\u2661'),
-        el('button',{class:'btn sm'+(inTrip?' on':''),type:'button',onclick:()=>{ const i=U.trip.indexOf(s.id); if(i>=0) U.trip.splice(i,1); else U.trip.push(s.id); save(); $('#trip-n').textContent=U.trip.length; renderDetail(s); }},inTrip?'✓ In trip':'+ Add to trip'),
-        map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
-    el('h2',{text:s.name})),
+    /* The head (the owner, November 28, 2026, with a drawing): no row of buttons. The name, a little smaller, with the favourite heart at its
+       right; Add to trip beside the line under the name; Back floats on the map above the scale (#mapback); Zoom in is gone, since a
+       double tap on the map does the same. */
+    el('div',{class:'dtitle'},(()=>{ const np=nameParts(s.name); return el('div',{class:'dname'},el('h2',{text:np[0],'data-full':s.name}),np[1]?el('p',{class:'dsub',text:np[1]}):null); })(),
+      el('button',{class:'btn sm favb'+(isFav(s.id)?' on':''),type:'button',id:'d-fav','aria-pressed':String(isFav(s.id)),'aria-label':isFav(s.id)?'Remove from my favourites':'Add to my favourites',title:isFav(s.id)?'In my favourites: tap to remove':'Add to my favourites: its pin stays on the map at every zoom',onclick:()=>{ const on=favToggle(s); banner(on?'Added to your favourites. Its pin now shows at every zoom; Filters has "My favourites".':'Removed from your favourites.',false,on?5000:2500); renderDetail(s); }},isFav(s.id)?'\u2665':'\u2661'))),
     el('div',{class:'dintro pad'},
-    el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s),legoWords(s)].filter(Boolean).join(' · ')}),archLine(s),stoneLine(s),
+    el('div',{class:'subrow'},el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s),legoWords(s)].filter(Boolean).join(' · ')}),
+      el('button',{class:'btn sm tripb'+(inTrip?' on':''),id:'d-trip',type:'button',onclick:()=>{ const i=U.trip.indexOf(s.id); if(i>=0) U.trip.splice(i,1); else U.trip.push(s.id); save(); $('#trip-n').textContent=U.trip.length; renderDetail(s); }},inTrip?'✓ In trip':'+ Add to trip')),archLine(s),stoneLine(s),
     tags,
     s.mine?sendRow(s):null, twinNote(s),
     photoBox(s),
@@ -2889,7 +2897,7 @@ function stoneSection(s){ if(!U.stone) U.stone={}; const d=el('details',{class:'
   const x=el('input',{type:'text',id:'stone-x',placeholder:'The words exactly, e.g. ERECTED 1892',maxlength:'240','aria-label':'The words on the building',value:(mine()||{}).x||''});
   const w=el('select',{id:'stone-w','aria-label':'Where the words are'},...[['','Where is it? (optional)'],['cornerstone','Cornerstone'],['datestone','Datestone'],['over the door','Over the door'],['gable','In the gable'],['tablet in the wall','Tablet in the wall'],['somewhere else','Somewhere else']].map(o=>el('option',{value:o[0],selected:(mine()||{}).w===o[0]},o[1])));
   const clr=el('button',{class:'btn sm',type:'button',id:'stone-clear'},'Clear my reading');
-  const show=()=>{ const m=mine(), old=document.querySelector('#v-detail .stoneline'), neu=stoneLine(s); if(old) old.remove(); const sub=document.querySelector('#v-detail .archline')||document.querySelector('#v-detail .sub2'); if(neu&&sub) sub.after(neu);
+  const show=()=>{ const m=mine(), old=document.querySelector('#v-detail .stoneline'), neu=stoneLine(s); if(old) old.remove(); const sub=document.querySelector('#v-detail .archline')||document.querySelector('#v-detail .subrow'); if(neu&&sub) sub.after(neu);
     out.replaceChildren(); clr.hidden=!m; if(m) out.append(shareBox('stone',{place:s.name+(s.town?', '+s.town:''),id:s.id,x:m.x,w:m.w})); };
   const sync=()=>{ const t=x.value.trim(); if(t.length<3){ if(mine()){ delete U.stone[s.id]; saveNow(); show(); } return; } U.stone[s.id]={x:t,w:w.value,d:new Date().toISOString().slice(0,10)}; saveNow(); show(); };
   clr.addEventListener('click',()=>{ delete U.stone[s.id]; saveNow(); x.value=''; w.value=''; show(); });
@@ -3248,7 +3256,7 @@ function goSync(v,auto){ const g=$('#goto'); goSeq++; const c=readCoords(v);
   if(/^https?:\/\//i.test(v)){ g.hidden=false; g.replaceChildren(el('p',{class:'gonote',text:'That link carries no coordinates. In Google Maps, press and hold the spot, copy the two numbers it shows, and paste them here.'})); return true; }
   if(v.length<3){ g.hidden=true; g.replaceChildren(); return false; }
   g.hidden=false; g.replaceChildren(goRow('Find <b>'+esc(v)+'</b> on the map: street, town or address',()=>goLook(v))); return false; }
-try{ window.__atlasGo={read:readCoords,brick:brickWords,lego:legoWords,stoneNote:stoneNote}; window.__atlasLegoExport=legoExport; window.__atlasStoneExport=stoneExport; }catch(e){}
+try{ window.__atlasGo={read:readCoords,brick:brickWords,lego:legoWords,stoneNote:stoneNote,nameParts:nameParts}; window.__atlasLegoExport=legoExport; window.__atlasStoneExport=stoneExport; }catch(e){}
 try{ window.__atlasSet=(k,v)=>setPref(k,v); }catch(e){}      /* for the tests: a setting changed as the Settings sheet changes it */
 $('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
 $('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });

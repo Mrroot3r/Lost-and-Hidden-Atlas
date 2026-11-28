@@ -16,6 +16,18 @@ const { chromium } = require('playwright');
   // ---- upright: as it was
   let side=await R('#side'), stage=await R('#stage');
   ok('upright: the map is above the menu',stage.b<=side.t+1&&stage.w>380,[stage.b,side.t].join(' '));
+  // ---- upright: slimmer bars (the owner, November 28, 2026: "cut that bar by like 1/3", tabs "way smaller" with lines between them so
+  // the wrong one is not hit; Full dropped where the bar can be dragged; Compare always in reach, then More, then Me at the far right)
+  { const m=await p.evaluate(()=>{ const r=q=>{ const e=document.querySelector(q); return e?e.getBoundingClientRect():null; }, t=[...document.querySelectorAll('.tabs button')];
+      return {bar:r('#lbar').height,tabs:r('.tabs').height,tabW:Math.min(...t.map(x=>x.getBoundingClientRect().width)),lines:t.slice(1).every(x=>parseFloat(getComputedStyle(x).borderLeftWidth)>=1),
+        fix:[...document.querySelectorAll('#lfix .lb')].filter(x=>x.offsetParent!==null).map(x=>x.id),inScroll:!!document.querySelector('#lscroll #lb-cmp'),ic:r('#lb-streets svg').height,txt:parseFloat(getComputedStyle(document.querySelector('#lb-streets')).fontSize)}; });
+    ok('upright: the layer bar is a third shorter than its old 54',m.bar<=39&&m.bar>=34,m.bar);
+    ok('upright: its icons and words are smaller, and still readable',m.ic<=18&&m.ic>=15&&m.txt>=10&&m.txt<11,[m.ic,m.txt].join(' '));
+    ok('upright: the tabs are much shorter than their old 45, with a line between each and room for a thumb across',m.tabs<=34&&m.tabs>=28&&m.lines&&m.tabW>=60,[m.tabs,m.lines,m.tabW].join(' '));
+    const NP=n=>p.evaluate(n=>window.__atlasGo.nameParts(n),n);
+    ok('a name in two parts: what is in brackets or after a comma goes underneath, smaller',JSON.stringify(await NP('Staten Island Light (Ambrose Channel Range Light)'))==='["Staten Island Light","Ambrose Channel Range Light"]'&&JSON.stringify(await NP('First Presbyterian Church, Cherry Valley'))==='["First Presbyterian Church","Cherry Valley"]'&&JSON.stringify(await NP('The Castle (John N. Roberts House, Castle Tea Room), 1307 Massachusetts Street'))==='["The Castle","John N. Roberts House, Castle Tea Room, 1307 Massachusetts Street"]',JSON.stringify(await NP('The Castle (John N. Roberts House, Castle Tea Room), 1307 Massachusetts Street')));
+    ok('a name in one part, or with brackets in its middle, is left whole',JSON.stringify(await NP('Joliet Iron Works'))==='["Joliet Iron Works",""]'&&JSON.stringify(await NP('La Grange M-K-T (Katy) Depot'))==='["La Grange M-K-T (Katy) Depot",""]',JSON.stringify(await NP('La Grange M-K-T (Katy) Depot')));
+    ok('upright: Compare, More and Me are always in reach, in that order, and there is no Full button',m.fix.join()==='lb-cmp,lb-opt,lb-loc'&&!m.inScroll,m.fix.join()); }
   // The compare divider pushed to the right edge: its right-hand label used to stick out past the screen, which made the page itself
   // wider than the phone. In the Android app the whole page could then be dragged about by the layer bar, with blank beside and below it.
   await p.evaluate(()=>{ document.getElementById('lb-cmp').click(); }); await p.waitForTimeout(500);
@@ -74,6 +86,7 @@ const { chromium } = require('playwright');
     ok(name+': the list is tall enough to scroll with a thumb',view&&view.h>=H-80,view&&view.h);
     ok(name+': the layer bar is at the top of the map, not along the bottom edge',bar&&bar.b<=H-120&&ls.b<=H-120&&bar.l>=stage.l-1,bar&&[bar.t,bar.b].join(' '));
     ok(name+': the Full button is there',(await R('#lb-big'))!==null);
+    ok(name+': Compare, More, Me and Full are fixed at the right of the bar',await p.evaluate(()=>[...document.querySelectorAll('#lfix .lb')].filter(x=>x.offsetParent!==null).map(x=>x.id).join())==='lb-cmp,lb-opt,lb-loc,lb-big');
     ok(name+': tabs fit in the column',await p.evaluate(()=>{ const t=document.querySelector('.tabs'); return t.scrollWidth<=t.clientWidth+1; }));
     // a finger drag on the map moves the map
     const c0=await p.evaluate(()=>{ const c=window.__atlasMap.getCenter(); return [c.lat,c.lng]; });
@@ -103,19 +116,21 @@ const { chromium } = require('playwright');
   await p.evaluate(()=>{ const li=[...document.querySelectorAll('#list li')].find(n=>!n.classList.contains('empty')); (li.querySelector('button,a,[role=button]')||li).click(); }); await p.waitForTimeout(600);
   await p.screenshot({path:'/tmp/land_780_place.png'});
   ok('a place page opens in the left column',await p.evaluate(()=>{ const v=document.querySelector('#v-detail'); const r=v.getBoundingClientRect(); return !v.hidden&&r.height>=innerHeight-80&&r.right<=document.querySelector('#stage').getBoundingClientRect().left+1; }));
-  const hd=await p.evaluate(()=>{ const h=document.querySelector('#v-detail .dhead'), v=document.querySelector('#v-detail'), bs=[...h.querySelectorAll('.dtop .btn')].map(b=>b.getBoundingClientRect());
+  const hd=await p.evaluate(()=>{ const h=document.querySelector('#v-detail .dhead'), v=document.querySelector('#v-detail'), bs=[...h.querySelectorAll('.btn')].map(b=>b.getBoundingClientRect());
     return {h:h.getBoundingClientRect().height,view:v.getBoundingClientRect().height,rows:new Set(bs.map(r=>Math.round(r.top))).size,n:bs.length,right:Math.max(...bs.map(r=>r.right)),edge:v.getBoundingClientRect().right,inside:!!h.querySelector('.dphoto,.dmeta,.sub2')}; });
-  ok('the place page\'s fixed head is one row of buttons and the name, under a third of the column',hd.rows===1&&hd.right<=hd.edge&&hd.h<=hd.view/3&&!hd.inside,JSON.stringify(hd));
+  ok('the place page\'s fixed head is the name with the heart beside it and nothing else, under a quarter of the column',hd.n===1&&hd.right<=hd.edge&&hd.h<=hd.view/4&&!hd.inside,JSON.stringify(hd));
+  { const mb=await p.evaluate(()=>{ const b=document.querySelector('#mapback'), st=document.querySelector('#stage').getBoundingClientRect(), sc=document.querySelector('.leaflet-control-scale'); if(!b||b.hidden) return null; const r=b.getBoundingClientRect(), q=sc.getBoundingClientRect(); return {in:r.left>=st.left&&r.right<=st.right&&r.bottom<=st.bottom,above:r.bottom<=q.top+1,left:r.left-st.left,trip:!!document.querySelector('#v-detail .subrow #d-trip'),zoom:[...document.querySelectorAll('#v-detail button')].some(x=>/^Zoom in$/.test(x.textContent))}; });
+    ok('Back floats on the map above the scale; Add to trip is on the line under the name; there is no Zoom in button',!!mb&&mb.in&&mb.above&&mb.left<30&&mb.trip&&!mb.zoom,JSON.stringify(mb)); }
   await p.evaluate(()=>{ document.querySelector('#v-detail').scrollTop=400; }); await p.waitForTimeout(150);
   const sc=await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead'); return Math.round(v.getBoundingClientRect().bottom-h.getBoundingClientRect().bottom); });
   ok('scrolled, three quarters of the column is left to read',sc>=hd.view*0.75,sc+' px under the head of '+Math.round(hd.view));
   await p.screenshot({path:'/tmp/land_780_place_scrolled.png'});
   { const long=await p.evaluate(()=>{ const S=window.__atlasNM.sites().slice().sort((x,y)=>y.name.length-x.name.length)[0]; location.hash='#'+S.id; return S.name; }); await p.waitForTimeout(700);
-    const fn=await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead h2'), f=v.querySelector('.dintro .fullname'); return {cut:h.scrollHeight>h.clientHeight+2,full:f?f.textContent:null,head:Math.round(v.querySelector('.dhead').getBoundingClientRect().height)}; });
+    const fn=await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead h2'), d=v.querySelector('.dhead .dsub'), f=v.querySelector('.dintro .fullname'); return {cut:h.scrollHeight>h.clientHeight+2||(!!d&&d.scrollHeight>d.clientHeight+2),full:f?f.textContent:null,head:Math.round(v.querySelector('.dhead').getBoundingClientRect().height)}; });
     ok('a name too long for two lines is cut in the head and given in full just under it',fn.cut&&fn.full===long&&fn.head<=110,JSON.stringify(fn).slice(0,160));
     await p.screenshot({path:'/tmp/land_780_longname.png'});
     await p.setViewportSize({width:390,height:844}); await p.waitForTimeout(500);
-    ok('upright, where the name is not cut, it is not written twice',await p.evaluate(()=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead h2'); return h.scrollHeight<=h.clientHeight+2&&!v.querySelector('.dintro .fullname'); }));
+    ok('upright, the name is written out in full under the head only when the head had to cut it',await p.evaluate(long=>{ const v=document.querySelector('#v-detail'), h=v.querySelector('.dhead h2'), d=v.querySelector('.dhead .dsub'), f=v.querySelector('.dintro .fullname'), cut=h.scrollHeight>h.clientHeight+2||(!!d&&d.scrollHeight>d.clientHeight+2); return cut?(!!f&&f.textContent===long):!f; },long));
     await p.setViewportSize({width:780,height:360}); await p.waitForTimeout(500);
     ok('and turned back on its side, the full name returns',await p.evaluate(()=>!!document.querySelector('#v-detail .dintro .fullname'))); }
   // the bars that float on the map sit under the layer bar, not on it

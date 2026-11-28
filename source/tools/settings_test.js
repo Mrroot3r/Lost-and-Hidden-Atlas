@@ -142,7 +142,7 @@ const { chromium, devices } = require('playwright');
     await p4.evaluate(()=>window.__atlasNM.setPref('dbl',3));
     const pin=await p4.evaluate(async()=>{ const N=window.__atlasNM, m=window.__atlasMap, s=N.sites().find(x=>x.st==='standing'&&!x.mine); m.setView([s.lat,s.lon],13,{animate:false}); N.syncMarkers(); await new Promise(r=>setTimeout(r,200));
       let mk=null; m.eachLayer(l=>{ if(l.getLatLng&&l.options.riseOnHover&&l.getLatLng().distanceTo([s.lat,s.lon])<2) mk=l; }); if(!mk) return null; mk.fire('click',{latlng:mk.getLatLng()}); await new Promise(r=>setTimeout(r,120)); mk.fire('dblclick',{latlng:mk.getLatLng()}); await new Promise(r=>setTimeout(r,1200));
-      return {z:m.getZoom(),off:Math.round(m.getCenter().distanceTo([s.lat,s.lon])),open:(document.querySelector('#v-detail h2')||{}).textContent===s.name}; });
+      return {z:m.getZoom(),off:Math.round(m.getCenter().distanceTo([s.lat,s.lon])),open:((document.querySelector('#v-detail h2')||{dataset:{}}).dataset.full)===s.name}; });
     ok('a double tap on a pin opens its page and goes to street level, on the pin',!!pin&&pin.z===17&&pin.off<30&&pin.open,JSON.stringify(pin));
     const grp=await p4.evaluate(async()=>{ const N=window.__atlasNM, m=window.__atlasMap; m.setView([42.652,-73.755],9,{animate:false}); N.syncMarkers(); await new Promise(r=>setTimeout(r,300));      /* Albany from far enough out to be one tight disc */
       const discs=[]; m.eachLayer(l=>{ if(l.options&&l.options.icon&&/^clus\b/.test(l.options.icon.options.className||'')) discs.push(l); }); if(!discs.length) return null;
