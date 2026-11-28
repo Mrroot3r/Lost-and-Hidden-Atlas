@@ -82,6 +82,9 @@ try:
     open(os.path.join(tmp,'data_evil.py'),'w').write("import os\nX=1\n"); open(os.path.join(tmp,'data_case.py'),'w').write("from data_evil import os\n")
     files,b=safe_data.check_folder(tmp); ok('refused: importing a module out of another list, in both files',sum('data_evil' in x.split(' ')[0] for x in b)>=1 and sum(x.startswith('data_case') for x in b)>=1,str(len(b))+' problems')
     open(os.path.join(tmp,'bricks_case.py'),'w').write("import subprocess\nBRICK={}\n"); files,b=safe_data.check_folder(tmp); ok('brick files are read too',any(x.startswith('bricks_case') for x in b))
+    import subprocess as _sp
+    r_=_sp.run([sys.executable,os.path.join(os.path.dirname(os.path.abspath(__file__)),'safe_data.py'),os.path.join(tmp,'bricks_case.py')],capture_output=True,text=True)
+    ok('given one file and not a folder, it reads that file (it used to say "0 place lists read")','1 place list' in r_.stdout and 'bricks_case' in r_.stdout and r_.returncode==1,r_.stdout[-200:])
     try: safe_data.must(tmp); ok('must() stops the program',False)
     except SystemExit as e: ok('must() stops the program, saying why',str(e).startswith('STOP'))
 finally: shutil.rmtree(tmp)

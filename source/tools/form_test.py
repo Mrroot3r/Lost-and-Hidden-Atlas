@@ -43,4 +43,10 @@ V='<iframe src="/themes/common-assets/pdf-viewer/viewer.html?file=https%3A%2F%2F
 ok('the form\'s own address is read out of Missouri\'s viewer page',form.pdf_in_viewer(V)=='https://mostateparks.com/sites/g/files/zuston361/files/media/pdf/2025/02/temple-block-building.pdf',form.pdf_in_viewer(V))
 ok('an old Missouri address is known as one that moved',form.moved('https://mostateparks.com/sites/mostateparks/files/Anderson-Electric-Car-Company-Building.pdf') and form.moved('https://dnr.mo.gov/shpo/nps-nr/85000942.pdf') and not form.moved('https://mostateparks.com/media/pdf/x') and not form.moved('https://example.org/a.pdf'))
 ok('the ladder of what to try names the form finder first for a Register form and never stops at the archive',form.ladder('https://npgallery.nps.gov/NRHP/GetAsset/NRHP/85000942_text')[0].startswith('python3 tools/form.py') and len(form.ladder('https://example.org/history'))>=4)
-print(f'{len(fails)} FAILED' if fails else 'form test: 16 checks passed'); sys.exit(1 if fails else 0)
+# a site the shell cannot reach at all is not a dead page: the web fetch tool is another road to it (the asylum pass, November 28, 2026:
+# ohio.edu, sah-archipedia.org, in.gov and seven more would not connect from page.py, and the web fetch tool read most of them)
+ok('a refused connection is told from a dead page',form.unreachable("ERROR HTTPSConnectionPool(host='www.ohio.edu', port=443): Max retries exceeded with url: / (Caused by ProxyError('Unable to connect to proxy', OSError('Tunnel connection failed: 403 Forbidden')))") and form.unreachable('ERROR [Errno -2] Name or service not known') and not form.unreachable('HTTP 404') and not form.unreachable('HTTP 403'))
+L_=form.ladder('https://www.ohio.edu/athens/bldgs/ridges.html','ERROR ProxyError Tunnel connection failed: 403 Forbidden')
+ok('for one, the web fetch tool is the first thing to try, with the same address',L_[0].startswith('The web fetch tool') and 'same address' in L_[0] and 'ohio.edu' in L_[0],L_[0])
+ok('and a dead page keeps the usual order',not form.ladder('https://example.org/gone.html','HTTP 404')[0].startswith('The web fetch tool, first'))
+print(f'{len(fails)} FAILED' if fails else 'form test: 19 checks passed'); sys.exit(1 if fails else 0)

@@ -1,4 +1,9 @@
 import json,sys,re
+import os as _os
+if not _os.environ.get('ATLAS_BUILD_LOCKED'):      # run by itself: wait for a build that is under way (tools/all.sh holds build/.lock while it works)
+    try:
+        import fcntl as _fc; _os.makedirs('build',exist_ok=True); _lk=open('build/.lock','w'); _fc.flock(_lk,_fc.LOCK_EX)
+    except Exception: pass
 import brickrule, legorule, archrule, stonerule
 sys.path.insert(0,'tools')
 # Before a single place list is run: prove that each one is only data (tools/safe_data.py says why this matters).

@@ -39,11 +39,13 @@ def left(st,lines=None):
     Listings a session set aside (choose.py --skip) and those the state's index marks demolished are not counted."""
     S=next((s for s in STATES if s['k']==st),None)
     if S is None: return None,'No state has the key "%s" (two letters, such as mo, ks, ny).'%st
-    f='cache/nrhp/%s.json'%st
-    if not os.path.exists(f):
-        try: subprocess.run([sys.executable,'tools/nrhp_state.py',S['name'].upper(),st],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,timeout=600)
-        except Exception: pass
-    if not os.path.exists(f): return None,'There is no National Register list for %s here (a Canadian province, or the Park Service did not answer).'%S['name']
+    f='cache/nrhp/%s.json'%st; _why=''
+    if not os.path.exists(f):      # the download's failure used to be thrown away, so a session saw "no list" with no reason (the asylum pass, November 28, 2026)
+        try:
+            _r=subprocess.run([sys.executable,'tools/nrhp_state.py',S['name'].upper(),st],capture_output=True,text=True,timeout=600)
+            if _r.returncode: _why=([l for l in ((_r.stderr or '')+(_r.stdout or '')).strip().split('\n') if l.strip()] or [''])[-1][:160]
+        except Exception as _e: _why=str(_e)[:160]
+    if not os.path.exists(f): return None,'There is no National Register list for %s here: a Canadian province, or the Park Service\'s map service did not answer from this workspace%s. The count by county cannot be made this session; work from tools/start.py and the open leads, and say so in your note.'%(S['name'],' ('+_why+')' if _why else '')
     if not os.path.exists('build/sites.json'): subprocess.run([sys.executable,'tools/build_sites.py'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
     reg=json.load(open(f,encoding='utf-8')); lines=claim_lines() if lines is None else lines
     skip={k.split(':',1)[1] for k in dry.skipped(lines) if k.startswith(st+':')}|state_says_gone(st,reg)

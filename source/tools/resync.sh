@@ -21,19 +21,36 @@ for d in tools src; do
     if ! git cat-file -e "$SC:$rel" 2>/dev/null || ! git show "$SC:$rel" | cmp -s - "$f"; then cp "$f" "$W/mine/$d/"; fi
   done
 done
+# The small files tools keep beside themselves (tools/.legos_key and the like: which file this workspace writes its answers to)
+# begin with a dot, so the loop above does not see them and setup.sh would delete them. Until November 28, 2026 a correction made
+# after a resync went into a second file for that reason.
+mkdir -p "$W/mine/dot"; for f in "$W"/tools/.[!.]*; do [ -f "$f" ] && cp "$f" "$W/mine/dot/"; done
+touch "$W/mine/.taken"      # anything in the workspace newer than this was written while this script worked (a helper finishing a list)
 for f in "$W"/build/topo/*.webp; do [ -e "$f" ] || continue; git cat-file -e "$SC:topo/$(basename "$f")" 2>/dev/null || cp "$f" "$W/mine/topo/"; done
 cp "$W/build/topo/meta.json" "$W/mine/topo-meta.json" 2>/dev/null || true
 # 2. a clean workspace from today's main (the LiDAR ledger is folded together, not replaced)
 git checkout -q --detach origin/main
 bash source/tools/setup.sh "$W" | grep -v "^NOTE\|^  \|Workspace ready" || true
 # 3. put this session's work back. A file that main changed too is not overwritten: it is left in mine/ and named.
-BOTH=""
+BOTH=""; LATER=""
 for d in tools src; do
   for f in "$W/mine/$d"/*; do
     [ -f "$f" ] || continue; rel="source/$d/$(basename "$f")"
-    if git cat-file -e "$SC:$rel" 2>/dev/null && ! git diff --quiet "$SC" origin/main -- "$rel"; then BOTH="$BOTH $d/$(basename "$f")"; else cp "$f" "$W/$d/"; fi
+    b="$(basename "$f")"; t="$W/$d/$b"
+    # Somebody wrote this file after setup.sh refilled the folder (helpers work side by side in one workspace): theirs is the newer
+    # state, and the copy taken at the start must not go back over it. A file setup.sh put there is the repository's, byte for byte.
+    if [ -e "$t" ] && ! { git cat-file -e "origin/main:$rel" 2>/dev/null && git show "origin/main:$rel" | cmp -s - "$t"; }; then LATER="$LATER $d/$b"; continue; fi
+    if git cat-file -e "$SC:$rel" 2>/dev/null && ! git diff --quiet "$SC" origin/main -- "$rel"; then BOTH="$BOTH $d/$b"; else cp "$f" "$W/$d/"; fi
   done
 done
+# A file written between the copy taken at the start and setup.sh emptying the folder: setup.sh moved it to stray/ if the repository
+# does not have it. Where it is newer than the copy and differs from it, it is the later state of a list somebody was still writing.
+for f in "$W"/stray/*; do
+  [ -f "$f" ] && [ "$f" -nt "$W/mine/.taken" ] || continue; b="$(basename "$f")"
+  case " $LATER " in *" tools/$b "*) continue;; esac
+  if [ ! -e "$W/mine/tools/$b" ] || ! cmp -s "$f" "$W/mine/tools/$b"; then cp "$f" "$W/tools/$b"; LATER="$LATER tools/$b"; fi
+done
+for f in "$W"/mine/dot/.[!.]*; do [ -f "$f" ] && [ ! -e "$W/tools/$(basename "$f")" ] && cp "$f" "$W/tools/"; done
 N=0; for f in "$W"/mine/topo/*.webp; do [ -e "$f" ] || continue; cp "$f" "$W/build/topo/"; N=$((N+1)); done
 python3 - "$W" <<'PY'
 import json,sys,os
@@ -43,6 +60,7 @@ if os.path.exists(a) and os.path.exists(b):
     now.update(add); json.dump(now,open(b,'w'))
 PY
 echo "Caught up with main. Kept from this session: $(ls "$W/mine/tools" "$W/mine/src" 2>/dev/null | grep -v ':' | grep -c . ) file(s) in tools/ and src/, $N old-map crop(s), and the LiDAR ledger."
+if [ -n "$LATER" ]; then echo "Written while this ran, and kept as they now are (not the copy taken at the start):"; for f in $LATER; do echo "  $f"; done; fi
 if [ -n "$BOTH" ]; then
   echo "NEEDS A DECISION: main changed these files and so did this session. The workspace now has main's version; yours is in $W/mine/:"; for f in $BOTH; do echo "  $f"; done
   echo "Put your change into the workspace copy by hand, then build."
