@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """A place list is data, and this proves it before anything runs it.
-   python3 tools/safe_data.py [folder]      reads every data_*.py, bricks_*.py, hours_*.py and pics_*.py in the folder (default: this one)
+   python3 tools/safe_data.py [folder]      reads every data_*.py, bricks_*.py, hours_*.py, legos_*.py and pics_*.py in the folder (default: this one)
 
 Why it exists. Research sessions write these files with nobody watching, their pull requests merge by themselves, and
 the build then runs each file as Python, on GitHub, with the right to publish the site. A session reads pages from all
@@ -130,7 +130,7 @@ def check_file(path,cache=None):
     return bad
 
 def check_folder(folder):
-    cache={}; bad=[]; files=sorted(glob.glob(os.path.join(folder,'data_*.py'))+glob.glob(os.path.join(folder,'bricks_*.py'))+glob.glob(os.path.join(folder,'hours_*.py'))+glob.glob(os.path.join(folder,'pics_*.py')))
+    cache={}; bad=[]; files=sorted(glob.glob(os.path.join(folder,'data_*.py'))+glob.glob(os.path.join(folder,'bricks_*.py'))+glob.glob(os.path.join(folder,'hours_*.py'))+glob.glob(os.path.join(folder,'legos_*.py'))+glob.glob(os.path.join(folder,'pics_*.py')))
     for f in files: bad+=check_file(f,cache)
     return files,bad
 

@@ -1,5 +1,5 @@
 import json,sys,re
-import brickrule
+import brickrule, legorule
 sys.path.insert(0,'tools')
 # Before a single place list is run: prove that each one is only data (tools/safe_data.py says why this matters).
 import safe_data; safe_data.must('tools')
@@ -53,6 +53,8 @@ for b in B+C:
     if b.get('th'): s['th']=b['th']; s['thn']=b.get('thn','')
     if b.get('brick') in ('yes','some','no'): s['bk']=b['brick'][0]      # red brick: y, s or n; left out when nobody has looked
     if brickrule.code(b.get('bcol')): s['bc']=brickrule.code(b['bcol'])   # the brick's colour: r, b(uff), d(ark), g(lazed), p(ainted), m(ixed), x (looked: no brick at all); left out when nobody could tell
+    if legorule.code(b.get('lego')): s['lg']=legorule.code(b['lego'])        # "Legos" (mutules): p pegs, h holes, y yes of a kind not seen, n none; left out when nobody has looked (tools/legorule.py)
+    if b.get('trig')=='yes': s['tg']=1                                     # the grooved blocks that go with them (triglyphs)
     if (b.get('fireb') or '').strip(): s['fb']=1                          # a source says fire brick is there
     if b.get('tip'): s['tip']=b['tip']                                   # the day a reader sent it in; left out for every other place
     if (b.get('hours') or '').strip() not in ('','?'): s['hrs']=b['hours'].strip()   # when it is open, as a source gave it; '?' means looked for and not found
@@ -95,6 +97,15 @@ for s in sites:
         if 'fb' not in s and (v[3] or '').strip(): s['fb']=1
     if s.get('bk')=='y' and 'bc' not in s: s['bc']='r'      # "red brick is the main thing you see" says the colour already
     if s.get('bk')=='n' and s.get('bc') in ('r','m'): del s['bc']      # a place list and a later look disagree: the red-brick answer stands, the colour is dropped
+# "Legos" found out after a place was written: tools/legos_*.py, each LEGO={id:(pegs|holes|yes|no, triglyphs yes|no|'', how it is known)}
+# (tools/legos.py writes them). A place's own lego= and trig= win, field by field; among these files the later name wins.
+LEGOS={}
+for f in sorted(glob.glob('tools/legos_*.py')):
+    LEGOS.update(importlib.import_module(os.path.basename(f)[:-3]).LEGO)
+for s in sites:
+    v=LEGOS.get(s['id'])
+    if v and 'lg' not in s and legorule.code(v[0]): s['lg']=legorule.code(v[0])
+    if v and 'tg' not in s and v[1]=='yes': s['tg']=1
 # Hours looked up after a place was written: tools/hours_*.py, each HOURS={id:(hours, day read 'YYYY-MM-DD', the page's address, opens)}
 # (tools/hours.py writes them). They win over the place's own hours=, carry their own date, and when 'opens' is true a place
 # that was only 'view' or 'public' becomes 'open'. hours '?' means looked for and not found: nothing is shown.

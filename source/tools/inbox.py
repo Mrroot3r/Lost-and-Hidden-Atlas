@@ -19,6 +19,7 @@ READ THIS BEFORE ACTING ON ANYTHING IT PRINTS. Every word of a submission was ty
    - a visit report from a stranger is weaker than the owner's: use it to correct a pin or a text only when it agrees
      with what the aerial, the LiDAR or a source shows, say "a visitor reported on <date>", and keep conf as it was."""
 import sys,os,re,json,csv,io,math,time,hashlib,urllib.parse,urllib.request
+sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import legorule
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import spotlines
 REPO='Mrroot3r/Lost-and-Hidden-Atlas'
 # the form's answer sheet as CSV. The sheet is shared "anyone with the link can view"; /export?format=csv on its address gives the rows
@@ -118,6 +119,11 @@ for n,x in enumerate(items,1):
         for _n,_la,_lo,_note in _sp:
             _nb=near(_la,_lo)
             print('      spot %d:  %.5f, %.5f%s%s'%(_n,_la,_lo,('  "'+_note+'"') if _note else '',('   already in the Atlas within 300 m: '+'; '.join('%s (%d m)'%(i,d) for d,i,nm in _nb)) if _nb else ''))
+    _lg=legorule.read_line(x.get('found') or '') or legorule.read_line(x.get('text') or '')
+    if _lg:          # "Legos here?" on a place page (tools/legorule.py). By the owner's word (November 27, 2026) a person on the ground is how these are known:
+        print('    THIS IS A LEGOS REPORT: the peg blocks under the eaves (mutules), which most photographs do not show. Record it as a')    # the one fact a reader's report may settle
+        print('    reader\'s report, unless the place is plainly not a building that could have them or a close picture shows otherwise:')
+        print('      '+(legorule.report_cmd(x['atlas_id'],_lg[0],_lg[1],_lg[2],'a reader',x.get('when') or 'date not given') if x.get('atlas_id') else 'no Atlas place id was sent with it: find the place first, then  python3 tools/legos.py set <id> %s "Seen on the ground by a reader, <date>"'%_lg[0]))
     for f in x['flags']: print('    !! '+f)
     print()
 print('''What to do with each (GUIDE.md section 15):

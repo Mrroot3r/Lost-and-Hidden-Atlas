@@ -68,7 +68,9 @@ if not REPO or not os.path.isdir(os.path.join(REPO,'source','tools')): print('(n
 else:
     d=tempfile.mkdtemp(); T=os.path.join(d,'source','tools')
     shutil.copytree(os.path.join(REPO,'source','tools'),T,ignore=shutil.ignore_patterns('__pycache__'))
-    for f_ in('check.py','dupes.py','data_b.py'): shutil.copy(os.path.join(W,'tools',f_),T)
+    import glob as _g          # the workspace's own tools over the clone's, so a check.py that needs a module the clone does not have yet still runs; the place lists stay the clone's
+    for f_ in _g.glob(os.path.join(W,'tools','*.py')):
+        if not re.match(r'(data|pics|hours|bricks|legos)_',os.path.basename(f_)) or os.path.basename(f_)=='data_b.py': shutil.copy(f_,T)
     shutil.copytree(os.path.join(REPO,'source','src'),os.path.join(d,'source','src')); shutil.copytree(os.path.join(REPO,'notes'),os.path.join(d,'notes'))
     os.makedirs(os.path.join(d,'source','build')); shutil.copy(os.path.join(REPO,'source','build','states.json'),os.path.join(d,'source','build'))
     sys.path.insert(0,T); import data_b

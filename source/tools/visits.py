@@ -29,6 +29,15 @@ if sp:
         note=str(x.get('note') or '').replace('|','/').strip()
         print('| Spot %s (owner, %s) | %.5f, %.5f | The owner marked this building as old and worth researching%s | Everything: work out which building stands at this point, then research it |'%(x.get('n','?'),x.get('t','?'),x['lat'],x['lon'],(': "'+note+'"') if note else ''))
     print()
+# "Legos": the peg blocks under the eaves that the owner catalogues (tools/legorule.py). He marks a place on its page ("Legos here?");
+# each mark is how it is known, and tools/legos.py records it.
+lg=(j.get('legos') if isinstance(j,dict) else None) or []
+if lg:
+    sys.path.insert(0,os.path.dirname(os.path.abspath(__file__))); import legorule
+    print('LEGOS: %d place(s) the owner marked. Run each line from the workspace after build_sites.py; the legos file goes out with the pull request.'%len(lg))
+    for x in lg:
+        if x.get('lego') in ('pegs','holes','no'): print('  '+legorule.report_cmd(x.get('id'),x['lego'],x.get('trig') or '',str(x.get('note') or '').strip(),"the Atlas's keeper",x.get('t') or 'date not given')+'      # '+str(x.get('place') or ''))
+    print()
 if not vs: print('No visit reports in that file.'); sys.exit(0)
 ledger='--ledger' in sys.argv; L=None
 if ledger:

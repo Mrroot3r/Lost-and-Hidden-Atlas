@@ -204,7 +204,7 @@ async function fetchDT(){
    map is, and is never hidden as "nothing to see". Filters has "My favourites" to list them. */
 const isFav=id=>Array.isArray(U.fav)&&U.fav.indexOf(id)>=0;
 function favToggle(s){ if(!Array.isArray(U.fav)) U.fav=[]; const i=U.fav.indexOf(s.id); if(i>=0) U.fav.splice(i,1); else U.fav.push(s.id); save(); refresh(); return i<0; }
-const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,tip:false,y0:0,y1:0,fresh:'',my:'any',hideDone:false};
+const F={fav:false,line:null,q:'',cat:new Set(),st:new Set(),reg:'',acc:new Set(),eff:new Set(),max:0,tag:'',now:false,lead:false,oldmap:false,pub:false,brick:false,lego:false,tip:false,y0:0,y1:0,fresh:'',my:'any',hideDone:false};
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
@@ -216,7 +216,7 @@ function brickWords(s){ const c=s.bc, a=s.bk==='y'?'Red brick':s.bk==='s'?(c==='
     ({b:'Buff or yellow brick',d:'Dark brick',g:'Glazed brick',p:'Painted brick'})[c]||'';
   return [a,s.fb?'Fire brick':''].filter(Boolean).join(' · '); }
 function hay(s){ let h=HAY.get(s.id); if(!h||h.s!==s){ h={s:s,n:fold(s.name+' '+(s.name2||'')),t:fold(s.town),
-  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,brickWords(s).toLowerCase().replace(' · ',' '),s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
+  x:fold([s.years,(CAT[s.cat]||[])[0],STS[s.st],REG[s.reg],s.hook,s.story,s.look,s.accn,s.hrs,Array.isArray(s.tags)?s.tags.join(' '):s.tags,brickWords(s).toLowerCase().replace(' · ',' '),legoWords(s).toLowerCase().replace(' · ',' '),s.tip?'sent in by a reader':''].filter(Boolean).join(' '))}; HAY.set(s.id,h); } return h; }
 let qMemo=['',[]];
 function qWords(){ if(qMemo[0]!==F.q) qMemo=[F.q,fold(F.q).split(/\s+/).filter(Boolean)]; return qMemo[1]; }
 function qTier(s){ const h=hay(s), w=qWords(); return w.every(x=>h.n.indexOf(x)>=0)?0:w.every(x=>h.n.indexOf(x)>=0||h.t.indexOf(x)>=0)?1:2; }
@@ -238,6 +238,7 @@ function match0(s){
   if(F.y0||F.y1){ const y=yearOf(s); if(y<0){ if(F.y0||!F.y1||-y>F.y1) return false; } else if(!y||(F.y0&&y<F.y0)||(F.y1&&y>F.y1)) return false; }      /* the year it dates from, within the range asked for; a place with no year is left out, not guessed */
   if(F.fav&&!isFav(s.id)) return false;
   if(F.tip&&!s.tip) return false;      /* a place that began as a reader's tip carries the day it was sent */
+  if(F.lego&&!hasLego(s)) return false;       /* "Legos": the peg blocks under the eaves, or the grooved blocks that go with them */
   if(F.brick&&s.bk!=='y'&&s.bk!=='s') return false;      /* red brick: bk is y (mostly), s (some), n (none); absent when nobody has looked */
   if(F.pub&&!(s.pl&&s.pl[2]==='OA')) return false;
   if(F.fresh&&s.new!==F.fresh) return false;
@@ -258,10 +259,20 @@ function yearOf(s){ if(YEAR.has(s.id)) return YEAR.get(s.id); const t=String(s.y
     (t.match(/(1[5-9]\d\d|20[0-2]\d)(?!\d)/g)||[]).forEach(m=>{ if(!y||+m<y) y=+m; });
     const c=/(\d\d)(st|nd|rd|th) century/i.exec(t); if(c){ const v=(+c[1]-1)*100; if(!y||v<y) y=v; } }
   YEAR.set(s.id,y); return y; }
-function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.y0||F.y1?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
+function activeCount(){ return (F.line?1:0)+(F.q?1:0)+F.cat.size+F.st.size+(F.reg?1:0)+F.acc.size+F.eff.size+(F.max?1:0)+(F.now?1:0)+(F.lead?1:0)+(F.oldmap?1:0)+(F.pub?1:0)+(F.brick?1:0)+(F.lego?1:0)+(F.tip?1:0)+(F.fav?1:0)+(F.y0||F.y1?1:0)+(F.fresh?1:0)+(F.my!=='any'?1:0)+(F.hideDone?1:0); }
 function syncFcount(){ const n=activeCount()-(F.q?1:0), b=$('#filt-btn'); { const fc=$('#fclear'), ct=$('#f-clear-top'); if(fc) fc.hidden=!activeCount(); if(ct) ct.hidden=!activeCount(); } $('#fcount').textContent=n?String(n):''; b.classList.toggle('on',n>0); b.setAttribute('aria-expanded',String($('#filters').open)); b.setAttribute('aria-label',n?'Filters, '+n+' on':'Filters'); }
-function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.tip=false;F.fav=false;F.y0=0;F.y1=0;F.fresh='';F.my='any';F.hideDone=false; }
+function clearF(){ setLine(null,true); F.q='';F.cat.clear();F.st.clear();F.reg='';F.acc.clear();F.eff.clear();F.max=0;F.now=false;F.lead=false;F.oldmap=false;F.pub=false;F.brick=false;F.lego=false;F.tip=false;F.fav=false;F.y0=0;F.y1=0;F.fresh='';F.my='any';F.hideDone=false; }
 /* batches of places, oldest first; each data file names its own, so a new state needs no change here */
+/* "Legos" (the owner's word, November 27, 2026): the flat blocks studded with pegs under the eaves of a building in the Doric order,
+   properly mutules with their guttae, and the grooved blocks in the frieze below them, triglyphs. lg: p pegs, h holes where the pegs
+   would be, y a source names them and nobody has seen which kind, n none. tg: triglyphs are there. A reader's own mark, U.lego[id] =
+   {k:'p'|'h'|'n', t:0|1, x: a line more, d: the day}, is kept on the device and stands in for the Atlas's answer there
+   (tools/legorule.py holds the rules for the Atlas's own; legoSection() is where a reader says so). */
+function legoOf(s){ const m=s.id&&U.lego?U.lego[s.id]:null; return m?{k:m.k,t:m.t||(s.tg?1:0)}:{k:s.lg||'',t:s.tg?1:0}; }
+function legoWords(s){ const g=legoOf(s), a=g.k==='p'?'Legos (mutules with pegs)':g.k==='h'?'Legos with holes (mutules)':g.k==='y'?'Legos (mutules)':'';
+  return [a,g.t?'Triglyphs':''].filter(Boolean).join(' · '); }
+function hasLego(s){ const g=legoOf(s); return g.k==='p'||g.k==='h'||g.k==='y'||!!g.t; }
+function legoExport(){ return Object.keys(U.lego||{}).map(id=>{ const m=U.lego[id], s=byId(id); return {id:id,place:s?s.name+(s.town?', '+s.town:''):'',lego:{p:'pegs',h:'holes',n:'no'}[m.k]||'',trig:m.t?'yes':'',note:m.x||'',t:m.d||''}; }); }
 const BATCHES=D.batches||[];
 /* Five shortcuts (the owner, November 24, 2026: the row had become clutter). Gone: ruins you can walk to and within 30 minutes (the Near
    tab does that), standing from before 1800 (the year range does), and the two that only repeated a chip under Kind of place. */
@@ -334,7 +345,7 @@ function buildFilters(){
   fb.append(el('div',{class:'field'},el('span',{text:'Dates from (years)'}),el('div',{class:'yrow'},yBox('f-y0','y0','from'),el('span',{text:'to'}),yBox('f-y1','y1','to'),age)));
   if(BATCHES.length){ const bs=el('select',{id:'f-batch',onchange:e=>{F.fresh=e.target.value;refresh();}},el('option',{value:'',text:'Any time'}),BATCHES.slice().reverse().map(b=>el('option',{value:b.key,text:b.label+' ('+b.n+')'}))); bs.value=F.fresh; fb.append(el('label',{class:'field'},el('span',{text:'Added in'}),bs)); }
   const tog=(label,key)=>el('button',{class:'chip',type:'button','aria-pressed':F[key]?'true':'false',onclick:()=>{F[key]=!F[key];refresh();}},label);
-  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('My favourites','fav'),tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('Sent in by readers','tip'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
+  fb.append(el('div',{class:'fgrp'},el('span',{class:'lbl',text:'Only show'}),el('div',{class:'chips'},tog('My favourites','fav'),tog('Changing right now','now'),tog('Leads and rough pins','lead'),tog('Has an old map overlay','oldmap'),tog('Red brick to see','brick'),tog('Legos to see','lego'),tog('Sent in by readers','tip'),tog('On open public land','pub'),tog('Hide filmed and skipped','hideDone'))));
   /* the way out of a long panel: close it and go to the list */
   fb.append(el('div',{class:'row fdone'},el('button',{class:'btn pri',type:'button',id:'f-done',onclick:()=>{ $('#filters').open=false; syncFcount(); const t=$('#v-list'); if(t&&t.scrollIntoView) t.scrollIntoView({block:'start'}); }},'Show '+visible.length+(visible.length===1?' place':' places')),
     el('button',{class:'btn sm',type:'button',onclick:()=>{clearF();$('#q').value='';refresh();}},'Clear all filters')));
@@ -2578,7 +2589,7 @@ function renderDetail(s){
         map?el('button',{class:'btn sm',type:'button',onclick:()=>map.flyTo([p.lat,p.lon],17,{duration:0.7})},'Zoom in'):null)),
     el('h2',{text:s.name})),
     el('div',{class:'dintro pad'},
-    el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s)].filter(Boolean).join(' · ')}),
+    el('p',{class:'sub2',text:[s.name2,s.town,s.years,brickWords(s),legoWords(s)].filter(Boolean).join(' · ')}),
     tags,
     s.mine?sendRow(s):null, twinNote(s),
     photoBox(s),
@@ -2641,7 +2652,7 @@ function renderDetail(s){
   if(s.look) st.append(el('p',null,el('b',{text:'Look for: '}),s.look));
   if(s.hook) st.append(el('p',{class:'hook',text:s.hook}));
   if(s.story||s.look||s.hook||s.fr) v.append(st);
-  v.append(visitSection(s)); if(!s.mine) v.append(problemSection(s));
+  v.append(visitSection(s)); if(!s.mine){ v.append(legoSection(s)); v.append(problemSection(s)); }
   /* mine */
   const sv=el('span',{class:'note-saved',text:''});
   const stSel=el('select',{id:'my-status',onchange:e=>{ if(e.target.value) U.status[s.id]=e.target.value; else delete U.status[s.id]; save(); syncMarkers(); sv.textContent='Saved'; }},Object.keys(MY).map(k=>el('option',{value:k,text:MY[k]})));
@@ -2799,18 +2810,21 @@ const SHARE={gh:'https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new',
   ent:{kind:'entry.1512318193',place:'entry.1603685238',where:'entry.1784127289',text:'entry.245411565',source:'entry.1131631114',access:'entry.2120312031'}};
 const cut=(t,n)=>{ t=String(t||''); return t.length>n?t.slice(0,n-1)+'…':t; };
 /* f: {place, where, text, source, access} for a lead; for a visit also {id, when, found, spot} */
-function shareText(kind,f){ if(kind==='problem') return ['A problem with a place on the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Problem: '+(f.reason||''),'More: '+(f.text||'')].join('\n');
+function legoLine(f){ return 'Legos seen: '+({p:'pegs',h:'holes',n:'none'})[f.k]+(f.t?'; triglyphs too':''); }
+function shareText(kind,f){ if(kind==='lego') return ['Legos on a place on the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),legoLine(f),'More: '+(f.text||'')].join('\n');
+  if(kind==='problem') return ['A problem with a place on the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Problem: '+(f.reason||''),'More: '+(f.text||'')].join('\n');
   return (kind==='visit'?['Visit report for the Lost & Hidden Atlas','Place: '+f.place+(f.id?' ('+f.id+')':''),'Visited: '+(f.when||''),'Found: '+(f.found||''),'What is there: '+(f.text||''),'Access as found: '+(f.access||''),'True spot: '+(f.spot||'the pin is right, or not known')]
     :['A place for the Lost & Hidden Atlas','Place: '+(f.place||''),'Where: '+(f.where||''),'What I know: '+(f.text||''),'Source or how I know: '+(f.source||''),'Can the public go there: '+(f.access||'')]).join('\n'); }
 function shareLinks(kind,f){ const q=o=>Object.keys(o).filter(k=>o[k]).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(cut(o[k],1500))).join('&');
-  const gh=SHARE.gh+'?'+(kind==='problem'?q({template:'problem.yml',title:'Problem: '+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),problem:f.reason,more:f.text}):kind==='visit'
-    ?q({template:'visit.yml',title:'Visit: '+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),when:f.when,found:f.found,there:f.text,access:f.access,spot:f.spot})
+  if(kind==='lego') f=Object.assign({},f,{found:legoLine(f),when:f.when||'',access:'',spot:''});      /* it travels as a visit report, a kind the form and the issue template already know; tools/inbox.py reads the first words */
+  const gh=SHARE.gh+'?'+(kind==='problem'?q({template:'problem.yml',title:'Problem: '+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),problem:f.reason,more:f.text}):kind==='visit'||kind==='lego'
+    ?q({template:'visit.yml',title:(kind==='lego'?'Legos: ':'Visit: ')+cut(f.place,80),place:f.place+(f.id?' ('+f.id+')':''),when:f.when,found:f.found,there:f.text,access:f.access,spot:f.spot})
     :q({template:'lead.yml',title:'Lead: '+cut(f.place||'a place',80),place:f.place,where:f.where,know:f.text,source:f.source}));
   let form='';
   if(SHARE.form&&SHARE.ent.place){ const e=SHARE.ent, o={}; const put=(k,v)=>{ if(e[k]&&v) o[e[k]]=v; };
-    put('kind',kind==='problem'?'A problem with a place':kind==='visit'?'A visit report':'A place I know about'); put('place',f.place+(kind!=='lead'&&f.id?' ('+f.id+')':''));
-    put('where',kind==='problem'?'':kind==='visit'?[f.when?'Visited '+f.when:'',f.spot?'true spot '+f.spot:''].filter(Boolean).join('; '):f.where);
-    put('text',kind==='problem'?['Problem: '+(f.reason||''),f.text].filter(Boolean).join('. '):kind==='visit'?[f.found,f.text].filter(Boolean).join('. '):f.text); put('source',f.source); put('access',f.access);
+    put('kind',kind==='problem'?'A problem with a place':kind==='visit'||kind==='lego'?'A visit report':'A place I know about'); put('place',f.place+(kind!=='lead'&&f.id?' ('+f.id+')':''));
+    put('where',kind==='problem'||kind==='lego'?'':kind==='visit'?[f.when?'Visited '+f.when:'',f.spot?'true spot '+f.spot:''].filter(Boolean).join('; '):f.where);
+    put('text',kind==='problem'?['Problem: '+(f.reason||''),f.text].filter(Boolean).join('. '):kind==='visit'||kind==='lego'?[f.found,f.text].filter(Boolean).join('. '):f.text); put('source',f.source); put('access',f.access);
     form=SHARE.form+(SHARE.form.indexOf('?')<0?'?':'&')+'usp=pp_url&'+q(o); }
   return {gh:gh,form:form}; }
 /* one link that sends a spot, coordinates already filled in: from a field-log note or a long press on the map */
@@ -2819,7 +2833,7 @@ const WHICH=()=>el('p',{class:'which',text:'My places stay on this device. The p
 function spotLink(name,la,lo,text,label){ const L=shareLinks('lead',{place:name||'',where:(+la).toFixed(5)+', '+(+lo).toFixed(5),text:text||'',source:'I was there',access:''}); return ext(L.form||L.gh,label||'Send this spot to the public Atlas','btn sm spot-send'); }
 function shareBox(kind,f){ const L=shareLinks(kind,f), cp=el('button',{class:'btn sm',type:'button'},'Copy as text'); cp.addEventListener('click',()=>copy(shareText(kind,f),cp));
   return el('div',{class:'sharebox'},
-    el('p',{class:'snote',style:'display:block',text:(kind==='problem'?'Send this':kind==='visit'?'Send this report':'Send this place')+' so the map can be corrected for everyone. A page opens with it filled in; nothing is sent until you press Submit there. What you send is public, so leave out anything private. Reports are checked before the map changes.'}),
+    el('p',{class:'snote',style:'display:block',text:(kind==='problem'||kind==='lego'?'Send this':kind==='visit'?'Send this report':'Send this place')+' so the map can be corrected for everyone. A page opens with it filled in; nothing is sent until you press Submit there. What you send is public, so leave out anything private. Reports are checked before the map changes.'}),
     el('div',{class:'row'},
       L.form?ext(L.form,'Send it (no account needed)','btn pri share-form'):null,
       ext(L.gh,L.form?'Post it on GitHub':'Post it on GitHub (free account)','btn sm share-gh'),cp)); }
@@ -2833,6 +2847,22 @@ let visitOpen=null;      /* {id, i} while a report is being written or edited; i
    not what the Atlas is for, is gone or changed, has its pin or a fact wrong. Not a visit report: nobody has to have been there.
    It goes the way the other reports go (the form or a GitHub issue, kind "A problem with a place") and waits in the same inbox. */
 const PROBLEMS=['Not what the Atlas is for','It is gone, or has changed','The pin is in the wrong spot','A fact is wrong','Something else'];
+/* "Legos here?" The people who look up at cornices are the best source there is for this: most photographs do not show the eaves closely
+   enough (the owner, November 27, 2026). The answer is kept on the device at once, shows on the page and in the Legos filter, and can be
+   sent the way a visit report is. Folded away like the problem report, so the page is no longer for those who do not care. */
+function legoSection(s){ if(!U.lego) U.lego={}; const d=el('details',{class:'sec pad prob',id:'lego'},el('summary',{text:'Legos here? Say what you saw'})), out=el('div',{id:'lego-out'});
+  const mine=()=>U.lego[s.id]||null, has=s.lg||s.tg, base=Object.assign({},s,{id:''});
+  const note=el('input',{type:'text',id:'lego-note',placeholder:'One line more, if you like (which side, how many pegs)',maxlength:'300','aria-label':'More about the Legos',value:(mine()||{}).x||''});
+  const trig=el('input',{type:'checkbox',id:'lego-t',checked:!!(mine()||{}).t});
+  const clr=el('button',{class:'btn sm',type:'button',id:'lego-clear'},'Clear my answer');
+  const show=()=>{ const m=mine(), sub=document.querySelector('#v-detail .sub2'); if(sub) sub.textContent=[s.name2,s.town,s.years,brickWords(s),legoWords(s)].filter(Boolean).join(' · ');
+    out.replaceChildren(); clr.hidden=!m; if(m) out.append(shareBox('lego',{place:s.name+(s.town?', '+s.town:''),id:s.id,k:m.k,t:m.t,text:m.x||''})); };
+  const sync=()=>{ const w=d.querySelector('input[name=lego-k]:checked'); if(!w) return; U.lego[s.id]={k:w.value,t:trig.checked&&w.value!=='n'?1:0,x:note.value.trim(),d:new Date().toISOString().slice(0,10)}; saveNow(); HAY.delete(s.id); show(); };
+  clr.addEventListener('click',()=>{ delete U.lego[s.id]; saveNow(); HAY.delete(s.id); d.querySelectorAll('input[name=lego-k]').forEach(i=>{ i.checked=false; }); trig.checked=false; note.value=''; show(); });
+  d.append(el('p',{class:'snote',style:'display:block',text:'"Legos" are the flat blocks studded with pegs under the eaves of some old buildings, often three rows of six. Their proper name is mutules, and the pegs are guttae. The grooved blocks in the band below them are triglyphs.'+(has?' The Atlas has this place as: '+legoWords(base)+'.':'')}),
+    el('div',{class:'probwhy'},...[['p','Pegs'],['h','Holes where the pegs would be'],['n','None, and I looked closely']].map(o=>{ const i=el('input',{type:'radio',name:'lego-k',value:o[0],checked:(mine()||{}).k===o[0]}); i.addEventListener('change',sync); return el('label',null,i,' '+o[1]); }),
+      el('label',null,trig,' The grooved blocks below them too (triglyphs)')),note,out,clr);
+  trig.addEventListener('change',sync); note.addEventListener('input',debounce(sync,200)); show(); return d; }
 function problemSection(s){ const d=el('details',{class:'sec pad prob',id:'prob'},el('summary',{text:'Report a problem with this place'})), out=el('div',{id:'prob-out'});
   const note=el('input',{type:'text',id:'prob-note',placeholder:'One line more, if you like',maxlength:'300','aria-label':'More about the problem'});
   const sync=()=>{ const w=d.querySelector('input[name=prob-why]:checked'); out.replaceChildren(); if(w) out.append(shareBox('problem',{place:s.name+(s.town?', '+s.town:''),id:s.id,reason:w.value,text:note.value.trim()})); };
@@ -2976,7 +3006,7 @@ function dataSections(v){
   const dump=()=>JSON.stringify(U);
   const b1=el('button',{class:'btn sm',type:'button'},'Copy backup'); b1.addEventListener('click',()=>{ out.value=dump(); copy(out.value,b1); });
   const b2=el('button',{class:'btn sm',type:'button',onclick:()=>{ out.value=dump(); try{ const a=el('a',{href:URL.createObjectURL(new Blob([out.value],{type:'application/json'})),download:'lost-hidden-atlas-backup.json'}); document.body.append(a); a.click(); a.remove(); }catch(e){} }},'Save backup file');
-  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status,visits:visitExport(),spots:spotExport()},null,1); out.value=t; copy(t,b3); });
+  const b3=el('button',{class:'btn sm',type:'button'},'Copy my additions for Claude'); b3.addEventListener('click',()=>{ const t=JSON.stringify({added:U.custom,movedPins:U.moved,notes:U.notes,progress:U.status,visits:visitExport(),spots:spotExport(),legos:legoExport()},null,1); out.value=t; copy(t,b3); });
   const inp=el('textarea',{id:'bk-in',placeholder:'Paste a backup here',style:'min-height:60px;font-family:var(--fm);font-size:11.5px'});
   const msg=el('span',{class:'note-saved'});
   const load=txt=>{ try{ const j=JSON.parse(txt); if(!j||typeof j!=='object'||!('status' in j)) throw 0; U=Object.assign(U0(),j); U.ui=Object.assign(U0().ui,j.ui||{}); if(!LD[U.ui.base]) U.ui.base='streets'; if(!U.me) U.me={}; aliasMigrate(); save(); applyTheme(); drawScale(); pushPrefs(); buildHome(); drawHome(); refresh(); msg.textContent='Restored.'; }catch(e){ msg.textContent='That does not look like an Atlas backup.'; } };
@@ -3170,7 +3200,7 @@ function goSync(v,auto){ const g=$('#goto'); goSeq++; const c=readCoords(v);
   if(/^https?:\/\//i.test(v)){ g.hidden=false; g.replaceChildren(el('p',{class:'gonote',text:'That link carries no coordinates. In Google Maps, press and hold the spot, copy the two numbers it shows, and paste them here.'})); return true; }
   if(v.length<3){ g.hidden=true; g.replaceChildren(); return false; }
   g.hidden=false; g.replaceChildren(goRow('Find <b>'+esc(v)+'</b> on the map: street, town or address',()=>goLook(v))); return false; }
-try{ window.__atlasGo={read:readCoords,brick:brickWords}; }catch(e){}
+try{ window.__atlasGo={read:readCoords,brick:brickWords,lego:legoWords}; window.__atlasLegoExport=legoExport; }catch(e){}
 try{ window.__atlasSet=(k,v)=>setPref(k,v); }catch(e){}      /* for the tests: a setting changed as the Settings sheet changes it */
 $('#q').addEventListener('input',debounce(e=>{ const v=e.target.value.trim(), spot=goSync(v,true); F.q=spot?'':v; renderList(); syncMarkers(); syncFcount(); },150));
 $('#q').addEventListener('keydown',e=>{ if(e.key!=='Enter') return; const v=e.target.value.trim(), c=readCoords(v); if(c) goTo(c.lat,c.lon,ll(c)); else if(v.length>=3&&!/^https?:\/\//i.test(v)) goLook(v); });

@@ -481,6 +481,20 @@ const { chromium } = require('playwright');
       ok('brick: buff, dark, glazed and painted brick are named, and are not red brick',await W({bk:'n',bc:'b'})==='Buff or yellow brick'&&await W({bk:'n',bc:'d'})==='Dark brick'&&await W({bk:'n',bc:'g'})==='Glazed brick'&&await W({bk:'n',bc:'p'})==='Painted brick',await W({bk:'n',bc:'b'}));
       ok('brick: no brick at all, or not looked at, says nothing',await W({bk:'n',bc:'x'})===''&&await W({bk:'n'})===''&&await W({})==='');
       ok('brick: fire brick is added when a source says so',await W({bk:'n',bc:'b',fb:1})==='Buff or yellow brick · Fire brick'&&await W({bk:'n',fb:1})==='Fire brick',await W({bk:'n',bc:'b',fb:1})); }
+    // ---- "Legos" (November 27, 2026): the peg blocks under the eaves (mutules, guttae) and the grooved blocks (triglyphs)
+    { const W=o=>p.evaluate(o=>window.__atlasGo.lego(o),o);
+      ok('legos: pegs, holes and a yes of unseen kind are named in the owner\'s word with the proper one after it',await W({lg:'p'})==='Legos (mutules with pegs)'&&await W({lg:'h'})==='Legos with holes (mutules)'&&await W({lg:'y'})==='Legos (mutules)',await W({lg:'h'}));
+      ok('legos: triglyphs are added, or stand alone',await W({lg:'p',tg:1})==='Legos (mutules with pegs) · Triglyphs'&&await W({tg:1})==='Triglyphs');
+      ok('legos: none, or not looked at, says nothing',await W({lg:'n'})===''&&await W({})==='');
+      await p.fill('#q',''); await p.waitForTimeout(400);      // the check before this one leaves words in the search box
+      const want=await p.evaluate(()=>JSON.parse(document.getElementById('d-sites').textContent).sites.filter(x=>x.lg==='p'||x.lg==='h'||x.lg==='y'||x.tg).length);
+      await p.evaluate(()=>{ const f=document.querySelector('#filters'); if(f&&!f.open) document.querySelector('#filt-btn').click(); }); await p.waitForTimeout(200);
+      const chip=await p.evaluate(()=>{ const c=[...document.querySelectorAll('#filters .chip')].find(b=>/^Legos/.test(b.textContent)); if(!c) return null; const all=[...c.parentNode.children].map(x=>x.textContent); c.click(); return {after:all[all.indexOf(c.textContent)-1]}; }); await p.waitForTimeout(350);
+      const got=await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0]);
+      ok('legos: the filter sits beside Red brick under "Only show" and lists the places marked, and only those',!!chip&&/Red brick/.test(chip.after)&&want>=3&&got===want,JSON.stringify(chip)+' '+got+' listed, '+want+' marked');
+      ok('legos: it is not one more shortcut in the row of five',await p.evaluate(()=>document.querySelectorAll('#presets .chip').length)===5);
+      await p.fill('#q','mutules'); await p.waitForTimeout(400);
+      ok('legos: the proper name finds them in the search box too',await p.evaluate(()=>+document.querySelector('#count').textContent.split(' ')[0])>=1); await p.fill('#q',''); }
     ok('go to: no script errors',errs.length===0,errs.join(' | ').slice(0,200)); await c.close(); }
   await b.close(); console.log(fails.length?('\n'+fails.length+' FAILED'):'\nplaces header test passed'); process.exit(fails.length?1:0);
 })();
