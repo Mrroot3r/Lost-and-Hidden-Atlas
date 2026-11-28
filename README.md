@@ -12,7 +12,7 @@ It is free and there is no account. Notes, favourites, trips and field logs stay
 
 <table>
 <tr>
-<td width="33%" valign="top"><a href="docs/features/01-map.jpg"><img src="docs/features/01-map.jpg" width="250" alt="The whole map"></a><br><b>The whole map</b><br>More than 9,600 old places across the United States and Canada. Zoomed out, numbered bubbles count them, or a heat map shows where they are thick: blue for a few, red for many. The picture shows half of each; you choose under the gear.</td>
+<td width="33%" valign="top"><a href="docs/features/01-map.jpg"><img src="docs/features/01-map.jpg" width="250" alt="The whole map"></a><br><b>The whole map</b><br>More than 9,700 old places across the United States and Canada. Zoomed out, numbered bubbles count them, or a heat map shows where they are thick: blue for a few, red for many. The picture shows half of each; you choose under the gear.</td>
 <td width="33%" valign="top"><a href="docs/features/02-place.jpg"><img src="docs/features/02-place.jpg" width="250" alt="A page for every place"></a><br><b>A page for every place</b><br>What was there, what is left to see, a photo, and the old survey map laid over the spot.</td>
 <td width="33%" valign="top"><a href="docs/features/03-access.jpg"><img src="docs/features/03-access.jpg" width="250" alt="How to get there, legally"></a><br><b>How to get there, legally</b><br>Whose land it is, how far the walk is, directions, and a way to look up the owner. Nothing about getting past a fence.</td>
 </tr>
