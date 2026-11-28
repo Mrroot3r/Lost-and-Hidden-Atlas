@@ -84,6 +84,10 @@ Notes, progress, field logs and added places are saved in the visitor's own brow
 
 New places, corrected pins and field reports are welcome. **You do not need to know GitHub:** in the Atlas, "I was here" on a place page and "+ Add" each end in a "Send to the public Atlas" button, and the [Suggest a place](https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new?template=lead.yml) and [Report a visit](https://github.com/Mrroot3r/Lost-and-Hidden-Atlas/issues/new?template=visit.yml) forms do the same from here. A name and a spot are enough; what you send is checked before the map changes, and it is public. `GUIDE.md` explains the place format and the research rules that keep the map trustworthy. Changes come in as pull requests; nothing is pushed straight to `main`, because merging publishes the site.
 
+## Licence
+
+The Atlas's own work (the places, their write-ups and pins, the notes and the code) is free to use and build on with credit: CC BY 4.0. Photographs and the layers that come from other sources keep their own terms. See [LICENSE.md](LICENSE.md).
+
 ## Data credits
 
 Imagery: New York State ITS Geospatial Services, MassGIS, Vermont Center for Geographic Information, RIGIS and the URI Environmental Data Center, New Jersey Office of GIS, CT ECO (University of Connecticut), NH GRANIT (University of New Hampshire), Pennsylvania Emergency Management Agency through PASDA, Maine GeoLibrary, Kansas NG911 through the Kansas Geological Survey, USGS (including the 3DEP elevation service), Esri.
