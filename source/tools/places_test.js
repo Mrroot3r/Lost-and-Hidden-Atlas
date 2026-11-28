@@ -124,6 +124,19 @@ const { chromium } = require('playwright');
     await p.click('#d-fav'); await p.waitForTimeout(500); bt=await btn();
     ok('tapped, it is a full heart and says how to undo it',!!bt&&bt.t==='♥'&&bt.p==='true'&&bt.l==='Remove from my favourites',JSON.stringify(bt));
     await p.click('#mapback'); await p.waitForTimeout(400);     // Back, which floats on the map
+    // Back goes back to where the place was opened from: the Near tab or the Trip tab, not always the Places list (November 28, 2026:
+    // the button used to say "All places"; now that it says "Back" it has to mean it)
+    { const from=async tab=>{ await p.evaluate(tab=>document.querySelector('#tab-'+tab).click(),tab); await p.waitForTimeout(300); await p.evaluate(id=>{ location.hash='#'+id; },two[1].id); await p.waitForTimeout(700); const open=await p.evaluate(()=>!document.querySelector('#v-detail').hidden); await p.click('#mapback'); await p.waitForTimeout(400);
+        return {open,views:await p.evaluate(()=>[...document.querySelectorAll('.view')].filter(v=>!v.hidden).map(v=>v.id).join()),tab:await p.evaluate(()=>document.querySelector('.tabs [aria-selected=true]').id),hash:await p.evaluate(()=>location.hash)}; };
+      const n=await from('near'), t=await from('trip'), l=await from('list');
+      ok('Back from a place opened on the Near tab goes back to Near, and from the Trip tab to Trip',n.open&&n.views==='v-near'&&n.tab==='tab-near'&&t.open&&t.views==='v-trip'&&t.tab==='tab-trip',JSON.stringify([n,t]));
+      ok('Back from a place opened on the Places tab is the list, as before, and the place is closed',l.open&&l.views==='v-list'&&l.tab==='tab-list'&&l.hash.length<=1&&n.hash.length<=1,JSON.stringify(l)); }
+    // The search box, typed on a phone: the curly apostrophe a phone keyboard puts in, a straight one, or none, and "St" with or without
+    // its full stop, all find the same places (November 28, 2026: "Chancellor’s Hall" found nothing, with the hall in the write-up)
+    { const find=async q=>{ await p.fill('#q',q); await p.waitForTimeout(450); return p.evaluate(()=>[...document.querySelectorAll('#list li')].slice(0,40).map(l=>l.innerText.split('\n')[0])); };
+      const a=await find("St. Peter's Church"), b=await find('St. Peter\u2019s Church'), c=await find('St Peters Church'), d=await find('Chancellor\u2019s Hall'), e=await find('U.S. Post Office'), f=await find('US Post Office'); await p.fill('#q',''); await p.waitForTimeout(450);
+      ok('search: the same places whichever apostrophe is typed, or none, and with or without the full stop',a.length>3&&JSON.stringify(a)===JSON.stringify(b)&&JSON.stringify(a)===JSON.stringify(c)&&e.length>3&&JSON.stringify(e)===JSON.stringify(f),JSON.stringify([a.length,b.length,c.length,e.length,f.length]));
+      ok('search: words from a write-up are found though the reader adds an apostrophe the write-up does not have',d.indexOf('New York State Education Building')>=0,JSON.stringify(d.slice(0,3))); }
     await p.evaluate(x=>window.__atlasMap.setView([x.lat,x.lon],9,{animate:false}),two[0]); v=await seen();
     ok('zoomed out again, the favourite has its own pin, ringed; its neighbour is still in the disc',!!v.a&&v.a.fav&&!v.b&&v.discs>0&&v.favs===1,JSON.stringify(v));
     // while the numbered discs are showing, a favourite is a small mark beside a disc, never on top of its number (the owner, November 21, 2026)

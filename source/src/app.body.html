@@ -42,7 +42,7 @@
         <div id="yrs" hidden></div>
       </div>
       <div class="pad" id="linechip" hidden style="padding-bottom:6px"></div>
-      <ul id="list"></ul>
+      <ul id="list"><li class="empty pad">Loading the places…</li></ul>
     </section>
 
     <section class="view" id="v-detail" hidden></section>
@@ -55,6 +55,7 @@
   <main id="stage">
     <button id="mapback" class="btn sm" type="button" hidden aria-label="Back to all places" title="All places">← Back</button>
     <div id="map" role="application" aria-label="Map of sites"></div>
+    <div id="loadnote" class="float" role="status">Loading the map and its places…<small>The first visit takes the longest.</small></div>   <!-- shown until app.js starts: the page is some megabytes and used to sit blank on a slow connection -->
     <div id="readout" class="float mono" hidden></div>
     <div id="lbar" role="toolbar" aria-label="Map layers and tools"><div class="lscroll" id="lscroll"></div><div class="lfix" id="lfix"></div></div>
     <div id="swipe" hidden><span class="side l" id="swipe-l"></span><span class="side r" id="swipe-r"></span><div class="grip" role="slider" aria-label="Compare divider" tabindex="0">&lt;&gt;</div></div>

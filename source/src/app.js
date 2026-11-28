@@ -208,7 +208,9 @@ const F={fav:false,line:null,arch:'',says:'',stone:false,q:'',cat:new Set(),st:n
 /* Searching. Each place's words are gathered once, lower-cased and with accents removed: its names, its town, and the
    rest (years, kind, what is left, region, the texts, the access note, series tags). Every word typed must be found
    somewhere. In the list, places with all the words in their name come first, then name or town, then the rest. */
-const HAY=new Map(), fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+/* what the search box compares: lower case, accents off, apostrophes of every kind out (a phone types \u2019, a write-up may have ' or none:
+   "St. Peter\u2019s", "St Peters" and "Chancellors" must all meet), and the full stop after a letter out ("St." is "St", "U.S." is "US"; 1.5 stays) */
+const HAY=new Map(), fold=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/['\u2018\u2019\u02bc\u2032`]/g,'').replace(/([a-z])\.(?![0-9])/g,'$1');
 /* What a place says of its brick. bk: red brick y (the main thing), s (some), n (none). bc: the brick's own colour, r red, b buff or
    yellow, d dark, g glazed, p painted, m red with another, x no brick at all. fb: a source says fire brick is there. Painted brick is
    never red brick (tools/brickrule.py holds the rules). The Red brick filter still goes by bk alone. */
@@ -443,7 +445,8 @@ function renderList(){
 let clusLayer=null;
 let map=null, sel=null, markers=new Map(), baseLayer=null, cmpLayer=null, histLayer=null, selShapes=[], homeMarker=null, schematic=false, adding=false, pickingHome=false;
 const stage=$('#stage');
-{ const mb=$('#mapback'); if(mb) mb.addEventListener('click',()=>deselect()); }      /* Back, floating on the map while a place is open */
+{ const n=$('#loadnote'); if(n) n.remove(); }      /* the words the page shows while it is still arriving (app.body.html); this script running means it has */
+{ const mb=$('#mapback'); if(mb) mb.addEventListener('click',()=>backFromPlace()); }      /* Back, floating on the map while a place is open */
 const W=20037508.342789244;
 let FnLayer=null;
 const YEARS=['Latest','2025','2024','2023','2022','2021','2020','2018','2017','2016','2015','2014','2013','2012','2011','2010','2009','2008','2007','2006','2005','2004','2003','2002','2001','2000','napp'];
@@ -833,7 +836,10 @@ function setupSplit(){
     const H=app.getBoundingClientRect().height; U.ui.split=splitClamp((st.h0+dy)/H,H); splitApply(); e.preventDefault();
     if(!st.raf){ const s0=st; s0.raf=requestAnimationFrame(()=>{ s0.raf=0; if(map) map.invalidateSize({pan:false}); }); } });
   const end=e=>{ if(!st||e.pointerId!==st.id) return; const was=st.on; st=null; bar.classList.remove('dragging'); if(!was) return;
-    quiet=Date.now()+400; save(); if(map) map.invalidateSize({pan:false}); };
+    quiet=Date.now()+400; save(); if(map){ map.invalidateSize({pan:false});
+      /* a place is open and the drag left its pin under the bar or at the map's edge: bring it back to the middle. A pin still well inside is left alone. */
+      if(view==='detail'&&sel){ const q=pos(sel), pt=map.latLngToContainerPoint([q.lat,q.lon]), z=map.getSize(), my=Math.min(45,z.y/4), mx=30;
+        if(pt.y<my||pt.y>z.y-my||pt.x<mx||pt.x>z.x-mx) map.panTo([q.lat,q.lon],{animate:true,duration:0.3}); } } };
   window.addEventListener('pointerup',end); window.addEventListener('pointercancel',end);
   bar.addEventListener('click',e=>{ if(Date.now()<quiet){ e.stopPropagation(); e.preventDefault(); } },true);      /* letting go over a button after a drag is not a tap on it */
 }
@@ -2446,7 +2452,7 @@ function onContext(e){
 }
 
 /* ---------- views ---------- */
-let view='list';
+let view='list', cameFrom='list';
 function showView(v){ view=v; { const mb=$('#mapback'); if(mb) mb.hidden=v!=='detail'; } if(v!=='detail') dropFormPin(); if(v==='list'&&listFrom!==nearFrom()){ if(F.max) refresh(); else renderList(); }      /* the position changed while another tab was open */
   ['list','detail','trip','log','guide','near'].forEach(k=>{ $('#v-'+k).hidden=(k!==v); });
   $('#tab-list').setAttribute('aria-selected',String(v==='list'||v==='detail')); $('#tab-trip').setAttribute('aria-selected',String(v==='trip')); $('#tab-guide').setAttribute('aria-selected',String(v==='guide')); $('#tab-log').setAttribute('aria-selected',String(v==='log')); $('#tab-near').setAttribute('aria-selected',String(v==='near'));
@@ -2454,12 +2460,15 @@ function showView(v){ view=v; { const mb=$('#mapback'); if(mb) mb.hidden=v!=='de
   if(v==='trip') renderTrip(); if(v==='guide') renderGuide(); if(v==='log') renderLog(); }
 function refresh(){ buildFilters(); renderList(); spotCard(); syncMarkers(); $('#trip-n').textContent=U.trip.length; if(view==='trip') renderTrip(); }
 function select(s,fly){
+  if(view!=='detail') cameFrom=view;      /* Back goes back there (backFromPlace) */
   dropFormPin(); sel=s; renderDetail(s); showView('detail'); syncMarkers(); drawSel(); showHist();
   document.querySelectorAll('#list .item.cur').forEach(n=>n.classList.remove('cur'));
   if(map&&fly!==null){ const p=pos(s), z=Math.max(map.getZoom(),s.prec==='area'?14:15); if(fly) map.flyTo([p.lat,p.lon],z,{duration:0.8}); else map.panTo([p.lat,p.lon]); }
   try{ history.replaceState(null,'','#'+s.id); }catch(e){ try{ location.hash=s.id; }catch(x){} }
 }
-function deselect(){ sel=null; drawSel(); showHist(); syncMarkers(); showView('list'); renderList(); try{ history.replaceState(null,'','#'); }catch(e){} }
+/* Back on a place page: to the Near or Trip tab when the place was opened from there, otherwise to the Places list */
+function backFromPlace(){ const to=cameFrom; deselect(); if(to==='near'||to==='trip') showView(to); }
+function deselect(){ cameFrom='list'; sel=null; drawSel(); showHist(); syncMarkers(); showView('list'); renderList(); try{ history.replaceState(null,'','#'); }catch(e){} }
 
 /* ---- a photo at the top of a place page ----
    Taken when the page opens from the place's Wikipedia article: the picture Wikipedia itself chose for the article
@@ -2573,7 +2582,15 @@ function photoBox(s){ if(!pref('wikiPhotos')||s.mine||navigator.onLine===false) 
    Staten Island Light with Ambrose Channel Range Light beneath; "First Presbyterian Church, Cherry Valley" likewise; brackets in the
    middle of a name ("La Grange M-K-T (Katy) Depot") are left alone. Only how the head is drawn: the name itself is not changed. */
 function nameParts(n){ n=String(n||''); let m=n.match(/^(.{3,}?)\s*\(([^()]+)\)\s*(?:,\s*(.+))?$/); if(m) return [m[1].trim(),m[2].trim()+(m[3]?', '+m[3].trim():'')];
-  m=n.match(/^([^(),:]{3,}?)\s*[:,]\s+(.+)$/); return m?[m[1].trim(),m[2].trim()]:[n,'']; }
+  m=n.match(/^([^(),:]{3,}?)\s*([:,])\s+(.+)$/); if(!m) return [n,'']; if(m[2]===':') return [m[1].trim(),m[3].trim()];
+  /* a comma may be the first comma of a list or of a railroad's name ("Delaware, Lackawanna & Western station, Binghamton", "Webb, Deane and
+     Stevens houses"): the name is then cut after the list, or not at all. A street corner ("18th and Vine", "Broadway and Church Street")
+     and "now …", "the …", "near …" are not a list. */
+  const seg=n.split(/,\s+/), a=seg[0].trim(), b=(seg[1]||'').trim(), ox=/^(and|&)\s/i.test(seg[2]||'');
+  const aside=/^(now|near|the|an?|formerly|later|once|under|at|on|in|by|off|opposite|with|\d+(st|nd|rd|th))\b/i.test(b)||/\b(Streets?|Avenues?|Roads?|Boulevard|Parkway)$/.test(b);
+  const list=ox||(/\s(and|&)\s/.test(b)&&!aside)||(!/\s/.test(a)&&/^[A-Z]/.test(b));
+  if(!list) return [a,seg.slice(1).join(', ').trim()];
+  const rest=ox?'':seg.slice(2).join(', ').trim(); return rest?[a+', '+b,rest]:[n,'']; }
 function nameFit(){ const v=$('#v-detail'), h=v&&v.querySelector('.dhead h2'), d=v&&v.querySelector('.dhead .dsub'), intro=v&&v.querySelector('.dintro'); if(!h||!intro) return;
   const cut=h.scrollHeight>h.clientHeight+2||(!!d&&d.scrollHeight>d.clientHeight+2), old=intro.querySelector('.fullname');
   if(cut&&!old) intro.prepend(el('p',{class:'fullname',text:h.dataset.full||h.textContent})); else if(!cut&&old) old.remove(); }
@@ -2657,7 +2674,7 @@ function renderDetail(s){
     el('div',{class:'row',style:'margin-top:8px'},ext(gd,'Directions in Google Maps','btn pri'),ext('https://www.google.com/maps/search/?api=1&query='+dst.lat+','+dst.lon,s.th?'Parking in Google Maps':'Open pin: hours, photos','btn'))));
   /* whose land */
   { const who=el('div',{class:'who'}), moved=!!U.moved[s.id];
-    const line=s.mine||moved?'Check the spot before you go.':s.pl?'The pin falls on '+s.pl[0]+(s.pl[1]?' ('+s.pl[1]+')':'')+', mapped as "'+(PADC[s.pl[2]]||PADC.UK)[0].toLowerCase()+'."':'The pin is not on mapped public land, so treat it as private until you have checked.';
+    const line=s.mine||moved?'Check the spot before you go.':s.pl?'The pin falls on '+s.pl[0]+(s.pl[1]?' ('+s.pl[1]+')':'')+', mapped as "'+(PADC[s.pl[2]]||PADC.UK)[0].toLowerCase()+'."':(s.acc==='open'?'This place takes visitors: see Access above. The pin is not on mapped public land, so keep to where visitors are let in.':'The pin is not on mapped public land, so treat it as private until you have checked.');
     v.append(el('div',{class:'sec pad'},el('h3',{text:'Whose land is it?'}),
       el('p',{style:'font-size:12.5px;color:var(--mute)',text:line+(s.prec==='area'?' This pin is approximate, so look up the actual spot on the map too.':'')}),
       schematic?null:el('div',{class:'row'},el('button',{class:'btn sm',type:'button',onclick:()=>lookup(p,who)},'Look up the owner at the pin')),who,letterBox(s))); }
@@ -3277,7 +3294,7 @@ $('#rec-form').addEventListener('submit',e=>{ e.preventDefault(); addNote($('#re
 { const b=$('#rec-stop'); let armed=false; b.addEventListener('click',()=>{ if(!armed){ armed=true; b.textContent='Tap again to stop'; setTimeout(()=>{ armed=false; b.textContent='Stop'; },3500); return; } armed=false; b.textContent='Stop'; stopLog(); }); }
 $('#add-cancel').addEventListener('click',()=>{ adding=false; spotting=false; pickingHome=false; asking=false; stage.classList.remove('adding'); $('#addbar').hidden=true; addBar(); syncBar(); });
 $('#sheet-x').addEventListener('click',closeSheet); $('#sheet-set').addEventListener('click',()=>showSettings(sheetMode!=='set')); $('#scrim').addEventListener('click',closeSheet);
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('#sheet').hidden){ closeSheet(); } else if(adding||spotting||pickingHome||asking){ $('#add-cancel').click(); } else if(view==='detail'&&sel&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))) deselect(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(!$('#sheet').hidden){ closeSheet(); } else if(adding||spotting||pickingHome||asking){ $('#add-cancel').click(); } else if(view==='detail'&&sel&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target.tagName||''))) backFromPlace(); } });
 if(window.matchMedia('(min-width:821px)').matches) $('#filters').open=false;
 
 buildHome(); buildFilters(); renderList(); $('#trip-n').textContent=U.trip.length;
@@ -3294,7 +3311,7 @@ window.atlasBack=()=>{
   if(!$('#rec-form').hidden){ $('#rec-form').hidden=true; return true; }
   if(map&&map._popup&&map._popup.isOpen&&map._popup.isOpen()){ map.closePopup(); return true; }
   if($('#app').classList.contains('mapbig')){ $('#app').classList.remove('mapbig'); buildBar(); setTimeout(()=>map&&map.invalidateSize(),60); return true; }
-  if(view==='detail'&&sel){ deselect(); return true; }
+  if(view==='detail'&&sel){ backFromPlace(); return true; }
   if(view==='near'&&NM.goal){ nmGoal(null); return true; }
   if(view!=='list'){ showView(sel?'detail':'list'); return true; }
   return false; };
