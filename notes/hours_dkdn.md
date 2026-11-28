@@ -6,7 +6,7 @@ places: 0
 file: hours_dkdn.py
 
 ## What this batch is
-An "hours" session (PROMPTS.md type 7): no new places and no pins. When it began, 40 places of worship waited anywhere (none in New York). All 40 were looked up: 3 got times from the page of whoever runs them, 2 more were settled from a church or venue page, and 35 are recorded `?`. With no church left waiting, the session turned to New York's other open places (libraries, museums, a music hall): 18 got hours. 57 entries in all: 22 with hours, 35 `?`.
+An "hours" session (PROMPTS.md type 7): no new places and no pins. When it began, 40 places of worship waited anywhere (none in New York). All 40 were looked up: 3 got times or an entry arrangement from the page of whoever runs them, and 37 are recorded `?`. With no church left waiting, the session turned to New York's other open places (libraries, museums, a music hall): 17 got hours. 57 entries in all: 20 with hours, 37 `?`.
 
 Hours recorded (address or town on each page checked against the place):
 - Notre Dame d'Auvergne, Ponteix: Archdiocese of Regina parish page (Ponteix Masses on a monthly rota). Open.
