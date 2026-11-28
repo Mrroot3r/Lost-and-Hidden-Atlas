@@ -61,7 +61,7 @@ N('wyoming-state-capitol-cheyenne','Wyoming State Capitol','Cheyenne','wy','civi
   'A territorial-era capitol with a golden dome, open to walk through.',
   'State building at 200 West 24th Street, Cheyenne. The state\'s visit page, as a search result quoted it, gives 8 a.m. to 5 p.m. Monday to Friday, closed Saturday, Sunday and state holidays; a Capitol Square page gives longer summer hours. No admission fee. Street parking.',
   [W('Wyoming State Capitol'),L('State of Wyoming: visit the Capitol','https://ai.wyo.gov/about-us/visit-the-capitol')],
-  brick='no',hours='Monday to Friday 8 a.m. to 5 p.m.; closed state holidays (longer in summer, not checked)'),
+  brick='no',hours='Monday to Friday 8 a.m. to 5 p.m.; closed state holidays (longer in summer, not checked)',was='wyoming-state-capitol'),
 ]
 PIN_NOTES={
 'mountain-view-hotel-centennial':'Wikipedia and Register coordinate; checked on the aerial.',

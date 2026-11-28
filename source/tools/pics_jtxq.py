@@ -8,7 +8,6 @@ PICS={
  'bloomingburg-reformed-dutch-church':('https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Bloomingburg_Reformed_Dutch_Church.jpg/960px-Bloomingburg_Reformed_Dutch_Church.jpg', 900, 917, 'Daniel Case', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Bloomingburg_Reformed_Dutch_Church.jpg', '2026-11-22', 'pin+name'),
  'church-of-rockwell-falls-lake-luzerne':('', '2026-11-22', 'two document scans of a street sprinkler letter, not the church', 2),
  'dellemont-wemple-farm-rotterdam':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
- 'feeder-five-combines':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
  'fort-banks':('https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Fort_Banks_Mortar_Battery_Winthrop_MA_01.jpg/960px-Fort_Banks_Mortar_Battery_Winthrop_MA_01.jpg', 900, 659, 'Jameslwoodward', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Fort_Banks_Mortar_Battery_Winthrop_MA_01.jpg', '2026-11-22', 'pin+name'),
  'fort-ellice-site':('', '2026-11-22', '1 a plaque close-up, not the site; 2 a portrait of a person', 2),
  'hampton-lighthouse-ns':('https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Hampton_Lighthouse.jpg/960px-Hampton_Lighthouse.jpg', 900, 602, 'Dennis G. Jarvis', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Hampton_Lighthouse.jpg', '2026-11-22', 'pin+name'),

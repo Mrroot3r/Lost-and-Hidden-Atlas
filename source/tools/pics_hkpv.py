@@ -17,7 +17,6 @@ PICS={
  'lime-rock-kilns':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
  'manoir-mauvide-genest-io':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Manoir_Mauvide-Genest_%281%29.JPG/960px-Manoir_Mauvide-Genest_%281%29.JPG', 900, 675, 'Huguette Dion', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Manoir_Mauvide-Genest_(1).JPG', '2026-11-22', 'pin+name'),
  'old-yankton-bridge-sioux-falls':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
- 'scott-ice-house':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),
  'tremper-house':('', '2026-11-22', 'Railway museum, station and rolling stock 14-32 m off, a Quonset garage and a 2023 street view; nothing of the 1879 resort or its terrace (burned 1908)', 2),
  'tunstall-store-lincoln-nm':('https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Tunstall-McSween_Store_in_Lincoln%2C_New_Mexico.JPG/960px-Tunstall-McSween_Store_in_Lincoln%2C_New_Mexico.JPG', 900, 343, 'Daniel Mayer', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Tunstall-McSween_Store_in_Lincoln,_New_Mexico.JPG', '2026-11-22', 'name'),
  'van-vleeck-house-lansingburgh':('', '2026-11-22', 'nothing on Commons near the pin, under its names or in a category of its own', 2),

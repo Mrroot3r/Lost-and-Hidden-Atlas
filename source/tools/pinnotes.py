@@ -3,7 +3,6 @@ PN={
 'trolley-bridge-piers':'Piers show on the leaf-off aerial in a line at about -73.8994, roughly half a mile upstream of the Route 146 bridge. The 1930 map shows the trolley crossing here.',
 'overlook-mountain-house':'The roofless concrete shell is plainly visible on the leaf-off aerial at this spot, beside the carriage road.',
 'hotel-kaaterskill':'The 1903 map draws the hotel here. Today it is a clearing with a small pond; LiDAR shows low platforms and a long wall line just northwest.',
-'scott-ice-house':'The ice house\'s big rectangular platform shows on LiDAR at the river\'s edge, matching the marker location.',
 'lock-23':'The lock chamber shows on LiDAR just south of where the trail crosses.',
 'waterford-side-cut':'Three old lock chambers in a row are visible on the aerial, immediately south of Barge Canal Lock 2.',
 'schoharie-crossing':'The surviving arches are visible on the aerial crossing Schoharie Creek at this point.',

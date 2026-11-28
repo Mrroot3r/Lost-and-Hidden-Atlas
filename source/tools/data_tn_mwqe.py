@@ -81,13 +81,6 @@ N('beersheba-springs-resort', 'Beersheba Springs resort', 'Beersheba Springs', '
   'The grounds are in use for church assemblies, camps and an arts and crafts festival; they are not shown to be open at set times, so look from the public road and ask before going in. The pin marks the town\'s historic area, not one building.',
   [W('Beersheba Springs, Tennessee')],
   conf='mixed', brick='?'),
-N('elkmont-historic-district', 'Elkmont Historic District', 'Gatlinburg', 'tn', 'town', 'standing', 35.65556, -83.58444, 'area', 'public', 'walk', '', '1908–1930s',
-  'A logging town founded by the Little River Lumber Company in 1908 became a mountain resort for wealthy Knoxville families, with the Appalachian Club and the Wonderland Club and a hotel opened in 1912. Cottage owners kept lifetime leases when the national park was made in the 1930s, but the Park Service let them lapse in 1992. The Wonderland Hotel collapsed in 2005. In 2009 the Park Service decided to restore the Appalachian Clubhouse and 18 cottages and outbuildings, mostly in the Appalachian Club\'s Daisy Town, and to remove the rest.',
-  'Restored rustic cottages in the Appalachian Club area, and chimneys where the other buildings were removed in 2018. Two pioneer cabins, the Avent cabin (about 1850) and the Levi Trentham cabin (about 1830), also remain. Inside the cottages was not checked.',
-  'A vanished mountain resort whose rich cottage owners helped start the national park.',
-  'Inside Great Smoky Mountains National Park. The park\'s own page for Elkmont (read for this entry) was not found, so access, hours and parking are not checked. The pin marks the district as a whole.',
-  [W('Elkmont, Tennessee')],
-  conf='mixed', brick='?'),
 ]
 
 PIN_NOTES = {
@@ -101,5 +94,4 @@ PIN_NOTES = {
 'ryman-auditorium-nashville': 'Wikipedia coordinates for the auditorium.',
 'tipton-haynes-johnson-city': 'Address lookup (2620 South Roan Street).',
 'beersheba-springs-resort': 'Wikipedia coordinates for the town, taken as the middle of the old resort area.',
-'elkmont-historic-district': 'Wikipedia coordinates for Elkmont, taken as the middle of the historic district.',
 }
