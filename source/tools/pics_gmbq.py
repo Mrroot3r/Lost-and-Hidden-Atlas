@@ -1,0 +1,11 @@
+# Pictures found on Wikimedia Commons near a place's pin, chosen by looking (tools/photo_find.py). Data only.
+# id: (picture address, width, height, photographer, licence, the file's page on Commons, day chosen, how it was found)   or   ('', day, why none fits, which search)
+PICS={
+ 'backhouse-grist-mill-port-rowan':('https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/Backhouse_Grist_Mill_NHS.jpg/960px-Backhouse_Grist_Mill_NHS.jpg', 900, 653, 'Yoho2001', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Backhouse_Grist_Mill_NHS.jpg', '2026-11-28', 'name'),
+ 'barnum-house-grafton':('https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Grafton_Ontario%2C_Barnum_House%2C_1819.jpg/960px-Grafton_Ontario%2C_Barnum_House%2C_1819.jpg', 900, 675, 'Drenowe', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Grafton_Ontario,_Barnum_House,_1819.jpg', '2026-11-28', 'pin+name'),
+ 'bois-blanc-lighthouse-amherstburg':('https://thumb.wikimedia.org/wikipedia/commons/thumb/a/aa/Bois_Bland_Island_Lighthouse.jpg/960px-Bois_Bland_Island_Lighthouse.jpg', 900, 675, 'Yoho2001', 'CC BY-SA 3.0', 'https://commons.wikimedia.org/wiki/File:Bois_Bland_Island_Lighthouse.jpg', '2026-11-28', 'category'),
+ 'lansdowne-iron-works-lyndhurst':('', '2026-11-28', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'normandale-furnace-site':('', '2026-11-28', 'nothing on Commons near the pin, under its names or in a category of its own', 3),
+ 'rosamond-woollen-mill-almonte':('https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Site_of_the_Rosamond_Woolen_Company_%2841163357165%29.jpg/960px-Site_of_the_Rosamond_Woolen_Company_%2841163357165%29.jpg', 900, 675, 'Ross Dunn: Thanks -10million views!', 'CC BY-SA 2.0', 'https://commons.wikimedia.org/wiki/File:Site_of_the_Rosamond_Woolen_Company_(41163357165).jpg', '2026-11-28', 'pin+name'),
+ 'st-raphaels-ruins-glengarry':('https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Ruin_of_St._Raphael%27s_Roman_Catholic_Church_-_St._Raphael%2C_ON.jpg/960px-Ruin_of_St._Raphael%27s_Roman_Catholic_Church_-_St._Raphael%2C_ON.jpg', 900, 505, 'JFVoll', 'CC BY-SA 4.0', 'https://commons.wikimedia.org/wiki/File:Ruin_of_St._Raphael%27s_Roman_Catholic_Church_-_St._Raphael,_ON.jpg', '2026-11-28', 'pin+name'),
+}
